@@ -1,4 +1,4 @@
-package com.example
+package se.skoview
 
 import pl.treksoft.kvision.Application
 import pl.treksoft.kvision.html.div
@@ -24,7 +24,7 @@ class App : Application() {
             )
 
         root("kvapp") {
-            div(tr("This is a localized message."))
+            div(tr("This is a localized message!"))
             // TODO
         }
     }

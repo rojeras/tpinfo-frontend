@@ -73,7 +73,7 @@ kotlinFrontend {
     webpackBundle {
         bundleName = "main"
         sourceMapEnabled = false
-        port = 3000
+        port = 2000
         proxyUrl = "http://localhost:8080"
         contentPath = webDir
         mode = if (isProductionBuild) "production" else "development"

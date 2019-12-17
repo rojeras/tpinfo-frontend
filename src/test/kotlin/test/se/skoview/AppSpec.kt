@@ -1,4 +1,4 @@
-package test.com.example
+package test.se.skoview
 
 import pl.treksoft.kvision.test.SimpleSpec
 import kotlin.test.Test
