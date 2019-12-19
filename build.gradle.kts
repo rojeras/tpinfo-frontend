@@ -59,6 +59,7 @@ dependencies {
     implementation("pl.treksoft:kvision-tabulator:$kvisionVersion")
     implementation("pl.treksoft:kvision-pace:$kvisionVersion")
     implementation("pl.treksoft:kvision-moment:$kvisionVersion")
+    implementation("pl.treksoft:kvision-redux:$kvisionVersion")
     testImplementation(kotlin("test-js"))
     testImplementation("pl.treksoft:kvision-testutils:$kvisionVersion:tests")
 }
