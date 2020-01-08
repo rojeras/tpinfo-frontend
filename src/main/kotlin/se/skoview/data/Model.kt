@@ -1,13 +1,11 @@
 package se.skoview.data
 
-import kotlinx.serialization.Optional
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonConfiguration
 import kotlinx.serialization.list
 import pl.treksoft.kvision.redux.ActionCreator
 import pl.treksoft.kvision.redux.RAction
-import pl.treksoft.kvision.rest.RestClient
 import se.skoview.data.ServiceComponent.Companion.isLoaded
 import se.skoview.lib.getAsyncTpDb
 
@@ -39,7 +37,7 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
-
+/*
 @Serializable
 data class ServiceComponent(
     val id: Int,
@@ -74,13 +72,12 @@ data class ServiceComponent(
         var isLoaded = false
     }
 }
-
+ */
 fun downloadServiceComponents(): ActionCreator<dynamic, HippoState> {
     return { dispatch, _ ->
         val baseUrl = "https://qa.integrationer.tjansteplattform.se/tpdb/tpdbapi.php/api/v1/components"
         //val baseUrl = "https://pokeapi.co/api/v2/pokemon/"
         println("After url")
-        val restClient = RestClient()
         dispatch(HippoAction.StartDownload)
         println("After dispatch")
 

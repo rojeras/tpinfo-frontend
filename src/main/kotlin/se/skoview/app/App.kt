@@ -60,7 +60,6 @@ class App : Application() {
                 }
             }
         }
-
         store.dispatch(downloadServiceComponents())
     }
     private fun Container.informationText(state: HippoState) {
