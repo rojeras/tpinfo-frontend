@@ -6,11 +6,12 @@ import kotlinx.serialization.json.JsonConfiguration
 import kotlinx.serialization.list
 import pl.treksoft.kvision.redux.ReduxStore
 import se.skoview.lib.getAsyncTpDb
+import kotlin.browser.window
 import kotlin.js.Date
 
-suspend fun loadBaseItems(store: ReduxStore<HippoState, HippoAction>) {
+fun loadBaseItems(store: ReduxStore<HippoState, HippoAction>) {
     console.log("Will now load BaseItems")
-    store.dispatch(HippoAction.StartDownload)
+    store.dispatch(HippoAction.StartDownloadBaseItems)
 
     BaseDates.load({ areAllBaseItemsLoaded(store) })
     ServiceDomain.load({ areAllBaseItemsLoaded(store) })
@@ -30,7 +31,15 @@ fun areAllBaseItemsLoaded(store: ReduxStore<HippoState, HippoAction>) {
         ServiceDomain.isLoaded &&
         BaseDates.isLoaded
     ) {
-        store.dispatch(HippoAction.DownloadOk)
+        store.dispatch { dispatch, getState ->
+            //window.setTimeout({
+            dispatch(HippoAction.DoneDownloadBaseItems)
+            println("Dispatched function with redux-thunk works!!")
+            println("Time to download the integrations")
+            loadIntegrations(getState())
+            //}, 1000)
+        }
+        //store.dispatch(HippoAction.DoneDownloadBaseItems)
     }
 }
 
@@ -84,7 +93,7 @@ data class ServiceComponent(
 
     override val name: String = hsaId
     //override val itemType = ItemType.COMPONENT
-    override var searchField = "$name $description"
+    override val searchField = "$name $description"
 
     override fun equals(other: Any?): Boolean {
         if (other == null || other !is ServiceComponent) return false
@@ -105,19 +114,7 @@ data class ServiceComponent(
         var isLoaded = false
 
         fun load(callback: () -> Unit) {
-            /*
-            @Serializable
-            data class ServiceComponentJsonParse(val id: Int, val description: String, val hsaId: String)
 
-            val type = "components"
-            getAsyncTpDb(type) { response ->
-                val items = JSON.parse<Array<ServiceComponentJsonParse>>(response)
-                items.forEach { item ->
-                    ServiceComponent(item.id, item.hsaId, item.description)
-                }
-                isLoaded = true
-                callback()
-             */
             val type = "components"
 
             getAsyncTpDb(type) { response ->
@@ -125,9 +122,6 @@ data class ServiceComponent(
                 val json = Json(JsonConfiguration.Stable)
                 val serviceComponents: List<ServiceComponent> =
                     json.parse(ServiceComponent.serializer().list, response)
-
-                println("Service components new parsing:")
-                console.log(serviceComponents)
 
                 isLoaded = true
                 callback
@@ -147,7 +141,7 @@ data class LogicalAddress constructor(
     }
 
     //override val itemType = ItemType.LOGICAL_ADDRESS
-    override var searchField = "$name $description"
+    override val searchField = "$name $description"
 
     override fun toString(): String = "$name : $description"
 
