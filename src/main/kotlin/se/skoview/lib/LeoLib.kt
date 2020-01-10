@@ -7,6 +7,7 @@ import kotlinx.coroutines.launch
 import org.w3c.xhr.XMLHttpRequest
 import pl.treksoft.kvision.core.Color
 import pl.treksoft.kvision.rest.RestClient
+import se.skoview.data.BaseItem
 import kotlin.js.Date
 import kotlin.math.absoluteValue
 
@@ -100,3 +101,4 @@ fun getColorForObject(obj: Any): Color {
     val col = (fValue * 256 * 256 * 256 - 1).toInt()
     return Color(col)
 }
+

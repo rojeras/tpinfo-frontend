@@ -36,7 +36,17 @@ data class HippoState(
     // Integrations data
     val integrationArrs: List<Integration>,
     val maxCounters: MaxCounter,
-    val updateDates: List<String>
+    val updateDates: List<String>,
+
+    // View data structures
+    val vServiceConsumers: List<ServiceComponent>,
+    val vServiceProducers: List<ServiceComponent>,
+    val vServiceDomains: List<ServiceDomain>,
+    val vServiceContracts: List<ServiceContract>,
+    val vDomainsAndContracts: List<BaseItem>,
+    val vPlattformChains: List<PlattformChain>,
+    val vLogicalAddresses: List<LogicalAddress>
+
 )
 
 // The extension function create the part of the URL to fetch integrations
@@ -87,6 +97,13 @@ val INITIAL_STATE = HippoState(
     listOf(),
     listOf(),
     MaxCounter(-1, -1, -1, -1, -1, -1),
+    listOf(),
+    listOf(),
+    listOf(),
+    listOf(),
+    listOf(),
+    listOf(),
+    listOf(),
     listOf()
 )
 
@@ -99,7 +116,17 @@ sealed class HippoAction : RAction {
         val maxCounters: MaxCounter,
         val updateDates: List<String>
     ) : HippoAction()
+
     data class DownloadErrorBaseItems(val errorMessage: String) : HippoAction()
+    data class ViewUpdated(
+        val vServiceConsumers: List<ServiceComponent>,
+        val vServiceProducers: List<ServiceComponent>,
+        val vServiceDomains: List<ServiceDomain>,
+        val vServiceContracts: List<ServiceContract>,
+        val vDomainsAndContracts: List<BaseItem>,
+        val vPlattformChains: List<PlattformChain>,
+        val vLogicalAddresses: List<LogicalAddress>
+        ) : HippoAction()
 }
 
 fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
@@ -135,34 +162,23 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
             downloadingIntegrations = false,
             integrationArrs = action.integrationArrs,
             maxCounters = action.maxCounters,
-            updateDates = action.updateDates)
+            updateDates = action.updateDates
+        )
+        is HippoAction.ViewUpdated -> state.copy(
+            vServiceConsumers = action.vServiceConsumers,
+            vServiceProducers = action.vServiceProducers,
+            vServiceDomains = action.vServiceDomains,
+            vServiceContracts = action.vServiceContracts,
+            vDomainsAndContracts = action.vDomainsAndContracts,
+            vPlattformChains = action.vPlattformChains,
+            vLogicalAddresses = action.vLogicalAddresses
+        )
     }
     println("<---- After hippoReducer, action=${action::class}, new state is")
     console.log(newState)
 
     return newState
 }
-
-fun hippoMiddlewarePre(state: HippoState, action: HippoAction): HippoAction {
-
-
-    return action
-}
-
-fun hippoMiddlewarePost(state: HippoState, action: HippoAction, comment: String = "") {
-
-    when (action) {
-        is HippoAction.DoneDownloadBaseItems -> {
-            if (!state.downloadingIntegrations) {
-
-            }
-        }
-    }
-
-
-    println(comment)
-}
-
 
 val store = createReduxStore(
     ::hippoReducer,

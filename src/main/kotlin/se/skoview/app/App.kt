@@ -25,7 +25,6 @@ class App : Application() {
         require("css/kvapp.css")
     }
 
-
     override fun start() {
         I18n.manager =
             DefaultI18nManager(
@@ -35,39 +34,14 @@ class App : Application() {
                 )
             )
 
-
-
         root("kvapp") {
-            vPanel(alignItems = FlexAlignItems.STRETCH) {
-                width = 100.perc
-                //searchField()
-                div { +"Message: " }
-                vPanel(alignItems = FlexAlignItems.STRETCH) {
-                    maxWidth = 1200.px
-                    textAlign = TextAlign.CENTER
-                    marginLeft = auto
-                    marginRight = auto
-                }.stateBinding(store) { state ->
-                    informationText(state)
-                    if (!state.downloadingBaseItems && state.errorMessage == null) {
-                        //pokemonGrid(state)
-                        //pagination(state)
-                    }
-                }
-            }
+
+            add(hippoPage)
         }
         //store.dispatch(downloadServiceComponents())
         loadBaseItems(store)
     }
-    private fun Container.informationText(state: HippoState) {
-        if (state.downloadingBaseItems) {
-            div(tr("Loading ..."))
-        } else if (state.errorMessage != null) {
-            div(state.errorMessage)
-        } else {
-            div(tr("Loading completed"))
-        }
-    }
+
 }
 
 fun main() {

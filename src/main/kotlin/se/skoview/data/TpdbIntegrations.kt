@@ -7,6 +7,7 @@ import kotlinx.serialization.list
 import pl.treksoft.kvision.data.BaseDataComponent
 import pl.treksoft.kvision.state.ObservableListWrapper
 import pl.treksoft.kvision.state.observableListOf
+import se.skoview.app.createViewData
 import se.skoview.lib.getAsync
 import se.skoview.lib.getAsyncTpDb
 import kotlin.js.Date
@@ -98,6 +99,7 @@ fun loadIntegrations(state: HippoState) {
             integrationArrs.add(Integration(one, two, three, four, five, six, seven, eight))
         }
         store.dispatch(HippoAction.DoneDownloadIntegrations(integrationArrs, integrationInfo.maxCounters, integrationInfo.updateDates))
+        createViewData(store.getState())
     }
 }
 
