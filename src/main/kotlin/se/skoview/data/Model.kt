@@ -14,8 +14,8 @@ data class HippoState(
     val errorMessage: String?,
 
     // Base Items
-    val integrationDates: List<Date>,
-    val statisticsDates: List<Date>,
+    val integrationDates: List<String>,
+    val statisticsDates: List<String>,
     val serviceComponents: Map<Int, ServiceComponent>,
     val logicalAddresses: Map<Int, LogicalAddress>,
     val serviceContracts: Map<Int, ServiceContract>,
@@ -24,8 +24,8 @@ data class HippoState(
     val plattformChains: Map<Int, PlattformChain>,
 
     // Filter parameters
-    val dateEffective: Date,
-    val dateEnd: Date,
+    val dateEffective: String,
+    val dateEnd: String,
     val selectedConsumerIds: List<Int>,
     val selectedProducerIds: List<Int>,
     val selectedLogicalAddresses: List<Int>,
@@ -53,6 +53,7 @@ data class HippoState(
 fun HippoState.getParams(): String {
 
     var params = "?dummy&contractId=379"
+    //var params = "?dummy"
 /*
     for ((key, _) in activeFilter) {
         if ((key != ItemType.PLATTFORM_CHAIN) && (activeFilter[key]!!.size > 0)) params += activeFilter[key]!!
@@ -69,8 +70,8 @@ fun HippoState.getParams(): String {
     }
 */
 
-    params += TYPE_PARAM[ItemType.DATE_EFFECTIVE] + this.dateEffective?.toSwedishDate()
-    params += TYPE_PARAM[ItemType.DATE_END] + this.dateEnd?.toSwedishDate()
+    params += TYPE_PARAM[ItemType.DATE_EFFECTIVE] + this.dateEffective
+    params += TYPE_PARAM[ItemType.DATE_END] + this.dateEnd
 
     return params
 }
@@ -87,8 +88,8 @@ val INITIAL_STATE = HippoState(
     mapOf(),
     mapOf(),
     mapOf(),
-    Date(), // todo: Verify if this is a good default - really want empty value
-    Date(),
+    "", // todo: Verify if this is a good default - really want empty value
+    "",
     listOf(),
     listOf(),
     listOf(),
@@ -96,7 +97,7 @@ val INITIAL_STATE = HippoState(
     listOf(),
     listOf(),
     listOf(),
-    MaxCounter(-1, -1, -1, -1, -1, -1),
+    MaxCounter(0, 0, 0, 0, 0, 0),
     listOf(),
     listOf(),
     listOf(),
@@ -127,6 +128,7 @@ sealed class HippoAction : RAction {
         val vPlattformChains: List<PlattformChain>,
         val vLogicalAddresses: List<LogicalAddress>
         ) : HippoAction()
+    data class DateSelected(val selectedDate: String) : HippoAction()
 }
 
 fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
@@ -173,6 +175,9 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
             vPlattformChains = action.vPlattformChains,
             vLogicalAddresses = action.vLogicalAddresses
         )
+        is HippoAction.DateSelected -> state.copy(
+            dateEffective = action.selectedDate,
+            dateEnd = action.selectedDate)
     }
     println("<---- After hippoReducer, action=${action::class}, new state is")
     console.log(newState)
@@ -184,66 +189,4 @@ val store = createReduxStore(
     ::hippoReducer,
     INITIAL_STATE
 )
-// ---------------------------------------------------------------------------------------------------------------------
-/*
-@Serializable
-data class ServiceComponent(
-    val id: Int,
-    val hsaId: String,
-    val description: String = "",
-    val synonym: String? = null
-) {
-    init {
-        map[id] = this
-    }
 
-    val name: String = hsaId
-    //override val itemType = ItemType.COMPONENT
-    var searchField = "$name $description"
-
-    override fun equals(other: Any?): Boolean {
-        if (other == null || other !is ServiceComponent) return false
-        return id == other.id
-    }
-
-    override fun toString(): String {
-        return "ServiceComponent(id=$id, name=$name, description=$description)"
-    }
-
-    override fun hashCode(): Int {
-        return id
-    }
-
-    companion object {
-        val map = hashMapOf<Int, ServiceComponent>()
-
-        var isLoaded = false
-    }
-}
-*/
-
-/*
-fun downloadServiceComponents(): ActionCreator<dynamic, HippoState> {
-    return { dispatch, _ ->
-        val baseUrl = "https://qa.integrationer.tjansteplattform.se/tpdb/tpdbapi.php/api/v1/components"
-        //val baseUrl = "https://pokeapi.co/api/v2/pokemon/"
-        println("After url")
-        dispatch(HippoAction.StartDownloadBaseItems)
-        println("After dispatch")
-
-        getAsyncTpDb("components") { response ->
-            println("Size of response is: ${response.length}")
-            val json = Json(JsonConfiguration.Stable)
-            val serviceComponents: List<ServiceComponent> =
-                json.parse(ServiceComponent.serializer().list, response)
-
-            console.log(serviceComponents)
-
-            isLoaded = true
-            dispatch(HippoAction.DownloadOkBaseItems)
-            dispatch(HippoAction.SetServiceComponentList(serviceComponents))
-        }
-    }
-}
-
- */

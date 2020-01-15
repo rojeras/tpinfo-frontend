@@ -1,24 +1,15 @@
 package se.skoview.app
 
 import pl.treksoft.kvision.Application
-import pl.treksoft.kvision.core.Container
-import pl.treksoft.kvision.core.TextAlign
-import pl.treksoft.kvision.html.div
 import pl.treksoft.kvision.i18n.DefaultI18nManager
 import pl.treksoft.kvision.i18n.I18n
-import pl.treksoft.kvision.i18n.I18n.tr
-import pl.treksoft.kvision.panel.FlexAlignItems
 import pl.treksoft.kvision.panel.root
 import pl.treksoft.kvision.panel.vPanel
-import pl.treksoft.kvision.redux.ReduxStore
-import pl.treksoft.kvision.redux.createReduxStore
 import pl.treksoft.kvision.require
 import pl.treksoft.kvision.startApplication
-import pl.treksoft.kvision.state.stateBinding
-import pl.treksoft.kvision.utils.auto
 import pl.treksoft.kvision.utils.perc
-import pl.treksoft.kvision.utils.px
 import se.skoview.data.*
+import se.skoview.view.hippoPage
 
 class App : Application() {
     init {
@@ -35,9 +26,13 @@ class App : Application() {
             )
 
         root("kvapp") {
-
-            add(hippoPage)
+            vPanel {
+                add(hippoPage)
+            }.apply {
+                width = 100.perc
+            }
         }
+
         //store.dispatch(downloadServiceComponents())
         loadBaseItems(store)
     }

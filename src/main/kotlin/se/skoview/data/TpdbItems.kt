@@ -53,8 +53,8 @@ abstract class BaseItem {
 }
 
 object BaseDates {
-    val integrationDates = mutableListOf<Date>()
-    val statisticsDates = mutableListOf<Date>()
+    val integrationDates = mutableListOf<String>()
+    val statisticsDates = mutableListOf<String>()
     var isLoaded = false
 
     fun load(callback: () -> Unit) {
@@ -67,10 +67,10 @@ object BaseDates {
         getAsyncTpDb(type) { response ->
             val items = JSON.parse<BaseDatesJsonParse>(response)
             for (integration in items.dates.integrations) {
-                integrationDates.add(Date(integration))
+                integrationDates.add(integration)
             }
             for (statistics in items.dates.statistics) {
-                statisticsDates.add(Date(statistics))
+                statisticsDates.add(statistics)
             }
 
             isLoaded = true
