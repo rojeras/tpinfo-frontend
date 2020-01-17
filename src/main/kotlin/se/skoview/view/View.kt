@@ -35,6 +35,9 @@ import kotlin.browser.window
 <div id="ballsWaveG_8" class="ballsWaveG"></div>
 </div>
  */
+
+
+
 data class ViewInformation(
     val baseItem: BaseItem,
     val showData: String,

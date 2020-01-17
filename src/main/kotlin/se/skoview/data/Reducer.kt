@@ -78,6 +78,7 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
             dateEnd = action.selectedDate
         )
         is HippoAction.ItemSelected -> {
+
             val id = action.baseItem.id
 
             val newList = if (state.isItemFiltered(itemType = action.viewType, id = id)) listOf() else listOf(id)

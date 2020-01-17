@@ -3,6 +3,7 @@ package se.skoview.app
 import pl.treksoft.kvision.Application
 import pl.treksoft.kvision.i18n.DefaultI18nManager
 import pl.treksoft.kvision.i18n.I18n
+import pl.treksoft.kvision.pace.Pace
 import pl.treksoft.kvision.panel.root
 import pl.treksoft.kvision.panel.vPanel
 import pl.treksoft.kvision.require
@@ -43,7 +44,9 @@ class App : Application() {
         }
 
         //store.dispatch(downloadServiceComponents())
+        Pace.init()
         loadBaseItems(store)
+
     }
 
 }
