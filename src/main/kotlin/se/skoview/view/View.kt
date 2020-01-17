@@ -14,11 +14,14 @@ import pl.treksoft.kvision.state.observableListOf
 import pl.treksoft.kvision.state.stateBinding
 import pl.treksoft.kvision.table.*
 import pl.treksoft.kvision.tabulator.*
+import pl.treksoft.kvision.utils.Object
 import pl.treksoft.kvision.utils.auto
 import pl.treksoft.kvision.utils.perc
 import pl.treksoft.kvision.utils.px
 import se.skoview.data.*
 import se.skoview.lib.toSwedishDate
+import kotlin.browser.window
+
 // Spinner:
 /*
 <div id="ballsWaveG">
@@ -218,12 +221,12 @@ object hippoPage : SimplePanel() {
 }
 
 private fun Container.informationText(state: HippoState) {
-    if (state.downloadingBaseItems) {
-        span(I18n.tr("Loading ..."))
+    if (state.downloadingBaseItems || state.downloadingIntegrations) {
+        span("Loading ...")
     } else if (state.errorMessage != null) {
         div(state.errorMessage)
     } else {
-        span(I18n.tr("Loading completed"))
+        span(" ... ")
     }
 }
 
@@ -278,4 +281,18 @@ class HippoTabulator(
             width = 100.perc
         }
     }
+}
+
+fun setUrlFilter(bookmark: String) {
+
+    val hostname = window.location.hostname;
+    val protocol = window.location.protocol;
+    val port = window.location.port;
+
+    val portSpec = if (port.length > 0) ":$port" else ""
+
+    val newUrl = protocol + "//" + hostname + portSpec + "?filter=" + bookmark
+
+    console.log("New URL: " + newUrl)
+    window.history.pushState(newUrl, "hippo-utforska integrationer", newUrl)
 }

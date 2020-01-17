@@ -5,6 +5,7 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonConfiguration
 import se.skoview.lib.getAsyncTpDb
 import se.skoview.view.createViewData
+import se.skoview.view.setUrlFilter
 
 enum class ItemType {
     CONSUMER,
@@ -85,6 +86,10 @@ data class IntegrationCache(
 
 fun loadIntegrations(state: HippoState) {
     store.dispatch(HippoAction.StartDownloadIntegrations)
+
+    val bookmark = state.getBookmark()
+    setUrlFilter(bookmark)
+
     val urlParameters = state.getParams()
     val parameters = "integrations$urlParameters"
 

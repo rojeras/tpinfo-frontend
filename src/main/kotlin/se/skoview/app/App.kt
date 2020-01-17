@@ -17,6 +17,8 @@ import se.skoview.view.hippoPage
 // todo: Färger på rubrikerna
 // todo: Översta raden ska bort
 // todo: Bredden på datumväljarenLite hjälptexter
+// todo: Döp om och få bort "template"
+// todo: Show item id as tooltip
 
 class App : Application() {
     init {
