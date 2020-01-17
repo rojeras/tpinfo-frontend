@@ -69,30 +69,69 @@ data class MaxCounter(
     val producers: Int
 )
 
+data class IntegrationCache(
+    val key: String,
+    val integrationArr: List<Integration>,
+    val maxCounters: MaxCounter,
+    val updateDates: List<String>
+) {
+    init {
+        map[key] = this
+    }
+    companion object {
+        val map: HashMap<String, IntegrationCache> = hashMapOf<String, IntegrationCache>()
+    }
+}
+
 fun loadIntegrations(state: HippoState) {
     store.dispatch(HippoAction.StartDownloadIntegrations)
     val urlParameters = state.getParams()
     val parameters = "integrations$urlParameters"
 
-    getAsyncTpDb(parameters) { response ->
-        println("Size of response is: ${response.length}")
-        val json = Json(JsonConfiguration.Stable)
-        val integrationInfo: IntegrationInfo = json.parse(IntegrationInfo.serializer(), response)
-        console.log(integrationInfo)
-        val integrationArrs: MutableList<Integration> = mutableListOf()
-        for (arr: List<Int?> in integrationInfo.integrations) {
-            val one: Int = arr[1] ?: -1
-            val two: Int? = arr[2]
-            val three: Int = arr[3] ?: -1
-            val four: Int = arr[4] ?: -1
-            val five: Int = arr[5] ?: -1
-            val six: Int = arr[6] ?: -1
-            val seven: Int = arr[7] ?: -1
-            val eight: Int = arr[8] ?: -1
-
-            integrationArrs.add(Integration(one, two, three, four, five, six, seven, eight))
-        }
-        store.dispatch(HippoAction.DoneDownloadIntegrations(integrationArrs, integrationInfo.maxCounters, integrationInfo.updateDates))
+    // Check if the integration info is available in the cache
+    if (IntegrationCache.map.containsKey(parameters)) {
+        println("Integrations found in cache")
+        val integrationsCache = IntegrationCache.map[parameters]
+        // todo: Make sure to remove the !! below
+        store.dispatch(
+            HippoAction.DoneDownloadIntegrations(
+                integrationsCache!!.integrationArr,
+                integrationsCache.maxCounters,
+                integrationsCache.updateDates
+            )
+        )
         createViewData(store.getState())
+
+    } else {
+        println("Integrations NOT found in cache - will download")
+        console.log(parameters)
+        getAsyncTpDb(parameters) { response ->
+            println("Size of response is: ${response.length}")
+            val json = Json(JsonConfiguration.Stable)
+            val integrationInfo: IntegrationInfo = json.parse(IntegrationInfo.serializer(), response)
+            console.log(integrationInfo)
+            val integrationArrs: MutableList<Integration> = mutableListOf()
+            for (arr: List<Int?> in integrationInfo.integrations) {
+                val one: Int = arr[1] ?: -1
+                val two: Int? = arr[2]
+                val three: Int = arr[3] ?: -1
+                val four: Int = arr[4] ?: -1
+                val five: Int = arr[5] ?: -1
+                val six: Int = arr[6] ?: -1
+                val seven: Int = arr[7] ?: -1
+                val eight: Int = arr[8] ?: -1
+
+                integrationArrs.add(Integration(one, two, three, four, five, six, seven, eight))
+                IntegrationCache(parameters, integrationArrs, integrationInfo.maxCounters, integrationInfo.updateDates)
+            }
+            store.dispatch(
+                HippoAction.DoneDownloadIntegrations(
+                    integrationArrs,
+                    integrationInfo.maxCounters,
+                    integrationInfo.updateDates
+                )
+            )
+            createViewData(store.getState())
+        }
     }
 }

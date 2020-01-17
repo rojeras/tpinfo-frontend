@@ -228,14 +228,14 @@ data class ServiceDomain(override val id: Int, override val name: String) : Base
     //override val itemType = ItemType.DOMAIN
     var contracts: MutableSet<ServiceContract> = mutableSetOf()
 
-    override val description = ""
+    override val description = name
 
     init {
         // todo: Add logic to populate contracts
         map[id] = this
     }
 
-    override var searchField: String = name
+    override val searchField: String = name
 
     override fun toString(): String = name
 

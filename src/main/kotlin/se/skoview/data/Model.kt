@@ -26,8 +26,9 @@ data class HippoState(
     // Filter parameters
     val dateEffective: String,
     val dateEnd: String,
-    val selectedConsumerIds: List<Int>,
-    val selectedProducerIds: List<Int>,
+
+    val selectedConsumers: List<Int>,
+    val selectedProducers: List<Int>,
     val selectedLogicalAddresses: List<Int>,
     val selectedContracts: List<Int>,
     val selectedDomains: List<Int>,
@@ -52,28 +53,42 @@ data class HippoState(
 // The extension function create the part of the URL to fetch integrations
 fun HippoState.getParams(): String {
 
-    var params = "?dummy&contractId=379"
-    //var params = "?dummy"
-/*
-    for ((key, _) in activeFilter) {
-        if ((key != ItemType.PLATTFORM_CHAIN) && (activeFilter[key]!!.size > 0)) params += activeFilter[key]!!
-            .sorted()
-            .joinToString(prefix = typeParam[key]!!, separator = ",")
-    }
+    //var params = "?dummy&contractId=379"
+    var params = "?dummy"
 
-    // Separate plattforms now stored in filter, not the chain
-    for (pcId in activeFilter[ItemType.PLATTFORM_CHAIN]!!) {
-        val firstId = PlattformChain.map[pcId]?.first
-        val lastId = PlattformChain.map[pcId]?.last
-        params += typeParam[ItemType.FIRST_PLATTFORM] + firstId
-        params += typeParam[ItemType.LAST_PLATTFORM] + lastId
-    }
-*/
+    params += if (this.selectedConsumers.isNotEmpty()) this.selectedConsumers.joinToString(prefix = "&consumerId=", separator = ",") else ""
+    params += if (this.selectedDomains.isNotEmpty()) this.selectedDomains.joinToString(prefix = "&domainId=", separator = ",") else ""
+    params += if (this.selectedContracts.isNotEmpty()) this.selectedContracts.joinToString(prefix = "&contractId=", separator = ",") else ""
+    params += if (this.selectedLogicalAddresses.isNotEmpty()) this.selectedLogicalAddresses.joinToString(prefix = "&logicalAddressId=", separator = ",") else ""
+    params += if (this.selectedProducers.isNotEmpty()) this.selectedProducers.joinToString(prefix = "&producerId=", separator = ",") else ""
 
     params += TYPE_PARAM[ItemType.DATE_EFFECTIVE] + this.dateEffective
     params += TYPE_PARAM[ItemType.DATE_END] + this.dateEnd
 
+    // Separate plattforms now stored in filter, not the chain
+    for (pcId in this.selectedPlattformChains) {
+        val firstId = PlattformChain.map[pcId]?.first
+        val lastId = PlattformChain.map[pcId]?.last
+        params += "&firstPlattformId=" + firstId
+        params += "&lastPlattformId=" + lastId
+    }
+
     return params
+}
+
+fun HippoState.isItemFiltered(itemType: ItemType, id: Int): Boolean {
+    return when (itemType) {
+        ItemType.CONSUMER -> this.selectedConsumers.contains(id)
+        ItemType.DOMAIN -> this.selectedDomains.contains(id)
+        ItemType.CONTRACT -> this.selectedContracts.contains(id)
+        ItemType.PLATTFORM_CHAIN -> this.selectedPlattformChains.contains(id)
+        ItemType.LOGICAL_ADDRESS -> this.selectedLogicalAddresses.contains(id)
+        ItemType.PRODUCER -> this.selectedProducers.contains(id)
+        else -> {
+            println("*** ERROR, unexpected type in isItemFiltered: $itemType")
+            false
+        }
+    }
 }
 
 val INITIAL_STATE = HippoState(
@@ -129,11 +144,15 @@ sealed class HippoAction : RAction {
         val vLogicalAddresses: List<LogicalAddress>
         ) : HippoAction()
     data class DateSelected(val selectedDate: String) : HippoAction()
+    data class ItemSelected(
+        val viewType: ItemType,
+        val baseItem: BaseItem
+    ) : HippoAction()
 }
 
 fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
-    println("----> In hippoReducer, action=${action::class}, current state is")
-    console.log(state)
+    println("----> In hippoReducer, action=${action::class}")
+    //console.log(state)
 
     val newState = when (action) {
         is HippoAction.StartDownloadBaseItems -> state.copy(downloadingBaseItems = true)
@@ -177,10 +196,27 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
         )
         is HippoAction.DateSelected -> state.copy(
             dateEffective = action.selectedDate,
-            dateEnd = action.selectedDate)
+            dateEnd = action.selectedDate
+        )
+        is HippoAction.ItemSelected -> {
+            val id = action.baseItem.id
+
+            val newList = if (state.isItemFiltered(itemType = action.viewType, id = id)) listOf() else listOf(id)
+
+            when (action.viewType) {
+                ItemType.CONSUMER -> state.copy( selectedConsumers = newList )
+                ItemType.DOMAIN -> state.copy( selectedDomains = newList )
+                ItemType.CONTRACT -> state.copy( selectedContracts = newList )
+                ItemType.PLATTFORM_CHAIN -> state.copy( selectedPlattformChains = newList )
+                ItemType.LOGICAL_ADDRESS -> state.copy( selectedLogicalAddresses = newList )
+                ItemType.PRODUCER -> state.copy( selectedProducers = newList )
+                else -> {
+                    println("*** ERROR in when clause for reduare ItemSelected: ${action.viewType}")
+                    state
+                }
+            }
+        }
     }
-    println("<---- After hippoReducer, action=${action::class}, new state is")
-    console.log(newState)
 
     return newState
 }

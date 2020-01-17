@@ -11,6 +11,13 @@ import pl.treksoft.kvision.utils.perc
 import se.skoview.data.*
 import se.skoview.view.hippoPage
 
+// todo: Indikering när nedladdning pågår
+// todo: Hantering av URL-er
+// todo: Kolumnerna rör sig lite i sidled ibland
+// todo: Färger på rubrikerna
+// todo: Översta raden ska bort
+// todo: Bredden på datumväljarenLite hjälptexter
+
 class App : Application() {
     init {
         require("css/kvapp.css")
