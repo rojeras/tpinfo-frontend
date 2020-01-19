@@ -42,11 +42,8 @@ class App : Application() {
                 width = 100.perc
             }
         }
-
-        //store.dispatch(downloadServiceComponents())
         Pace.init()
         loadBaseItems(store)
-
     }
 
 }

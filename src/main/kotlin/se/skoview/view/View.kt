@@ -22,22 +22,6 @@ import se.skoview.data.*
 import se.skoview.lib.toSwedishDate
 import kotlin.browser.window
 
-// Spinner:
-/*
-<div id="ballsWaveG">
-<div id="ballsWaveG_1" class="ballsWaveG"></div>
-<div id="ballsWaveG_2" class="ballsWaveG"></div>
-<div id="ballsWaveG_3" class="ballsWaveG"></div>
-<div id="ballsWaveG_4" class="ballsWaveG"></div>
-<div id="ballsWaveG_5" class="ballsWaveG"></div>
-<div id="ballsWaveG_6" class="ballsWaveG"></div>
-<div id="ballsWaveG_7" class="ballsWaveG"></div>
-<div id="ballsWaveG_8" class="ballsWaveG"></div>
-</div>
- */
-
-
-
 data class ViewInformation(
     val baseItem: BaseItem,
     val showData: String,
@@ -48,22 +32,7 @@ object hippoPage : SimplePanel() {
 
     init {
         println("In hippoPage")
-        //vPanel(alignItems = FlexAlignItems.STRETCH) { this.width = 100.perc
-        //searchField()
 
-        vPanel(alignItems = FlexAlignItems.STRETCH) {
-            //maxWidth = 1200.px
-            textAlign = TextAlign.CENTER
-            marginLeft = auto
-            marginRight = auto
-        }.stateBinding(store) { state ->
-            informationText(state)
-            if (!state.downloadingBaseItems && state.errorMessage == null) {
-                //pokemonGrid(state)
-                //pagination(state)
-            }
-        }
-        //}
         vPanel {
             div {
                 h2("RHippo - integrationer via tjänsteplattform/ar för nationell e-hälsa")
@@ -75,10 +44,12 @@ object hippoPage : SimplePanel() {
                 background = Background(0x113d3d)
                 align = Align.CENTER
                 color = Color(Col.WHITE)
+                marginTop = 5.px
             }
         }
         vPanel {
         }.apply {
+            width = 100.perc
             clear = Clear.BOTH
             margin = 0.px
             background = Background(0xf6efe9)
@@ -106,6 +77,7 @@ object hippoPage : SimplePanel() {
         vPanel {
         }.apply {
             //background = Background(0x009090)
+            width = 100.perc
         }.stateBinding(store) { state ->
             //println("========================> Actions submitter: ${state::class.simpleName}")
             val consumerHeading: String =
@@ -178,7 +150,7 @@ object hippoPage : SimplePanel() {
                         }
                         add(HippoTabulator(plattformHeading, viewPlattformList))
                     }.apply {
-                        width = 20.perc
+                        width = 15.perc
                     }
                     // Logical addresses
                     cell {
@@ -214,6 +186,7 @@ object hippoPage : SimplePanel() {
                     }
                 }.apply {
                     color = Color(Col.BLACK)
+                    width = 100.perc
                 }
             }.apply {
                 color = Color(0x009090)
@@ -223,6 +196,7 @@ object hippoPage : SimplePanel() {
     }
 }
 
+/*
 private fun Container.informationText(state: HippoState) {
     if (state.downloadingBaseItems || state.downloadingIntegrations) {
         span("Loading ...")
@@ -232,8 +206,10 @@ private fun Container.informationText(state: HippoState) {
         span(" ... ")
     }
 }
+*/
 
 class HippoTabulator(
+
     columnHeader: String,
     itemList: List<ViewInformation>
 ) : SimplePanel() {
@@ -281,7 +257,7 @@ class HippoTabulator(
         )
         {
             //height = 430.px
-            width = 100.perc
+            width = 90.perc
         }
     }
 }
