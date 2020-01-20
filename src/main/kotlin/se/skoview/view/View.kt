@@ -1,25 +1,18 @@
 package se.skoview.view
 
 import pl.treksoft.kvision.core.*
+import pl.treksoft.kvision.form.InputSize
 import pl.treksoft.kvision.form.select.selectInput
 import pl.treksoft.kvision.html.*
 import pl.treksoft.kvision.html.Align
-import pl.treksoft.kvision.i18n.I18n
-import pl.treksoft.kvision.panel.FlexAlignItems
 import pl.treksoft.kvision.panel.SimplePanel
-import pl.treksoft.kvision.panel.root
 import pl.treksoft.kvision.panel.vPanel
-import pl.treksoft.kvision.state.ObservableList
-import pl.treksoft.kvision.state.observableListOf
 import pl.treksoft.kvision.state.stateBinding
 import pl.treksoft.kvision.table.*
 import pl.treksoft.kvision.tabulator.*
-import pl.treksoft.kvision.utils.Object
-import pl.treksoft.kvision.utils.auto
 import pl.treksoft.kvision.utils.perc
 import pl.treksoft.kvision.utils.px
 import se.skoview.data.*
-import se.skoview.lib.toSwedishDate
 import kotlin.browser.window
 
 data class ViewInformation(
@@ -31,6 +24,7 @@ data class ViewInformation(
 object hippoPage : SimplePanel() {
 
     init {
+
         println("In hippoPage")
 
         vPanel {
@@ -61,7 +55,12 @@ object hippoPage : SimplePanel() {
                 selectInput(
                     options = dateOptionList,
                     value = state.dateEffective
-                ).onEvent {
+                )
+                    .apply {
+                        selectWidth = CssSize(150, UNIT.px)
+                        size = InputSize.SMALL
+                    }
+                    .onEvent {
                     change = {
                         println("Date selected:")
                         console.log(self.value)
@@ -79,6 +78,9 @@ object hippoPage : SimplePanel() {
             //background = Background(0x009090)
             width = 100.perc
         }.stateBinding(store) { state ->
+
+
+
             //println("========================> Actions submitter: ${state::class.simpleName}")
             val consumerHeading: String =
                 "Tjänstekonsumenter (${state.vServiceConsumers.size}/${state.maxCounters.consumers})"
@@ -97,10 +99,9 @@ object hippoPage : SimplePanel() {
                     "",
                     "",
                     ""
-                ),//consumerHeading, contractHeading, plattformHeading, logicalAddressHeading, producerHeading ),
+                ),
                 setOf(TableType.SMALL, TableType.BORDERED),
                 classes = setOf("table-layout:fixed")
-                //responsiveType = ResponsiveType.RESPONSIVE
             )
             {
                 row(classes = setOf("table-layout:fixed")) {
@@ -196,18 +197,6 @@ object hippoPage : SimplePanel() {
     }
 }
 
-/*
-private fun Container.informationText(state: HippoState) {
-    if (state.downloadingBaseItems || state.downloadingIntegrations) {
-        span("Loading ...")
-    } else if (state.errorMessage != null) {
-        div(state.errorMessage)
-    } else {
-        span(" ... ")
-    }
-}
-*/
-
 class HippoTabulator(
 
     columnHeader: String,
@@ -262,16 +251,20 @@ class HippoTabulator(
     }
 }
 
+// Let the URL mirror the current state
 fun setUrlFilter(bookmark: String) {
+    if (bookmark.length > 1) {
+        val hostname = window.location.hostname;
+        val protocol = window.location.protocol;
+        val port = window.location.port;
 
-    val hostname = window.location.hostname;
-    val protocol = window.location.protocol;
-    val port = window.location.port;
+        val portSpec = if (port.length > 0) ":$port" else ""
 
-    val portSpec = if (port.length > 0) ":$port" else ""
+        val newUrl = protocol + "//" + hostname + portSpec + "?filter=" + bookmark
 
-    val newUrl = protocol + "//" + hostname + portSpec + "?filter=" + bookmark
-
-    console.log("New URL: " + newUrl)
-    window.history.pushState(newUrl, "hippo-utforska integrationer", newUrl)
+        console.log("New URL: " + newUrl)
+        window.history.pushState(newUrl, "hippo-utforska integrationer", newUrl)
+    }
 }
+
+// Parse the filter parameter and set the state accordingly

@@ -1,10 +1,7 @@
 package se.skoview.data
 
-import pl.treksoft.kvision.redux.RAction
 import pl.treksoft.kvision.redux.createReduxStore
 import kotlin.js.Date
-import kotlin.js.Math
-import kotlin.js.Math.floor
 
 //@Serializable
 data class HippoState(
@@ -55,11 +52,26 @@ fun HippoState.getParams(): String {
     //var params = "?dummy&contractId=379"
     var params = "?dummy"
 
-    params += if (this.selectedConsumers.isNotEmpty()) this.selectedConsumers.joinToString(prefix = "&consumerId=", separator = ",") else ""
-    params += if (this.selectedDomains.isNotEmpty()) this.selectedDomains.joinToString(prefix = "&domainId=", separator = ",") else ""
-    params += if (this.selectedContracts.isNotEmpty()) this.selectedContracts.joinToString(prefix = "&contractId=", separator = ",") else ""
-    params += if (this.selectedLogicalAddresses.isNotEmpty()) this.selectedLogicalAddresses.joinToString(prefix = "&logicalAddressId=", separator = ",") else ""
-    params += if (this.selectedProducers.isNotEmpty()) this.selectedProducers.joinToString(prefix = "&producerId=", separator = ",") else ""
+    params += if (this.selectedConsumers.isNotEmpty()) this.selectedConsumers.joinToString(
+        prefix = "&consumerId=",
+        separator = ","
+    ) else ""
+    params += if (this.selectedDomains.isNotEmpty()) this.selectedDomains.joinToString(
+        prefix = "&domainId=",
+        separator = ","
+    ) else ""
+    params += if (this.selectedContracts.isNotEmpty()) this.selectedContracts.joinToString(
+        prefix = "&contractId=",
+        separator = ","
+    ) else ""
+    params += if (this.selectedLogicalAddresses.isNotEmpty()) this.selectedLogicalAddresses.joinToString(
+        prefix = "&logicalAddressId=",
+        separator = ","
+    ) else ""
+    params += if (this.selectedProducers.isNotEmpty()) this.selectedProducers.joinToString(
+        prefix = "&producerId=",
+        separator = ","
+    ) else ""
 
     params += "&dateEffective=" + this.dateEffective
     params += "&dateEnd=" + this.dateEnd
@@ -75,16 +87,35 @@ fun HippoState.getParams(): String {
     return params
 }
 
-fun HippoState.getBookmark(excludeDates: Boolean = false): String {
+fun HippoState.getBookmark(): String {
+    if (this.updateDates.size == 0 || this.dateEffective == "") return ""
+
     var bookmark = ""
 
-    bookmark += if (this.selectedConsumers.isNotEmpty()) this.selectedConsumers.joinToString(prefix = "c", separator = "c") else ""
-    bookmark += if (this.selectedDomains.isNotEmpty()) this.selectedDomains.joinToString(prefix = "d", separator = "d") else ""
-    bookmark += if (this.selectedContracts.isNotEmpty()) this.selectedContracts.joinToString(prefix = "C", separator = "C") else ""
-    bookmark += if (this.selectedLogicalAddresses.isNotEmpty()) this.selectedLogicalAddresses.joinToString(prefix = "l", separator = "l") else ""
-    bookmark += if (this.selectedProducers.isNotEmpty()) this.selectedProducers.joinToString(prefix = "p", separator = "p") else ""
+    bookmark += if (this.selectedConsumers.isNotEmpty()) this.selectedConsumers.joinToString(
+        prefix = "c",
+        separator = "c"
+    ) else ""
+    bookmark += if (this.selectedDomains.isNotEmpty()) this.selectedDomains.joinToString(
+        prefix = "d",
+        separator = "d"
+    ) else ""
+    bookmark += if (this.selectedContracts.isNotEmpty()) this.selectedContracts.joinToString(
+        prefix = "C",
+        separator = "C"
+    ) else ""
+    bookmark += if (this.selectedLogicalAddresses.isNotEmpty()) this.selectedLogicalAddresses.joinToString(
+        prefix = "l",
+        separator = "l"
+    ) else ""
+    bookmark += if (this.selectedProducers.isNotEmpty()) this.selectedProducers.joinToString(
+        prefix = "p",
+        separator = "p"
+    ) else ""
 
-    if (! excludeDates) {
+    // Exclude dates if dateEnd == current date (first in updateDates list)
+
+    if (this.dateEnd != this.updateDates[0]) {
         bookmark += "S" + date2DaysSinceEpoch(this.dateEffective)
         bookmark += "E" + date2DaysSinceEpoch(this.dateEnd)
     }
@@ -100,7 +131,6 @@ fun HippoState.getBookmark(excludeDates: Boolean = false): String {
     println("Bookmark is: $bookmark")
     return bookmark
 
-
 }
 
 fun date2DaysSinceEpoch(dateString: String): Double {
@@ -108,12 +138,6 @@ fun date2DaysSinceEpoch(dateString: String): Double {
 
     return (day.getTime() / 8.64e7) - 16874  // Dived by number of millisecs since epoch (1/1 1970)
 }
-/*
-    fun daysSinceEpoch2date(daysSinceEpoch) {
-        var date = new Date((daysSinceEpoch + 16874) * 8.64e7);
-        return date.toISOString().substring(0, 10);
-    }
-*/
 
 fun HippoState.isItemFiltered(itemType: ItemType, id: Int): Boolean {
     return when (itemType) {
@@ -130,40 +154,59 @@ fun HippoState.isItemFiltered(itemType: ItemType, id: Int): Boolean {
     }
 }
 
-val INITIAL_STATE = HippoState(
-    false,
-    false,
-    null,
-    listOf(),
-    listOf(),
-    mapOf(),
-    mapOf(),
-    mapOf(),
-    mapOf(),
-    mapOf(),
-    mapOf(),
-    "", // todo: Verify if this is a good default - really want empty value
-    "",
-    listOf(),
-    listOf(),
-    listOf(),
-    listOf(),
-    listOf(),
-    listOf(),
-    listOf(),
-    MaxCounter(0, 0, 0, 0, 0, 0),
-    listOf(),
-    listOf(),
-    listOf(),
-    listOf(),
-    listOf(),
-    listOf(),
-    listOf(),
-    listOf()
+data class BookmarkInformation(
+    var dateEffective: String = "",
+    var dateEnd: String = "",
+
+    var selectedConsumers: List<Int> = listOf(),
+    var selectedProducers: List<Int> = listOf(),
+    var selectedLogicalAddresses: List<Int> = listOf(),
+    var selectedContracts: List<Int> = listOf(),
+    var selectedDomains: List<Int> = listOf(),
+    var selectedPlattformChains: List<Int> = listOf()
 )
+
+// This function creates the initial state based on an option filter parameter in the URL
+fun getInitialState(): HippoState {
+
+    val bookmarkInformation = BookmarkInformation()
+
+    val initialState = HippoState(
+        false,
+        false,
+        null,
+        listOf(),
+        listOf(),
+        mapOf(),
+        mapOf(),
+        mapOf(),
+        mapOf(),
+        mapOf(),
+        mapOf(),
+        bookmarkInformation.dateEffective, // todo: Verify if this is a good default - really want empty value
+        bookmarkInformation.dateEnd,
+        bookmarkInformation.selectedConsumers,
+        bookmarkInformation.selectedProducers,
+        bookmarkInformation.selectedLogicalAddresses,
+        bookmarkInformation.selectedContracts,
+        bookmarkInformation.selectedDomains,
+        bookmarkInformation.selectedPlattformChains,
+        listOf(),
+        MaxCounter(0, 0, 0, 0, 0, 0),
+        listOf(),
+        listOf(),
+        listOf(),
+        listOf(),
+        listOf(),
+        listOf(),
+        listOf(),
+        listOf()
+    )
+    return initialState
+}
 
 val store = createReduxStore(
     ::hippoReducer,
-    INITIAL_STATE
+    getInitialState()
 )
 

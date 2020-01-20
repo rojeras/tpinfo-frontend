@@ -58,12 +58,20 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
         is HippoAction.StartDownloadIntegrations -> {
             state.copy(downloadingIntegrations = true)
         }
-        is HippoAction.DoneDownloadIntegrations -> state.copy(
-            downloadingIntegrations = false,
-            integrationArrs = action.integrationArrs,
-            maxCounters = action.maxCounters,
-            updateDates = action.updateDates
-        )
+        is HippoAction.DoneDownloadIntegrations ->
+        {
+            var dates: MutableList<String> = mutableListOf()
+            // Must ensure the selected date is part of the list of all dates
+            // Otherwise the date selector might be empty
+            dates.addAll(action.updateDates)
+            dates.add(state.dateEffective)
+            state.copy(
+                downloadingIntegrations = false,
+                integrationArrs = action.integrationArrs,
+                maxCounters = action.maxCounters,
+                updateDates = dates.distinct().sortedDescending() //action.updateDates
+            )
+        }
         is HippoAction.ViewUpdated -> state.copy(
             vServiceConsumers = action.vServiceConsumers,
             vServiceProducers = action.vServiceProducers,
@@ -91,7 +99,7 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
                 ItemType.LOGICAL_ADDRESS -> state.copy( selectedLogicalAddresses = newList )
                 ItemType.PRODUCER -> state.copy( selectedProducers = newList )
                 else -> {
-                    println("*** ERROR in when clause for reduare ItemSelected: ${action.viewType}")
+                    println("*** ERROR in when clause for reducer ItemSelected: ${action.viewType}")
                     state
                 }
             }

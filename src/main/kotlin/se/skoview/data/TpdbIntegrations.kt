@@ -86,10 +86,8 @@ data class IntegrationCache(
 
 fun loadIntegrations(state: HippoState) {
     store.dispatch(HippoAction.StartDownloadIntegrations)
-
     val bookmark = state.getBookmark()
     setUrlFilter(bookmark)
-
     val urlParameters = state.getParams()
     val parameters = "integrations$urlParameters"
 

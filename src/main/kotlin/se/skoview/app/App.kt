@@ -11,14 +11,12 @@ import pl.treksoft.kvision.startApplication
 import pl.treksoft.kvision.utils.perc
 import se.skoview.data.*
 import se.skoview.view.hippoPage
+import kotlin.browser.document
 
-// todo: Indikering när nedladdning pågår
 // todo: Hantering av URL-er
-// todo: Kolumnerna rör sig lite i sidled ibland
 // todo: Färger på rubrikerna
-// todo: Översta raden ska bort
-// todo: Bredden på datumväljarenLite hjälptexter
-// todo: Döp om och få bort "template"
+// todo: Bredden på datumväljaren
+// todo: Lite hjälptexter
 // todo: Show item id as tooltip
 
 class App : Application() {
@@ -36,6 +34,7 @@ class App : Application() {
             )
 
         root("kvapp") {
+            console.log(document.baseURI)
             vPanel {
                 add(hippoPage)
             }.apply {
