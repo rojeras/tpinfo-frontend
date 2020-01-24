@@ -1,13 +1,29 @@
 package se.skoview.data
 
 import pl.treksoft.kvision.redux.createReduxStore
+import kotlin.browser.document
 import kotlin.js.Date
+
+enum class SyncActionStatus {
+    NOT_DONE,
+    DONE,
+    ERROR
+}
+
+enum class AsyncActionStatus {
+    NOT_INITIALIZED,
+    INITIALIZED,
+    COMPLETED,
+    ERROR
+}
+
 
 //@Serializable
 data class HippoState(
-    // Status infomration
-    val downloadingBaseItems: Boolean,
-    val downloadingIntegrations: Boolean,
+    // Status information
+    val applicationStarted: Boolean,
+    val downloadBaseItemStatus: AsyncActionStatus,
+    val downloadIntegrationStatus: AsyncActionStatus,
     val errorMessage: String?,
 
     // Base Items
@@ -133,10 +149,86 @@ fun HippoState.getBookmark(): String {
 
 }
 
+fun parseBookmark(): BookmarkInformation {
+    // ---------------------------------------------------------------------
+    fun parseBookmarkType(typeChar: String, filterValue: String): List<Int> {
+        //val regex = Regex("""c\d*""")
+        val regexPattern = """\d*"""
+        val regex = Regex(typeChar + regexPattern)
+
+        val idWithCharList = regex.findAll(filterValue).toList()
+
+        var iDList = mutableListOf<Int>()
+        for (idWithCar in idWithCharList) {
+            val id = idWithCar.value.drop(1).toInt()
+            iDList.add(id)
+        }
+        return iDList
+    }
+    // ---------------------------------------------------------------------
+
+    val fullUrl = document.baseURI
+
+    val filterParam = "filter"
+    var ix = fullUrl.indexOf(filterParam)
+    if (ix < 0) return BookmarkInformation()
+
+    ix += filterParam.length + 1
+
+    val filterValueStart = fullUrl.substring(ix)
+    val parts = filterValueStart.split('&')
+    val filterValue = parts[0]
+    println("bookmark: $filterValue")
+
+    // Extract and calculate the date values
+    val dateEffectiveCodeList = parseBookmarkType("S", filterValue)
+    val dateEffective = if (dateEffectiveCodeList.size > 0)  daysSinceEpoch2date(dateEffectiveCodeList[0].toInt()) else ""
+
+    val dateEndCodeList = parseBookmarkType("E", filterValue)
+    val dateEnd = if (dateEndCodeList.size > 0)  daysSinceEpoch2date(dateEffectiveCodeList[0].toInt()) else ""
+
+    println("dates are : $dateEffective, $dateEnd")
+    // Extract and calculate the plattforms values
+    val firstPlattformCodeList = parseBookmarkType("F", filterValue)
+    val lastPlattformCodeList = parseBookmarkType("L", filterValue)
+
+    var plattformChainList = listOf<Int>()
+
+    if (firstPlattformCodeList.size > 0 && lastPlattformCodeList.size > 0) {
+        val first = firstPlattformCodeList[0]
+        val last = lastPlattformCodeList[0]
+        console.log("first=$first, last=$last")
+        val plattformChainId = PlattformChain.calculateId(f = first, m = null, l = last)
+
+        plattformChainList = listOf(plattformChainId)
+    }
+
+    val bookmarkInformation = BookmarkInformation(
+        dateEffective,
+        dateEnd,
+        parseBookmarkType("c", filterValue),
+        parseBookmarkType("p", filterValue),
+        parseBookmarkType("l", filterValue),
+        parseBookmarkType("C", filterValue),
+        parseBookmarkType("d", filterValue),
+        plattformChainList
+    )
+    //val cList = parseBookmarkType("c", filterValue)
+    println("Final bookmarkInformation:")
+    console.log(bookmarkInformation)
+
+    return bookmarkInformation
+}
+
 fun date2DaysSinceEpoch(dateString: String): Double {
     val day = Date(dateString)
 
     return (day.getTime() / 8.64e7) - 16874  // Dived by number of millisecs since epoch (1/1 1970)
+}
+
+fun daysSinceEpoch2date(daysSinceEpoch: Int): String {
+    var date = Date((daysSinceEpoch + 16874) * 8.64e7)
+    return date.toISOString().substring(0, 10)
 }
 
 fun HippoState.isItemFiltered(itemType: ItemType, id: Int): Boolean {
@@ -169,11 +261,13 @@ data class BookmarkInformation(
 // This function creates the initial state based on an option filter parameter in the URL
 fun getInitialState(): HippoState {
 
-    val bookmarkInformation = BookmarkInformation()
+    val bookmarkInformation = parseBookmark()
+
 
     val initialState = HippoState(
         false,
-        false,
+        AsyncActionStatus.NOT_INITIALIZED,
+        AsyncActionStatus.NOT_INITIALIZED,
         null,
         listOf(),
         listOf(),

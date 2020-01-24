@@ -36,7 +36,7 @@ fun areAllBaseItemsLoaded(store: ReduxStore<HippoState, HippoAction>) {
             dispatch(HippoAction.DoneDownloadBaseItems)
             println("Dispatched function with redux-thunk works!!")
             println("Time to download the integrations")
-            loadIntegrations(getState())
+            //loadIntegrations(getState())
             //}, 1000)
         }
         //store.dispatch(HippoAction.DoneDownloadBaseItems)

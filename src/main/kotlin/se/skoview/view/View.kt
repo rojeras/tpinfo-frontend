@@ -79,8 +79,6 @@ object hippoPage : SimplePanel() {
             width = 100.perc
         }.stateBinding(store) { state ->
 
-
-
             //println("========================> Actions submitter: ${state::class.simpleName}")
             val consumerHeading: String =
                 "Tjänstekonsumenter (${state.vServiceConsumers.size}/${state.maxCounters.consumers})"

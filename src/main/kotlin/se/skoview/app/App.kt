@@ -11,13 +11,21 @@ import pl.treksoft.kvision.startApplication
 import pl.treksoft.kvision.utils.perc
 import se.skoview.data.*
 import se.skoview.view.hippoPage
-import kotlin.browser.document
 
 // todo: Hantering av URL-er
 // todo: Färger på rubrikerna
-// todo: Bredden på datumväljaren
 // todo: Lite hjälptexter
 // todo: Show item id as tooltip
+/*
+Kommentarer från ML:
+rhippo
+    Rörigt med scrollbars
+    Sidnumren försvinner när skärmen minskas ner
+    Lägg in texterna: Sök tjänsteplattformar etc
+    Skippa sidescroll
+        Kanske bara klippa
+
+ */
 
 class App : Application() {
     init {
@@ -34,15 +42,21 @@ class App : Application() {
             )
 
         root("kvapp") {
-            console.log(document.baseURI)
+
             vPanel {
                 add(hippoPage)
             }.apply {
                 width = 100.perc
             }
         }
+
+        store.subscribe { state ->
+            stateChangeTrigger(state)
+        }
+
         Pace.init()
-        loadBaseItems(store)
+        store.dispatch(HippoAction.ApplicationStarted)
+        //loadBaseItems(store)
     }
 
 }

@@ -1,43 +1,16 @@
 package se.skoview.data
 
-import pl.treksoft.kvision.redux.RAction
-
-sealed class HippoAction : RAction {
-    object StartDownloadBaseItems : HippoAction()
-    object DoneDownloadBaseItems : HippoAction()
-    object StartDownloadIntegrations : HippoAction()
-    data class DoneDownloadIntegrations(
-        val integrationArrs: List<Integration>,
-        val maxCounters: MaxCounter,
-        val updateDates: List<String>
-    ) : HippoAction()
-
-    data class DownloadErrorBaseItems(val errorMessage: String) : HippoAction()
-    data class ViewUpdated(
-        val vServiceConsumers: List<ServiceComponent>,
-        val vServiceProducers: List<ServiceComponent>,
-        val vServiceDomains: List<ServiceDomain>,
-        val vServiceContracts: List<ServiceContract>,
-        val vDomainsAndContracts: List<BaseItem>,
-        val vPlattformChains: List<PlattformChain>,
-        val vLogicalAddresses: List<LogicalAddress>
-    ) : HippoAction()
-    data class DateSelected(val selectedDate: String) : HippoAction()
-    data class ItemSelected(
-        val viewType: ItemType,
-        val baseItem: BaseItem
-    ) : HippoAction()
-}
 
 fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
     println("----> In hippoReducer, action=${action::class}")
     //console.log(state)
 
     val newState = when (action) {
-        is HippoAction.StartDownloadBaseItems -> state.copy(downloadingBaseItems = true)
+        is HippoAction.ApplicationStarted -> state.copy(applicationStarted = true)
+        is HippoAction.StartDownloadBaseItems -> state.copy(downloadBaseItemStatus = AsyncActionStatus.INITIALIZED)
         is HippoAction.DoneDownloadBaseItems -> {
             state.copy(
-                downloadingBaseItems = false,
+                downloadBaseItemStatus = AsyncActionStatus.COMPLETED,
                 integrationDates = BaseDates.integrationDates,
                 statisticsDates = BaseDates.statisticsDates,
                 serviceComponents = ServiceComponent.map,
@@ -51,27 +24,31 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
                 dateEnd = BaseDates.integrationDates[0]
             )
         }
-        is HippoAction.DownloadErrorBaseItems -> state.copy(
-            downloadingBaseItems = false,
+        is HippoAction.ErrorDownloadBaseItems -> state.copy(
+            downloadBaseItemStatus = AsyncActionStatus.ERROR,
             errorMessage = action.errorMessage
         )
         is HippoAction.StartDownloadIntegrations -> {
-            state.copy(downloadingIntegrations = true)
+            state.copy(downloadIntegrationStatus = AsyncActionStatus.INITIALIZED)
         }
-        is HippoAction.DoneDownloadIntegrations ->
-        {
+        is HippoAction.DoneDownloadIntegrations -> {
             var dates: MutableList<String> = mutableListOf()
             // Must ensure the selected date is part of the list of all dates
             // Otherwise the date selector might be empty
             dates.addAll(action.updateDates)
             dates.add(state.dateEffective)
             state.copy(
-                downloadingIntegrations = false,
+                downloadIntegrationStatus = AsyncActionStatus.COMPLETED,
                 integrationArrs = action.integrationArrs,
                 maxCounters = action.maxCounters,
                 updateDates = dates.distinct().sortedDescending() //action.updateDates
             )
+
         }
+        is HippoAction.ErrorDownloadIntegrations -> state.copy(
+            downloadIntegrationStatus = AsyncActionStatus.ERROR,
+            errorMessage = action.errorMessage
+        )
         is HippoAction.ViewUpdated -> state.copy(
             vServiceConsumers = action.vServiceConsumers,
             vServiceProducers = action.vServiceProducers,
@@ -92,12 +69,12 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
             val newList = if (state.isItemFiltered(itemType = action.viewType, id = id)) listOf() else listOf(id)
 
             when (action.viewType) {
-                ItemType.CONSUMER -> state.copy( selectedConsumers = newList )
-                ItemType.DOMAIN -> state.copy( selectedDomains = newList )
-                ItemType.CONTRACT -> state.copy( selectedContracts = newList )
-                ItemType.PLATTFORM_CHAIN -> state.copy( selectedPlattformChains = newList )
-                ItemType.LOGICAL_ADDRESS -> state.copy( selectedLogicalAddresses = newList )
-                ItemType.PRODUCER -> state.copy( selectedProducers = newList )
+                ItemType.CONSUMER -> state.copy(selectedConsumers = newList)
+                ItemType.DOMAIN -> state.copy(selectedDomains = newList)
+                ItemType.CONTRACT -> state.copy(selectedContracts = newList)
+                ItemType.PLATTFORM_CHAIN -> state.copy(selectedPlattformChains = newList)
+                ItemType.LOGICAL_ADDRESS -> state.copy(selectedLogicalAddresses = newList)
+                ItemType.PRODUCER -> state.copy(selectedProducers = newList)
                 else -> {
                     println("*** ERROR in when clause for reducer ItemSelected: ${action.viewType}")
                     state
@@ -107,4 +84,20 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
     }
 
     return newState
+}
+
+// Called after each state change (reducer)
+fun stateChangeTrigger(state: HippoState) {
+    // Load base items at application start
+    if (state.applicationStarted == true && state.downloadBaseItemStatus == AsyncActionStatus.NOT_INITIALIZED) {
+        loadBaseItems(store)
+        return
+    }
+
+    // Load integrations
+    if ( state.downloadBaseItemStatus == AsyncActionStatus.COMPLETED
+        && state.downloadIntegrationStatus == AsyncActionStatus.NOT_INITIALIZED ) {
+        loadIntegrations(state)
+        return
+    }
 }
