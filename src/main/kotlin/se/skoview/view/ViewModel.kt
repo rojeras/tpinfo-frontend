@@ -2,8 +2,18 @@ package se.skoview.view
 
 import se.skoview.data.*
 
-fun createViewData(state: HippoState) {
+data class IntegrationLists(
+    val serviceConsumers: List<ServiceComponent>,
+    val serviceProducers: List<ServiceComponent>,
+    val serviceDomains: List<ServiceDomain>,
+    val serviceContracts: List<ServiceContract>,
+    val domainsAndContracts: List<BaseItem>,
+    val plattformChains: List<PlattformChain>,
+    val logicalAddresses: List<LogicalAddress>
+)
 
+fun createViewData(state: HippoState): IntegrationLists {
+    println(":::::::::::: Start createViewData() ::::::::::::::::")
     // Extract plattform chains
     val plattformChains =
         state.integrationArrs.asSequence()
@@ -39,7 +49,7 @@ fun createViewData(state: HippoState) {
             .toList()
 
     // Contracts
-    println(":::::::::::: Start mapping TK ::::::::::::::::")
+
     val serviceContracts =
         state.integrationArrs.asSequence()
             .map { integration: Integration -> integration.serviceContractId }
@@ -50,7 +60,7 @@ fun createViewData(state: HippoState) {
             }
             .sortedWith(compareBy(ServiceContract::description))
             .toList()
-    println(":::::::::::: Done mapping TK ::::::::::::::::")
+
 
     // Consumers
     val serviceConsumers =
@@ -89,6 +99,18 @@ fun createViewData(state: HippoState) {
         }
     }
 
+    val integrationLists = IntegrationLists(
+        serviceConsumers,
+        serviceProducers,
+        serviceDomains,
+        serviceContracts,
+        domainsAndContracts,
+        plattformChains,
+        logicalAddresses
+    )
+    println(":::::::::::: End createViewData() ::::::::::::::::")
+    return integrationLists
+/*
     store.dispatch(
         HippoAction.ViewUpdated(
             serviceConsumers,
@@ -100,6 +122,7 @@ fun createViewData(state: HippoState) {
             logicalAddresses
         )
     )
+ */
 }
 
 private fun addUnique(item: BaseItem, list: MutableList<BaseItem>) {

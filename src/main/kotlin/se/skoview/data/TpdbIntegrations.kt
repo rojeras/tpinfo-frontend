@@ -103,7 +103,7 @@ fun loadIntegrations(state: HippoState) {
                 integrationsCache.updateDates
             )
         )
-        createViewData(store.getState())
+        //createViewData(store.getState())
 
     } else {
         println("Integrations NOT found in cache - will download")
@@ -134,7 +134,7 @@ fun loadIntegrations(state: HippoState) {
                     integrationInfo.updateDates
                 )
             )
-            createViewData(store.getState())
+            //createViewData(store.getState())
         }
     }
 }

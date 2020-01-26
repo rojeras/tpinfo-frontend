@@ -16,6 +16,7 @@ import se.skoview.view.hippoPage
 // todo: Färger på rubrikerna
 // todo: Lite hjälptexter
 // todo: Show item id as tooltip
+// todo: Tag bort v-datat från state. Detta kan tas fram dynamiskt när informationen presenteras
 /*
 Kommentarer från ML:
 rhippo
@@ -56,7 +57,6 @@ class App : Application() {
 
         Pace.init()
         store.dispatch(HippoAction.ApplicationStarted)
-        //loadBaseItems(store)
     }
 
 }

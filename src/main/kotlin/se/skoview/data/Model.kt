@@ -24,6 +24,7 @@ data class HippoState(
     val applicationStarted: Boolean,
     val downloadBaseItemStatus: AsyncActionStatus,
     val downloadIntegrationStatus: AsyncActionStatus,
+    val showIntegrations: Boolean,
     val errorMessage: String?,
 
     // Base Items
@@ -50,16 +51,7 @@ data class HippoState(
     // Integrations data
     val integrationArrs: List<Integration>,
     val maxCounters: MaxCounter,
-    val updateDates: List<String>,
-
-    // View data structures
-    val vServiceConsumers: List<ServiceComponent>,
-    val vServiceProducers: List<ServiceComponent>,
-    val vServiceDomains: List<ServiceDomain>,
-    val vServiceContracts: List<ServiceContract>,
-    val vDomainsAndContracts: List<BaseItem>,
-    val vPlattformChains: List<PlattformChain>,
-    val vLogicalAddresses: List<LogicalAddress>
+    val updateDates: List<String>
 )
 
 // The extension function create the part of the URL to fetch integrations
@@ -268,6 +260,7 @@ fun getInitialState(): HippoState {
         false,
         AsyncActionStatus.NOT_INITIALIZED,
         AsyncActionStatus.NOT_INITIALIZED,
+        false,
         null,
         listOf(),
         listOf(),
@@ -287,13 +280,6 @@ fun getInitialState(): HippoState {
         bookmarkInformation.selectedPlattformChains,
         listOf(),
         MaxCounter(0, 0, 0, 0, 0, 0),
-        listOf(),
-        listOf(),
-        listOf(),
-        listOf(),
-        listOf(),
-        listOf(),
-        listOf(),
         listOf()
     )
     return initialState

@@ -21,15 +21,6 @@ sealed class HippoAction : RAction {
         val updateDates: List<String>
     ) : HippoAction()
     data class ErrorDownloadIntegrations(val errorMessage: String) : HippoAction()
-    data class ViewUpdated(
-        val vServiceConsumers: List<ServiceComponent>,
-        val vServiceProducers: List<ServiceComponent>,
-        val vServiceDomains: List<ServiceDomain>,
-        val vServiceContracts: List<ServiceContract>,
-        val vDomainsAndContracts: List<BaseItem>,
-        val vPlattformChains: List<PlattformChain>,
-        val vLogicalAddresses: List<LogicalAddress>
-    ) : HippoAction()
     data class DateSelected(val selectedDate: String) : HippoAction()
     data class ItemSelected(
         val viewType: ItemType,

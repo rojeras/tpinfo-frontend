@@ -30,26 +30,15 @@ fun areAllBaseItemsLoaded(store: ReduxStore<HippoState, HippoAction>) {
         ServiceContract.isLoaded &&
         ServiceDomain.isLoaded &&
         BaseDates.isLoaded
-    ) {
-        store.dispatch { dispatch, getState ->
-            //window.setTimeout({
-            dispatch(HippoAction.DoneDownloadBaseItems)
-            println("Dispatched function with redux-thunk works!!")
-            println("Time to download the integrations")
-            //loadIntegrations(getState())
-            //}, 1000)
-        }
-        //store.dispatch(HippoAction.DoneDownloadBaseItems)
-    }
+    )
+        store.dispatch(HippoAction.DoneDownloadBaseItems)
 }
-
 
 abstract class BaseItem {
     abstract val description: String
     abstract val name: String
     abstract val searchField: String
     abstract val id: Int
-    //abstract val itemType: ItemType
 }
 
 object BaseDates {
@@ -140,7 +129,6 @@ data class LogicalAddress constructor(
         map[id] = this
     }
 
-    //override val itemType = ItemType.LOGICAL_ADDRESS
     override val searchField = "$name $description"
 
     override fun toString(): String = "$name : $description"

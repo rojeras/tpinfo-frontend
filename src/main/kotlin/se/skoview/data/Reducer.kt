@@ -29,7 +29,10 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
             errorMessage = action.errorMessage
         )
         is HippoAction.StartDownloadIntegrations -> {
-            state.copy(downloadIntegrationStatus = AsyncActionStatus.INITIALIZED)
+            state.copy(
+                showIntegrations = true,
+                downloadIntegrationStatus = AsyncActionStatus.INITIALIZED
+            )
         }
         is HippoAction.DoneDownloadIntegrations -> {
             var dates: MutableList<String> = mutableListOf()
@@ -38,6 +41,7 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
             dates.addAll(action.updateDates)
             dates.add(state.dateEffective)
             state.copy(
+                showIntegrations = true,
                 downloadIntegrationStatus = AsyncActionStatus.COMPLETED,
                 integrationArrs = action.integrationArrs,
                 maxCounters = action.maxCounters,
@@ -49,16 +53,8 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
             downloadIntegrationStatus = AsyncActionStatus.ERROR,
             errorMessage = action.errorMessage
         )
-        is HippoAction.ViewUpdated -> state.copy(
-            vServiceConsumers = action.vServiceConsumers,
-            vServiceProducers = action.vServiceProducers,
-            vServiceDomains = action.vServiceDomains,
-            vServiceContracts = action.vServiceContracts,
-            vDomainsAndContracts = action.vDomainsAndContracts,
-            vPlattformChains = action.vPlattformChains,
-            vLogicalAddresses = action.vLogicalAddresses
-        )
         is HippoAction.DateSelected -> state.copy(
+            showIntegrations = false,
             dateEffective = action.selectedDate,
             dateEnd = action.selectedDate
         )
@@ -69,12 +65,30 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
             val newList = if (state.isItemFiltered(itemType = action.viewType, id = id)) listOf() else listOf(id)
 
             when (action.viewType) {
-                ItemType.CONSUMER -> state.copy(selectedConsumers = newList)
-                ItemType.DOMAIN -> state.copy(selectedDomains = newList)
-                ItemType.CONTRACT -> state.copy(selectedContracts = newList)
-                ItemType.PLATTFORM_CHAIN -> state.copy(selectedPlattformChains = newList)
-                ItemType.LOGICAL_ADDRESS -> state.copy(selectedLogicalAddresses = newList)
-                ItemType.PRODUCER -> state.copy(selectedProducers = newList)
+                ItemType.CONSUMER -> state.copy(
+                    showIntegrations = false,
+                    selectedConsumers = newList
+                )
+                ItemType.DOMAIN -> state.copy(
+                    showIntegrations = false,
+                    selectedDomains = newList
+                )
+                ItemType.CONTRACT -> state.copy(
+                    showIntegrations = false,
+                    selectedContracts = newList
+                )
+                ItemType.PLATTFORM_CHAIN -> state.copy(
+                    showIntegrations = false,
+                    selectedPlattformChains = newList
+                )
+                ItemType.LOGICAL_ADDRESS -> state.copy(
+                    showIntegrations = false,
+                    selectedLogicalAddresses = newList
+                )
+                ItemType.PRODUCER -> state.copy(
+                    showIntegrations = false,
+                    selectedProducers = newList
+                )
                 else -> {
                     println("*** ERROR in when clause for reducer ItemSelected: ${action.viewType}")
                     state

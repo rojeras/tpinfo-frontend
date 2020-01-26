@@ -61,16 +61,16 @@ object hippoPage : SimplePanel() {
                         size = InputSize.SMALL
                     }
                     .onEvent {
-                    change = {
-                        println("Date selected:")
-                        console.log(self.value)
-                        store.dispatch(HippoAction.DateSelected(self.value ?: ""))
-                        store.dispatch { dispatch, getState ->
-                            dispatch(HippoAction.DateSelected(self.value ?: ""))
-                            loadIntegrations(getState())
+                        change = {
+                            println("Date selected:")
+                            console.log(self.value)
+                            store.dispatch(HippoAction.DateSelected(self.value ?: ""))
+                            store.dispatch { dispatch, getState ->
+                                dispatch(HippoAction.DateSelected(self.value ?: ""))
+                                loadIntegrations(getState())
+                            }
                         }
                     }
-                }
             }
         }
         vPanel {
@@ -78,118 +78,123 @@ object hippoPage : SimplePanel() {
             //background = Background(0x009090)
             width = 100.perc
         }.stateBinding(store) { state ->
+            if (state.showIntegrations) {
+                println("===== View invoked =====")
 
-            //println("========================> Actions submitter: ${state::class.simpleName}")
-            val consumerHeading: String =
-                "Tjänstekonsumenter (${state.vServiceConsumers.size}/${state.maxCounters.consumers})"
-            val contractHeading: String =
-                "Tjänstekontrakt (${state.vServiceContracts.size}/${state.maxCounters.contracts})"
-            val plattformHeading: String =
-                "Tjänsteplattformar (${state.vPlattformChains.size}/${state.maxCounters.plattformChains})"
-            val logicalAddressHeading: String =
-                "Logiska adresser (${state.vLogicalAddresses.size}/${state.maxCounters.logicalAddress})"
-            val producerHeading: String =
-                "Tjänsteproducenter (${state.vServiceProducers.size}/${state.maxCounters.producers})"
-            table(
-                listOf(
-                    "",
-                    "",
-                    "",
-                    "",
-                    ""
-                ),
-                setOf(TableType.SMALL, TableType.BORDERED),
-                classes = setOf("table-layout:fixed")
-            )
-            {
-                row(classes = setOf("table-layout:fixed")) {
-                    // Service consumers
-                    cell(classes = setOf("table-layout:fixed")) {
-                        val viewConsumerLst: MutableList<ViewInformation> = mutableListOf()
-                        state.vServiceConsumers.map {
-                            viewConsumerLst.add(
-                                ViewInformation(
-                                    it,
-                                    "<i>${it.description}</i><br>${it.hsaId}",
-                                    ItemType.CONSUMER
+                val integrationLists = createViewData(state)
+
+                //println("========================> Actions submitter: ${state::class.simpleName}")
+                val consumerHeading: String =
+                    "Tjänstekonsumenter (${integrationLists.serviceConsumers.size}/${state.maxCounters.consumers})"
+                val contractHeading: String =
+                    "Tjänstekontrakt (${integrationLists.serviceContracts.size}/${state.maxCounters.contracts})"
+                val plattformHeading: String =
+                    "Tjänsteplattformar (${integrationLists.plattformChains.size}/${state.maxCounters.plattformChains})"
+                val logicalAddressHeading: String =
+                    "Logiska adresser (${integrationLists.logicalAddresses.size}/${state.maxCounters.logicalAddress})"
+                val producerHeading: String =
+                    "Tjänsteproducenter (${integrationLists.serviceProducers.size}/${state.maxCounters.producers})"
+                table(
+                    listOf(
+                        "",
+                        "",
+                        "",
+                        "",
+                        ""
+                    ),
+                    setOf(TableType.SMALL, TableType.BORDERED),
+                    classes = setOf("table-layout:fixed")
+                )
+                {
+                    row(classes = setOf("table-layout:fixed")) {
+                        // Service consumers
+                        cell(classes = setOf("table-layout:fixed")) {
+                            val viewConsumerLst: MutableList<ViewInformation> = mutableListOf()
+                            integrationLists.serviceConsumers.map {
+                                viewConsumerLst.add(
+                                    ViewInformation(
+                                        it,
+                                        "<i>${it.description}</i><br>${it.hsaId}",
+                                        ItemType.CONSUMER
+                                    )
                                 )
-                            )
-                        }
-                        add(HippoTabulator(consumerHeading, viewConsumerLst))
-                    }.apply {
-                        width = 20.perc
-                    }
-                    // Service contracts
-                    cell {
-                        val viewContractLst: MutableList<ViewInformation> = mutableListOf()
-                        state.vDomainsAndContracts.map {
-                            if (it::class.simpleName == "ServiceDomain") {
-                                val desc = "<b>${it.description}</b>"
-                                viewContractLst.add(ViewInformation(it, desc, ItemType.DOMAIN))
-                            } else {
-                                val desc = it.description
-                                viewContractLst.add(ViewInformation(it, desc, ItemType.CONTRACT))
                             }
+                            add(HippoTabulator(consumerHeading, viewConsumerLst))
+                        }.apply {
+                            width = 20.perc
                         }
-                        add(HippoTabulator(contractHeading, viewContractLst))
-                    }.apply {
-                        width = 20.perc
-                    }
-                    // Plattforms
-                    cell {
-                        val viewPlattformList: MutableList<ViewInformation> = mutableListOf()
-                        state.vPlattformChains.map {
-                            viewPlattformList.add(
-                                ViewInformation(
-                                    it,
-                                    it.name,
-                                    ItemType.PLATTFORM_CHAIN
+                        // Service contracts
+                        cell {
+                            val viewContractLst: MutableList<ViewInformation> = mutableListOf()
+                            integrationLists.domainsAndContracts.map {
+                                if (it::class.simpleName == "ServiceDomain") {
+                                    val desc = "<b>${it.description}</b>"
+                                    viewContractLst.add(ViewInformation(it, desc, ItemType.DOMAIN))
+                                } else {
+                                    val desc = it.description
+                                    viewContractLst.add(ViewInformation(it, desc, ItemType.CONTRACT))
+                                }
+                            }
+                            add(HippoTabulator(contractHeading, viewContractLst))
+                        }.apply {
+                            width = 20.perc
+                        }
+                        // Plattforms
+                        cell {
+                            val viewPlattformList: MutableList<ViewInformation> = mutableListOf()
+                            integrationLists.plattformChains.map {
+                                viewPlattformList.add(
+                                    ViewInformation(
+                                        it,
+                                        it.name,
+                                        ItemType.PLATTFORM_CHAIN
+                                    )
                                 )
-                            )
+                            }
+                            add(HippoTabulator(plattformHeading, viewPlattformList))
+                        }.apply {
+                            width = 15.perc
                         }
-                        add(HippoTabulator(plattformHeading, viewPlattformList))
-                    }.apply {
-                        width = 15.perc
-                    }
-                    // Logical addresses
-                    cell {
-                        val viewLogicalAddressList: MutableList<ViewInformation> = mutableListOf()
-                        state.vLogicalAddresses.map {
-                            viewLogicalAddressList.add(
-                                ViewInformation(
-                                    it,
-                                    "<i>${it.description}</i><br>${it.name}",
-                                    ItemType.LOGICAL_ADDRESS
+                        // Logical addresses
+                        cell {
+                            val viewLogicalAddressList: MutableList<ViewInformation> = mutableListOf()
+                            integrationLists.logicalAddresses.map {
+                                viewLogicalAddressList.add(
+                                    ViewInformation(
+                                        it,
+                                        "<i>${it.description}</i><br>${it.name}",
+                                        ItemType.LOGICAL_ADDRESS
+                                    )
                                 )
-                            )
+                            }
+                            add(HippoTabulator(logicalAddressHeading, viewLogicalAddressList))
+                        }.apply {
+                            width = 20.perc
                         }
-                        add(HippoTabulator(logicalAddressHeading, viewLogicalAddressList))
-                    }.apply {
-                        width = 20.perc
-                    }
-                    // Service producers
-                    cell {
-                        val viewProducerLst: MutableList<ViewInformation> = mutableListOf()
-                        state.vServiceProducers.map {
-                            viewProducerLst.add(
-                                ViewInformation(
-                                    it,
-                                    "<i>${it.description}</i><br>${it.hsaId}",
-                                    ItemType.PRODUCER
+                        // Service producers
+                        cell {
+                            val viewProducerLst: MutableList<ViewInformation> = mutableListOf()
+                            integrationLists.serviceProducers.map {
+                                viewProducerLst.add(
+                                    ViewInformation(
+                                        it,
+                                        "<i>${it.description}</i><br>${it.hsaId}",
+                                        ItemType.PRODUCER
+                                    )
                                 )
-                            )
+                            }
+                            add(HippoTabulator(producerHeading, viewProducerLst))
+                        }.apply {
+                            width = 20.perc
                         }
-                        add(HippoTabulator(producerHeading, viewProducerLst))
                     }.apply {
-                        width = 20.perc
+                        color = Color(Col.BLACK)
+                        width = 100.perc
                     }
                 }.apply {
-                    color = Color(Col.BLACK)
+                    color = Color(0x009090)
                     width = 100.perc
                 }
-            }.apply {
-                color = Color(0x009090)
-                width = 100.perc
             }
         }
     }
