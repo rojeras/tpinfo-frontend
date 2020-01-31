@@ -51,7 +51,10 @@ data class HippoState(
     // Integrations data
     val integrationArrs: List<Integration>,
     val maxCounters: MaxCounter,
-    val updateDates: List<String>
+    val updateDates: List<String>,
+
+    // Text search filter
+    val consumerFilter: String
 )
 
 // The extension function create the part of the URL to fetch integrations
@@ -255,7 +258,6 @@ fun getInitialState(): HippoState {
 
     val bookmarkInformation = parseBookmark()
 
-
     val initialState = HippoState(
         false,
         AsyncActionStatus.NOT_INITIALIZED,
@@ -280,7 +282,8 @@ fun getInitialState(): HippoState {
         bookmarkInformation.selectedPlattformChains,
         listOf(),
         MaxCounter(0, 0, 0, 0, 0, 0),
-        listOf()
+        listOf(),
+        ""
     )
     return initialState
 }

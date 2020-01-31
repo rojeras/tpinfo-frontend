@@ -6,6 +6,7 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
     //console.log(state)
 
     val newState = when (action) {
+        is HippoAction.FilterConsumers -> state.copy(consumerFilter = action.consumerFilter)
         is HippoAction.ApplicationStarted -> state.copy(applicationStarted = true)
         is HippoAction.StartDownloadBaseItems -> state.copy(downloadBaseItemStatus = AsyncActionStatus.INITIALIZED)
         is HippoAction.DoneDownloadBaseItems -> {

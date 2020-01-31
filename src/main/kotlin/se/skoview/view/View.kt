@@ -9,11 +9,9 @@ import pl.treksoft.kvision.panel.SimplePanel
 import pl.treksoft.kvision.panel.vPanel
 import pl.treksoft.kvision.state.stateBinding
 import pl.treksoft.kvision.table.*
-import pl.treksoft.kvision.tabulator.*
 import pl.treksoft.kvision.utils.perc
 import pl.treksoft.kvision.utils.px
 import se.skoview.data.*
-import kotlin.browser.window
 
 data class ViewInformation(
     val baseItem: BaseItem,
@@ -94,180 +92,79 @@ object hippoPage : SimplePanel() {
                     "Logiska adresser (${integrationLists.logicalAddresses.size}/${state.maxCounters.logicalAddress})"
                 val producerHeading: String =
                     "Tjänsteproducenter (${integrationLists.serviceProducers.size}/${state.maxCounters.producers})"
-                table(
-                    listOf(
-                        "",
-                        "",
-                        "",
-                        "",
-                        ""
-                    ),
-                    setOf(TableType.SMALL, TableType.BORDERED),
-                    classes = setOf("table-layout:fixed")
-                )
-                {
-                    row(classes = setOf("table-layout:fixed")) {
-                        // Service consumers
-                        cell(classes = setOf("table-layout:fixed")) {
-                            val viewConsumerLst: MutableList<ViewInformation> = mutableListOf()
-                            integrationLists.serviceConsumers.map {
-                                viewConsumerLst.add(
-                                    ViewInformation(
-                                        it,
-                                        "<i>${it.description}</i><br>${it.hsaId}",
-                                        ItemType.CONSUMER
-                                    )
-                                )
-                            }
-                            add(HippoTabulator(consumerHeading, viewConsumerLst))
-                        }.apply {
-                            width = 20.perc
-                        }
-                        // Service contracts
-                        cell {
-                            val viewContractLst: MutableList<ViewInformation> = mutableListOf()
-                            integrationLists.domainsAndContracts.map {
-                                if (it::class.simpleName == "ServiceDomain") {
-                                    val desc = "<b>${it.description}</b>"
-                                    viewContractLst.add(ViewInformation(it, desc, ItemType.DOMAIN))
-                                } else {
-                                    val desc = it.description
-                                    viewContractLst.add(ViewInformation(it, desc, ItemType.CONTRACT))
-                                }
-                            }
-                            add(HippoTabulator(contractHeading, viewContractLst))
-                        }.apply {
-                            width = 20.perc
-                        }
-                        // Plattforms
-                        cell {
-                            val viewPlattformList: MutableList<ViewInformation> = mutableListOf()
-                            integrationLists.plattformChains.map {
-                                viewPlattformList.add(
-                                    ViewInformation(
-                                        it,
-                                        it.name,
-                                        ItemType.PLATTFORM_CHAIN
-                                    )
-                                )
-                            }
-                            add(HippoTabulator(plattformHeading, viewPlattformList))
-                        }.apply {
-                            width = 15.perc
-                        }
-                        // Logical addresses
-                        cell {
-                            val viewLogicalAddressList: MutableList<ViewInformation> = mutableListOf()
-                            integrationLists.logicalAddresses.map {
-                                viewLogicalAddressList.add(
-                                    ViewInformation(
-                                        it,
-                                        "<i>${it.description}</i><br>${it.name}",
-                                        ItemType.LOGICAL_ADDRESS
-                                    )
-                                )
-                            }
-                            add(HippoTabulator(logicalAddressHeading, viewLogicalAddressList))
-                        }.apply {
-                            width = 20.perc
-                        }
-                        // Service producers
-                        cell {
-                            val viewProducerLst: MutableList<ViewInformation> = mutableListOf()
-                            integrationLists.serviceProducers.map {
-                                viewProducerLst.add(
-                                    ViewInformation(
-                                        it,
-                                        "<i>${it.description}</i><br>${it.hsaId}",
-                                        ItemType.PRODUCER
-                                    )
-                                )
-                            }
-                            add(HippoTabulator(producerHeading, viewProducerLst))
-                        }.apply {
-                            width = 20.perc
-                        }
-                    }.apply {
-                        color = Color(Col.BLACK)
-                        width = 100.perc
-                    }
-                }.apply {
-                    color = Color(0x009090)
-                    width = 100.perc
+
+                val viewConsumerLst: MutableList<ViewInformation> = mutableListOf()
+                integrationLists.serviceConsumers.map {
+                    viewConsumerLst.add(
+                        ViewInformation(
+                            it,
+                            "<i>${it.description}</i><br>${it.hsaId}",
+                            ItemType.CONSUMER
+                        )
+                    )
                 }
+
+                val viewContractLst: MutableList<ViewInformation> = mutableListOf()
+                integrationLists.domainsAndContracts.map {
+                    if (it::class.simpleName == "ServiceDomain") {
+                        val desc = "<b>${it.description}</b>"
+                        viewContractLst.add(ViewInformation(it, desc, ItemType.DOMAIN))
+                    } else {
+                        val desc = it.description
+                        viewContractLst.add(ViewInformation(it, desc, ItemType.CONTRACT))
+                    }
+                }
+
+                val viewPlattformList: MutableList<ViewInformation> = mutableListOf()
+                integrationLists.plattformChains.map {
+                    viewPlattformList.add(
+                        ViewInformation(
+                            it,
+                            it.name,
+                            ItemType.PLATTFORM_CHAIN
+                        )
+                    )
+                }
+
+                val viewLogicalAddressList: MutableList<ViewInformation> = mutableListOf()
+                integrationLists.logicalAddresses.map {
+                    viewLogicalAddressList.add(
+                        ViewInformation(
+                            it,
+                            "<i>${it.description}</i><br>${it.name}",
+                            ItemType.LOGICAL_ADDRESS
+                        )
+                    )
+                }
+
+                val viewProducerLst: MutableList<ViewInformation> = mutableListOf()
+                integrationLists.serviceProducers.map {
+                    viewProducerLst.add(
+                        ViewInformation(
+                            it,
+                            "<i>${it.description}</i><br>${it.hsaId}",
+                            ItemType.PRODUCER
+                        )
+                    )
+                }
+
+                add(
+                    //HippoTabulatorPage(
+                    HippoTablePage(
+                        consumerHeading,
+                        contractHeading,
+                        plattformHeading,
+                        logicalAddressHeading,
+                        producerHeading,
+                        viewConsumerLst,
+                        viewContractLst,
+                        viewPlattformList,
+                        viewLogicalAddressList,
+                        viewProducerLst
+                    )
+                )
             }
         }
     }
 }
 
-class HippoTabulator(
-
-    columnHeader: String,
-    itemList: List<ViewInformation>
-) : SimplePanel() {
-    init {
-        tabulator(
-            itemList,
-            options = TabulatorOptions(
-                columns = listOf(
-                    ColumnDefinition(
-                        columnHeader, "showData",
-
-                        formatterComponentFunction = { _, _, item ->
-                            //console.log("In ColumnDef: ${item.name}")
-                            Div(rich = true) {
-                                if (store.getState().isItemFiltered(item.type, item.baseItem.id)) {
-                                    background = Background(Col.LIGHTSTEELBLUE)
-                                }
-                                +item.showData
-                            }
-                            //Div() { +item.hsaId }
-                        },
-                        headerFilter = Editor.INPUT
-                    )
-                ),
-                layout = Layout.FITCOLUMNS,
-                layoutColumnsOnNewData = false,
-                pagination = PaginationMode.LOCAL,
-                height = "80vh",
-                paginationSize = 100,
-                selectable = true,
-                rowSelected = { row ->
-                    console.log(row)
-                    val viewItem = row.getData() as ViewInformation
-                    val viewType = viewItem.type
-                    val baseItem = viewItem.baseItem
-                    store.dispatch { dispatch, getState ->
-                        store.dispatch(HippoAction.ItemSelected(viewType, baseItem))
-                        println("Time to download the integrations since an item has been selected")
-                        loadIntegrations(getState())
-                    }
-                    println("Item clicked: $viewType")
-                    console.log(baseItem)
-                }
-            )
-        )
-        {
-            //height = 430.px
-            width = 90.perc
-        }
-    }
-}
-
-// Let the URL mirror the current state
-fun setUrlFilter(bookmark: String) {
-    if (bookmark.length > 1) {
-        val hostname = window.location.hostname;
-        val protocol = window.location.protocol;
-        val port = window.location.port;
-
-        val portSpec = if (port.length > 0) ":$port" else ""
-
-        val newUrl = protocol + "//" + hostname + portSpec + "?filter=" + bookmark
-
-        console.log("New URL: " + newUrl)
-        window.history.pushState(newUrl, "hippo-utforska integrationer", newUrl)
-    }
-}
-
-// Parse the filter parameter and set the state accordingly

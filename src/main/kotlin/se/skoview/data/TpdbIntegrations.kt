@@ -4,8 +4,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonConfiguration
 import se.skoview.lib.getAsyncTpDb
-import se.skoview.view.createViewData
-import se.skoview.view.setUrlFilter
+import kotlin.browser.window
 
 enum class ItemType {
     CONSUMER,
@@ -34,12 +33,6 @@ val TYPE_PARAM: Map<ItemType, String> = mapOf(
     ItemType.DATE_END to "&dateEnd=",
     ItemType.DATE_EFFECTIVE to "&dateEffective="
 )
-
-/**
- * Defines all integrations for the current filter. The filter is provided as a parameter to the factory function mkIntegrationInfo(filter)
- * An IntegrationsInfo object should not change after it has been created.
- * Each object is defined by the filter bookmark, and a map companion contains all objects
- */
 
 @Serializable
 data class IntegrationInfo(
@@ -79,6 +72,7 @@ data class IntegrationCache(
     init {
         map[key] = this
     }
+
     companion object {
         val map: HashMap<String, IntegrationCache> = hashMapOf<String, IntegrationCache>()
     }
@@ -103,8 +97,6 @@ fun loadIntegrations(state: HippoState) {
                 integrationsCache.updateDates
             )
         )
-        //createViewData(store.getState())
-
     } else {
         println("Integrations NOT found in cache - will download")
         console.log(parameters)
@@ -134,7 +126,23 @@ fun loadIntegrations(state: HippoState) {
                     integrationInfo.updateDates
                 )
             )
-            //createViewData(store.getState())
         }
     }
+}
+
+// Let the URL mirror the current state
+fun setUrlFilter(bookmark: String) {
+    println("In serUrlFilter(), bookmark=$bookmark")
+    val hostname = window.location.hostname;
+    val protocol = window.location.protocol;
+    val port = window.location.port;
+
+    val portSpec = if (port.length > 0) ":$port" else ""
+    var newUrl = protocol + "//" + hostname + portSpec
+
+    if (bookmark.length > 1) {
+        newUrl += "?filter=" + bookmark
+    }
+    console.log("New URL: " + newUrl)
+    window.history.pushState(newUrl, "hippo-utforska integrationer", newUrl)
 }

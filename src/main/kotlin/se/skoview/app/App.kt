@@ -12,7 +12,7 @@ import pl.treksoft.kvision.utils.perc
 import se.skoview.data.*
 import se.skoview.view.hippoPage
 
-// todo: Hantering av URL-er
+// todo: Fixa så det går att kopiera text utan att itemet väljs bort
 // todo: Färger på rubrikerna
 // todo: Lite hjälptexter
 // todo: Show item id as tooltip
