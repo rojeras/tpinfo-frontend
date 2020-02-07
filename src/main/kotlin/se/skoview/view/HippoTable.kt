@@ -7,6 +7,7 @@ import pl.treksoft.kvision.form.text.TextInputType
 import pl.treksoft.kvision.form.text.textInput
 import pl.treksoft.kvision.html.*
 import pl.treksoft.kvision.panel.SimplePanel
+import pl.treksoft.kvision.panel.hPanel
 import pl.treksoft.kvision.panel.vPanel
 import pl.treksoft.kvision.state.ObservableList
 import pl.treksoft.kvision.state.observableListOf
@@ -81,47 +82,62 @@ object hippoTablePage : SimplePanel() {
                     }
             }
         }
-        vPanel {
-        }.apply {
-            //background = Background(0x009090)
-            width = 100.perc
-        }
 
         println(">>> In HippoTablePage")
-        table(
-            listOf(),
-            setOf(TableType.SMALL, TableType.BORDERLESS),
-            classes = setOf("table-layout:fixed")
-            //).stateBinding(store) { state ->
-        ).stateBinding(store) { state ->
-            println(">>> In HippoTablePage - recreate the view")
+        vPanel(
+        )
+        println(">>> In HippoTablePage - recreate the view")
 
-            row(classes = setOf("table-layout:fixed")) {
-                cell { h5("Tjänstekonsumenter (${state.vServiceConsumers.size}/${state.maxCounters.consumers})") }.apply {
-                    width = 20.perc
-                }
-                cell { h5("Tjänstekontrakt (${state.vServiceContracts.size}/${state.maxCounters.contracts})") }.apply {
-                    width = 20.perc
-                }
-                cell { h5("Tjänsteplattformar (${state.vPlattformChains.size}/${state.maxCounters.plattformChains})") }.apply {
-                    width = 15.perc
-                }
-                cell { h5("Logiska adresser (${state.vLogicalAddresses.size}/${state.maxCounters.logicalAddress})") }.apply {
-                    width = 20.perc
-                }
-                cell { h5("Tjänsteproducenter (${state.vServiceProducers.size}/${state.maxCounters.producers})") }.apply {
-                    width = 20.perc
-                }
+        /*
+        hPanel {
+            h5("Tjänstekonsumenter (${state.vServiceConsumers.size}/${state.maxCounters.consumers})").apply {
+                width = 20.perc
             }
-            row(classes = setOf("table-layout:fixed")) {
-                cell { searchField() }
-                cell { span("Sökfält") }
-                cell { span("Sökfält") }
-                cell { span("Sökfält") }
-                cell { span("Sökfält") }
+
+            h5("Tjänstekontrakt (${state.vServiceContracts.size}/${state.maxCounters.contracts})").apply {
+                width = 20.perc
             }
-            row(classes = setOf("table-layout:fixed")) {
-                cell(classes = setOf("table-layout:fixed")) {
+            h5("Tjänsteplattformar (${state.vPlattformChains.size}/${state.maxCounters.plattformChains})").apply {
+                width = 15.perc
+            }
+            h5("Logiska adresser (${state.vLogicalAddresses.size}/${state.maxCounters.logicalAddress})").apply {
+                width = 20.perc
+            }
+            h5("Tjänsteproducenter (${state.vServiceProducers.size}/${state.maxCounters.producers})").apply {
+                width = 20.perc
+            }
+        }
+        hPanel(classes = setOf("table-layout:fixed")) {
+            div { searchField() }.apply {
+                width = 20.perc
+            }
+            h5("Tjänstekonsumenter (${state.vServiceConsumers.size}/${state.maxCounters.consumers})").apply {
+                width = 20.perc
+            }
+            div { span("Sökfält") }.apply {
+                width = 20.perc
+            }
+            div { span("Sökfält") }.apply {
+                width = 15.perc
+            }
+            div { span("Sökfält") }.apply {
+                width = 20.perc
+            }
+            div { span("Sökfält") }.apply {
+                width = 20.perc
+            }
+        }
+         */
+        hPanel {
+            vPanel {
+                // Consumers
+                div { searchField() }.apply {
+                    width = 20.perc
+                }.apply { width = 100.perc }
+                div {}.stateBinding(store) { state ->
+                    h5("Tjänstekonsumenter (${state.vServiceConsumers.size}/${state.maxCounters.consumers})").apply {
+                        width = 20.perc
+                    }
                     div {
                         state.vServiceConsumers.subList(0, min(state.vServiceConsumers.size, 100)).map {
                             div(
@@ -142,10 +158,12 @@ object hippoTablePage : SimplePanel() {
                             }
                         }.apply { width = 100.perc }
                     }
-                }.apply { width = 20.perc }
+                }
+            }
 
+/*
                 // Service contracts
-                cell {
+                div {
                     val viewContractLst: MutableList<ViewTableInformation> = mutableListOf()
                     state.vDomainsAndContracts.map {
                         if (it::class.simpleName == "ServiceDomain") {
@@ -157,11 +175,9 @@ object hippoTablePage : SimplePanel() {
                         }
                     }
                     add(HippoTable(viewContractLst))
-                }.apply {
-                    width = 20.perc
                 }
                 // Plattforms
-                cell {
+                div {
                     val viewPlattformList: MutableList<ViewTableInformation> = mutableListOf()
                     state.vPlattformChains.map {
                         viewPlattformList.add(
@@ -173,11 +189,9 @@ object hippoTablePage : SimplePanel() {
                         )
                     }
                     add(HippoTable(viewPlattformList))
-                }.apply {
-                    width = 15.perc
                 }
                 // Logical addresses
-                cell {
+                div {
                     val viewLogicalAddressList: MutableList<ViewTableInformation> = mutableListOf()
                     state.vLogicalAddresses.map {
                         viewLogicalAddressList.add(
@@ -189,11 +203,9 @@ object hippoTablePage : SimplePanel() {
                         )
                     }
                     add(HippoTable(viewLogicalAddressList))
-                }.apply {
-                    width = 20.perc
                 }
                 // Service producers
-                cell {
+                div {
                     val viewProducerLst: MutableList<ViewTableInformation> = mutableListOf()
                     state.vServiceProducers.map {
                         viewProducerLst.add(
@@ -205,17 +217,16 @@ object hippoTablePage : SimplePanel() {
                         )
                     }
                     add(HippoTable(viewProducerLst))
-                }.apply {
-                    width = 20.perc
                 }
-                /*
-            }.apply
-            {
-                color = Color(Col.BLACK)
-                width = 100.perc
-            }
+
+ */
+            /*
+        }.apply
+        {
+            color = Color(Col.BLACK)
+            width = 100.perc
+        }
 */
-            }
         }
     }
 }
@@ -281,7 +292,7 @@ private fun Container.searchField() {
             input = {
                 println("Before dispatch: ${self.value ?: ""}")
                 //store.dispatch { dispatch, getState ->
-                    store.dispatch(HippoAction.FilterConsumers(self.value ?: ""))
+                store.dispatch(HippoAction.FilterConsumers(self.value ?: ""))
                 //}
                 println("After dispatch")
             }

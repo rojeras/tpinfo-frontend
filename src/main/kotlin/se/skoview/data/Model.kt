@@ -1,7 +1,9 @@
 package se.skoview.data
 
+import org.w3c.dom.get
 import pl.treksoft.kvision.redux.createReduxStore
 import kotlin.browser.document
+import kotlin.browser.window
 import kotlin.js.Date
 
 enum class SyncActionStatus {
