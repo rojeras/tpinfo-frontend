@@ -10,7 +10,7 @@ import pl.treksoft.kvision.require
 import pl.treksoft.kvision.startApplication
 import pl.treksoft.kvision.utils.perc
 import se.skoview.data.*
-import se.skoview.view.hippoPage
+import se.skoview.view.hippoTablePage
 
 // todo: Fixa så det går att kopiera text utan att itemet väljs bort
 // todo: Färger på rubrikerna
@@ -45,18 +45,20 @@ class App : Application() {
         root("kvapp") {
 
             vPanel {
-                add(hippoPage)
+                add(hippoTablePage)
             }.apply {
                 width = 100.perc
             }
         }
 
         store.subscribe { state ->
+            println("Store subscribe before call to stateChangeTrigger")
             stateChangeTrigger(state)
+            println("Store subscribe after call to stateChangeTrigger")
         }
 
         Pace.init()
-        store.dispatch(HippoAction.ApplicationStarted)
+        //store.dispatch(HippoAction.ApplicationStarted)
     }
 
 }

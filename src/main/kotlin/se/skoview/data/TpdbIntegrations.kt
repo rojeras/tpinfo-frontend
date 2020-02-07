@@ -98,10 +98,10 @@ fun loadIntegrations(state: HippoState) {
             )
         )
     } else {
-        println("Integrations NOT found in cache - will download")
+        println(">>> Integrations NOT found in cache - will download")
         console.log(parameters)
         getAsyncTpDb(parameters) { response ->
-            println("Size of response is: ${response.length}")
+            println(">>> Size of fetched integrations is: ${response.length}")
             val json = Json(JsonConfiguration.Stable)
             val integrationInfo: IntegrationInfo = json.parse(IntegrationInfo.serializer(), response)
             console.log(integrationInfo)

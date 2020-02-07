@@ -1,5 +1,6 @@
 package se.skoview.view
 
+import pl.treksoft.kvision.i18n.tr
 import se.skoview.data.*
 
 data class IntegrationLists(
@@ -12,11 +13,16 @@ data class IntegrationLists(
     val logicalAddresses: List<LogicalAddress>
 )
 
-fun createViewData(state: HippoState): IntegrationLists {
-    println(":::::::::::: Start createViewData() ::::::::::::::::")
+fun createViewData(state: HippoState) {
+    println(">>> Start createViewData()")
     // Extract plattform chains
+
+    //val state = store.getState()
+
+    val filteredIntegrations = filterViewData(state)
+
     val plattformChains =
-        state.integrationArrs.asSequence()
+        filteredIntegrations.asSequence()
             .map { integration: Integration ->
                 PlattformChain.calculateId(
                     integration.firstTpId,
@@ -30,7 +36,7 @@ fun createViewData(state: HippoState): IntegrationLists {
 
     // Extract logical addresses
     val logicalAddresses =
-        state.integrationArrs.asSequence()
+        filteredIntegrations.asSequence()
             .map { integration: Integration -> integration.logicalAddressId } //iarr: Array<Int> -> iarr[4] }
             .distinct()
             .map { LogicalAddress.map[it] ?: LogicalAddress(-1, "", "") }
@@ -39,7 +45,7 @@ fun createViewData(state: HippoState): IntegrationLists {
 
     // Domains must be added before the contracts
     val serviceDomains =
-        state.integrationArrs.asSequence()
+        filteredIntegrations.asSequence()
             .map { integration: Integration -> integration.serviceDomainId }
             .distinct()
             .map {
@@ -51,7 +57,7 @@ fun createViewData(state: HippoState): IntegrationLists {
     // Contracts
 
     val serviceContracts =
-        state.integrationArrs.asSequence()
+        filteredIntegrations.asSequence()
             .map { integration: Integration -> integration.serviceContractId }
             .distinct()
             .map {
@@ -64,7 +70,7 @@ fun createViewData(state: HippoState): IntegrationLists {
 
     // Consumers
     val serviceConsumers =
-        state.integrationArrs.asSequence()
+        filteredIntegrations.asSequence()
             .map { integration: Integration -> integration.serviceConsumerId }
             .distinct()
             .map {
@@ -74,7 +80,7 @@ fun createViewData(state: HippoState): IntegrationLists {
             .toList()
 
     val serviceProducers =
-        state.integrationArrs.asSequence()
+        filteredIntegrations.asSequence()
             .map { integration: Integration -> integration.serviceProducerId }
             .distinct()
             .map {
@@ -108,21 +114,64 @@ fun createViewData(state: HippoState): IntegrationLists {
         plattformChains,
         logicalAddresses
     )
-    println(":::::::::::: End createViewData() ::::::::::::::::")
-    return integrationLists
-/*
-    store.dispatch(
-        HippoAction.ViewUpdated(
-            serviceConsumers,
-            serviceProducers,
-            serviceDomains,
-            serviceContracts,
-            domainsAndContracts,
-            plattformChains,
-            logicalAddresses
-        )
-    )
- */
+    println("<<< End createViewData()")
+    store.dispatch(HippoAction.ViewUpdated(integrationLists))
+}
+
+fun filterViewData(state: HippoState): List<Integration> {
+
+    println(">>>> Start filterViewData")
+    val integrationListsIn = state.integrationArrs
+
+    val consumerFilter = state.consumerFilter
+    val contractFilter = ""
+    val laFilter = ""
+    val producerFilter = ""
+
+    val selectedConsumers = state.selectedConsumers
+
+    // Loop through the list and remove all items which does not fulfill the filtering
+    val resultList: MutableList<Integration> = mutableListOf()
+
+    for (integration in integrationListsIn) {
+
+        if (
+            selectedConsumers.isNotEmpty() &&
+            (!selectedConsumers.contains(integration.serviceConsumerId))
+        ) continue
+        else if (
+            consumerFilter.isNotEmpty() &&
+            !ServiceComponent
+                .map[integration.serviceConsumerId]!!
+                .searchField
+                .contains(
+                    consumerFilter,
+                    true
+                )
+        ) continue
+
+        if (contractFilter.isNotEmpty() && !ServiceContract.map[integration.serviceContractId]!!.searchField.contains(
+                contractFilter,
+                true
+            )
+        ) continue
+        if (laFilter.isNotEmpty() && !LogicalAddress.map[integration.logicalAddressId]!!.searchField.contains(
+                laFilter,
+                true
+            )
+        ) continue
+        if (producerFilter.isNotEmpty() && !ServiceComponent.map[integration.serviceProducerId]!!.searchField.contains(
+                producerFilter,
+                true
+            )
+        ) continue
+
+        resultList.add(integration)
+    }
+
+    println("<<<< End filterViewData")
+
+    return resultList
 }
 
 private fun addUnique(item: BaseItem, list: MutableList<BaseItem>) {

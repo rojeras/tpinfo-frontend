@@ -1,6 +1,7 @@
 package se.skoview.data
 
 import pl.treksoft.kvision.redux.RAction
+import se.skoview.view.IntegrationLists
 
 /** According to: https://github.com/redux-utilities/flux-standard-action
  * An action object should have a type and contain:
@@ -26,6 +27,6 @@ sealed class HippoAction : RAction {
         val viewType: ItemType,
         val baseItem: BaseItem
     ) : HippoAction()
-
+    data class ViewUpdated(val integrationLists: IntegrationLists) : HippoAction()
     data class FilterConsumers(val consumerFilter: String) : HippoAction()
 }

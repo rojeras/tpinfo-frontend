@@ -1,16 +1,28 @@
 package se.skoview.data
 
+import se.skoview.view.createViewData
+
 
 fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
-    println("----> In hippoReducer, action=${action::class}")
+    println("=====>>> ${action::class}")
     //console.log(state)
-
     val newState = when (action) {
-        is HippoAction.FilterConsumers -> state.copy(consumerFilter = action.consumerFilter)
-        is HippoAction.ApplicationStarted -> state.copy(applicationStarted = true)
-        is HippoAction.StartDownloadBaseItems -> state.copy(downloadBaseItemStatus = AsyncActionStatus.INITIALIZED)
+        is HippoAction.FilterConsumers -> state.copy(
+            currentAction = action,
+            recreateViewData = true,
+            consumerFilter = action.consumerFilter
+        )
+        is HippoAction.ApplicationStarted -> state.copy(
+            currentAction = action,
+            applicationStarted = true
+        )
+        is HippoAction.StartDownloadBaseItems -> state.copy(
+            currentAction = action,
+            downloadBaseItemStatus = AsyncActionStatus.INITIALIZED
+        )
         is HippoAction.DoneDownloadBaseItems -> {
             state.copy(
+                currentAction = action,
                 downloadBaseItemStatus = AsyncActionStatus.COMPLETED,
                 integrationDates = BaseDates.integrationDates,
                 statisticsDates = BaseDates.statisticsDates,
@@ -26,38 +38,53 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
             )
         }
         is HippoAction.ErrorDownloadBaseItems -> state.copy(
+            currentAction = action,
             downloadBaseItemStatus = AsyncActionStatus.ERROR,
             errorMessage = action.errorMessage
         )
         is HippoAction.StartDownloadIntegrations -> {
             state.copy(
-                showIntegrations = true,
+                currentAction = action,
+                recreateViewData = false,
                 downloadIntegrationStatus = AsyncActionStatus.INITIALIZED
             )
         }
         is HippoAction.DoneDownloadIntegrations -> {
-            var dates: MutableList<String> = mutableListOf()
+            val dates: MutableList<String> = mutableListOf()
             // Must ensure the selected date is part of the list of all dates
             // Otherwise the date selector might be empty
             dates.addAll(action.updateDates)
             dates.add(state.dateEffective)
             state.copy(
-                showIntegrations = true,
+                currentAction = action,
+                recreateViewData = true,
                 downloadIntegrationStatus = AsyncActionStatus.COMPLETED,
                 integrationArrs = action.integrationArrs,
                 maxCounters = action.maxCounters,
                 updateDates = dates.distinct().sortedDescending() //action.updateDates
             )
-
         }
         is HippoAction.ErrorDownloadIntegrations -> state.copy(
+            currentAction = action,
             downloadIntegrationStatus = AsyncActionStatus.ERROR,
             errorMessage = action.errorMessage
         )
         is HippoAction.DateSelected -> state.copy(
-            showIntegrations = false,
+            currentAction = action,
+            recreateViewData = false,
             dateEffective = action.selectedDate,
             dateEnd = action.selectedDate
+        )
+        is HippoAction.ViewUpdated -> state.copy(
+            currentAction = action,
+            recreateViewData = false,
+            vServiceConsumers = action.integrationLists.serviceConsumers,
+            vServiceDomains = action.integrationLists.serviceDomains,
+            vServiceContracts = action.integrationLists.serviceContracts,
+            vDomainsAndContracts = action.integrationLists.domainsAndContracts,
+            vPlattformChains = action.integrationLists.plattformChains,
+            vLogicalAddresses = action.integrationLists.logicalAddresses,
+            vServiceProducers = action.integrationLists.serviceProducers
         )
         is HippoAction.ItemSelected -> {
 
@@ -67,27 +94,33 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
 
             when (action.viewType) {
                 ItemType.CONSUMER -> state.copy(
-                    showIntegrations = false,
+                    currentAction = action,
+                    recreateViewData = true,
                     selectedConsumers = newList
                 )
                 ItemType.DOMAIN -> state.copy(
-                    showIntegrations = false,
+                    currentAction = action,
+                    recreateViewData = true,
                     selectedDomains = newList
                 )
                 ItemType.CONTRACT -> state.copy(
-                    showIntegrations = false,
+                    currentAction = action,
+                    recreateViewData = true,
                     selectedContracts = newList
                 )
                 ItemType.PLATTFORM_CHAIN -> state.copy(
-                    showIntegrations = false,
+                    currentAction = action,
+                    recreateViewData = true,
                     selectedPlattformChains = newList
                 )
                 ItemType.LOGICAL_ADDRESS -> state.copy(
-                    showIntegrations = false,
+                    currentAction = action,
+                    recreateViewData = true,
                     selectedLogicalAddresses = newList
                 )
                 ItemType.PRODUCER -> state.copy(
-                    showIntegrations = false,
+                    currentAction = action,
+                    recreateViewData = true,
                     selectedProducers = newList
                 )
                 else -> {
@@ -98,21 +131,28 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
         }
     }
 
+    console.log(newState)
+    println("<<<===== ${action::class}")
+
     return newState
 }
 
 // Called after each state change (reducer)
 fun stateChangeTrigger(state: HippoState) {
-    // Load base items at application start
-    if (state.applicationStarted == true && state.downloadBaseItemStatus == AsyncActionStatus.NOT_INITIALIZED) {
-        loadBaseItems(store)
-        return
+    println("+++++>>> ${state.currentAction::class}")
+    when (state.currentAction) {
+        // Load base items at application start
+        is HippoAction.ApplicationStarted -> {
+            println(">> stateChangeTrigger() - when currentState == ApplicationStarted")
+            loadBaseItems(store)
+        }
+        is HippoAction.DoneDownloadBaseItems -> loadIntegrations(state)
+
+        is HippoAction.DoneDownloadIntegrations -> createViewData(state)
+        //is HippoAction.ItemSelected -> loadIntegrations(state)
+        is HippoAction.ItemSelected -> createViewData(state)
+        is HippoAction.FilterConsumers -> createViewData(state)
     }
 
-    // Load integrations
-    if ( state.downloadBaseItemStatus == AsyncActionStatus.COMPLETED
-        && state.downloadIntegrationStatus == AsyncActionStatus.NOT_INITIALIZED ) {
-        loadIntegrations(state)
-        return
-    }
+    println("<<<+++++ ${state.currentAction::class}")
 }

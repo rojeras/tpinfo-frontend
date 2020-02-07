@@ -21,10 +21,11 @@ enum class AsyncActionStatus {
 //@Serializable
 data class HippoState(
     // Status information
+    val currentAction: HippoAction,
     val applicationStarted: Boolean,
     val downloadBaseItemStatus: AsyncActionStatus,
     val downloadIntegrationStatus: AsyncActionStatus,
-    val showIntegrations: Boolean,
+    val recreateViewData: Boolean = false, // Default is false
     val errorMessage: String?,
 
     // Base Items
@@ -52,6 +53,15 @@ data class HippoState(
     val integrationArrs: List<Integration>,
     val maxCounters: MaxCounter,
     val updateDates: List<String>,
+
+    // View data
+    val vServiceConsumers: List<ServiceComponent>,
+    val vServiceProducers: List<ServiceComponent>,
+    val vServiceDomains: List<ServiceDomain>,
+    val vServiceContracts: List<ServiceContract>,
+    val vDomainsAndContracts: List<BaseItem>,
+    val vPlattformChains: List<PlattformChain>,
+    val vLogicalAddresses: List<LogicalAddress>,
 
     // Text search filter
     val consumerFilter: String
@@ -259,6 +269,7 @@ fun getInitialState(): HippoState {
     val bookmarkInformation = parseBookmark()
 
     val initialState = HippoState(
+        HippoAction.ApplicationStarted,
         false,
         AsyncActionStatus.NOT_INITIALIZED,
         AsyncActionStatus.NOT_INITIALIZED,
@@ -282,6 +293,13 @@ fun getInitialState(): HippoState {
         bookmarkInformation.selectedPlattformChains,
         listOf(),
         MaxCounter(0, 0, 0, 0, 0, 0),
+        listOf(),
+        listOf(),
+        listOf(),
+        listOf(),
+        listOf(),
+        listOf(),
+        listOf(),
         listOf(),
         ""
     )
