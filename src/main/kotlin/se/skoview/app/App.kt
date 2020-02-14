@@ -16,7 +16,16 @@ import se.skoview.view.hippoTablePage
 // todo: Färger på rubrikerna
 // todo: Lite hjälptexter
 // todo: Show item id as tooltip
-// todo: Tag bort v-datat från state. Detta kan tas fram dynamiskt när informationen presenteras
+// todo: Byta plats på logiska adresser och producenter
+// todo: Stöd för backpil (dvs backa)
+// todo: Byt ut den gröna färgen i headern
+// todo: Steg 1 Driftsätt K-hippo (rhippo)
+// todo: Steg 2 Lös detta med att visa SE
+// todo: Steg 3 Tag fram mock för hur integrationer ska presenteras där det kan finnas flera LA
+// todo: Steg 4 Lös trädklättringen, kanske mha HSA-trädet
+// todo: Publicera rhippo på hippokrates.se
+
+
 /*
 Kommentarer från ML:
 rhippo
@@ -51,13 +60,16 @@ class App : Application() {
             }
         }
 
+        /*
         store.subscribe { state ->
             println("Store subscribe before call to stateChangeTrigger")
             stateChangeTrigger(state)
             println("Store subscribe after call to stateChangeTrigger")
         }
+         */
 
         Pace.init()
+        loadBaseItems(store)
         //store.dispatch(HippoAction.ApplicationStarted)
     }
 

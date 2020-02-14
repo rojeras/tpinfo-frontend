@@ -28,5 +28,5 @@ sealed class HippoAction : RAction {
         val baseItem: BaseItem
     ) : HippoAction()
     data class ViewUpdated(val integrationLists: IntegrationLists) : HippoAction()
-    data class FilterConsumers(val consumerFilter: String) : HippoAction()
+    data class FilterItems(val type: ItemType, val filterString: String) : HippoAction()
 }

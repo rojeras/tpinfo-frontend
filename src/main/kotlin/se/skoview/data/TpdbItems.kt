@@ -31,7 +31,10 @@ fun areAllBaseItemsLoaded(store: ReduxStore<HippoState, HippoAction>) {
         ServiceDomain.isLoaded &&
         BaseDates.isLoaded
     )
-        store.dispatch(HippoAction.DoneDownloadBaseItems)
+        store.dispatch { action, getState ->
+            store.dispatch(HippoAction.DoneDownloadBaseItems)
+            loadIntegrations(getState())
+        }
 }
 
 abstract class BaseItem {

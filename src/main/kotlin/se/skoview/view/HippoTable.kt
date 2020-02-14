@@ -9,20 +9,17 @@ import pl.treksoft.kvision.html.*
 import pl.treksoft.kvision.panel.SimplePanel
 import pl.treksoft.kvision.panel.hPanel
 import pl.treksoft.kvision.panel.vPanel
-import pl.treksoft.kvision.state.ObservableList
-import pl.treksoft.kvision.state.observableListOf
 import pl.treksoft.kvision.state.stateBinding
 import pl.treksoft.kvision.table.*
 import pl.treksoft.kvision.utils.perc
 import pl.treksoft.kvision.utils.px
+import pl.treksoft.kvision.utils.vw
 import se.skoview.data.*
 import kotlin.math.min
 
 data class SearchFilter(
     var consumerSearchFilter: String = ""
 )
-
-val searchFilters: ObservableList<SearchFilter> = observableListOf(SearchFilter(""))
 
 data class ViewTableInformation(
     val baseItem: BaseItem,
@@ -57,7 +54,7 @@ object hippoTablePage : SimplePanel() {
             margin = 0.px
             background = Background(0xf6efe9)
         }.stateBinding(store) { state ->
-            div(classes = setOf(""""class="cssload-loader""""))
+            div(classes = setOf(""""class="cssload-loader"""")).width = 100.perc
             div {
                 //add(DateSelectPanel(state.updateDates, state.dateEffective.toSwedishDate()))
                 val dateOptionList = state.updateDates.map { Pair(it, it) }
@@ -73,229 +70,260 @@ object hippoTablePage : SimplePanel() {
                         change = {
                             println("Date selected:")
                             console.log(self.value)
-                            store.dispatch(HippoAction.DateSelected(self.value ?: ""))
                             store.dispatch { dispatch, getState ->
                                 dispatch(HippoAction.DateSelected(self.value ?: ""))
                                 loadIntegrations(getState())
                             }
                         }
                     }
-            }
+            }//.width = 100.perc
         }
 
-        println(">>> In HippoTablePage")
-        vPanel(
-        )
-        println(">>> In HippoTablePage - recreate the view")
-
-        /*
         hPanel {
-            h5("Tjänstekonsumenter (${state.vServiceConsumers.size}/${state.maxCounters.consumers})").apply {
-                width = 20.perc
-            }
+            // The whole item table
 
-            h5("Tjänstekontrakt (${state.vServiceContracts.size}/${state.maxCounters.contracts})").apply {
-                width = 20.perc
-            }
-            h5("Tjänsteplattformar (${state.vPlattformChains.size}/${state.maxCounters.plattformChains})").apply {
-                width = 15.perc
-            }
-            h5("Logiska adresser (${state.vLogicalAddresses.size}/${state.maxCounters.logicalAddress})").apply {
-                width = 20.perc
-            }
-            h5("Tjänsteproducenter (${state.vServiceProducers.size}/${state.maxCounters.producers})").apply {
-                width = 20.perc
-            }
-        }
-        hPanel(classes = setOf("table-layout:fixed")) {
-            div { searchField() }.apply {
-                width = 20.perc
-            }
-            h5("Tjänstekonsumenter (${state.vServiceConsumers.size}/${state.maxCounters.consumers})").apply {
-                width = 20.perc
-            }
-            div { span("Sökfält") }.apply {
-                width = 20.perc
-            }
-            div { span("Sökfält") }.apply {
-                width = 15.perc
-            }
-            div { span("Sökfält") }.apply {
-                width = 20.perc
-            }
-            div { span("Sökfält") }.apply {
-                width = 20.perc
-            }
-        }
-         */
-        hPanel {
+            // -------------------------------------------------------------------------------------------------------
+            // Consumers
             vPanel {
-                // Consumers
-                div { searchField() }.apply {
-                    width = 20.perc
-                }.apply { width = 100.perc }
+                width = 20.vw
+                div {
+                    width = 100.perc
+                    minWidth = 100.perc
+                    searchField(ItemType.CONSUMER)
+                }
                 div {}.stateBinding(store) { state ->
-                    h5("Tjänstekonsumenter (${state.vServiceConsumers.size}/${state.maxCounters.consumers})").apply {
-                        width = 20.perc
-                    }
+                    h5("Tjänstekonsumenter (${state.vServiceConsumers.size}/${state.maxCounters.consumers})")
                     div {
-                        state.vServiceConsumers.subList(0, min(state.vServiceConsumers.size, 100)).map {
-                            div(
-                                rich = true
-                            ) {
-                                border = Border(1.px, BorderStyle.SOLID, Col.GRAY)
-                                val item = it
-                                if (store.getState().isItemFiltered(ItemType.CONSUMER, item.id)) background =
-                                    Background(Col.LIGHTSTEELBLUE)
+                        state.vServiceConsumers.subList(0, min(state.vServiceConsumers.size, 100))
+                            .map {
+                                div(
+                                    rich = true
+                                ) {
+                                    wordBreak = WordBreak.BREAKALL
+                                    border = Border(1.px, BorderStyle.SOLID, Col.GRAY)
+                                    val item = it
+                                    if (store.getState().isItemFiltered(ItemType.CONSUMER, item.id)) background =
+                                        Background(Col.LIGHTSTEELBLUE)
 
-                                val content = "<i>${it.description}</i><br>${item.hsaId}"
-                                +"""<span style=word-break:break-all; word-wrap: break-word; "onMouseOver=this.style.cursor='hand'";>${content}</span>"""
-                                onEvent {
-                                    click = {
-                                        store.dispatch(HippoAction.ItemSelected(ItemType.CONSUMER, item))
+                                    val content = "<i>${it.description}</i><br>${item.hsaId}"
+                                    +"""<span style=word-break:break-all;>${content}</span>"""
+
+                                    onEvent {
+                                        click = {
+                                            store.dispatch { dispatch, getState ->
+                                                dispatch(HippoAction.ItemSelected(ItemType.CONSUMER, item))
+                                                createViewData(getState())
+                                            }
+                                        }
                                     }
                                 }
                             }
-                        }.apply { width = 100.perc }
                     }
                 }
             }
 
-/*
-                // Service contracts
+            // -------------------------------------------------------------------------------------------------------
+            // Domains and contracts
+            vPanel {
                 div {
-                    val viewContractLst: MutableList<ViewTableInformation> = mutableListOf()
-                    state.vDomainsAndContracts.map {
-                        if (it::class.simpleName == "ServiceDomain") {
-                            val desc = "<b>${it.description}</b>"
-                            viewContractLst.add(ViewTableInformation(it, desc, ItemType.DOMAIN))
-                        } else {
-                            val desc = it.description
-                            viewContractLst.add(ViewTableInformation(it, desc, ItemType.CONTRACT))
-                        }
-                    }
-                    add(HippoTable(viewContractLst))
+                    width = 20.vw
+                    searchField(ItemType.CONTRACT)
                 }
-                // Plattforms
-                div {
-                    val viewPlattformList: MutableList<ViewTableInformation> = mutableListOf()
-                    state.vPlattformChains.map {
-                        viewPlattformList.add(
-                            ViewTableInformation(
-                                it,
-                                it.name,
-                                ItemType.PLATTFORM_CHAIN
-                            )
-                        )
-                    }
-                    add(HippoTable(viewPlattformList))
-                }
-                // Logical addresses
-                div {
-                    val viewLogicalAddressList: MutableList<ViewTableInformation> = mutableListOf()
-                    state.vLogicalAddresses.map {
-                        viewLogicalAddressList.add(
-                            ViewTableInformation(
-                                it,
-                                "<i>${it.description}</i><br>${it.name}",
-                                ItemType.LOGICAL_ADDRESS
-                            )
-                        )
-                    }
-                    add(HippoTable(viewLogicalAddressList))
-                }
-                // Service producers
-                div {
-                    val viewProducerLst: MutableList<ViewTableInformation> = mutableListOf()
-                    state.vServiceProducers.map {
-                        viewProducerLst.add(
-                            ViewTableInformation(
-                                it,
-                                "<i>${it.description}</i><br>${it.hsaId}",
-                                ItemType.PRODUCER
-                            )
-                        )
-                    }
-                    add(HippoTable(viewProducerLst))
-                }
+                div {}.stateBinding(store) { state ->
+                    h5("Tjänstekontrakt (${state.vServiceContracts.size}/${state.maxCounters.contracts})")
+                    div {
+                        border = Border(1.px, BorderStyle.SOLID, Col.GRAY)
+                        state.vDomainsAndContracts.subList(0, min(state.vDomainsAndContracts.size, 100))
+                            .map {
+                                div(
+                                    rich = true
+                                ) {
+                                    wordBreak = WordBreak.BREAKALL
+                                    //border = Border(1.px, BorderStyle.SOLID, Col.GRAY)
+                                    val item = it
+                                    // Service Contract
+                                    if (item::class.simpleName == "ServiceContract") {
+                                        //border = Border(1.px, BorderStyle.SOLID, Col.GRAY)
+                                        if (store.getState().isItemFiltered(ItemType.CONTRACT, item.id)) background =
+                                            Background(Col.LIGHTSTEELBLUE)
 
- */
-            /*
-        }.apply
-        {
-            color = Color(Col.BLACK)
-            width = 100.perc
-        }
-*/
-        }
-    }
-}
+                                        val content = it.description
+                                        +"""<span style=word-break:break-all; word-wrap: break-word; "onMouseOver=this.style.cursor='hand'";>${content}</span>"""
 
-class HippoTable(
-    itemList: List<ViewTableInformation>
-) : SimplePanel() {
-    init {
-        div {
-            border = Border(1.px, BorderStyle.SOLID, Col.BLACK)
-            table(
-                listOf(),
-                setOf(TableType.SMALL, TableType.BORDERLESS),
-                responsiveType = ResponsiveType.RESPONSIVE
-                //setOf(TableType.SMALL, TableType.BORDERED)
-            ) {
-                itemList
-                    .subList(0, min(itemList.size, 100))
-                    .map {
-                        div(
-                            rich = true
-                        ) {
-                            val item = it
+                                        onEvent {
+                                            click = {
+                                                store.dispatch { dispatch, getState ->
+                                                    dispatch(HippoAction.ItemSelected(ItemType.CONTRACT, item))
+                                                    createViewData(getState())
+                                                }
+                                            }
+                                        }
+                                    } else {
+                                        // Service Domain
+                                        border = Border(1.px, BorderStyle.SOLID, Col.GRAY)
+                                        if (store.getState().isItemFiltered(ItemType.DOMAIN, item.id)) background =
+                                            Background(Col.LIGHTSTEELBLUE)
 
-                            if (it.type == ItemType.CONTRACT) {
-                                //border = Border(1.px, BorderStyle.SOLID, Col.GRAY)
-                            } else {
-                                border = Border(1.px, BorderStyle.SOLID, Col.GRAY)
-                            }
-                            if (store.getState().isItemFiltered(item.type, item.baseItem.id)) {
-                                background = Background(Col.LIGHTSTEELBLUE)
-                            }
+                                        val content = "<b>${it.description}</b>"
+                                        +"""<span style=word-break:break-all; word-wrap: break-word; "onMouseOver=this.style.cursor='hand'";>${content}</span>"""
 
-                            +"""<span style=word-break:break-all; word-wrap: break-word; "onMouseOver=this.style.cursor='hand'";>${it.showData}</span>"""
-
-                            onEvent {
-                                click = {
-                                    println("Clicked: ${item.showData}")
-                                    val viewType = item.type
-                                    val baseItem = item.baseItem
-                                    //store.dispatch { dispatch, getState ->
-                                    store.dispatch(HippoAction.ItemSelected(viewType, baseItem))
-                                    //println("Time to download the integrations since an item has been selected/deselected")
-                                    //console.log(getState())
-                                    //loadIntegrations(getState())
-                                    //}
+                                        onEvent {
+                                            click = {
+                                                store.dispatch { dispatch, getState ->
+                                                    dispatch(HippoAction.ItemSelected(ItemType.DOMAIN, item))
+                                                    createViewData(getState())
+                                                }
+                                            }
+                                        }
+                                    }
                                 }
                             }
-
-                        }
                     }
-            }.apply {
-                width = 100.perc
+                }
+            }
+            // -------------------------------------------------------------------------------------------------------
+            // Plattform chains
+            vPanel {
+                div {
+                    width = 15.vw
+                    searchField(ItemType.PLATTFORM_CHAIN)
+                }
+                div {}.stateBinding(store) { state ->
+                    h5("Tjänsteplattformar (${state.vPlattformChains.size}/${state.maxCounters.plattformChains})")
+                    div {
+                        state.vPlattformChains.subList(0, min(state.vPlattformChains.size, 100))
+                            .map {
+                                div(
+                                    rich = true
+                                ) {
+                                    wordBreak = WordBreak.BREAKALL
+                                    border = Border(1.px, BorderStyle.SOLID, Col.GRAY)
+                                    val item = it
+                                    if (store.getState().isItemFiltered(ItemType.PLATTFORM_CHAIN, item.id)) background =
+                                        Background(Col.LIGHTSTEELBLUE)
+
+                                    val content = item.name
+                                    +"""<span style=word-break:break-all; word-wrap: break-word; "onMouseOver=this.style.cursor='hand'";>${content}</span>"""
+
+                                    onEvent {
+                                        click = {
+                                            store.dispatch { dispatch, getState ->
+                                                dispatch(HippoAction.ItemSelected(ItemType.PLATTFORM_CHAIN, item))
+                                                createViewData(getState())
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                    }
+                } //.apply { width = 100.perc }
+            }
+
+
+            // -------------------------------------------------------------------------------------------------------
+            // Logical Addresses
+            vPanel {
+                div {
+                    width = 20.vw
+                    searchField(ItemType.LOGICAL_ADDRESS)
+                }
+                div {}.stateBinding(store) { state ->
+                    h5("Logiska adresser (${state.vLogicalAddresses.size}/${state.maxCounters.logicalAddress})")
+                    div {
+                        state.vLogicalAddresses.subList(0, min(state.vLogicalAddresses.size, 100))
+                            .map {
+                                div(
+                                    rich = true
+                                ) {
+                                    wordBreak = WordBreak.BREAKALL
+                                    border = Border(1.px, BorderStyle.SOLID, Col.GRAY)
+                                    val item = it
+                                    if (store.getState().isItemFiltered(ItemType.LOGICAL_ADDRESS, item.id)) background =
+                                        Background(Col.LIGHTSTEELBLUE)
+
+                                    val content = "<i>${it.description}</i><br>${item.name}"
+                                    +"""<span style=word-break:break-all; word-wrap: break-word; "onMouseOver=this.style.cursor='hand'";>${content}</span>"""
+
+                                    onEvent {
+                                        click = {
+                                            store.dispatch { dispatch, getState ->
+                                                dispatch(HippoAction.ItemSelected(ItemType.LOGICAL_ADDRESS, item))
+                                                createViewData(getState())
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                    }
+                } //.apply { width = 100.perc }
+            }
+
+            // -------------------------------------------------------------------------------------------------------
+            // Producers
+            vPanel {
+                div {
+                    minWidth = 100.perc
+                    searchField(ItemType.PRODUCER)
+                }
+                div {}.stateBinding(store) { state ->
+                    h5("Tjänsteproducenter (${state.vServiceProducers.size}/${state.maxCounters.producers})")
+                    div {
+                        state.vServiceProducers.subList(0, min(state.vServiceProducers.size, 100))
+                            .map {
+                                div(
+                                    rich = true
+                                ) {
+                                    wordBreak = WordBreak.BREAKALL
+                                    border = Border(1.px, BorderStyle.SOLID, Col.GRAY)
+                                    val item = it
+                                    if (store.getState().isItemFiltered(ItemType.PRODUCER, item.id)) background =
+                                        Background(Col.LIGHTSTEELBLUE)
+
+                                    val content = "<i>${it.description}</i><br>${item.hsaId}"
+                                    +"""<span style=word-break:break-all; word-wrap: break-word; "onMouseOver=this.style.cursor='hand'";>${content}</span>"""
+
+                                    onEvent {
+                                        click = {
+                                            store.dispatch { dispatch, getState ->
+                                                dispatch(HippoAction.ItemSelected(ItemType.PRODUCER, item))
+                                                createViewData(getState())
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                    }
+                } //.apply { width = 100.perc }
             }
         }
     }
 }
 
-private fun Container.searchField() {
+private fun Container.searchField(type: ItemType) {
     textInput(type = TextInputType.SEARCH) {
-        placeholder = "Sök tjänstekonsument..."
+        if (type == ItemType.CONSUMER) placeholder = "Sök tjänstekonsument..."
+        else if (type == ItemType.CONTRACT) placeholder = "Sök tjänstekontrakt/tjänstedomän..."
+        else if (type == ItemType.LOGICAL_ADDRESS) placeholder = "Sök logisk adress..."
+        else if (type == ItemType.PRODUCER) placeholder = "Sök tjänsteproducent..."
+        else if (type == ItemType.PLATTFORM_CHAIN) placeholder = "Sök tjänsteplattform(ar)..."
+        else placeholder == "Internal error in searchField()"
+
         onEvent {
+            var timeout = 0
             input = {
-                println("Before dispatch: ${self.value ?: ""}")
-                //store.dispatch { dispatch, getState ->
-                store.dispatch(HippoAction.FilterConsumers(self.value ?: ""))
-                //}
-                println("After dispatch")
+                kotlin.browser.window.clearTimeout(timeout)
+                val value = self.value ?: ""
+                timeout = kotlin.browser.window.setTimeout({
+                    store.dispatch { dispatch, getState ->
+                        println("::::::::::::::> Current field: ${self.value}")
+                        if (value.length > 0) self.background = Background(Col.LIGHTCYAN)
+                        else self.background = Background(Col.WHITE)
+                        dispatch(HippoAction.FilterItems(type, value))
+                        createViewData(getState())
+                    }
+                }, 500)
             }
         }
-    }.apply { value = store.getState().consumerFilter }
+    }
 }
+

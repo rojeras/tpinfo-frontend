@@ -66,7 +66,12 @@ data class HippoState(
     val vLogicalAddresses: List<LogicalAddress>,
 
     // Text search filter
-    val consumerFilter: String
+    val consumerFilter: String,
+    val producerFilter: String,
+    val contractFilter: String,
+    val domainFilter: String,
+    val logicalAddressFilter: String,
+    val plattformChainFilter: String
 )
 
 // The extension function create the part of the URL to fetch integrations
@@ -303,6 +308,11 @@ fun getInitialState(): HippoState {
         listOf(),
         listOf(),
         listOf(),
+        "",
+        "",
+        "",
+        "",
+        "",
         ""
     )
     return initialState

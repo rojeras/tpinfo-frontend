@@ -4,6 +4,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonConfiguration
 import se.skoview.lib.getAsyncTpDb
+import se.skoview.view.createViewData
 import kotlin.browser.window
 
 enum class ItemType {
@@ -119,13 +120,17 @@ fun loadIntegrations(state: HippoState) {
                 integrationArrs.add(Integration(one, two, three, four, five, six, seven, eight))
                 IntegrationCache(parameters, integrationArrs, integrationInfo.maxCounters, integrationInfo.updateDates)
             }
-            store.dispatch(
-                HippoAction.DoneDownloadIntegrations(
-                    integrationArrs,
-                    integrationInfo.maxCounters,
-                    integrationInfo.updateDates
+            println("Number of integrations: ${integrationArrs.size}")
+            store.dispatch { action, getState ->
+                store.dispatch(
+                    HippoAction.DoneDownloadIntegrations(
+                        integrationArrs,
+                        integrationInfo.maxCounters,
+                        integrationInfo.updateDates
+                    )
                 )
-            )
+                createViewData(getState())
+            }
         }
     }
 }

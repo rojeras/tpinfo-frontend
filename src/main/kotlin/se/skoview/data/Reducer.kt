@@ -1,17 +1,46 @@
 package se.skoview.data
 
-import se.skoview.view.createViewData
-
-
 fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
     println("=====>>> ${action::class}")
     //console.log(state)
     val newState = when (action) {
-        is HippoAction.FilterConsumers -> state.copy(
-            currentAction = action,
-            recreateViewData = true,
-            consumerFilter = action.consumerFilter
-        )
+        is HippoAction.FilterItems -> {
+            if (action.type == ItemType.CONSUMER) {
+                state.copy(
+                    currentAction = action,
+                    recreateViewData = true,
+                    consumerFilter = action.filterString
+                )
+            }
+            else if (action.type == ItemType.CONTRACT) {
+                state.copy(
+                    currentAction = action,
+                    recreateViewData = true,
+                    contractFilter = action.filterString
+                )
+            }
+            else if (action.type == ItemType.LOGICAL_ADDRESS) {
+                state.copy(
+                    currentAction = action,
+                    recreateViewData = true,
+                    logicalAddressFilter = action.filterString
+                )
+            }
+            else if (action.type == ItemType.PRODUCER) {
+                state.copy(
+                    currentAction = action,
+                    recreateViewData = true,
+                    producerFilter = action.filterString
+                )
+            }
+            else {
+                state.copy(
+                    currentAction = action,
+                    recreateViewData = true,
+                    consumerFilter = action.filterString
+                )
+            }
+        }
         is HippoAction.ApplicationStarted -> state.copy(
             currentAction = action,
             applicationStarted = true
@@ -137,22 +166,3 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
     return newState
 }
 
-// Called after each state change (reducer)
-fun stateChangeTrigger(state: HippoState) {
-    println("+++++>>> ${state.currentAction::class}")
-    when (state.currentAction) {
-        // Load base items at application start
-        is HippoAction.ApplicationStarted -> {
-            println(">> stateChangeTrigger() - when currentState == ApplicationStarted")
-            loadBaseItems(store)
-        }
-        is HippoAction.DoneDownloadBaseItems -> loadIntegrations(state)
-
-        is HippoAction.DoneDownloadIntegrations -> createViewData(state)
-        //is HippoAction.ItemSelected -> loadIntegrations(state)
-        is HippoAction.ItemSelected -> createViewData(state)
-        is HippoAction.FilterConsumers -> createViewData(state)
-    }
-
-    println("<<<+++++ ${state.currentAction::class}")
-}
