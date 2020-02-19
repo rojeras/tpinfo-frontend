@@ -2,6 +2,7 @@ package se.skoview.view
 
 import pl.treksoft.kvision.form.time.DateTime
 import pl.treksoft.kvision.i18n.tr
+import se.skoview.app.store
 import se.skoview.data.*
 import kotlin.js.Date
 
@@ -252,12 +253,15 @@ fun filterViewData(state: HippoState): List<Integration> {
         ) continue
 
         // Plattform Chains
-        /*
+
         if (
             selectedPlattformChain.isNotEmpty() &&
-            (!selectedPlattformChain.contains(integration.))
+            !selectedPlattformChain.contains(integration.plattformChainId)
         ) continue
-        */
+        else if (
+            plattformChainFilterIds.isNotEmpty() &&
+            !plattformChainFilterIds.contains(integration.plattformChainId)
+        ) continue
 
         resultList.add(integration)
     }

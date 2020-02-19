@@ -6,8 +6,6 @@ import kotlinx.serialization.json.JsonConfiguration
 import kotlinx.serialization.list
 import pl.treksoft.kvision.redux.ReduxStore
 import se.skoview.lib.getAsyncTpDb
-import kotlin.browser.window
-import kotlin.js.Date
 
 fun loadBaseItems(store: ReduxStore<HippoState, HippoAction>) {
     console.log("Will now load BaseItems")
@@ -306,18 +304,18 @@ data class Plattform(override val id: Int, val platform: String, val environment
 }
 
 data class PlattformChain(val first: Int, val middle: Int?, val last: Int) : BaseItem() {
-    //override val itemType = ItemType.PLATTFORM_CHAIN
-    override val id = calculateId(first, middle, last)
-    override var name: String = "plattformsnamn"
-    override var description = ""
-    override var searchField: String = name
 
     private val firstPlattform = Plattform.map[first]
     //private val middlePlattform = Plattform.map[middle]
     private val lastPlattform = Plattform.map[last]
 
+    override val id = calculateId(first, middle, last)
+    override val name: String = calculateName()
+    override val description = ""
+    override val searchField: String = calculateName()
+
     init {
-        name = calculateName()
+        //name = calculateName()
         map[id] = this
     }
 
@@ -353,9 +351,24 @@ data class PlattformChain(val first: Int, val middle: Int?, val last: Int) : Bas
             }
         }
 
-        fun calculateId(f: Int, m: Int?, l: Int): Int {
-            val saveM: Int = m ?: 0
-            return (f * 10000) + saveM * 100 + l
+        // Calculte a plattformChainId based on ids of three separate plattforms
+        fun calculateId(first: Int, middle: Int?, last: Int): Int {
+            val saveM: Int = middle ?: 0
+            return (first * 10000) + saveM * 100 + last
+        }
+
+        fun calculateSeparatePlattformIds(plattformChainId: Int): Triple<Int, Int, Int> {
+            var id = plattformChainId
+
+            val first = id / 10000
+            id -= first
+            val middle = id / 100
+            id -= middle
+            val last = id
+
+            println("$plattformChainId converted to Triple<$first, $middle, $last")
+
+            return Triple(first, middle, last)
         }
     }
 }

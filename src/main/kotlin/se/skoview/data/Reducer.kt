@@ -7,51 +7,45 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
         is HippoAction.FilterItems -> {
             if (action.type == ItemType.CONSUMER) {
                 state.copy(
-                    currentAction = action,
-                    recreateViewData = true,
                     consumerFilter = action.filterString
                 )
             }
             else if (action.type == ItemType.CONTRACT) {
                 state.copy(
-                    currentAction = action,
-                    recreateViewData = true,
                     contractFilter = action.filterString
                 )
             }
             else if (action.type == ItemType.LOGICAL_ADDRESS) {
                 state.copy(
-                    currentAction = action,
-                    recreateViewData = true,
                     logicalAddressFilter = action.filterString
                 )
             }
             else if (action.type == ItemType.PRODUCER) {
                 state.copy(
-                    currentAction = action,
-                    recreateViewData = true,
                     producerFilter = action.filterString
                 )
             }
-            else {
+            else if (action.type == ItemType.PLATTFORM_CHAIN) {
                 state.copy(
-                    currentAction = action,
-                    recreateViewData = true,
-                    consumerFilter = action.filterString
+                    plattformChainFilter = action.filterString
                 )
+            }
+            else {
+                println("Internal error i filter reducer")
+                state
             }
         }
         is HippoAction.ApplicationStarted -> state.copy(
-            currentAction = action,
             applicationStarted = true
         )
         is HippoAction.StartDownloadBaseItems -> state.copy(
-            currentAction = action,
             downloadBaseItemStatus = AsyncActionStatus.INITIALIZED
         )
         is HippoAction.DoneDownloadBaseItems -> {
+            // If dates not set by URL at startup the default to latest date
+            val newDate = if (state.dateEffective == "") BaseDates.integrationDates[0] else state.dateEffective
+
             state.copy(
-                currentAction = action,
                 downloadBaseItemStatus = AsyncActionStatus.COMPLETED,
                 integrationDates = BaseDates.integrationDates,
                 statisticsDates = BaseDates.statisticsDates,
@@ -62,19 +56,16 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
                 plattforms = Plattform.map,
                 plattformChains = PlattformChain.map,
 
-                dateEffective = BaseDates.integrationDates[0],
-                dateEnd = BaseDates.integrationDates[0]
+                dateEffective = newDate,
+                dateEnd = newDate
             )
         }
         is HippoAction.ErrorDownloadBaseItems -> state.copy(
-            currentAction = action,
             downloadBaseItemStatus = AsyncActionStatus.ERROR,
             errorMessage = action.errorMessage
         )
         is HippoAction.StartDownloadIntegrations -> {
             state.copy(
-                currentAction = action,
-                recreateViewData = false,
                 downloadIntegrationStatus = AsyncActionStatus.INITIALIZED
             )
         }
@@ -85,8 +76,6 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
             dates.addAll(action.updateDates)
             dates.add(state.dateEffective)
             state.copy(
-                currentAction = action,
-                recreateViewData = true,
                 downloadIntegrationStatus = AsyncActionStatus.COMPLETED,
                 integrationArrs = action.integrationArrs,
                 maxCounters = action.maxCounters,
@@ -94,19 +83,14 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
             )
         }
         is HippoAction.ErrorDownloadIntegrations -> state.copy(
-            currentAction = action,
             downloadIntegrationStatus = AsyncActionStatus.ERROR,
             errorMessage = action.errorMessage
         )
         is HippoAction.DateSelected -> state.copy(
-            currentAction = action,
-            recreateViewData = false,
             dateEffective = action.selectedDate,
             dateEnd = action.selectedDate
         )
         is HippoAction.ViewUpdated -> state.copy(
-            currentAction = action,
-            recreateViewData = false,
             vServiceConsumers = action.integrationLists.serviceConsumers,
             vServiceDomains = action.integrationLists.serviceDomains,
             vServiceContracts = action.integrationLists.serviceContracts,
@@ -123,33 +107,21 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
 
             when (action.viewType) {
                 ItemType.CONSUMER -> state.copy(
-                    currentAction = action,
-                    recreateViewData = true,
                     selectedConsumers = newList
                 )
                 ItemType.DOMAIN -> state.copy(
-                    currentAction = action,
-                    recreateViewData = true,
                     selectedDomains = newList
                 )
                 ItemType.CONTRACT -> state.copy(
-                    currentAction = action,
-                    recreateViewData = true,
                     selectedContracts = newList
                 )
                 ItemType.PLATTFORM_CHAIN -> state.copy(
-                    currentAction = action,
-                    recreateViewData = true,
                     selectedPlattformChains = newList
                 )
                 ItemType.LOGICAL_ADDRESS -> state.copy(
-                    currentAction = action,
-                    recreateViewData = true,
                     selectedLogicalAddresses = newList
                 )
                 ItemType.PRODUCER -> state.copy(
-                    currentAction = action,
-                    recreateViewData = true,
                     selectedProducers = newList
                 )
                 else -> {

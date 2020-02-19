@@ -3,8 +3,11 @@ package se.skoview.data
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonConfiguration
+import se.skoview.app.store
 import se.skoview.lib.getAsyncTpDb
 import se.skoview.view.createViewData
+import se.skoview.view.getBookmark
+import se.skoview.view.setUrlFilter
 import kotlin.browser.window
 
 enum class ItemType {
@@ -52,7 +55,9 @@ data class Integration(
     val serviceDomainId: Int,
     val serviceConsumerId: Int,
     val serviceProducerId: Int
-)
+) {
+    val plattformChainId = PlattformChain.calculateId(firstTpId, middleTpId, lastTpId)
+}
 
 @Serializable
 data class MaxCounter(
@@ -81,8 +86,7 @@ data class IntegrationCache(
 
 fun loadIntegrations(state: HippoState) {
     store.dispatch(HippoAction.StartDownloadIntegrations)
-    val bookmark = state.getBookmark()
-    setUrlFilter(bookmark)
+    //setUrlFilter(state)
     val urlParameters = state.getParams()
     val parameters = "integrations$urlParameters"
 
@@ -135,19 +139,4 @@ fun loadIntegrations(state: HippoState) {
     }
 }
 
-// Let the URL mirror the current state
-fun setUrlFilter(bookmark: String) {
-    println("In serUrlFilter(), bookmark=$bookmark")
-    val hostname = window.location.hostname;
-    val protocol = window.location.protocol;
-    val port = window.location.port;
 
-    val portSpec = if (port.length > 0) ":$port" else ""
-    var newUrl = protocol + "//" + hostname + portSpec
-
-    if (bookmark.length > 1) {
-        newUrl += "?filter=" + bookmark
-    }
-    console.log("New URL: " + newUrl)
-    window.history.pushState(newUrl, "hippo-utforska integrationer", newUrl)
-}
