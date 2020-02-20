@@ -5,34 +5,16 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
     //console.log(state)
     val newState = when (action) {
         is HippoAction.FilterItems -> {
-            if (action.type == ItemType.CONSUMER) {
-                state.copy(
-                    consumerFilter = action.filterString
-                )
-            }
-            else if (action.type == ItemType.CONTRACT) {
-                state.copy(
-                    contractFilter = action.filterString
-                )
-            }
-            else if (action.type == ItemType.LOGICAL_ADDRESS) {
-                state.copy(
-                    logicalAddressFilter = action.filterString
-                )
-            }
-            else if (action.type == ItemType.PRODUCER) {
-                state.copy(
-                    producerFilter = action.filterString
-                )
-            }
-            else if (action.type == ItemType.PLATTFORM_CHAIN) {
-                state.copy(
-                    plattformChainFilter = action.filterString
-                )
-            }
-            else {
-                println("Internal error i filter reducer")
-                state
+            when (action.type) {
+                ItemType.CONSUMER -> state.copy(consumerFilter = action.filterString)
+                ItemType.CONTRACT -> state.copy(contractFilter = action.filterString)
+                ItemType.LOGICAL_ADDRESS -> state.copy(logicalAddressFilter = action.filterString)
+                ItemType.PRODUCER -> state.copy(producerFilter = action.filterString)
+                ItemType.PLATTFORM_CHAIN -> state.copy(plattformChainFilter = action.filterString)
+                else -> {
+                    println("Internal error i the filter reducer")
+                    state
+                }
             }
         }
         is HippoAction.ApplicationStarted -> state.copy(
@@ -124,10 +106,6 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
                 ItemType.PRODUCER -> state.copy(
                     selectedProducers = newList
                 )
-                else -> {
-                    println("*** ERROR in when clause for reducer ItemSelected: ${action.viewType}")
-                    state
-                }
             }
         }
     }

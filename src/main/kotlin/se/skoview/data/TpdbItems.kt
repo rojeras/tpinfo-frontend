@@ -11,13 +11,13 @@ fun loadBaseItems(store: ReduxStore<HippoState, HippoAction>) {
     console.log("Will now load BaseItems")
     store.dispatch(HippoAction.StartDownloadBaseItems)
 
-    BaseDates.load({ areAllBaseItemsLoaded(store) })
-    ServiceDomain.load({ areAllBaseItemsLoaded(store) })
-    ServiceContract.load({ areAllBaseItemsLoaded(store) })
-    ServiceComponent.load({ areAllBaseItemsLoaded(store) })
-    LogicalAddress.load({ areAllBaseItemsLoaded(store) })
-    Plattform.load({ areAllBaseItemsLoaded(store) })
-    PlattformChain.load({ areAllBaseItemsLoaded(store) })
+    BaseDates.load { areAllBaseItemsLoaded(store) }
+    ServiceDomain.load { areAllBaseItemsLoaded(store) }
+    ServiceContract.load { areAllBaseItemsLoaded(store) }
+    ServiceComponent.load { areAllBaseItemsLoaded(store) }
+    LogicalAddress.load { areAllBaseItemsLoaded(store) }
+    Plattform.load { areAllBaseItemsLoaded(store) }
+    PlattformChain.load { areAllBaseItemsLoaded(store) }
 }
 
 fun areAllBaseItemsLoaded(store: ReduxStore<HippoState, HippoAction>) {
@@ -40,6 +40,7 @@ abstract class BaseItem {
     abstract val name: String
     abstract val searchField: String
     abstract val id: Int
+    open val hsaId = ""
 }
 
 object BaseDates {
@@ -72,7 +73,7 @@ object BaseDates {
 @Serializable
 data class ServiceComponent(
     override val id: Int = -1,
-    val hsaId: String = "",
+    override val hsaId: String = "",
     override val description: String = "",
     val synonym: String? = null
 ) : BaseItem() {
@@ -357,6 +358,7 @@ data class PlattformChain(val first: Int, val middle: Int?, val last: Int) : Bas
             return (first * 10000) + saveM * 100 + last
         }
 
+        /*
         fun calculateSeparatePlattformIds(plattformChainId: Int): Triple<Int, Int, Int> {
             var id = plattformChainId
 
@@ -370,6 +372,7 @@ data class PlattformChain(val first: Int, val middle: Int?, val last: Int) : Bas
 
             return Triple(first, middle, last)
         }
+         */
     }
 }
 

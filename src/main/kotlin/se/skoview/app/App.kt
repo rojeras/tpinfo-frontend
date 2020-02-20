@@ -9,11 +9,13 @@ import pl.treksoft.kvision.require
 import pl.treksoft.kvision.startApplication
 import pl.treksoft.kvision.utils.perc
 import se.skoview.data.*
-import se.skoview.view.hippoTablePage
+import se.skoview.view.HippoTablePage
 import se.skoview.view.setUrlFilter
 
 // done: Fixa så det går att kopiera text utan att itemet väljs bort
-// todo: Lite hjälptexter, troligen på egen sida
+// todo: Lite hjälptexter, troligen på egen sida (via knapp ev)
+// todo: Testa i andra webbläsare och Win/Linux
+// todo: Mer detaljerad styrning av muspekaren
 // done: Höjden på datumraden
 // done: Kolumnerna ändrar fortfarande bredd
 // done: Fixa val och fritextsökning av plattformChains
@@ -22,9 +24,11 @@ import se.skoview.view.setUrlFilter
 // done: Stödtext efter item 100
 // done: Snygga till ramarna och marginalerna
 // done: Byta plats på logiska adresser och producenter
-// todo: Gå igenom all kod, städa och refacotrera det viktigaste
+// done: Fix bug reported by Annika about error in filtering. Due to getParams() should only return dates.
+// done: Bug in url handling. http//hippokrates.se/hippo - it seems hippo is removed
+// done: Gå igenom all kod, städa och refaktorera det viktigaste
 // todo: Tag bort hand-pekaren när man pekar på ett valt item
-// todo: Fixa till färgerna
+// done: Fixa till färgerna
 // todo: Steg 1 Driftsätt K-hippo (rhippo)
 // todo: Steg 2 Lös detta med att visa SE
 // todo: Steg 3 Tag fram mock för hur integrationer ska presenteras där det kan finnas flera LA
@@ -38,11 +42,15 @@ import se.skoview.view.setUrlFilter
 // todo: Färger på rubrikerna
 // todo: Frys rubrikraden
 
-
+// Initialize the redux store
 val store = createReduxStore(
     ::hippoReducer,
     getInitialState()
 )
+
+fun main() {
+    startApplication(::App)
+}
 
 class App : Application() {
     init {
@@ -54,7 +62,7 @@ class App : Application() {
         root("hippo") {
 
             vPanel {
-                add(hippoTablePage)
+                add(HippoTablePage)
             }.apply {
                 width = 100.perc
             }
@@ -71,6 +79,3 @@ class App : Application() {
     }
 }
 
-fun main() {
-    startApplication(::App)
-}

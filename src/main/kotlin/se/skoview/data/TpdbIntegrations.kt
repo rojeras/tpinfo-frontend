@@ -6,9 +6,6 @@ import kotlinx.serialization.json.JsonConfiguration
 import se.skoview.app.store
 import se.skoview.lib.getAsyncTpDb
 import se.skoview.view.createViewData
-import se.skoview.view.getBookmark
-import se.skoview.view.setUrlFilter
-import kotlin.browser.window
 
 enum class ItemType {
     CONSUMER,
@@ -16,27 +13,8 @@ enum class ItemType {
     LOGICAL_ADDRESS,
     DOMAIN,
     CONTRACT,
-    DATE_EFFECTIVE,
-    DATE_END,
-    PLATTFORM,
-    FIRST_PLATTFORM,
-    MIDDLE_PLATTFORM,
-    LAST_PLATTFORM,
     PLATTFORM_CHAIN
 }
-
-val TYPE_PARAM: Map<ItemType, String> = mapOf(
-    ItemType.CONSUMER to "&consumerId=",
-    ItemType.PRODUCER to "&producerId=",
-    ItemType.LOGICAL_ADDRESS to "&logicalAddressId=",
-    ItemType.CONTRACT to "&contractId=",
-    ItemType.DOMAIN to "&domainId=",
-    ItemType.FIRST_PLATTFORM to "&firstPlattformId=",
-    ItemType.MIDDLE_PLATTFORM to "&middlePlattformId=",
-    ItemType.LAST_PLATTFORM to "&lastPlattformId=",
-    ItemType.DATE_END to "&dateEnd=",
-    ItemType.DATE_EFFECTIVE to "&dateEffective="
-)
 
 @Serializable
 data class IntegrationInfo(
@@ -139,4 +117,46 @@ fun loadIntegrations(state: HippoState) {
     }
 }
 
+// The extension function create the part of the URL to fetch integrations
+fun HippoState.getParams(): String {
 
+    //var params = "?dummy&contractId=379"
+    var params = "?dummy"
+
+    params += "&dateEffective=" + this.dateEffective
+    params += "&dateEnd=" + this.dateEnd
+
+    /**
+     * Filtering currently handled locally, not on the server. Only dates are passed to the server
+     *
+    params += if (this.selectedConsumers.isNotEmpty()) this.selectedConsumers.joinToString(
+        prefix = "&consumerId=",
+        separator = ","
+    ) else ""
+    params += if (this.selectedDomains.isNotEmpty()) this.selectedDomains.joinToString(
+        prefix = "&domainId=",
+        separator = ","
+    ) else ""
+    params += if (this.selectedContracts.isNotEmpty()) this.selectedContracts.joinToString(
+        prefix = "&contractId=",
+        separator = ","
+    ) else ""
+    params += if (this.selectedLogicalAddresses.isNotEmpty()) this.selectedLogicalAddresses.joinToString(
+        prefix = "&logicalAddressId=",
+        separator = ","
+    ) else ""
+    params += if (this.selectedProducers.isNotEmpty()) this.selectedProducers.joinToString(
+        prefix = "&producerId=",
+        separator = ","
+    ) else ""
+
+    // Separate plattforms now stored in filter, not the chain
+    for (pcId in this.selectedPlattformChains) {
+        val firstId = PlattformChain.map[pcId]?.first
+        val lastId = PlattformChain.map[pcId]?.last
+        params += "&firstPlattformId=" + firstId
+        params += "&lastPlattformId=" + lastId
+    }
+    */
+    return params
+}

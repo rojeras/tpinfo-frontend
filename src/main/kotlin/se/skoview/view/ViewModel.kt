@@ -1,11 +1,11 @@
 package se.skoview.view
 
-import pl.treksoft.kvision.form.time.DateTime
-import pl.treksoft.kvision.i18n.tr
 import se.skoview.app.store
 import se.skoview.data.*
 import kotlin.js.Date
 
+
+// todo: Speed up and simplify
 data class IntegrationLists(
     val serviceConsumers: List<ServiceComponent>,
     val serviceProducers: List<ServiceComponent>,
@@ -124,7 +124,8 @@ fun createViewData(state: HippoState) {
 }
 
 fun filterViewData(state: HippoState): List<Integration> {
-
+    // todo: Rewrite with sequence and filter to speed it up
+    // One way to speed up might be to replace the Int in integrationArrs with an arrarr of acutal Baseitems
     println(">>>> Start filterViewData")
     val integrationListsIn = state.integrationArrs
 
@@ -151,6 +152,8 @@ fun filterViewData(state: HippoState): List<Integration> {
 
     // Loop through the list and remove all items which does not fulfill the filtering
     val resultList: MutableList<Integration> = mutableListOf()
+
+    //val result = integrationListsIn.asSequence() .filter { arr ->  }
 
     for (integration in integrationListsIn) {
 

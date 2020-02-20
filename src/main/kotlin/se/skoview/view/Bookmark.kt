@@ -9,7 +9,6 @@ import kotlin.js.Date
 data class BookmarkInformation(
     var dateEffective: String = "",
     var dateEnd: String = "",
-
     var selectedConsumers: List<Int> = listOf(),
     var selectedProducers: List<Int> = listOf(),
     var selectedLogicalAddresses: List<Int> = listOf(),
@@ -22,22 +21,24 @@ data class BookmarkInformation(
 fun setUrlFilter(state: HippoState) {
     val bookmark = state.getBookmark()
     println("In serUrlFilter(), bookmark=$bookmark")
-    val hostname = window.location.hostname;
-    val protocol = window.location.protocol;
-    val port = window.location.port;
+    val hostname = window.location.hostname
+    val protocol = window.location.protocol
+    val port = window.location.port
+    val pathname = window.location.pathname
 
-    val portSpec = if (port.length > 0) ":$port" else ""
-    var newUrl = protocol + "//" + hostname + portSpec
+    val portSpec = if (port.isNotEmpty()) ":$port" else ""
+    var newUrl = "$protocol//$hostname$portSpec$pathname"
 
     if (bookmark.length > 1) {
-        newUrl += "?filter=" + bookmark
+        newUrl += "?filter=$bookmark"
     }
-    console.log("New URL: " + newUrl)
+    console.log("Old pathname: $pathname")
+    console.log("New URL: $newUrl")
     window.history.pushState(newUrl, "hippo-utforska integrationer", newUrl)
 }
 
 fun HippoState.getBookmark(): String {
-    if (this.updateDates.size == 0 || this.dateEffective == "") return ""
+    if (this.updateDates.isEmpty() || this.dateEffective == "") return ""
 
     var bookmark = ""
 
@@ -73,8 +74,8 @@ fun HippoState.getBookmark(): String {
     for (pcId in this.selectedPlattformChains) {
         val firstId = PlattformChain.map[pcId]?.first
         val lastId = PlattformChain.map[pcId]?.last
-        bookmark += "F" + firstId
-        bookmark += "L" + lastId
+        bookmark += "F$firstId"
+        bookmark += "L$lastId"
     }
 
     println("Bookmark is: $bookmark")
@@ -91,7 +92,7 @@ fun parseBookmark(): BookmarkInformation {
 
         val idWithCharList = regex.findAll(filterValue).toList()
 
-        var iDList = mutableListOf<Int>()
+        val iDList = mutableListOf<Int>()
         for (idWithCar in idWithCharList) {
             val id = idWithCar.value.drop(1).toInt()
             iDList.add(id)
@@ -115,8 +116,7 @@ fun parseBookmark(): BookmarkInformation {
 
     // Extract and calculate the date values
     val dateEffectiveCodeList = parseBookmarkType("S", filterValue)
-    val dateEffective =
-        if (dateEffectiveCodeList.size > 0) daysSinceEpoch2date(dateEffectiveCodeList[0].toInt()) else ""
+    val dateEffective = if (dateEffectiveCodeList.isNotEmpty()) daysSinceEpoch2date(dateEffectiveCodeList[0]) else ""
 
     val dateEndCodeList = parseBookmarkType("E", filterValue)
     val dateEnd = if (dateEndCodeList.size > 0) daysSinceEpoch2date(dateEffectiveCodeList[0].toInt()) else ""
@@ -128,7 +128,7 @@ fun parseBookmark(): BookmarkInformation {
 
     var plattformChainList = listOf<Int>()
 
-    if (firstPlattformCodeList.size > 0 && lastPlattformCodeList.size > 0) {
+    if (firstPlattformCodeList.isNotEmpty() && lastPlattformCodeList.isNotEmpty()) {
         val first = firstPlattformCodeList[0]
         val last = lastPlattformCodeList[0]
         console.log("first=$first, last=$last")
