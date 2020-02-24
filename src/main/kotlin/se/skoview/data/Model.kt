@@ -58,7 +58,10 @@ data class HippoState(
     val contractFilter: String,
     val domainFilter: String,
     val logicalAddressFilter: String,
-    val plattformChainFilter: String
+    val plattformChainFilter: String,
+
+    // Filtered integrations
+    val activeIntegrationArrs: List<Integration>
 )
 
 fun HippoState.isItemFiltered(itemType: ItemType, id: Int): Boolean {
@@ -113,7 +116,8 @@ fun getInitialState(): HippoState {
         "",
         "",
         "",
-        ""
+        "",
+        listOf()
     )
 }
 

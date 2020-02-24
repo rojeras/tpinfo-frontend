@@ -60,6 +60,7 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
             state.copy(
                 downloadIntegrationStatus = AsyncActionStatus.COMPLETED,
                 integrationArrs = action.integrationArrs,
+                activeIntegrationArrs = action.integrationArrs,
                 maxCounters = action.maxCounters,
                 updateDates = dates.distinct().sortedDescending() //action.updateDates
             )

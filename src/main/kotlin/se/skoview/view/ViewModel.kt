@@ -17,9 +17,6 @@ data class IntegrationLists(
 )
 
 fun createViewData(state: HippoState) {
-    // Extract plattform chains
-
-    //val state = store.getState()
     val start = Date().getMilliseconds()
     val filteredIntegrations = filterViewData(state)
     val end = Date().getMilliseconds()
@@ -127,7 +124,7 @@ fun filterViewData(state: HippoState): List<Integration> {
     // todo: Rewrite with sequence and filter to speed it up
     // One way to speed up might be to replace the Int in integrationArrs with an arrarr of acutal Baseitems
     println(">>>> Start filterViewData")
-    val integrationListsIn = state.integrationArrs
+    val integrationListsIn = state.activeIntegrationArrs
 
     val consumerFilter = state.consumerFilter
     val contractFilter = state.contractFilter
@@ -142,135 +139,136 @@ fun filterViewData(state: HippoState): List<Integration> {
     val selectedPlattformChain = state.selectedPlattformChains
     val selectedLogicalAddresses = state.selectedLogicalAddresses
     val selectedProducers = state.selectedProducers
+    //val result = integrationListsIn.asSequence() .filter { arr ->  }
 
-    val consumerFilterIds = filterItems(ServiceComponent.map as HashMap<Int, BaseItem>, consumerFilter)
-    val contractFilterIds = filterItems(ServiceContract.map as HashMap<Int, BaseItem>, contractFilter)
-    val domainFilterIds = filterItems(ServiceDomain.map as HashMap<Int, BaseItem>, domainFilter)
-    val plattformChainFilterIds = filterItems(PlattformChain.map as HashMap<Int, BaseItem>, plattformChainFilter)
-    //val laFilterIds = filterItems(LogicalAddress.map as HashMap<Int, BaseItem>, logicalAddressFilter)
-    val producerFilterIds = filterItems(ServiceComponent.map as HashMap<Int, BaseItem>, producerFilter)
+    // Decide in which order the item types should be filtered
+    // First do the ones that have been selected
+    // Then the ones with a filter value
+    // The longer filter value, the earlier it should be evaluated
+    // First sort based on length of filter value, then just move the selected ones to the beginning of the prio list
+    // Finally remove items which neither have filter nor are selected
+
+    val selectedItemType = mapOf(
+        ItemType.CONSUMER to selectedConsumers.isNotEmpty(),
+        ItemType.PRODUCER to selectedProducers.isNotEmpty(),
+        ItemType.CONTRACT to selectedContracts.isNotEmpty(),
+        ItemType.DOMAIN to selectedDomains.isNotEmpty(),
+        ItemType.LOGICAL_ADDRESS to selectedLogicalAddresses.isNotEmpty(),
+        ItemType.PLATTFORM_CHAIN to selectedPlattformChain.isNotEmpty()
+    )
+
+    val filterLengthItemType = mapOf(
+        ItemType.CONSUMER to consumerFilter.length,
+        ItemType.PRODUCER to producerFilter.length,
+        ItemType.CONTRACT to contractFilter.length,
+        ItemType.LOGICAL_ADDRESS to logicalAddressFilter.length,
+        ItemType.PLATTFORM_CHAIN to plattformChainFilter.length
+    )
+
+    val prioList: MutableList<ItemType> = mutableListOf(
+        ItemType.CONSUMER,
+        ItemType.PRODUCER,
+        ItemType.CONTRACT,
+        ItemType.DOMAIN,
+        ItemType.LOGICAL_ADDRESS,
+        ItemType.PLATTFORM_CHAIN
+    )
+
+    println("filterLengthItemType: $filterLengthItemType")
+    prioList.sortByDescending { filterLengthItemType[it] }
+
+    for (type in prioList) {
+        if (selectedItemType[type]!!) {
+            prioList.remove(type)
+            prioList.add(0, type)
+        }
+    }
+
+    // todo: Remove the items which neither have a selection nor a filter from the priolist
+    prioList.removeAll { filterLengthItemType[it] == 0 && !selectedItemType[it]!! }
+
+    println("Priolist: $prioList")
 
     // Loop through the list and remove all items which does not fulfill the filtering
     val resultList: MutableList<Integration> = mutableListOf()
 
-    //val result = integrationListsIn.asSequence() .filter { arr ->  }
+    val consumerSearchCache = SearchCache(domainFilter)
+    val domainSearchCache = SearchCache(domainFilter)
+    val contractSearchCache = SearchCache(contractFilter)
+    val plattformChainSearchCache = SearchCache(plattformChainFilter)
+    val logicalAddressSearchCache = SearchCache(logicalAddressFilter)
+    val producerSearchCache = SearchCache(producerFilter)
 
-    for (integration in integrationListsIn) {
+    filtering@ for (integration in integrationListsIn) {
 
-        // Consumers
-        if (
-            selectedConsumers.isNotEmpty() &&
-            (!selectedConsumers.contains(integration.serviceConsumerId))
-        ) continue
-        else if (
-            consumerFilterIds.isNotEmpty() &&
-            !consumerFilterIds.contains(integration.serviceConsumerId)
-            /*
-            consumerFilter.isNotEmpty() &&
-            !ServiceComponent
-                .map[integration.serviceConsumerId]!!
-                .searchField
-                .contains(
-                    consumerFilter,
-                    true
+        // The order of evalutation is decided by the priolist
+        for (eval in prioList) {
+            when (eval) {
+                ItemType.CONSUMER -> if (!isItemIncluded(
+                        selectedConsumers,
+                        consumerFilter,
+                        ServiceComponent.map as HashMap<Int, BaseItem>,
+                        integration.serviceConsumerId,
+                        consumerSearchCache
+                    )
                 )
-             */
-        ) continue
+                    continue@filtering
 
-        // Contracts
-        if (
-            selectedContracts.isNotEmpty() &&
-            (!selectedContracts.contains(integration.serviceContractId))
-        ) continue
-        else if (
-            contractFilterIds.isNotEmpty() &&
-            !contractFilterIds.contains(integration.serviceContractId)
-            /*
-            contractFilter.isNotEmpty() &&
-            !ServiceContract
-                .map[integration.serviceContractId]!!
-                .searchField
-                .contains(
-                    contractFilter,
-                    true
+                ItemType.CONTRACT -> if (!isItemIncluded(
+                        selectedContracts,
+                        contractFilter,
+                        ServiceContract.map as HashMap<Int, BaseItem>,
+                        integration.serviceContractId,
+                        contractSearchCache
+                    )
                 )
-             */
-        ) continue
+                    continue@filtering
 
-        // Domains
-        if (
-            selectedDomains.isNotEmpty() &&
-            (!selectedDomains.contains(integration.serviceDomainId))
-        ) continue
-        else if (
-            domainFilterIds.isNotEmpty() &&
-            !domainFilterIds.contains(integration.serviceDomainId)
-            /*
-            domainFilter.isNotEmpty() &&
-            !ServiceDomain
-                .map[integration.serviceDomainId]!!
-                .searchField
-                .contains(
-                    domainFilter,
-                    true
+                ItemType.DOMAIN -> if (!isItemIncluded(
+                        selectedDomains,
+                        domainFilter,
+                        ServiceDomain.map as HashMap<Int, BaseItem>,
+                        integration.serviceDomainId,
+                        domainSearchCache
+                    )
                 )
-             */
-        ) continue
+                    continue@filtering
 
-        // Logical Addresses
-        if (
-            selectedLogicalAddresses.isNotEmpty() &&
-            (!selectedLogicalAddresses.contains(integration.logicalAddressId))
-        ) continue
-        else if (
-            //laFilterIds.isNotEmpty() &&
-            //!laFilterIds.contains(integration.logicalAddressId)
-            logicalAddressFilter.isNotEmpty() &&
-                    !LogicalAddress
-                        .map[integration.logicalAddressId]!!
-                        .searchField
-                        .contains(
-                                logicalAddressFilter,
-                                true
-                        )
-        ) continue
-
-        // Producers
-        if (
-            selectedProducers.isNotEmpty() &&
-            (!selectedProducers.contains(integration.serviceProducerId))
-        ) continue
-        else if (
-            producerFilterIds.isNotEmpty() &&
-            !producerFilterIds.contains(integration.serviceProducerId)
-            /*
-            producerFilter.isNotEmpty() &&
-            !ServiceComponent
-                .map[integration.serviceProducerId]!!
-                .searchField
-                .contains(
-                    producerFilter,
-                    true
+                ItemType.LOGICAL_ADDRESS -> if (!isItemIncluded(
+                        selectedLogicalAddresses,
+                        logicalAddressFilter,
+                        LogicalAddress.map as HashMap<Int, BaseItem>,
+                        integration.logicalAddressId,
+                        logicalAddressSearchCache
+                    )
                 )
-             */
-        ) continue
+                    continue@filtering
 
-        // Plattform Chains
+                ItemType.PRODUCER -> if (!isItemIncluded(
+                        selectedProducers,
+                        producerFilter,
+                        ServiceComponent.map as HashMap<Int, BaseItem>,
+                        integration.serviceProducerId,
+                        producerSearchCache
+                    )
+                )
+                    continue@filtering
 
-        if (
-            selectedPlattformChain.isNotEmpty() &&
-            !selectedPlattformChain.contains(integration.plattformChainId)
-        ) continue
-        else if (
-            plattformChainFilterIds.isNotEmpty() &&
-            !plattformChainFilterIds.contains(integration.plattformChainId)
-        ) continue
-
+                ItemType.PLATTFORM_CHAIN -> if (!isItemIncluded(
+                        selectedPlattformChain,
+                        plattformChainFilter,
+                        PlattformChain.map as HashMap<Int, BaseItem>,
+                        integration.plattformChainId,
+                        plattformChainSearchCache
+                    )
+                )
+                    continue@filtering
+            }
+        }
         resultList.add(integration)
     }
 
     println("<<<< End filterViewData")
-
     return resultList
 }
 
@@ -279,15 +277,37 @@ private fun addUnique(item: BaseItem, list: MutableList<BaseItem>) {
     list.add(item)
 }
 
-// Make the free text search of the baseitems and collect hits as list of id's
-private fun filterItems(map: HashMap<Int, BaseItem>, filter: String): List<Int> {
-    val idList = mutableListOf<Int>()
+data class SearchCache(val filter: String) {
+    val idCache = mutableListOf<Int>()
 
-    if (filter.isEmpty()) return idList
-
-    for ((id, item) in map) {
-        if (item.searchField.contains(filter, true)) idList.add(id)
+    fun doContain(item: BaseItem): Boolean {
+        val id = item.id
+        if (idCache.binarySearch(id) >= 0) return true
+        if (item.searchField.contains(filter, true)) {
+            idCache.add(id)
+            idCache.sort()
+            return true
+        }
+        return false
     }
-
-    return idList.distinct()
 }
+
+private fun isItemIncluded(
+    selectedItems: List<Int>,
+    filter: String,
+    map: HashMap<Int, BaseItem>,
+    itemId: Int,
+    searchCache: SearchCache
+): Boolean {
+    if (
+        selectedItems.isNotEmpty() &&
+        (!selectedItems.contains(itemId))
+    ) return false
+    else if (
+        filter.isNotEmpty() && !searchCache.doContain(map[itemId]!!)
+    ) return false
+
+    return true
+}
+
+

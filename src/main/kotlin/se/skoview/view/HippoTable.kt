@@ -81,9 +81,10 @@ object HippoTablePage : SimplePanel() {
                 }
                 div {}.stateBinding(store) { state ->
                     h5("Tjänstekontrakt (${state.vServiceContracts.size}/${state.maxCounters.contracts})").apply {color = Color(0x227777)}
+                    val maxItemsToShow = 1000
                     div {
                         border = Border(1.px, BorderStyle.SOLID, Col.GRAY)
-                        state.vDomainsAndContracts.subList(0, min(state.vDomainsAndContracts.size, 100))
+                        state.vDomainsAndContracts.subList(0, min(state.vDomainsAndContracts.size, maxItemsToShow))
                             .map { item ->
                                 div(
                                     classes = setOf("pointer"),
@@ -109,7 +110,7 @@ object HippoTablePage : SimplePanel() {
                                 }
                             }
                     }
-                    showMoreItemText(state.vServiceContracts.size)
+                    showMoreItemText(state.vServiceContracts.size, maxItemsToShow)
                 }
             }
             // -------------------------------------------------------------------------------------------------------
@@ -186,7 +187,7 @@ private fun Container.searchField(type: ItemType) {
     textInput(type = TextInputType.SEARCH) {
         when (type) {
             ItemType.CONSUMER -> placeholder = "Sök tjänstekonsument..."
-            ItemType.CONTRACT -> placeholder = "Sök tjänstekontrakt/tjänstedomän..."
+            ItemType.CONTRACT -> placeholder = "Sök tjänstekontrakt/domän..."
             ItemType.LOGICAL_ADDRESS -> placeholder = "Sök logisk adress..."
             ItemType.PRODUCER -> placeholder = "Sök tjänsteproducent..."
             ItemType.PLATTFORM_CHAIN -> placeholder = "Sök tjänsteplattform(ar)..."
@@ -224,8 +225,17 @@ private fun Div.itemSelect(item: BaseItem, type: ItemType) {
 }
 
 private fun Div.insertResetButton(item: BaseItem, type: ItemType) {
+    val buttonText = when (type) {
+        ItemType.CONSUMER -> "Återställ tjänstekonsument"
+        ItemType.CONTRACT -> "Återställ tjänstekontrakt"
+        ItemType.DOMAIN -> "Återställ tjänstedomän"
+        ItemType.LOGICAL_ADDRESS -> "Återställ logisk adress"
+        ItemType.PRODUCER -> "Återställ tjänsteproducent"
+        ItemType.PLATTFORM_CHAIN -> "Återställ tjänsteplattform(ar)"
+        else ->  "Internal error in insertResetButton()"
+    }
     div {
-        button("Återställ", style = ButtonStyle.PRIMARY) {
+        button(buttonText, style = ButtonStyle.PRIMARY) {
             width = 100.perc
             background = Background(Col.GRAY)
             onClick {
@@ -238,8 +248,8 @@ private fun Div.insertResetButton(item: BaseItem, type: ItemType) {
     }
 }
 
-private fun Container.showMoreItemText(size: Int) {
-    if (size > 100) {
+private fun Container.showMoreItemText(size: Int, maxItemsToShow: Int = 100) {
+    if (size > maxItemsToShow) {
         div {
             color = Color(Col.RED)
             +"Ytterligare ${size - 100} rader tillgängliga via sökning eller filtrering"

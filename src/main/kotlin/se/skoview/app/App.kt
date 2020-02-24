@@ -15,7 +15,6 @@ import se.skoview.view.setUrlFilter
 // done: Fixa så det går att kopiera text utan att itemet väljs bort
 // todo: Lite hjälptexter, troligen på egen sida (via knapp ev)
 // todo: Testa i andra webbläsare och Win/Linux
-// todo: Mer detaljerad styrning av muspekaren
 // done: Höjden på datumraden
 // done: Kolumnerna ändrar fortfarande bredd
 // done: Fixa val och fritextsökning av plattformChains
@@ -37,6 +36,7 @@ import se.skoview.view.setUrlFilter
 // todo: Markera om ingen träff i sökning på nåt sätt
 
 // Och efter produktionssättningen, i 1.1
+// todo: Mer detaljerad styrning av muspekaren
 // todo: Förbättre svarstiderna för fritextsökningen
 // todo: Setting för att bestämma ordning på kolumnerna
 // todo: Färger på rubrikerna
