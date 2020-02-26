@@ -161,6 +161,7 @@ fun filterViewData(state: HippoState): List<Integration> {
         ItemType.CONSUMER to consumerFilter.length,
         ItemType.PRODUCER to producerFilter.length,
         ItemType.CONTRACT to contractFilter.length,
+        ItemType.DOMAIN to contractFilter.length,
         ItemType.LOGICAL_ADDRESS to logicalAddressFilter.length,
         ItemType.PLATTFORM_CHAIN to plattformChainFilter.length
     )
@@ -192,7 +193,7 @@ fun filterViewData(state: HippoState): List<Integration> {
     // Loop through the list and remove all items which does not fulfill the filtering
     val resultList: MutableList<Integration> = mutableListOf()
 
-    val consumerSearchCache = SearchCache(domainFilter)
+    val consumerSearchCache = SearchCache(consumerFilter)
     val domainSearchCache = SearchCache(domainFilter)
     val contractSearchCache = SearchCache(contractFilter)
     val plattformChainSearchCache = SearchCache(plattformChainFilter)
@@ -282,7 +283,9 @@ data class SearchCache(val filter: String) {
 
     fun doContain(item: BaseItem): Boolean {
         val id = item.id
-        if (idCache.binarySearch(id) >= 0) return true
+        if (idCache.binarySearch(id) >= 0) {
+            return true
+        }
         if (item.searchField.contains(filter, true)) {
             idCache.add(id)
             idCache.sort()

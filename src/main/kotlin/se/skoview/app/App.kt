@@ -27,6 +27,7 @@ import se.skoview.view.setUrlFilter
 // done: Bug in url handling. http//hippokrates.se/hippo - it seems hippo is removed
 // done: Gå igenom all kod, städa och refaktorera det viktigaste
 // todo: Tag bort hand-pekaren när man pekar på ett valt item
+// todo: Länk till statistiken
 // done: Fixa till färgerna
 // todo: Steg 1 Driftsätt K-hippo (rhippo)
 // todo: Steg 2 Lös detta med att visa SE

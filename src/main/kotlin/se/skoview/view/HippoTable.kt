@@ -6,10 +6,9 @@ import pl.treksoft.kvision.form.select.selectInput
 import pl.treksoft.kvision.form.text.TextInputType
 import pl.treksoft.kvision.form.text.textInput
 import pl.treksoft.kvision.html.*
-import pl.treksoft.kvision.panel.SimplePanel
-import pl.treksoft.kvision.panel.VPanel
-import pl.treksoft.kvision.panel.hPanel
-import pl.treksoft.kvision.panel.vPanel
+import pl.treksoft.kvision.modal.Modal
+import pl.treksoft.kvision.modal.ModalSize
+import pl.treksoft.kvision.panel.*
 import pl.treksoft.kvision.state.stateBinding
 import pl.treksoft.kvision.utils.perc
 import pl.treksoft.kvision.utils.px
@@ -35,29 +34,53 @@ object HippoTablePage : SimplePanel() {
             }
         }
         // Date selector
-        vPanel {
-        }.apply {
-            clear = Clear.BOTH
+
+        //hPanel { clear = Clear.BOTH
+        flexPanel(
+            FlexDir.ROW, FlexWrap.WRAP, FlexJustify.SPACEBETWEEN, FlexAlignItems.CENTER,
+            spacing = 5
+        ) { clear = Clear.BOTH
             margin = 0.px
             background = Background(0xf6efe9)
-        }.stateBinding(store) { state ->
-            //div(classes = setOf(""""class="cssload-loader"""")).width = 100.perc
             div {
-                height = 40.px
-                val dateOptionList = state.updateDates.map { Pair(it, it) }
-                selectInput(
-                    options = dateOptionList,
-                    value = state.dateEffective
-                ) {
-                    selectWidth = CssSize(150, UNIT.px)
-                    size = InputSize.SMALL
-                }.onEvent {
-                    change = {
-                        store.dispatch { dispatch, getState ->
-                            dispatch(HippoAction.DateSelected(self.value ?: ""))
-                            loadIntegrations(getState())
+                align = Align.LEFT
+            }.stateBinding(store) { state ->
+                //div(classes = setOf(""""class="cssload-loader"""")).width = 100.perc
+                div {
+                    height = 40.px
+                    val dateOptionList = state.updateDates.map { Pair(it, it) }
+                    selectInput(
+                        options = dateOptionList,
+                        value = state.dateEffective
+                    ) {
+                        selectWidth = CssSize(150, UNIT.px)
+                        size = InputSize.SMALL
+                    }.onEvent {
+                        change = {
+                            store.dispatch { dispatch, getState ->
+                                dispatch(HippoAction.DateSelected(self.value ?: ""))
+                                loadIntegrations(getState())
+                            }
                         }
                     }
+                }
+            }
+
+            div {
+                align = Align.RIGHT
+                val modal = Modal("Om hippo")
+                modal.iframe( src = "about.html", iframeHeight = 400, iframeWidth = 700)
+                modal.size = ModalSize.LARGE
+                //modal.add(H(require("img/dog.jpg")))
+                modal.addButton(Button("Stäng").onClick {
+                    modal.hide()
+                })
+                button("Om hippo", style = ButtonStyle.INFO).onClick {
+                    size = ButtonSize.SMALL
+                    modal.show()
+                }.apply {
+                    addBsBgColor(BsBgColor.LIGHT)
+                    addBsColor(BsColor.BLACK50)
                 }
             }
         }
@@ -80,7 +103,9 @@ object HippoTablePage : SimplePanel() {
                     searchField(ItemType.CONTRACT)
                 }
                 div {}.stateBinding(store) { state ->
-                    h5("Tjänstekontrakt (${state.vServiceContracts.size}/${state.maxCounters.contracts})").apply {color = Color(0x227777)}
+                    h5("Tjänstekontrakt (${state.vServiceContracts.size}/${state.maxCounters.contracts})").apply {
+                        color = Color(0x227777)
+                    }
                     val maxItemsToShow = 1000
                     div {
                         border = Border(1.px, BorderStyle.SOLID, Col.GRAY)
@@ -95,7 +120,7 @@ object HippoTablePage : SimplePanel() {
                                     // Service Contract
                                     if (item::class.simpleName == "ServiceContract") {
                                         +item.description
-                                        if (store.getState().isItemFiltered( ItemType.CONTRACT, item.id ) ) {
+                                        if (store.getState().isItemFiltered(ItemType.CONTRACT, item.id)) {
                                             insertResetButton(item, ItemType.CONTRACT)
                                         } else itemSelect(item, ItemType.CONTRACT)
                                     } else {
@@ -121,7 +146,7 @@ object HippoTablePage : SimplePanel() {
     }
 }
 
-class HippoItemsView(type: ItemType, heading: String, bredd: Int = 20): VPanel() {
+class HippoItemsView(type: ItemType, heading: String, bredd: Int = 20) : VPanel() {
     init {
         //background = Background(Col.LIGHTCYAN)
         width = bredd.vw
@@ -155,7 +180,7 @@ class HippoItemsView(type: ItemType, heading: String, bredd: Int = 20): VPanel()
                 else -> println("Error in HippoItemsView class, type = $type")
             }
 
-            h5("$heading (${vList.size}/${maxCounter})").apply {color = Color(0x227777)}
+            h5("$heading (${vList.size}/${maxCounter})").apply { color = Color(0x227777) }
             div {
                 vList.subList(0, min(vList.size, 100))
                     .map { item ->
@@ -232,7 +257,7 @@ private fun Div.insertResetButton(item: BaseItem, type: ItemType) {
         ItemType.LOGICAL_ADDRESS -> "Återställ logisk adress"
         ItemType.PRODUCER -> "Återställ tjänsteproducent"
         ItemType.PLATTFORM_CHAIN -> "Återställ tjänsteplattform(ar)"
-        else ->  "Internal error in insertResetButton()"
+        else -> "Internal error in insertResetButton()"
     }
     div {
         button(buttonText, style = ButtonStyle.PRIMARY) {
