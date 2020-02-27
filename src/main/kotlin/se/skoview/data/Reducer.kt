@@ -111,7 +111,7 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
         }
     }
 
-    console.log(newState)
+    //console.log(newState)
     println("<<<===== ${action::class}")
 
     return newState

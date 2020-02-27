@@ -103,7 +103,7 @@ fun loadIntegrations(state: HippoState) {
                 IntegrationCache(parameters, integrationArrs, integrationInfo.maxCounters, integrationInfo.updateDates)
             }
             println("Number of integrations: ${integrationArrs.size}")
-            store.dispatch { action, getState ->
+            store.dispatch { _, getState ->
                 store.dispatch(
                     HippoAction.DoneDownloadIntegrations(
                         integrationArrs,

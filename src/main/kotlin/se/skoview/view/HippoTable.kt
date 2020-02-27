@@ -15,6 +15,7 @@ import pl.treksoft.kvision.utils.px
 import pl.treksoft.kvision.utils.vw
 import se.skoview.app.store
 import se.skoview.data.*
+import kotlin.browser.window
 import kotlin.math.min
 
 object HippoTablePage : SimplePanel() {
@@ -39,11 +40,13 @@ object HippoTablePage : SimplePanel() {
         flexPanel(
             FlexDir.ROW, FlexWrap.WRAP, FlexJustify.SPACEBETWEEN, FlexAlignItems.CENTER,
             spacing = 5
-        ) { clear = Clear.BOTH
+        ) {
+            clear = Clear.BOTH
             margin = 0.px
             background = Background(0xf6efe9)
             div {
                 align = Align.LEFT
+                //background = Background(Col.BLUEVIOLET)
             }.stateBinding(store) { state ->
                 //div(classes = setOf(""""class="cssload-loader"""")).width = 100.perc
                 div {
@@ -67,9 +70,30 @@ object HippoTablePage : SimplePanel() {
             }
 
             div {
+                align = Align.CENTER
+                //background = Background(Col.LIGHTSTEELBLUE)
+            }.stateBinding(store) { state ->
+                val sllRtpProdId = 3
+                val chainId = if (state.vPlattformChains.size == 1) state.vPlattformChains[0].id else -1
+                if (chainId > 0) {
+                    val chain = PlattformChain.map[chainId]
+                    if (chain!!.first== sllRtpProdId || chain.last == sllRtpProdId) {
+                        button("SLL statistiktjänst", style = ButtonStyle.INFO).onClick {
+                            size = ButtonSize.SMALL
+                            window.open( "https://statistik.tjansteplattform.se/", "_blank")
+                        }.apply {
+                            addBsBgColor(BsBgColor.INFO)
+                            addBsColor(BsColor.WHITE)
+                        }
+                    }
+                }
+            }
+
+            div {
+                //background = Background(Col.LIGHTSKYBLUE)
                 align = Align.RIGHT
                 val modal = Modal("Om hippo")
-                modal.iframe( src = "about.html", iframeHeight = 400, iframeWidth = 700)
+                modal.iframe(src = "about.html", iframeHeight = 400, iframeWidth = 700)
                 modal.size = ModalSize.LARGE
                 //modal.add(H(require("img/dog.jpg")))
                 modal.addButton(Button("Stäng").onClick {
@@ -222,9 +246,9 @@ private fun Container.searchField(type: ItemType) {
         onEvent {
             var timeout = 0
             input = {
-                kotlin.browser.window.clearTimeout(timeout)
+                window.clearTimeout(timeout)
                 val value = self.value ?: ""
-                timeout = kotlin.browser.window.setTimeout({
+                timeout = window.setTimeout({
                     store.dispatch { dispatch, getState ->
                         println("::::::::::::::> Current field: ${self.value}")
                         if (value.isNotEmpty()) self.background = Background(Col.LIGHTGREEN)
@@ -257,7 +281,6 @@ private fun Div.insertResetButton(item: BaseItem, type: ItemType) {
         ItemType.LOGICAL_ADDRESS -> "Återställ logisk adress"
         ItemType.PRODUCER -> "Återställ tjänsteproducent"
         ItemType.PLATTFORM_CHAIN -> "Återställ tjänsteplattform(ar)"
-        else -> "Internal error in insertResetButton()"
     }
     div {
         button(buttonText, style = ButtonStyle.PRIMARY) {

@@ -175,7 +175,7 @@ fun filterViewData(state: HippoState): List<Integration> {
         ItemType.PLATTFORM_CHAIN
     )
 
-    println("filterLengthItemType: $filterLengthItemType")
+    //println("filterLengthItemType: $filterLengthItemType")
     prioList.sortByDescending { filterLengthItemType[it] }
 
     for (type in prioList) {
@@ -188,7 +188,7 @@ fun filterViewData(state: HippoState): List<Integration> {
     // todo: Remove the items which neither have a selection nor a filter from the priolist
     prioList.removeAll { filterLengthItemType[it] == 0 && !selectedItemType[it]!! }
 
-    println("Priolist: $prioList")
+    //println("Priolist: $prioList")
 
     // Loop through the list and remove all items which does not fulfill the filtering
     val resultList: MutableList<Integration> = mutableListOf()

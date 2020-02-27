@@ -13,7 +13,7 @@ import se.skoview.view.HippoTablePage
 import se.skoview.view.setUrlFilter
 
 // done: Fixa så det går att kopiera text utan att itemet väljs bort
-// todo: Lite hjälptexter, troligen på egen sida (via knapp ev)
+// done: Lite hjälptexter, troligen på egen sida (via knapp ev)
 // todo: Testa i andra webbläsare och Win/Linux
 // done: Höjden på datumraden
 // done: Kolumnerna ändrar fortfarande bredd
@@ -27,8 +27,9 @@ import se.skoview.view.setUrlFilter
 // done: Bug in url handling. http//hippokrates.se/hippo - it seems hippo is removed
 // done: Gå igenom all kod, städa och refaktorera det viktigaste
 // todo: Tag bort hand-pekaren när man pekar på ett valt item
-// todo: Länk till statistiken
+// done: Länk till statistiken
 // done: Fixa till färgerna
+// todo: Aktivera Google Analytics
 // todo: Steg 1 Driftsätt K-hippo (rhippo)
 // todo: Steg 2 Lös detta med att visa SE
 // todo: Steg 3 Tag fram mock för hur integrationer ska presenteras där det kan finnas flera LA
