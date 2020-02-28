@@ -15,12 +15,15 @@ import pl.treksoft.kvision.utils.px
 import pl.treksoft.kvision.utils.vw
 import se.skoview.app.store
 import se.skoview.data.*
+import kotlin.browser.document
 import kotlin.browser.window
 import kotlin.math.min
 
 object HippoTablePage : SimplePanel() {
 
     init {
+        // font-family: Georgia,Times New Roman,Times,serif;
+        fontFamily = "Times New Roman"
         // Page header
         vPanel {
             div {
@@ -28,7 +31,7 @@ object HippoTablePage : SimplePanel() {
                 div("Integrationer för tjänsteplattformar vars tjänstadresseringskatalog (TAK) är tillgänglig i Ineras TAK-api visas.")
             }.apply {
                 //width = 100.perc
-                background = Background(Col.DARKCYAN)
+                background = Background(0x113d3d)
                 align = Align.CENTER
                 color = Color(Col.WHITE)
                 marginTop = 5.px
@@ -48,7 +51,9 @@ object HippoTablePage : SimplePanel() {
                 align = Align.LEFT
                 //background = Background(Col.BLUEVIOLET)
             }.stateBinding(store) { state ->
-                //div(classes = setOf(""""class="cssload-loader"""")).width = 100.perc
+                // Lets scroll to top here
+                document.body!!.scrollTop = 0.toDouble()
+                document.documentElement!!.scrollTop = 0.toDouble() // All other browsers
                 div {
                     height = 40.px
                     val dateOptionList = state.updateDates.map { Pair(it, it) }
@@ -111,7 +116,7 @@ object HippoTablePage : SimplePanel() {
 
         // The whole item table
         hPanel {
-            background = Background(0xf2ffff)
+            background = Background(0xffffff)
             // -------------------------------------------------------------------------------------------------------
             // Consumers
 
@@ -127,12 +132,15 @@ object HippoTablePage : SimplePanel() {
                     searchField(ItemType.CONTRACT)
                 }
                 div {}.stateBinding(store) { state ->
-                    h5("Tjänstekontrakt (${state.vServiceContracts.size}/${state.maxCounters.contracts})").apply {
+                    h5("<b>Tjänstekontrakt (${state.vServiceContracts.size}/${state.maxCounters.contracts})</b>").apply {
                         color = Color(0x227777)
+                        rich = true
                     }
                     val maxItemsToShow = 1000
                     div {
-                        border = Border(1.px, BorderStyle.SOLID, Col.GRAY)
+                        borderLeft = Border(1.px, BorderStyle.SOLID, Col.GRAY)
+                        borderRight = Border(1.px, BorderStyle.SOLID, Col.GRAY)
+                        borderBottom = Border(1.px, BorderStyle.SOLID, Col.GRAY)
                         state.vDomainsAndContracts.subList(0, min(state.vDomainsAndContracts.size, maxItemsToShow))
                             .map { item ->
                                 div(
@@ -150,7 +158,8 @@ object HippoTablePage : SimplePanel() {
                                     } else {
                                         // Service Domain
                                         +"<b>${item.description}</b>"
-                                        border = Border(1.px, BorderStyle.SOLID, Col.GRAY)
+                                        borderTop = Border(1.px, BorderStyle.SOLID, Col.GRAY)
+
                                         if (store.getState().isItemFiltered(ItemType.DOMAIN, item.id)) {
                                             //background = Background(Col.LIGHTSTEELBLUE)
                                             insertResetButton(item, ItemType.DOMAIN)
@@ -165,7 +174,7 @@ object HippoTablePage : SimplePanel() {
             // -------------------------------------------------------------------------------------------------------
             add(HippoItemsView(ItemType.PLATTFORM_CHAIN, "Tjänsteplattformar", 18))
             add(HippoItemsView(ItemType.PRODUCER, "Tjänsteproducenter"))
-            add(HippoItemsView(ItemType.LOGICAL_ADDRESS, "Logisk adresser"))
+            add(HippoItemsView(ItemType.LOGICAL_ADDRESS, "Logiska adresser"))
         }
     }
 }
@@ -204,8 +213,15 @@ class HippoItemsView(type: ItemType, heading: String, bredd: Int = 20) : VPanel(
                 else -> println("Error in HippoItemsView class, type = $type")
             }
 
-            h5("$heading (${vList.size}/${maxCounter})").apply { color = Color(0x227777) }
+            h5("<b>$heading (${vList.size}/${maxCounter})</b>")
+                .apply {
+                    color = Color(0x227777)
+                    rich = true
+                }
             div {
+                borderLeft = Border(1.px, BorderStyle.SOLID, Col.GRAY)
+                borderRight = Border(1.px, BorderStyle.SOLID, Col.GRAY)
+                borderBottom = Border(1.px, BorderStyle.SOLID, Col.GRAY)
                 vList.subList(0, min(vList.size, 100))
                     .map { item ->
                         div(
@@ -218,7 +234,7 @@ class HippoItemsView(type: ItemType, heading: String, bredd: Int = 20) : VPanel(
                             +itemText
 
                             wordBreak = WordBreak.BREAKALL
-                            border = Border(1.px, BorderStyle.SOLID, Col.GRAY)
+                            borderTop = Border(1.px, BorderStyle.SOLID, Col.GRAY)
 
                             if (store.getState().isItemFiltered(type, item.id)) {
                                 //background = Background(Col.LIGHTSTEELBLUE)

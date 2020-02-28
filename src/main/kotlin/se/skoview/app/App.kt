@@ -27,6 +27,7 @@ import se.skoview.view.setUrlFilter
 // done: Bug in url handling. http//hippokrates.se/hippo - it seems hippo is removed
 // done: Gå igenom all kod, städa och refaktorera det viktigaste
 // todo: Tag bort hand-pekaren när man pekar på ett valt item
+// todo: Ev se till att förstasidan börjar renderas snabbare
 // done: Länk till statistiken
 // done: Fixa till färgerna
 // todo: Aktivera Google Analytics
@@ -43,6 +44,7 @@ import se.skoview.view.setUrlFilter
 // todo: Setting för att bestämma ordning på kolumnerna
 // todo: Färger på rubrikerna
 // todo: Frys rubrikraden
+// todo: Lägg till knapp som tar bort gränsen över hur många items som visar. Dvs en "visa alla"-knapp som dyker upp isf den röda texten.
 
 // Initialize the redux store
 val store = createReduxStore(
