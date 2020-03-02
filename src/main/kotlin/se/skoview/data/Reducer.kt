@@ -62,7 +62,10 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
                 integrationArrs = action.integrationArrs,
                 activeIntegrationArrs = action.integrationArrs,
                 maxCounters = action.maxCounters,
-                updateDates = dates.distinct().sortedDescending() //action.updateDates
+                updateDates = dates.distinct().sortedDescending(), //action.updateDates
+                vServiceConsumersMax = 100,
+                vServiceProducersMax = 100,
+                vLogicalAddressesMax = 100
             )
         }
         is HippoAction.ErrorDownloadIntegrations -> state.copy(
@@ -109,10 +112,28 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
                 )
             }
         }
+        is HippoAction.SetVMax -> {
+            when (action.type) {
+                ItemType.CONSUMER -> state.copy(
+                    vServiceConsumersMax = action.size
+                )
+                ItemType.LOGICAL_ADDRESS -> state.copy(
+                    vLogicalAddressesMax = action.size
+                )
+                ItemType.PRODUCER -> state.copy(
+                    vServiceProducersMax = action.size
+                )
+                else -> {
+                    println("Internal error i the ShowMoreItems reducer")
+                    state
+                }
+            }
+        }
     }
 
     //console.log(newState)
     println("<<<===== ${action::class}")
+    //console.log(newState)
 
     return newState
 }

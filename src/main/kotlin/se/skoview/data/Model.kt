@@ -61,7 +61,12 @@ data class HippoState(
     val plattformChainFilter: String,
 
     // Filtered integrations
-    val activeIntegrationArrs: List<Integration>
+    val activeIntegrationArrs: List<Integration>,
+
+    // Max number of items to display
+    val vServiceConsumersMax: Int,
+    val vServiceProducersMax: Int,
+    val vLogicalAddressesMax: Int
 )
 
 fun HippoState.isItemFiltered(itemType: ItemType, id: Int): Boolean {
@@ -117,7 +122,10 @@ fun getInitialState(): HippoState {
         "",
         "",
         "",
-        listOf()
+        listOf(),
+        100,
+        100,
+        100
     )
 }
 

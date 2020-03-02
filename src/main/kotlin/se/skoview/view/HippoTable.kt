@@ -74,6 +74,7 @@ object HippoTablePage : SimplePanel() {
                 }
             }
 
+            // Statistics button
             div {
                 align = Align.CENTER
                 //background = Background(Col.LIGHTSTEELBLUE)
@@ -82,10 +83,10 @@ object HippoTablePage : SimplePanel() {
                 val chainId = if (state.vPlattformChains.size == 1) state.vPlattformChains[0].id else -1
                 if (chainId > 0) {
                     val chain = PlattformChain.map[chainId]
-                    if (chain!!.first== sllRtpProdId || chain.last == sllRtpProdId) {
+                    if (chain!!.first == sllRtpProdId || chain.last == sllRtpProdId) {
                         button("SLL statistiktjänst", style = ButtonStyle.INFO).onClick {
                             size = ButtonSize.SMALL
-                            window.open( "https://statistik.tjansteplattform.se/", "_blank")
+                            window.open("https://statistik.tjansteplattform.se/", "_blank")
                         }.apply {
                             addBsBgColor(BsBgColor.INFO)
                             addBsColor(BsColor.WHITE)
@@ -94,6 +95,7 @@ object HippoTablePage : SimplePanel() {
                 }
             }
 
+            // About button
             div {
                 //background = Background(Col.LIGHTSKYBLUE)
                 align = Align.RIGHT
@@ -136,12 +138,11 @@ object HippoTablePage : SimplePanel() {
                         color = Color(0x227777)
                         rich = true
                     }
-                    val maxItemsToShow = 1000
                     div {
                         borderLeft = Border(1.px, BorderStyle.SOLID, Col.GRAY)
                         borderRight = Border(1.px, BorderStyle.SOLID, Col.GRAY)
                         borderBottom = Border(1.px, BorderStyle.SOLID, Col.GRAY)
-                        state.vDomainsAndContracts.subList(0, min(state.vDomainsAndContracts.size, maxItemsToShow))
+                        state.vDomainsAndContracts
                             .map { item ->
                                 div(
                                     classes = setOf("pointer"),
@@ -168,13 +169,23 @@ object HippoTablePage : SimplePanel() {
                                 }
                             }
                     }
-                    showMoreItemText(state.vServiceContracts.size, maxItemsToShow)
                 }
             }
             // -------------------------------------------------------------------------------------------------------
             add(HippoItemsView(ItemType.PLATTFORM_CHAIN, "Tjänsteplattformar", 18))
-            add(HippoItemsView(ItemType.PRODUCER, "Tjänsteproducenter"))
-            add(HippoItemsView(ItemType.LOGICAL_ADDRESS, "Logiska adresser"))
+            add(
+                HippoItemsView(
+                    ItemType.PRODUCER,
+                    "Tjänsteproducenter"
+                )
+            )
+            add(
+                HippoItemsView(
+                    ItemType.LOGICAL_ADDRESS,
+                    "Logiska adresser"
+                )
+            )
+
         }
     }
 }
@@ -188,67 +199,74 @@ class HippoItemsView(type: ItemType, heading: String, bredd: Int = 20) : VPanel(
             searchField(type)
         }
         div {}.stateBinding(store) { state ->
-            // todo: Kolla om dessa kan göras till val eller defieras inom if-satsen nedan
-            var vList = listOf<BaseItem>()
-            var maxCounter = -1
-
-            //background = Background(Col.LIGHTSTEELBLUE)
-            when (type) {
-                ItemType.CONSUMER -> {
-                    vList = state.vServiceConsumers
-                    maxCounter = state.maxCounters.consumers
-                }
-                ItemType.PRODUCER -> {
-                    vList = state.vServiceProducers
-                    maxCounter = state.maxCounters.producers
-                }
-                ItemType.PLATTFORM_CHAIN -> {
-                    vList = state.vPlattformChains
-                    maxCounter = state.maxCounters.plattformChains
-                }
-                ItemType.LOGICAL_ADDRESS -> {
-                    vList = state.vLogicalAddresses
-                    maxCounter = state.maxCounters.logicalAddress
-                }
-                else -> println("Error in HippoItemsView class, type = $type")
-            }
-
-            h5("<b>$heading (${vList.size}/${maxCounter})</b>")
-                .apply {
-                    color = Color(0x227777)
-                    rich = true
-                }
             div {
-                borderLeft = Border(1.px, BorderStyle.SOLID, Col.GRAY)
-                borderRight = Border(1.px, BorderStyle.SOLID, Col.GRAY)
-                borderBottom = Border(1.px, BorderStyle.SOLID, Col.GRAY)
-                vList.subList(0, min(vList.size, 100))
-                    .map { item ->
-                        div(
-                            classes = setOf("pointer"),
-                            rich = true
-                        ) {
-                            val itemText = if (type == ItemType.PLATTFORM_CHAIN) item.name
-                            else "<i>${item.description}</i><br>${item.name}"
+                // todo: Kolla om dessa kan göras till val eller defieras inom if-satsen nedan
+                var vList = listOf<BaseItem>()
+                var maxCounter = -1
+                var maxNoItems = -1
 
-                            +itemText
-
-                            wordBreak = WordBreak.BREAKALL
-                            borderTop = Border(1.px, BorderStyle.SOLID, Col.GRAY)
-
-                            if (store.getState().isItemFiltered(type, item.id)) {
-                                //background = Background(Col.LIGHTSTEELBLUE)
-                                insertResetButton(item, type)
-                            } else itemSelect(item, type)
-                        }
+                //background = Background(Col.LIGHTSTEELBLUE)
+                when (type) {
+                    ItemType.CONSUMER -> {
+                        vList = state.vServiceConsumers
+                        maxCounter = state.maxCounters.consumers
+                        maxNoItems = state.vServiceConsumersMax
                     }
+                    ItemType.PRODUCER -> {
+                        vList = state.vServiceProducers
+                        maxCounter = state.maxCounters.producers
+                        maxNoItems = state.vServiceProducersMax
+                    }
+                    ItemType.PLATTFORM_CHAIN -> {
+                        vList = state.vPlattformChains
+                        maxCounter = state.maxCounters.plattformChains
+                        maxNoItems = 100
+                    }
+                    ItemType.LOGICAL_ADDRESS -> {
+                        vList = state.vLogicalAddresses
+                        maxCounter = state.maxCounters.logicalAddress
+                        maxNoItems = state.vLogicalAddressesMax
+                    }
+                    else -> println("Error in HippoItemsView class, type = $type")
+                }
+
+                h5("<b>$heading (${vList.size}/${maxCounter})</b>")
+                    .apply {
+                        color = Color(0x227777)
+                        rich = true
+                    }
+                div {
+                    borderLeft = Border(1.px, BorderStyle.SOLID, Col.GRAY)
+                    borderRight = Border(1.px, BorderStyle.SOLID, Col.GRAY)
+                    borderBottom = Border(1.px, BorderStyle.SOLID, Col.GRAY)
+                    vList.subList(0, min(vList.size, maxNoItems))
+                        .map { item ->
+                            div(
+                                classes = setOf("pointer"),
+                                rich = true
+                            ) {
+                                val itemText = if (type == ItemType.PLATTFORM_CHAIN) item.name
+                                else "<i>${item.description}</i><br>${item.name}"
+
+                                +itemText
+
+                                wordBreak = WordBreak.BREAKALL
+                                borderTop = Border(1.px, BorderStyle.SOLID, Col.GRAY)
+
+                                if (store.getState().isItemFiltered(type, item.id)) {
+                                    //background = Background(Col.LIGHTSTEELBLUE)
+                                    insertResetButton(item, type)
+                                } else itemSelect(item, type)
+                            }
+                        }
+                }
+                showMoreItemsButton(type, vList.size, maxNoItems)
             }
-            showMoreItemText(vList.size)
         }
     }
 }
 
-private fun Container.searchField(type: ItemType) {
+private fun Container.searchField(type: ItemType, currentValue: String = "") {
     textInput(type = TextInputType.SEARCH) {
         when (type) {
             ItemType.CONSUMER -> placeholder = "Sök tjänstekonsument..."
@@ -258,7 +276,7 @@ private fun Container.searchField(type: ItemType) {
             ItemType.PLATTFORM_CHAIN -> placeholder = "Sök tjänsteplattform(ar)..."
             else -> placeholder == "Internal error in searchField()"
         }
-
+        //value = currentValue
         onEvent {
             var timeout = 0
             input = {
@@ -312,11 +330,24 @@ private fun Div.insertResetButton(item: BaseItem, type: ItemType) {
     }
 }
 
-private fun Container.showMoreItemText(size: Int, maxItemsToShow: Int = 100) {
+private fun Container.showMoreItemsButton(type: ItemType, size: Int, maxItemsToShow: Int) {
     if (size > maxItemsToShow) {
         div {
-            color = Color(Col.RED)
-            +"Ytterligare ${size - 100} rader tillgängliga via sökning eller filtrering"
+            //color = Color(Col.RED)
+            //+"Ytterligare ${size - maxItemsToShow} rader tillgängliga via sökning eller filtrering"
+            val linesLeft = size - maxItemsToShow
+            val moreLinesToShow = min(linesLeft, 500)
+            val actualLinesToShow = moreLinesToShow + maxItemsToShow
+            button("Visa ytterligare ${moreLinesToShow} rader", style = ButtonStyle.PRIMARY) {
+                width = 100.perc
+                background = Background(Col.GRAY)
+                onClick {
+                    store.dispatch { dispatch, getState ->
+                        dispatch(HippoAction.SetVMax(type, actualLinesToShow))
+                        createViewData(getState())
+                    }
+                }
+            }
         }
     }
 }

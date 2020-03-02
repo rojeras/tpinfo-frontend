@@ -29,4 +29,5 @@ sealed class HippoAction : RAction {
     ) : HippoAction()
     data class ViewUpdated(val integrationLists: IntegrationLists) : HippoAction()
     data class FilterItems(val type: ItemType, val filterString: String) : HippoAction()
+    data class SetVMax(val type: ItemType, val size: Int): HippoAction()
 }
