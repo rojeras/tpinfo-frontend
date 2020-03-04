@@ -60,9 +60,6 @@ data class HippoState(
     val logicalAddressFilter: String,
     val plattformChainFilter: String,
 
-    // Filtered integrations
-    val activeIntegrationArrs: List<Integration>,
-
     // Max number of items to display
     val vServiceConsumersMax: Int,
     val vServiceProducersMax: Int,
@@ -122,7 +119,6 @@ fun getInitialState(): HippoState {
         "",
         "",
         "",
-        listOf(),
         100,
         100,
         100

@@ -46,11 +46,13 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
             downloadBaseItemStatus = AsyncActionStatus.ERROR,
             errorMessage = action.errorMessage
         )
+        /*
         is HippoAction.StartDownloadIntegrations -> {
             state.copy(
                 downloadIntegrationStatus = AsyncActionStatus.INITIALIZED
             )
         }
+         */
         is HippoAction.DoneDownloadIntegrations -> {
             val dates: MutableList<String> = mutableListOf()
             // Must ensure the selected date is part of the list of all dates
@@ -60,7 +62,6 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
             state.copy(
                 downloadIntegrationStatus = AsyncActionStatus.COMPLETED,
                 integrationArrs = action.integrationArrs,
-                activeIntegrationArrs = action.integrationArrs,
                 maxCounters = action.maxCounters,
                 updateDates = dates.distinct().sortedDescending(), //action.updateDates
                 vServiceConsumersMax = 100,

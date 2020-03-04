@@ -74,7 +74,6 @@ class App : Application() {
 
         // A listener that sets the URL after each state change
         store.subscribe { state ->
-            println("Store subscribe - will set URL")
             setUrlFilter(state)
         }
 

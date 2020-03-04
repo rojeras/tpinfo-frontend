@@ -20,7 +20,6 @@ data class BookmarkInformation(
 // Let the URL mirror the current state
 fun setUrlFilter(state: HippoState) {
     val bookmark = state.getBookmark()
-    println("In serUrlFilter(), bookmark=$bookmark")
     val hostname = window.location.hostname
     val protocol = window.location.protocol
     val port = window.location.port
@@ -32,8 +31,6 @@ fun setUrlFilter(state: HippoState) {
     if (bookmark.length > 1) {
         newUrl += "?filter=$bookmark"
     }
-    console.log("Old pathname: $pathname")
-    console.log("New URL: $newUrl")
     window.history.pushState(newUrl, "hippo-utforska integrationer", newUrl)
 }
 
@@ -78,7 +75,6 @@ fun HippoState.getBookmark(): String {
         bookmark += "L$lastId"
     }
 
-    println("Bookmark is: $bookmark")
     return bookmark
 
 }
@@ -112,7 +108,6 @@ fun parseBookmark(): BookmarkInformation {
     val filterValueStart = fullUrl.substring(ix)
     val parts = filterValueStart.split('&')
     val filterValue = parts[0]
-    println("bookmark: $filterValue")
 
     // Extract and calculate the date values
     val dateEffectiveCodeList = parseBookmarkType("S", filterValue)
@@ -121,7 +116,6 @@ fun parseBookmark(): BookmarkInformation {
     val dateEndCodeList = parseBookmarkType("E", filterValue)
     val dateEnd = if (dateEndCodeList.size > 0) daysSinceEpoch2date(dateEffectiveCodeList[0].toInt()) else ""
 
-    println("dates are : $dateEffective, $dateEnd")
     // Extract and calculate the plattforms values
     val firstPlattformCodeList = parseBookmarkType("F", filterValue)
     val lastPlattformCodeList = parseBookmarkType("L", filterValue)
@@ -131,7 +125,6 @@ fun parseBookmark(): BookmarkInformation {
     if (firstPlattformCodeList.isNotEmpty() && lastPlattformCodeList.isNotEmpty()) {
         val first = firstPlattformCodeList[0]
         val last = lastPlattformCodeList[0]
-        console.log("first=$first, last=$last")
         val plattformChainId = PlattformChain.calculateId(first = first, middle = null, last = last)
 
         plattformChainList = listOf(plattformChainId)
@@ -148,15 +141,12 @@ fun parseBookmark(): BookmarkInformation {
         plattformChainList
     )
     //val cList = parseBookmarkType("c", filterValue)
-    println("Final bookmarkInformation:")
-    console.log(bookmarkInformation)
 
     return bookmarkInformation
 }
 
 fun date2DaysSinceEpoch(dateString: String): Double {
     val day = Date(dateString)
-
     return (day.getTime() / 8.64e7) - 16874  // Dived by number of millisecs since epoch (1/1 1970)
 }
 

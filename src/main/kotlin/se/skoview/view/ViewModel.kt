@@ -4,7 +4,6 @@ import se.skoview.app.store
 import se.skoview.data.*
 import kotlin.js.Date
 
-
 // todo: Speed up and simplify
 data class IntegrationLists(
     val serviceConsumers: List<ServiceComponent>,
@@ -17,12 +16,9 @@ data class IntegrationLists(
 )
 
 fun createViewData(state: HippoState) {
-    val start = Date().getMilliseconds()
-    val filteredIntegrations = filterViewData(state)
-    val end = Date().getMilliseconds()
-    println("Elapsed time: ${end - start} ms")
+    //val filteredIntegrations = filterViewData(state)
+    val filteredIntegrations = state.integrationArrs
 
-    //println(">>> Start createViewData()")
     val plattformChains =
         filteredIntegrations.asSequence()
             .map { integration: Integration ->
@@ -124,7 +120,7 @@ fun filterViewData(state: HippoState): List<Integration> {
     // todo: Rewrite with sequence and filter to speed it up
     // One way to speed up might be to replace the Int in integrationArrs with an arrarr of acutal Baseitems
     println(">>>> Start filterViewData")
-    val integrationListsIn = state.activeIntegrationArrs
+    val integrationListsIn = state.integrationArrs
 
     val consumerFilter = state.consumerFilter
     val contractFilter = state.contractFilter

@@ -134,7 +134,11 @@ object HippoTablePage : SimplePanel() {
                     searchField(ItemType.CONTRACT)
                 }
                 div {}.stateBinding(store) { state ->
-                    h5("<b>Tjänstekontrakt (${state.vServiceContracts.size}/${state.maxCounters.contracts})</b>").apply {
+
+                    val textFilter = state.contractFilter
+                    val filteredList = state.vDomainsAndContracts.filter { it.searchField.isEmpty() || it.searchField.contains(textFilter, true) }
+
+                    h5("<b>Tjänstekontrakt (${filteredList.size}/${state.maxCounters.contracts})</b>").apply {
                         color = Color(0x227777)
                         rich = true
                     }
@@ -142,8 +146,8 @@ object HippoTablePage : SimplePanel() {
                         borderLeft = Border(1.px, BorderStyle.SOLID, Col.GRAY)
                         borderRight = Border(1.px, BorderStyle.SOLID, Col.GRAY)
                         borderBottom = Border(1.px, BorderStyle.SOLID, Col.GRAY)
-                        state.vDomainsAndContracts
-                            .map { item ->
+                        if (filteredList.size < state.vDomainsAndContracts.size) background = Background(Col.LIGHTGRAY)
+                        filteredList.map { item ->
                                 div(
                                     classes = setOf("pointer"),
                                     rich = true
@@ -153,7 +157,11 @@ object HippoTablePage : SimplePanel() {
                                     // Service Contract
                                     if (item::class.simpleName == "ServiceContract") {
                                         +item.description
-                                        if (store.getState().isItemFiltered(ItemType.CONTRACT, item.id)) {
+                                        //if (store.getState().isItemFiltered(ItemType.CONTRACT, item.id)) {
+                                        if (
+                                            state.isItemFiltered(ItemType.CONTRACT, item.id) &&
+                                            state.vServiceContracts.size == 1
+                                        ) {
                                             insertResetButton(item, ItemType.CONTRACT)
                                         } else itemSelect(item, ItemType.CONTRACT)
                                     } else {
@@ -161,7 +169,10 @@ object HippoTablePage : SimplePanel() {
                                         +"<b>${item.description}</b>"
                                         borderTop = Border(1.px, BorderStyle.SOLID, Col.GRAY)
 
-                                        if (store.getState().isItemFiltered(ItemType.DOMAIN, item.id)) {
+                                        if (
+                                            state.isItemFiltered(ItemType.DOMAIN, item.id) &&
+                                            state.vServiceDomains.size == 1
+                                        ) {
                                             //background = Background(Col.LIGHTSTEELBLUE)
                                             insertResetButton(item, ItemType.DOMAIN)
                                         } else itemSelect(item, ItemType.DOMAIN)
@@ -204,6 +215,7 @@ class HippoItemsView(type: ItemType, heading: String, bredd: Int = 20) : VPanel(
                 var vList = listOf<BaseItem>()
                 var maxCounter = -1
                 var maxNoItems = -1
+                var textFilter = ""
 
                 //background = Background(Col.LIGHTSTEELBLUE)
                 when (type) {
@@ -211,26 +223,32 @@ class HippoItemsView(type: ItemType, heading: String, bredd: Int = 20) : VPanel(
                         vList = state.vServiceConsumers
                         maxCounter = state.maxCounters.consumers
                         maxNoItems = state.vServiceConsumersMax
+                        textFilter = state.consumerFilter
                     }
                     ItemType.PRODUCER -> {
                         vList = state.vServiceProducers
                         maxCounter = state.maxCounters.producers
                         maxNoItems = state.vServiceProducersMax
+                        textFilter = state.producerFilter
                     }
                     ItemType.PLATTFORM_CHAIN -> {
                         vList = state.vPlattformChains
                         maxCounter = state.maxCounters.plattformChains
                         maxNoItems = 100
+                        textFilter = state.plattformChainFilter
                     }
                     ItemType.LOGICAL_ADDRESS -> {
                         vList = state.vLogicalAddresses
                         maxCounter = state.maxCounters.logicalAddress
                         maxNoItems = state.vLogicalAddressesMax
+                        textFilter = state.logicalAddressFilter
                     }
                     else -> println("Error in HippoItemsView class, type = $type")
                 }
 
-                h5("<b>$heading (${vList.size}/${maxCounter})</b>")
+                val filteredList = vList.filter { it.searchField.isEmpty() || it.searchField.contains(textFilter, true) }
+
+                h5("<b>$heading (${filteredList.size}/${maxCounter})</b>")
                     .apply {
                         color = Color(0x227777)
                         rich = true
@@ -239,28 +257,36 @@ class HippoItemsView(type: ItemType, heading: String, bredd: Int = 20) : VPanel(
                     borderLeft = Border(1.px, BorderStyle.SOLID, Col.GRAY)
                     borderRight = Border(1.px, BorderStyle.SOLID, Col.GRAY)
                     borderBottom = Border(1.px, BorderStyle.SOLID, Col.GRAY)
-                    vList.subList(0, min(vList.size, maxNoItems))
+                    if (filteredList.size < vList.size) background = Background(Col.LIGHTGRAY)
+
+                    //vList.filter { it.searchField.isEmpty() || it.searchField.contains(textFilter, true) }
+
+                    filteredList
+                        .subList(0, min(filteredList.size, maxNoItems))
                         .map { item ->
-                            div(
-                                classes = setOf("pointer"),
-                                rich = true
-                            ) {
-                                val itemText = if (type == ItemType.PLATTFORM_CHAIN) item.name
-                                else "<i>${item.description}</i><br>${item.name}"
+                                div(
+                                    classes = setOf("pointer"),
+                                    rich = true
+                                ) {
+                                    val itemText = if (type == ItemType.PLATTFORM_CHAIN) item.name
+                                    else "<i>${item.description}</i><br>${item.name}"
 
-                                +itemText
+                                    +itemText
 
-                                wordBreak = WordBreak.BREAKALL
-                                borderTop = Border(1.px, BorderStyle.SOLID, Col.GRAY)
+                                    wordBreak = WordBreak.BREAKALL
+                                    borderTop = Border(1.px, BorderStyle.SOLID, Col.GRAY)
 
-                                if (store.getState().isItemFiltered(type, item.id)) {
-                                    //background = Background(Col.LIGHTSTEELBLUE)
-                                    insertResetButton(item, type)
-                                } else itemSelect(item, type)
-                            }
+                                    if (
+                                        state.isItemFiltered(type, item.id) &&
+                                        vList.size == 1
+                                    ) {
+                                        //background = Background(Col.LIGHTSTEELBLUE)
+                                        insertResetButton(item, type)
+                                    } else itemSelect(item, type)
+                                }
                         }
                 }
-                showMoreItemsButton(type, vList.size, maxNoItems)
+                showMoreItemsButton(type, filteredList.size, maxNoItems)
             }
         }
     }
@@ -285,10 +311,10 @@ private fun Container.searchField(type: ItemType, currentValue: String = "") {
                 timeout = window.setTimeout({
                     store.dispatch { dispatch, getState ->
                         println("::::::::::::::> Current field: ${self.value}")
-                        if (value.isNotEmpty()) self.background = Background(Col.LIGHTGREEN)
+                        if (value.isNotEmpty()) self.background = Background(Col.LIGHTGRAY)
                         else self.background = Background(Col.WHITE)
                         dispatch(HippoAction.FilterItems(type, value))
-                        createViewData(getState())
+                        //createViewData(getState())
                     }
                 }, 500)
             }
@@ -300,8 +326,9 @@ private fun Div.itemSelect(item: BaseItem, type: ItemType) {
     onEvent {
         click = {
             store.dispatch { dispatch, getState ->
-                dispatch(HippoAction.ItemSelected(type, item))
-                createViewData(getState())
+                store.dispatch(HippoAction.ItemSelected(type, item))
+                //createViewData(getState())
+                loadIntegrations(getState())
             }
         }
     }
@@ -323,7 +350,8 @@ private fun Div.insertResetButton(item: BaseItem, type: ItemType) {
             onClick {
                 store.dispatch { dispatch, getState ->
                     dispatch(HippoAction.ItemSelected(type, item))
-                    createViewData(getState())
+                    //createViewData(getState())
+                    loadIntegrations(getState())
                 }
             }
         }
@@ -345,6 +373,7 @@ private fun Container.showMoreItemsButton(type: ItemType, size: Int, maxItemsToS
                     store.dispatch { dispatch, getState ->
                         dispatch(HippoAction.SetVMax(type, actualLinesToShow))
                         createViewData(getState())
+
                     }
                 }
             }

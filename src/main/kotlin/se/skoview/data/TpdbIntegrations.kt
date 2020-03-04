@@ -63,7 +63,7 @@ data class IntegrationCache(
 }
 
 fun loadIntegrations(state: HippoState) {
-    store.dispatch(HippoAction.StartDownloadIntegrations)
+    //store.dispatch(HippoAction.StartDownloadIntegrations)
     //setUrlFilter(state)
     val urlParameters = state.getParams()
     val parameters = "integrations$urlParameters"
@@ -73,21 +73,24 @@ fun loadIntegrations(state: HippoState) {
         println("Integrations found in cache")
         val integrationsCache = IntegrationCache.map[parameters]
         // todo: Make sure to remove the !! below
-        store.dispatch(
-            HippoAction.DoneDownloadIntegrations(
-                integrationsCache!!.integrationArr,
-                integrationsCache.maxCounters,
-                integrationsCache.updateDates
+        store.dispatch { _, getState ->
+            store.dispatch(
+                HippoAction.DoneDownloadIntegrations(
+                    integrationsCache!!.integrationArr,
+                    integrationsCache.maxCounters,
+                    integrationsCache.updateDates
+                )
             )
-        )
+            createViewData(getState())
+        }
     } else {
         println(">>> Integrations NOT found in cache - will download")
-        console.log(parameters)
+        //console.log(parameters)
         getAsyncTpDb(parameters) { response ->
             println(">>> Size of fetched integrations is: ${response.length}")
             val json = Json(JsonConfiguration.Stable)
             val integrationInfo: IntegrationInfo = json.parse(IntegrationInfo.serializer(), response)
-            console.log(integrationInfo)
+            //console.log(integrationInfo)
             val integrationArrs: MutableList<Integration> = mutableListOf()
             for (arr: List<Int?> in integrationInfo.integrations) {
                 val one: Int = arr[1] ?: -1
@@ -126,9 +129,6 @@ fun HippoState.getParams(): String {
     params += "&dateEffective=" + this.dateEffective
     params += "&dateEnd=" + this.dateEnd
 
-    /**
-     * Filtering currently handled locally, not on the server. Only dates are passed to the server
-     *
     params += if (this.selectedConsumers.isNotEmpty()) this.selectedConsumers.joinToString(
         prefix = "&consumerId=",
         separator = ","
@@ -157,6 +157,6 @@ fun HippoState.getParams(): String {
         params += "&firstPlattformId=" + firstId
         params += "&lastPlattformId=" + lastId
     }
-    */
+
     return params
 }
