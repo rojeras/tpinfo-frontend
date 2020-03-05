@@ -1,6 +1,8 @@
 package se.skoview.data
 
+import pl.treksoft.kvision.redux.RAction
 import se.skoview.view.parseBookmark
+import kotlin.reflect.KClass
 
 enum class AsyncActionStatus {
     NOT_INITIALIZED,
@@ -12,6 +14,7 @@ enum class AsyncActionStatus {
 //@Serializable
 data class HippoState(
     // Status information
+    val currentAction: KClass<out HippoAction>,
     val applicationStarted: Boolean,
     val downloadBaseItemStatus: AsyncActionStatus,
     val downloadIntegrationStatus: AsyncActionStatus,
@@ -83,6 +86,7 @@ fun getInitialState(): HippoState {
     val bookmarkInformation = parseBookmark()
 
     return HippoState(
+        HippoAction.ApplicationStarted::class,
         false,
         AsyncActionStatus.NOT_INITIALIZED,
         AsyncActionStatus.NOT_INITIALIZED,

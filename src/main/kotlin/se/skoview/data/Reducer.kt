@@ -1,7 +1,9 @@
 package se.skoview.data
 
+import kotlin.reflect.KClass
+
 fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
-    println("=====>>> ${action::class}")
+    //println("=====>>> ${action::class}")
     //console.log(state)
     val newState = when (action) {
         is HippoAction.FilterItems -> {
@@ -131,11 +133,12 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
             }
         }
     }
+    val finalState = newState.copy(currentAction = action::class)
 
     //console.log(newState)
     println("<<<===== ${action::class}")
-    //console.log(newState)
+    //console.log(finalState)
 
-    return newState
+    return finalState
 }
 

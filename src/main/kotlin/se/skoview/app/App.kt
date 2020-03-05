@@ -28,6 +28,7 @@ import se.skoview.view.setUrlFilter
 // done: Gå igenom all kod, städa och refaktorera det viktigaste
 // todo: Tag bort hand-pekaren när man pekar på ett valt item
 // todo: Ev se till att förstasidan börjar renderas snabbare
+// todo: Check why the icon is not displayed when run from hippokrates.se
 // done: Länk till statistiken
 // done: Fixa till färgerna
 // todo: Aktivera Google Analytics
