@@ -2,7 +2,6 @@ package se.skoview.view
 
 import se.skoview.app.store
 import se.skoview.data.*
-import kotlin.js.Date
 
 // todo: Speed up and simplify
 data class IntegrationLists(
@@ -116,6 +115,11 @@ fun createViewData(state: HippoState) {
     store.dispatch(HippoAction.ViewUpdated(integrationLists))
 }
 
+private fun addUnique(item: BaseItem, list: MutableList<BaseItem>) {
+    if (list.contains(item)) return
+    list.add(item)
+}
+/*
 fun filterViewData(state: HippoState): List<Integration> {
     // todo: Rewrite with sequence and filter to speed it up
     // One way to speed up might be to replace the Int in integrationArrs with an arrarr of acutal Baseitems
@@ -269,11 +273,10 @@ fun filterViewData(state: HippoState): List<Integration> {
     return resultList
 }
 
-private fun addUnique(item: BaseItem, list: MutableList<BaseItem>) {
-    if (list.contains(item)) return
-    list.add(item)
-}
+ */
 
+
+/*
 data class SearchCache(val filter: String) {
     val idCache = mutableListOf<Int>()
 
@@ -290,7 +293,8 @@ data class SearchCache(val filter: String) {
         return false
     }
 }
-
+*/
+/*
 private fun isItemIncluded(
     selectedItems: List<Int>,
     filter: String,
@@ -308,5 +312,5 @@ private fun isItemIncluded(
 
     return true
 }
-
+ */
 

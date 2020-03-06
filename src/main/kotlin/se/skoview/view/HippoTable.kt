@@ -53,8 +53,8 @@ object HippoTablePage : SimplePanel() {
                 //background = Background(Col.BLUEVIOLET)
             }.stateBinding(store) { state ->
                 // Lets scroll to top here
-                document.body!!.scrollTop = 0.toDouble()
-                document.documentElement!!.scrollTop = 0.toDouble() // All other browsers
+                //document.body!!.scrollTop = 0.toDouble()
+                //document.documentElement!!.scrollTop = 0.toDouble() // All other browsers
                 div {
                     height = 40.px
                     val dateOptionList = state.updateDates.map { Pair(it, it) }
@@ -62,6 +62,9 @@ object HippoTablePage : SimplePanel() {
                         options = dateOptionList,
                         value = state.dateEffective
                     ) {
+                        background = Background(Color.name(Col.BLUE))
+                        //if (state.updateDates.size < state.integrationDates.size) Background(Color.name(Col.LIGHTGRAY))
+                        //else Background(Color.name(Col.WHITE))
                         selectWidth = CssSize(150, UNIT.px)
                         size = InputSize.SMALL
                     }.onEvent {
@@ -120,97 +123,12 @@ object HippoTablePage : SimplePanel() {
         // The whole item table
         hPanel {
             background = Background(hex(0xffffff))
-            // -------------------------------------------------------------------------------------------------------
-            // Consumers
 
             add(HippoItemsView(ItemType.CONSUMER, "Tjänstekonsumenter"))
-
-            // -------------------------------------------------------------------------------------------------------
-            // Domains and contracts
-            vPanel {
-                //background = Background(Col.LIGHTCYAN)
-                width = 20.vw
-                margin = 3.px
-                div {
-                    searchField(ItemType.CONTRACT)
-                }
-                div {}.stateBinding(store) { state ->
-
-                    println("Current action: ${state.currentAction}")
-                    if (
-                        state.currentAction != HippoAction.ViewUpdated::class &&
-                        state.currentAction != HippoAction.FilterItems::class &&
-                        state.currentAction != HippoAction.ApplicationStarted::class
-                    ) return@stateBinding
-
-                    val textFilter = state.contractFilter
-                    val filteredList = state.vDomainsAndContracts.filter {
-                        it.searchField.isEmpty() || it.searchField.contains(
-                            textFilter,
-                            true
-                        )
-                    }
-
-                    h5("<b>Tjänstekontrakt (${filteredList.size}/${state.maxCounters.contracts})</b>").apply {
-                        color = Color.hex(0x227777)
-                        rich = true
-                    }
-                    div {
-                        borderLeft = Border(1.px, BorderStyle.SOLID, Color.name(Col.GRAY))
-                        borderRight = Border(1.px, BorderStyle.SOLID, Color.name(Col.GRAY))
-                        borderBottom = Border(1.px, BorderStyle.SOLID, Color.name(Col.GRAY))
-                        if (filteredList.size < state.vDomainsAndContracts.size) background =
-                            Background(Color.name(Col.LIGHTGRAY))
-                        filteredList.map { item ->
-                            div(
-                                classes = setOf("pointer"),
-                                rich = true
-                            ) {
-
-                                wordBreak = WordBreak.BREAKALL
-                                // Service Contract
-                                if (item::class.simpleName == "ServiceContract") {
-                                    +item.description
-                                    //if (store.getState().isItemFiltered(ItemType.CONTRACT, item.id)) {
-                                    if (
-                                        state.isItemFiltered(ItemType.CONTRACT, item.id) &&
-                                        state.vServiceContracts.size == 1
-                                    ) {
-                                        insertResetButton(item, ItemType.CONTRACT)
-                                    } else itemSelect(item, ItemType.CONTRACT)
-                                } else {
-                                    // Service Domain
-                                    +"<b>${item.description}</b>"
-                                    borderTop = Border(1.px, BorderStyle.SOLID, Color.name(Col.GRAY))
-
-                                    if (
-                                        state.isItemFiltered(ItemType.DOMAIN, item.id) &&
-                                        state.vServiceDomains.size == 1
-                                    ) {
-                                        //background = Background(Col.LIGHTSTEELBLUE)
-                                        insertResetButton(item, ItemType.DOMAIN)
-                                    } else itemSelect(item, ItemType.DOMAIN)
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            // -------------------------------------------------------------------------------------------------------
+            add(HippoItemsView(ItemType.CONTRACT, "Tjänstekontrakt"))
             add(HippoItemsView(ItemType.PLATTFORM_CHAIN, "Tjänsteplattformar", 18))
-            add(
-                HippoItemsView(
-                    ItemType.PRODUCER,
-                    "Tjänsteproducenter"
-                )
-            )
-            add(
-                HippoItemsView(
-                    ItemType.LOGICAL_ADDRESS,
-                    "Logiska adresser"
-                )
-            )
-
+            add(HippoItemsView(ItemType.PRODUCER, "Tjänsteproducenter"))
+            add(HippoItemsView(ItemType.LOGICAL_ADDRESS, "Logiska adresser"))
         }
     }
 }
@@ -227,11 +145,20 @@ class HippoItemsView(type: ItemType, heading: String, bredd: Int = 20) : VPanel(
             if (
                 state.currentAction != HippoAction.ViewUpdated::class &&
                 state.currentAction != HippoAction.FilterItems::class &&
+                state.currentAction != HippoAction.SetVMax::class &&
                 state.currentAction != HippoAction.ApplicationStarted::class
             ) return@stateBinding
 
+            if (type == ItemType.CONSUMER) println("Will now render")
+
+            // Go to to for most rendering actions
+            if (state.currentAction != HippoAction.SetVMax::class) {
+                document.body!!.scrollTop = 0.toDouble()
+                document.documentElement!!.scrollTop = 0.toDouble() // All other browsers
+            }
+
             div {
-                // todo: Kolla om dessa kan göras till val eller defieras inom if-satsen nedan
+                // todo: Kolla om dessa kan göras till val eller definieras inom if-satsen nedan
                 var vList = listOf<BaseItem>()
                 var maxCounter = -1
                 var maxNoItems = -1
@@ -263,27 +190,40 @@ class HippoItemsView(type: ItemType, heading: String, bredd: Int = 20) : VPanel(
                         maxNoItems = state.vLogicalAddressesMax
                         textFilter = state.logicalAddressFilter
                     }
+                    ItemType.CONTRACT -> {
+                        vList = state.vDomainsAndContracts
+                        maxCounter = state.maxCounters.contracts
+                        maxNoItems = state.vServiceContractsMax
+                        textFilter = state.contractFilter
+                    }
                     else -> println("Error in HippoItemsView class, type = $type")
                 }
 
+                // Perform the free text search filtering
                 val filteredList =
                     if (textFilter.isNotEmpty())
                         vList.filter { it.searchField.contains(textFilter, true) }
                     else
                         vList
 
-                h5("<b>$heading (${filteredList.size}/${maxCounter})</b>")
+                // Count current number of items displayed. For contracts we must calculate explicitly to remove domain items
+                val noFilteredItems =
+                    if (type == ItemType.CONTRACT) filteredList.filter { it::class.simpleName == "ServiceContract" }.size
+                    else filteredList.size
+
+                // Render the heading and counts
+                h5("<b>$heading (${noFilteredItems}/${maxCounter})</b>")
                     .apply {
                         color = Color.hex(0x227777)
                         rich = true
                     }
+
+                // Render the list of items
                 div {
                     borderLeft = Border(1.px, BorderStyle.SOLID, Color.name(Col.GRAY))
                     borderRight = Border(1.px, BorderStyle.SOLID, Color.name(Col.GRAY))
                     borderBottom = Border(1.px, BorderStyle.SOLID, Color.name(Col.GRAY))
                     if (filteredList.size < vList.size) background = Background(Color.name(Col.LIGHTGRAY))
-
-                    //vList.filter { it.searchField.isEmpty() || it.searchField.contains(textFilter, true) }
 
                     filteredList
                         .subList(0, min(filteredList.size, maxNoItems))
@@ -292,21 +232,44 @@ class HippoItemsView(type: ItemType, heading: String, bredd: Int = 20) : VPanel(
                                 classes = setOf("pointer"),
                                 rich = true
                             ) {
-                                val itemText = if (type == ItemType.PLATTFORM_CHAIN) item.name
-                                else "<i>${item.description}</i><br>${item.name}"
-
-                                +itemText
-
                                 wordBreak = WordBreak.BREAKALL
-                                borderTop = Border(1.px, BorderStyle.SOLID, Color.name(Col.GRAY))
 
-                                if (
-                                    state.isItemFiltered(type, item.id) &&
-                                    vList.size == 1
-                                ) {
-                                    //background = Background(Col.LIGHTSTEELBLUE)
-                                    insertResetButton(item, type)
-                                } else itemSelect(item, type)
+                                // Difference for contracts, domains and rest
+                                if (item::class.simpleName == "ServiceContract") {
+                                    +item.description
+                                    if (
+                                        state.isItemFiltered(ItemType.CONTRACT, item.id) &&
+                                        state.vServiceContracts.size == 1
+                                    ) {
+                                        insertResetButton(item, ItemType.CONTRACT)
+                                    } else itemSelect(item, ItemType.CONTRACT)
+
+                                } else if (item::class.simpleName == "ServiceDomain") {
+                                    +"<b>${item.description}</b>"
+                                    borderTop = Border(1.px, BorderStyle.SOLID, Color.name(Col.GRAY))
+
+                                    if (
+                                        state.isItemFiltered(ItemType.DOMAIN, item.id) &&
+                                        state.vServiceDomains.size == 1
+                                    ) {
+                                        insertResetButton(item, ItemType.DOMAIN)
+                                    } else itemSelect(item, ItemType.DOMAIN)
+
+                                } else {
+                                    val itemText =
+                                        if (type == ItemType.PLATTFORM_CHAIN) item.name
+                                        else "<i>${item.description}</i><br>${item.name}"
+
+                                    +itemText
+                                    borderTop = Border(1.px, BorderStyle.SOLID, Color.name(Col.GRAY))
+
+                                    if (
+                                        state.isItemFiltered(type, item.id) &&
+                                        vList.size == 1
+                                    ) {
+                                        insertResetButton(item, type)
+                                    } else itemSelect(item, type)
+                                }
                             }
                         }
                 }
@@ -347,7 +310,7 @@ private fun Container.searchField(type: ItemType) {
 private fun Div.itemSelect(item: BaseItem, type: ItemType) {
     onEvent {
         click = {
-            store.dispatch { dispatch, getState ->
+            store.dispatch { _, getState ->
                 store.dispatch(HippoAction.ItemSelected(type, item))
                 //createViewData(getState())
                 loadIntegrations(getState())
@@ -394,7 +357,7 @@ private fun Container.showMoreItemsButton(type: ItemType, size: Int, maxItemsToS
                 onClick {
                     store.dispatch { dispatch, getState ->
                         dispatch(HippoAction.SetVMax(type, actualLinesToShow))
-                        createViewData(getState())
+                        //createViewData(getState())
 
                     }
                 }

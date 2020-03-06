@@ -66,7 +66,8 @@ data class HippoState(
     // Max number of items to display
     val vServiceConsumersMax: Int,
     val vServiceProducersMax: Int,
-    val vLogicalAddressesMax: Int
+    val vLogicalAddressesMax: Int,
+    val vServiceContractsMax: Int
 )
 
 fun HippoState.isItemFiltered(itemType: ItemType, id: Int): Boolean {
@@ -125,7 +126,8 @@ fun getInitialState(): HippoState {
         "",
         100,
         100,
-        100
+        100,
+        500
     )
 }
 
