@@ -6,6 +6,7 @@ import kotlinx.serialization.json.JsonConfiguration
 import kotlinx.serialization.list
 import pl.treksoft.kvision.redux.ReduxStore
 import se.skoview.lib.getAsyncTpDb
+import kotlinx.serialization.builtins.*
 
 fun loadBaseItems(store: ReduxStore<HippoState, HippoAction>) {
     console.log("Will now load BaseItems")
