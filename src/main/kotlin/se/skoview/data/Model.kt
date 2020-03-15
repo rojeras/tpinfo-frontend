@@ -1,6 +1,5 @@
 package se.skoview.data
 
-import pl.treksoft.kvision.redux.RAction
 import se.skoview.view.parseBookmark
 import kotlin.reflect.KClass
 

@@ -114,7 +114,7 @@ fun parseBookmark(): BookmarkInformation {
     val dateEffective = if (dateEffectiveCodeList.isNotEmpty()) daysSinceEpoch2date(dateEffectiveCodeList[0]) else ""
 
     val dateEndCodeList = parseBookmarkType("E", filterValue)
-    val dateEnd = if (dateEndCodeList.size > 0) daysSinceEpoch2date(dateEffectiveCodeList[0].toInt()) else ""
+    val dateEnd = if (dateEndCodeList.isNotEmpty()) daysSinceEpoch2date(dateEffectiveCodeList[0].toInt()) else ""
 
     // Extract and calculate the plattforms values
     val firstPlattformCodeList = parseBookmarkType("F", filterValue)
