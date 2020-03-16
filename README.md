@@ -7,7 +7,7 @@
 1. Clone down kvision-examples
 1. Copy everything from `kvision-examples/showcase` except what has been left in step 3 above.
 1. Add the sourceset `implementation("pl.treksoft:kvision-redux-kotlin:$kvisionVersion")` to `build.gradle.kts 
-1. Change port fromm `3000` to `2000 in `build.gradle.kts`
+1. Change port from `3000` to `2000 in `build.gradle.kts`
 1. Add `import kotlinx.serialization.builtins.*` to `TpdbItems.kt`
 1. Open it up in Intellij
 1. Build, run and verify
