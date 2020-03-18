@@ -1,38 +1,27 @@
 #!/usr/bin/env kscript
 
-import java.lang.Exception
+import java.nio.file.DirectoryIteratorException
+import java.nio.file.Files
+import java.nio.file.Path
+import java.nio.file.Paths
 import kotlin.system.exitProcess
 
 // my imports
 
 //INCLUDE ./LeoLib.kts
-// String.exec(currentDir)
 
 // -------------------------------------------------------------------------------------------
 // Main program
 
-Argument.scriptDesc = "This script builds a hippo frontend in a Docker image"
-Argument("all", "aaa is used to ...", true)
-Argument("ball", "bbb is used to ...", false, "path")
-
+Argument.initialise("This script builds a hippo frontend in a Docker image", true, "basedir")
+Argument("zipfile", "Name of build zip file", true, "file")
 Argument.parse(args)
 
-/*
-val usage = """
-    Usage:
-        -a, --all: Bla bla bla 
-""".trimIndent()
-*/
+val zipDir = Directory()
+println("'$zipDir'")
+zipDir.cd(Argument.fileSpec)
+//println(Argument.arguments)
+//println("File spec: '${Argument.fileSpec}'")
 
-
-
-
-
-
-println("Arg parsing succesful")
-
-println(Argument.arguments)
-println("File spec: '${Argument.fileSpec}'")
-
-val fileList2 = "ls -la".exec()
+val fileList2 = "ls -la".exec(zipDir.toString())
 println(fileList2)
