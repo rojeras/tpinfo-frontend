@@ -44,6 +44,7 @@ if (!(environment.contains("qa") || environment.contains("prod"))) {
 */
 // -------------------------------------------------------------------------------------------
 val gitBranch = lExec("git rev-parse --abbrev-ref HEAD")
+val gitHash = lExec("git rev-parse --short HEAD") // Short version. Long can be reconstructed with the rev-parse command.
 
 val imageName = "rojeras/tpinfo-frontend:latest-$gitBranch"
 
