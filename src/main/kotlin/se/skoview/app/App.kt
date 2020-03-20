@@ -12,6 +12,7 @@ import se.skoview.data.*
 import se.skoview.view.HippoTablePage
 import se.skoview.view.setUrlFilter
 
+// todo: Fixa BASEURL så att den inte är hårdkodad mot tpinfo-a
 // done: Fixa så det går att kopiera text utan att itemet väljs bort
 // done: Lite hjälptexter, troligen på egen sida (via knapp ev)
 // todo: Testa i andra webbläsare och Win/Linux
@@ -28,7 +29,7 @@ import se.skoview.view.setUrlFilter
 // done: Gå igenom all kod, städa och refaktorera det viktigaste
 // todo: Tag bort hand-pekaren när man pekar på ett valt item
 // todo: Ev se till att förstasidan börjar renderas snabbare
-// todo: Check why the icon is not displayed when run from hippokrates.se
+// done: Check why the icon is not displayed when run from hippokrates.se
 // done: Länk till statistiken
 // done: Fixa till färgerna
 // todo: Aktivera Google Analytics
