@@ -56,7 +56,7 @@ val buildZipFile = "$buildDirName/$buildName.zip"
 val currentDir = lPwd()
 
 val isComitted = lExec("git status -s")
-println(isComitted)
+println("'$isComitted'")
 
 exitProcess(1)
 
