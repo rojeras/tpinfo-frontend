@@ -55,7 +55,10 @@ val buildZipFile = "$buildDirName/$buildName.zip"
 
 val currentDir = lPwd()
 
-//exitProcess(1)
+val isComitted = lExec("git status -s")
+println(isComitted)
+
+exitProcess(1)
 
 // -------------------------------------------------------------------------------------------
 if (Largument.isSet("clean")) lExec("./gradlew clean")
@@ -67,6 +70,8 @@ File(zipDirName).walkBottomUp().forEach {
 lExec("unzip -d $zipDirName $buildZipFile")
 
 lExec("docker build --rm -t $imageName .")
+
+// Do not tag and push if there are uncomitted changes - use "git status -s" and check no output
 
 if (Largument.isSet("push")) {
     lExec("docker tag $imageName docker-registry.centrera.se:443/sll-tpinfo/frontend:latest-$gitBranch")
