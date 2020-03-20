@@ -55,10 +55,10 @@ val buildZipFile = "$buildDirName/$buildName.zip"
 
 val currentDir = lPwd()
 
-val isComitted = lExec("git status -s")
-println("'$isComitted'")
+val statusMsg: String = lExec("git status -s") as String
+val isCommitted = statusMsg.isEmpty()
 
-exitProcess(1)
+//exitProcess(1)
 
 // -------------------------------------------------------------------------------------------
 if (Largument.isSet("clean")) lExec("./gradlew clean")
@@ -73,10 +73,12 @@ lExec("docker build --rm -t $imageName .")
 
 // Do not tag and push if there are uncomitted changes - use "git status -s" and check no output
 
-if (Largument.isSet("push")) {
-    lExec("docker tag $imageName docker-registry.centrera.se:443/sll-tpinfo/frontend:latest-$gitBranch")
-    lExec("docker push docker-registry.centrera.se:443/sll-tpinfo/frontend:latest-$gitBranch")
-}
+if (isCommitted) {
+    if (Largument.isSet("push")) {
+        lExec("docker tag $imageName docker-registry.centrera.se:443/sll-tpinfo/frontend:latest-$gitBranch")
+        lExec("docker push docker-registry.centrera.se:443/sll-tpinfo/frontend:latest-$gitBranch")
+    }
+} else println("Branch is not committed - the image will NOT be uploaded")
 
 if (Largument.isSet("run")) {
     lExec("docker run -d -p 8888:80 $imageName")
