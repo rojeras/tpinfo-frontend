@@ -49,7 +49,7 @@ val gitHash =
 
 val imageBaseTag = "tpinfo-kvfrontend:$gitBranch-$gitHash"
 val localImageTag = "rojeras/$imageBaseTag"
-val noguiImageTag = "docker-registry.centrera.se:443/sll-tpinfo/"
+val noguiImageTag = "docker-registry.centrera.se:443/sll-tpinfo/$imageBaseTag"
 
 val buildDirName = "build/libs"
 val buildName = "showcase-1.0.0-SNAPSHOT"
