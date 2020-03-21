@@ -46,7 +46,9 @@ if (!(environment.contains("qa") || environment.contains("prod"))) {
 val gitBranch = lExec("git rev-parse --abbrev-ref HEAD")
 val gitHash = lExec("git rev-parse --short HEAD") // Short version. Long can be reconstructed with the rev-parse command.
 
-val imageName = "rojeras/tpinfo-frontend:latest-$gitBranch"
+val imageBaseTag = "tpinfo-kvfrontend:$gitBranch-$gitHash"
+val localImageTag = "rojeras/$imageBaseTag"
+val noguiImageTag = "docker-registry.centrera.se:443/sll-tpinfo/"
 
 val buildDirName = "build/libs"
 val buildName = "showcase-1.0.0-SNAPSHOT"
@@ -69,19 +71,19 @@ File(zipDirName).walkBottomUp().forEach {
 }
 lExec("unzip -d $zipDirName $buildZipFile")
 
-lExec("docker build --rm -t $imageName .")
+lExec("docker build --rm -t $localImageTag .")
 
 // Do not tag and push if there are uncomitted changes - use "git status -s" and check no output
 
 if (isCommitted) {
     if (Largument.isSet("push")) {
-        lExec("docker tag $imageName docker-registry.centrera.se:443/sll-tpinfo/frontend:latest-$gitBranch")
-        lExec("docker push docker-registry.centrera.se:443/sll-tpinfo/frontend:latest-$gitBranch")
+        lExec("docker tag $localImageTag $noguiImageTag")
+        lExec("docker push $noguiImageTag")
     }
-} else println("Branch is not committed - the image will NOT be uploaded")
+} else println("Branch '$gitBranch' is not committed - the image will NOT be uploaded")
 
 if (Largument.isSet("run")) {
-    lExec("docker run -d -p 8888:80 $imageName")
+    lExec("docker run -d -p 8888:80 $localImageTag")
     println("The image is running and listen to port 8888")
 }
 
