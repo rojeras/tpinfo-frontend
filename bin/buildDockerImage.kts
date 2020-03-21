@@ -44,7 +44,8 @@ if (!(environment.contains("qa") || environment.contains("prod"))) {
 */
 // -------------------------------------------------------------------------------------------
 val gitBranch = lExec("git rev-parse --abbrev-ref HEAD")
-val gitHash = lExec("git rev-parse --short HEAD") // Short version. Long can be reconstructed with the rev-parse command.
+val gitHash =
+    lExec("git rev-parse --short HEAD") // Short version. Long can be reconstructed with the rev-parse command.
 
 val imageBaseTag = "tpinfo-kvfrontend:$gitBranch-$gitHash"
 val localImageTag = "rojeras/$imageBaseTag"
@@ -75,12 +76,12 @@ lExec("docker build --rm -t $localImageTag .")
 
 // Do not tag and push if there are uncomitted changes - use "git status -s" and check no output
 
-if (isCommitted) {
-    if (Largument.isSet("push")) {
+if (Largument.isSet("push")) {
+    if (isCommitted) {
         lExec("docker tag $localImageTag $noguiImageTag")
         lExec("docker push $noguiImageTag")
-    }
-} else println("Branch '$gitBranch' is not committed - the image will NOT be uploaded")
+    } else println("Branch '$gitBranch' is not committed - the image will NOT be uploaded")
+}
 
 if (Largument.isSet("run")) {
     lExec("docker run -d -p 8888:80 $localImageTag")
