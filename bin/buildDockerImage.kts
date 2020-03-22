@@ -6,18 +6,12 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 import kotlin.system.exitProcess
-
-// my imports
-
-// todo: Do not build if there are uncomitted changes
-// todo: docker tag name convention needed. Should include both git branch and commit hash|
+import java.time.LocalDateTime
 
 //INCLUDE ./LeoLib.kts
 
 // -------------------------------------------------------------------------------------------
 // Main program
-
-
 // -------------------------------------------------------------------------------------------
 Largument.initialise(
     """
@@ -31,17 +25,12 @@ Largument("clean", "Do a gradle clean before the build", false)
 Largument("nogradle", "Do NOT run gradle before the docker build", false)
 Largument("push", "Push image to NoGui docker registry", false)
 Largument("run", "Run the docker image", false)
+Largument("help", "Show this help information", false)
 
-//Argument("zipfile", "Name of build zip file", true, "file")
 Largument.parse(args)
 
-/*
-val environment: String = Largument.parameter("environment")
-//println(Largument.arguments)
-if (!(environment.contains("qa") || environment.contains("prod"))) {
-    Largument.showUsageAndExit("Environment must be 'qa' or 'prod' - not '$environment'")
-}
-*/
+if (Largument.isSet("help")) Largument.showUsageAndExit("")
+
 // -------------------------------------------------------------------------------------------
 val gitBranch = lExec("git rev-parse --abbrev-ref HEAD")
 val gitHash =
@@ -55,13 +44,25 @@ val buildDirName = "build/libs"
 val buildName = "showcase-1.0.0-SNAPSHOT"
 val zipDirName = "$buildDirName/$buildName"
 val buildZipFile = "$buildDirName/$buildName.zip"
+val indexHtmlFile = "$zipDirName/index.html"
 
 val currentDir = lPwd()
 
 val statusMsg: String = lExec("git status -s") as String
 val isCommitted = statusMsg.isEmpty()
 
-//exitProcess(1)
+val dateTime = LocalDateTime.now()
+
+val versionInfo = """
+    <!--
+    Build information
+    -----------------
+    Build time: $dateTime
+    Git branch: $gitBranch
+    Git commit: $gitHash 
+    -->
+""".trimIndent()
+
 
 // -------------------------------------------------------------------------------------------
 if (Largument.isSet("clean")) lExec("./gradlew clean")
@@ -72,7 +73,10 @@ File(zipDirName).walkBottomUp().forEach {
 }
 lExec("unzip -d $zipDirName $buildZipFile")
 
-lExec("docker build --rm -t $localImageTag .")
+File("versionInfo.txt").writeText(versionInfo)
+File(indexHtmlFile).appendText(versionInfo)
+
+lExec("docker build --rm -t $localImageTag .", quiet = true)
 
 // Do not tag and push if there are uncomitted changes - use "git status -s" and check no output
 
@@ -87,6 +91,5 @@ if (Largument.isSet("run")) {
     lExec("docker run -d -p 8888:80 $localImageTag")
     println("The image is running and listen to port 8888")
 }
-
 
 exitProcess(0)
