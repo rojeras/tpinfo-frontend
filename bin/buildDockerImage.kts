@@ -1,5 +1,20 @@
 #!/usr/bin/env kscript
-
+/**
+ * Copyright (C) 2013-2020 Lars Erik Röjerås
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 import java.io.File
 import java.nio.file.DirectoryIteratorException
 import java.nio.file.Files
@@ -13,6 +28,15 @@ import java.time.LocalDateTime
 // -------------------------------------------------------------------------------------------
 // Main program
 // -------------------------------------------------------------------------------------------
+/**
+ * todo:
+ * To push a docker image to nogui registry:
+ * 1. Mandatory paramters; git repo and git semver tag on the form vM.m.p
+ * 2. Check out the branch and and tag and verify that there are no more commits after the git tag
+ * 3. git clean
+ * 4. Build
+ * 5. Add the following as docker tag: branch-semver-commit hash
+ */
 Largument.initialise(
     """
     This script builds a hippo frontend in a Docker image

@@ -1,3 +1,19 @@
+/**
+ * Copyright (C) 2013-2020 Lars Erik Röjerås
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package se.skoview.lib
 
 import kotlinx.coroutines.Deferred
@@ -8,6 +24,7 @@ import org.w3c.xhr.XMLHttpRequest
 import pl.treksoft.kvision.core.Color
 import pl.treksoft.kvision.rest.RestClient
 import se.skoview.data.BaseItem
+import kotlin.browser.window
 import kotlin.js.Date
 import kotlin.math.absoluteValue
 
@@ -27,9 +44,18 @@ fun getAsync(url: String, callback: (String) -> Unit) {
 
 // todo: Evaluate the use of the KVision client CallAgent. See CallAgentExample.kt
 fun getAsyncTpDb(url: String, callback: (String) -> Unit) {
-    val baseUrl = "https://qa.integrationer.tjansteplattform.se/tpdb/tpdbapi.php/api/v1/"
+    val currentProtocol = window.location.protocol
+    val currentHost = window.location.host
+    // tpdb is assumed to be on the 'qa.integrationer.tjansteplattform.se' server if we run in development or test environment
+    val baseUrl = if (currentHost.contains("localhost") || currentHost.contains("www.hippokrates.se")) {
+        "https://qa.integrationer.tjansteplattform.se/tpdb/tpdbapi.php/api/v1/"
+    }
+    else {
+        "$currentProtocol//$currentHost/../tpdb/tpdbapi.php/api/v1/"
+    }
     val fullUrl = baseUrl + url
     console.log("URL: $fullUrl")
+
     val xmlHttp = XMLHttpRequest()
     xmlHttp.open("GET", fullUrl)
     xmlHttp.onload = {
