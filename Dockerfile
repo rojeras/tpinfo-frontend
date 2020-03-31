@@ -9,7 +9,7 @@ LABEL maintainer="SLL-IT suupport@sll.se"
 EXPOSE 80 443
 
 #COPY ./src/hippo/all.min.js /usr/local/apache2/htdocs/hippo/
-COPY ./build/libs/showcase-1.0.0-SNAPSHOT/* /usr/local/apache2/htdocs/hippo/
+COPY ./build/libs/showcase-1.0.0-SNAPSHOT/* /usr/local/apache2/htdocs/hippo7/
 
 
 # Then we need a way to redirect all calls:

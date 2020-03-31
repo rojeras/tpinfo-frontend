@@ -20,8 +20,12 @@ import java.nio.file.DirectoryIteratorException
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
+import java.time.LocalDate
 import kotlin.system.exitProcess
 import java.time.LocalDateTime
+import java.time.LocalTime
+import java.time.ZoneOffset
+
 
 //INCLUDE ./LeoLib.kts
 
@@ -33,10 +37,11 @@ import java.time.LocalDateTime
  * To push a docker image to nogui registry:
  * 1. Mandatory paramters; git repo and git semver tag on the form vM.m.p
  * 2. Check out the branch and and tag and verify that there are no more commits after the git tag
- * 3. git clean
+ * 3. gradle clean
  * 4. Build
  * 5. Add the following as docker tag: branch-semver-commit hash
  */
+
 Largument.initialise(
     """
     This script builds a hippo frontend in a Docker image
@@ -57,10 +62,12 @@ if (Largument.isSet("help")) Largument.showUsageAndExit("")
 
 // -------------------------------------------------------------------------------------------
 val gitBranch = lExec("git rev-parse --abbrev-ref HEAD")
-val gitHash =
-    lExec("git rev-parse --short HEAD") // Short version. Long can be reconstructed with the rev-parse command.
+val gitHash = lExec("git rev-parse --short HEAD") // Short version. Long can be reconstructed with the rev-parse command.
+val minutesSinceEpoch = minutesSinceEpoch()
 
-val imageBaseTag = "tpinfo-kvfrontend:$gitBranch-$gitHash"
+val dockerBuildId = "$minutesSinceEpoch-$gitHash"
+
+val imageBaseTag = "tpinfo-kvfrontend:$dockerBuildId"
 val localImageTag = "rojeras/$imageBaseTag"
 val noguiImageTag = "docker-registry.centrera.se:443/sll-tpinfo/$imageBaseTag"
 
@@ -117,3 +124,13 @@ if (Largument.isSet("run")) {
 }
 
 exitProcess(0)
+
+fun minutesSinceEpoch(): Int {
+    //val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm")
+    val epochDateTimeSeconds = LocalDateTime.parse("2020-01-01T00:00:00.000").toEpochSecond(ZoneOffset.UTC)
+    //val sss = epochDate.toEpochSecond(ZoneOffset.UTC)
+    val nowSeconds = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)
+
+    val diffMinutes = (nowSeconds - epochDateTimeSeconds) / 60
+    return diffMinutes.toInt()
+}
