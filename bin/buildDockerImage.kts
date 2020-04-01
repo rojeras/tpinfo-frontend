@@ -88,7 +88,7 @@ val localImageTag = "rojeras/$imageBaseTag"
 val noguiImageTag = "docker-registry.centrera.se:443/sll-tpinfo/$imageBaseTag"
 
 val buildDirName = "build/libs"
-val buildName = "showcase-1.0.0-SNAPSHOT"
+val buildName = "hippo-1.0.0-SNAPSHOT"
 val zipDirName = "$buildDirName/$buildName"
 val buildZipFile = "$buildDirName/$buildName.zip"
 val indexHtmlFile = "$zipDirName/index.html"
