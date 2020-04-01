@@ -60,6 +60,7 @@ Largument.parse(args)
 if (Largument.isSet("help")) Largument.showUsageAndExit("")
 
 // -------------------------------------------------------------------------------------------
+// can we use git describe
 val gitBranch = lExec("git rev-parse --abbrev-ref HEAD", quiet = true)
 val gitHash = lExec("git rev-parse --short HEAD", quiet = true) // Short version. Long can be reconstructed with the rev-parse command.
 val minutesSinceEpoch = minutesSinceEpoch()
