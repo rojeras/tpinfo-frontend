@@ -51,7 +51,6 @@ Largument.initialise(
 
 Largument("clean", "Do a gradle clean before the build", false)
 //Largument("environment", "Specify 'qa' | 'prod'", true, "environment")
-Largument("nogradle", "Do NOT run gradle before the docker build", false)
 Largument("push", "Push image to NoGui docker registry", false)
 Largument("run", "Run the docker image", false)
 Largument("help", "Show this help information", false)
@@ -61,8 +60,8 @@ Largument.parse(args)
 if (Largument.isSet("help")) Largument.showUsageAndExit("")
 
 // -------------------------------------------------------------------------------------------
-val gitBranch = lExec("git rev-parse --abbrev-ref HEAD")
-val gitHash = lExec("git rev-parse --short HEAD") // Short version. Long can be reconstructed with the rev-parse command.
+val gitBranch = lExec("git rev-parse --abbrev-ref HEAD", quiet = true)
+val gitHash = lExec("git rev-parse --short HEAD", quiet = true) // Short version. Long can be reconstructed with the rev-parse command.
 val minutesSinceEpoch = minutesSinceEpoch()
 
 val dockerBuildId = "$minutesSinceEpoch-$gitHash"
@@ -79,7 +78,7 @@ val indexHtmlFile = "$zipDirName/index.html"
 
 val currentDir = lPwd()
 
-val statusMsg: String = lExec("git status -s") as String
+val statusMsg: String = lExec("git status -s", quiet = true) as String
 val isCommitted = statusMsg.isEmpty()
 
 val dateTime = LocalDateTime.now()
@@ -98,16 +97,18 @@ val versionInfo = """
 // -------------------------------------------------------------------------------------------
 if (Largument.isSet("clean")) lExec("./gradlew clean")
 
-if (!Largument.isSet("nogradle")) lExec("./gradlew zip")
+lExec("./gradlew zip")
 File(zipDirName).walkBottomUp().forEach {
-    lExec("rm $it", quiet = false)
+    lExec("rm $it", quiet = true)
 }
-lExec("unzip -d $zipDirName $buildZipFile")
+
+println("Unzip")
+lExec("unzip -d $zipDirName $buildZipFile", quiet = true)
 
 File("versionInfo.txt").writeText(versionInfo)
 File(indexHtmlFile).appendText(versionInfo)
 
-lExec("docker build --rm -t $localImageTag .", quiet = true)
+lExec("docker build --rm -t $localImageTag .", quiet = false)
 
 // Do not tag and push if there are uncomitted changes - use "git status -s" and check no output
 

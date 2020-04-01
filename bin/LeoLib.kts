@@ -200,7 +200,7 @@ data class Largument(
  * Useful functions
  */
 //fun lPwd(): String = "pwd".exec()!!.trim()
-fun lPwd(): String = lExec("pwd")!!.trim()
+fun lPwd(quiet: Boolean = false): String = lExec("pwd", quiet = quiet)!!.trim()
 
 fun lExists(file: String): Boolean {
     val file = File(file)

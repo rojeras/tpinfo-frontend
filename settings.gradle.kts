@@ -16,4 +16,4 @@ pluginManagement {
         }
     }
 }
-rootProject.name = "showcase"
+rootProject.name = "hippo"
