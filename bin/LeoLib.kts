@@ -20,6 +20,8 @@ import java.io.IOException
 import java.lang.Exception
 import java.util.concurrent.TimeUnit
 import java.nio.file.Paths
+import java.time.LocalDateTime
+import java.time.ZoneOffset
 import kotlin.system.exitProcess
 
 // --------------------------------------------------------------------------------------------------------------
@@ -205,4 +207,16 @@ fun lPwd(quiet: Boolean = false): String = lExec("pwd", quiet = quiet)!!.trim()
 fun lExists(file: String): Boolean {
     val file = File(file)
     return file.exists()
+}
+
+
+// --------------------------------------------------------------------------------------------------------------
+fun minutesSinceEpoch(): Int {
+    //val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm")
+    val epochDateTimeSeconds = LocalDateTime.parse("2020-01-01T00:00:00.000").toEpochSecond(ZoneOffset.UTC)
+    //val sss = epochDate.toEpochSecond(ZoneOffset.UTC)
+    val nowSeconds = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)
+
+    val diffMinutes = (nowSeconds - epochDateTimeSeconds) / 60
+    return diffMinutes.toInt()
 }
