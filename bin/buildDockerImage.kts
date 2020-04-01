@@ -57,15 +57,32 @@ Largument("help", "Show this help information", false)
 
 Largument.parse(args)
 
-if (Largument.isSet("help")) Largument.showUsageAndExit("")
+if (Largument.isSet("help") || (! (Largument.isSet("run") || (Largument.isSet("push"))))) Largument.showUsageAndExit("One of '--run' or '--push' must be specified!")
 
 // -------------------------------------------------------------------------------------------
+
+
 // can we use git describe
+val statusMsg: String = lExec("git status -s", quiet = true) as String
+val isCommitted = statusMsg.isEmpty()
+if (! isCommitted) {
+    println("The current branch is not committed! No image will be built.")
+    exitProcess(1)
+}
+
+val gitDescribe: String = lExec("git describe", quiet = false) as String
+val isTagged = ! gitDescribe.contains("-")
+if (! isTagged && Largument.isSet("push")) {
+    println("The current branch is not tagged! The image will not be build nor pushed.")
+    exitProcess(1)
+}
+
 val gitBranch = lExec("git rev-parse --abbrev-ref HEAD", quiet = true)
 val gitHash = lExec("git rev-parse --short HEAD", quiet = true) // Short version. Long can be reconstructed with the rev-parse command.
 val minutesSinceEpoch = minutesSinceEpoch()
 
-val dockerBuildId = "$minutesSinceEpoch-$gitHash"
+//val dockerBuildId = "$minutesSinceEpoch-$gitHash"
+val dockerBuildId = "$gitDescribe"
 
 val imageBaseTag = "tpinfo-kvfrontend:$dockerBuildId"
 val localImageTag = "rojeras/$imageBaseTag"
@@ -79,8 +96,7 @@ val indexHtmlFile = "$zipDirName/index.html"
 
 val currentDir = lPwd()
 
-val statusMsg: String = lExec("git status -s", quiet = true) as String
-val isCommitted = statusMsg.isEmpty()
+
 
 val dateTime = LocalDateTime.now()
 
@@ -89,8 +105,7 @@ val versionInfo = """
     Build information
     -----------------
     Build time: $dateTime
-    Git branch: $gitBranch
-    Git commit: $gitHash 
+    Git build:  $gitDescribe
     -->
 """.trimIndent()
 
@@ -111,13 +126,9 @@ File(indexHtmlFile).appendText(versionInfo)
 
 lExec("docker build --rm -t $localImageTag .", quiet = false)
 
-// Do not tag and push if there are uncomitted changes - use "git status -s" and check no output
-
 if (Largument.isSet("push")) {
-    if (isCommitted) {
         lExec("docker tag $localImageTag $noguiImageTag")
         lExec("docker push $noguiImageTag")
-    } else println("Branch '$gitBranch' is not committed - the image will NOT be uploaded")
 }
 
 if (Largument.isSet("run")) {
@@ -126,6 +137,7 @@ if (Largument.isSet("run")) {
 }
 
 exitProcess(0)
+// ---------------------------------------------------------------------------------------------
 
 fun minutesSinceEpoch(): Int {
     //val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm")
