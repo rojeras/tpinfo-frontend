@@ -101,8 +101,8 @@ val versionInfo = """
     <!--
     Build information
     -----------------
+    Build:      $gitDescribe
     Build time: $dateTime
-    Git build:  $gitDescribe
     Git branch: $gitBranch
     Git hash:   $gitHash
     -->

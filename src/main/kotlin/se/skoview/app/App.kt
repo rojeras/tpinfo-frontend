@@ -34,7 +34,7 @@ import kotlin.browser.window
 // done: Fixa BASEURL så att den inte är hårdkodad mot tpinfo-a
 // done: Fixa så det går att kopiera text utan att itemet väljs bort
 // done: Lite hjälptexter, troligen på egen sida (via knapp ev)
-// todo: Testa i andra webbläsare och Win/Linux
+// done: Testa i andra webbläsare och Win/Linux
 // done: Höjden på datumraden
 // done: Kolumnerna ändrar fortfarande bredd
 // done: Fixa val och fritextsökning av plattformChains
@@ -46,21 +46,19 @@ import kotlin.browser.window
 // done: Fix bug reported by Annika about error in filtering. Due to getParams() should only return dates.
 // done: Bug in url handling. http//hippokrates.se/hippo - it seems hippo is removed
 // done: Gå igenom all kod, städa och refaktorera det viktigaste
-
 // done: Check why the icon is not displayed when run from hippokrates.se
 // done: Länk till statistiken
 // done: Fixa till färgerna
 // done: Aktivera Google Analytics
-
+// todo: Visa antal användare sensate 24 timmarna
 // todo: Steg 1 Driftsätt K-hippo (rhippo)
 // todo: Steg 2 Lös detta med att visa SE
 // todo: Steg 3 Tag fram mock för hur integrationer ska presenteras där det kan finnas flera LA
 // todo: Steg 4 Lös trädklättringen, kanske mha HSA-trädet
 // todo: Lägg till möjlighet att enkelt visa ett meddelande till användaren vid uppstart
-// todo: Visa antal användare sensate 24 timmarna
+
 // done: Publicera rhippo på hippokrates.se
-// todo: Markera om ingen träff i sökning på nåt sätt
-// todo: Mer detaljerad styrning av muspekaren
+// done: Markera om ingen träff i sökning på nåt sätt
 // Och efter produktionssättningen, i 1.1
 // done: Förbättre svarstiderna för fritextsökningen
 // done: Färger på rubrikerna
