@@ -1,0 +1,49 @@
+/**
+ * Copyright (C) 2013-2020 Lars Erik Röjerås
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+package se.skoview.data
+
+import pl.treksoft.kvision.redux.RAction
+import se.skoview.view.IntegrationLists
+
+/** According to: https://github.com/redux-utilities/flux-standard-action
+ * An action object should have a type and contain:
+ * - payload: data object | error object (if error == true) ?
+ * - error: Boolean?
+ * - meta: object?
+ */
+
+sealed class HippoAction : RAction {
+    object ApplicationStarted : HippoAction()
+    object StartDownloadBaseItems : HippoAction()
+    object DoneDownloadBaseItems : HippoAction()
+    data class ErrorDownloadBaseItems(val errorMessage: String) : HippoAction()
+    //object StartDownloadIntegrations : HippoAction()
+    data class DoneDownloadIntegrations(
+        val integrationArrs: List<Integration>,
+        val maxCounters: MaxCounter,
+        val updateDates: List<String>
+    ) : HippoAction()
+    data class ErrorDownloadIntegrations(val errorMessage: String) : HippoAction()
+    data class DateSelected(val selectedDate: String) : HippoAction()
+    data class ItemSelected(
+        val viewType: ItemType,
+        val baseItem: BaseItem
+    ) : HippoAction()
+    data class ViewUpdated(val integrationLists: IntegrationLists) : HippoAction()
+    data class FilterItems(val type: ItemType, val filterString: String) : HippoAction()
+    data class SetVMax(val type: ItemType, val size: Int): HippoAction()
+}

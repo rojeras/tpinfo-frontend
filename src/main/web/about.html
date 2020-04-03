@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h1>Användarinformation</h1>
+<div id="gui-version"></div>
+<div id="tpdb-version"></div>
+<p>
+    Hippo fokuserar på att visa tjänsteintegrationer.
+    I denna version visas anslutningar från och med ursprunglig tjänstekonsument till och med slutlig tjänsteproducent.
+    Det går därmed, t ex, att se vilka system som producerar information till NPÖ, även när system är anslutna via flera mellanliggande plattformar.
+<p>Historik är tillgängligt tillbaka till 2016-03-14. Man väljer vilken dag informationen skall baseras på i en diskret vallista uppe till vänster.</p>
+<p>En förutsättning för att tjänsteplattform kan presenteras i denna vy är att dess tjänsteadresseringskatalog (TAK) finns tillgänglig
+    via Ineras TAK-api, se <a href="http://api.ntjp.se/coop/doc/index.html">http://api.ntjp.se/coop/doc/index.html</a>. Hippo hämtar information från
+    TAK-api en gång per dygn, varje natt.</p>
+
+<h4>Användning:</h4>
+<ul>
+    <li>Vid uppstart visas nuläget av all information från samtliga tjänsteadresseringskataloger som finns tillgängliga (via TAK-apit).</li>
+    <li>Mittenkolumnen visar integrationsvägar. En sådan består av en enskild tjänsteplattform, eller en kedja av dem.</li>
+    <li>Filtrera genom att välja (peka på) en konsument, kontrakt, producent, logisk adress eller kedja av tjänsteplattformar. Det finns ett sökfält per typ vilket gör det enkelt att hitta ett specifikt objekt.</li>
+    <li>Upprepa föregående steg till ett samband är klarlagt.</li>
+    <li>Aktuellt urval återspeglas alltid i sidans URL. Den kan enkelt sparas eller delas med andra användare, och är ett enklare alternativ än att skicka skärmurklipp.</li>
+    <li>Om SLL-PROD ingår i en vald tjänsteplattformskedja visas knappen "Statistik". Den för användaren till en applikation som visar statistik över anrop genom SLL-PROD.</li>
+    <li>När ett val görs dyker knappen "Återställ" upp - tryck på den för att ta bort valet (och åter visa alla)</li>
+</ul>
+<h4>Exempel 1: Vilka journalsystem i Sverige producerar information till Journalen</h4>
+<ol>
+    <li>Välj (klicka på) tjänstekonsumenten Journalen (den har id SE5565594230-BDK)</li>
+    <li>Man kan nu se anslutna producentsystem. Observera att dessa i sin tur kan vara regionala tjänsteplattformar (som ännu inte tillhandahåller sin information via TAK-apit).</li>
+    <li>Man kan även se vilka tjänstekontrakt som Journalen konsumerar.</li>
+    <li>Välj sedan tjänsteplattformskombinationen "NTJP-PROD ---> SLL-PROD"</li>
+    <li>Nu visas vilka tjänsteproducenter och logiska adresser som Journalen når via SLLs regionala tjänsteplattform.</li>
+</ol>
+
+<h4>Exempel 2: Vilka tjänstekonsumenter inom SLL, anslutna till SLL-RTP, når tjänster nationellt.</h4>
+<ol>
+    <li>Vilj tjänsteplattformskombinationen "SLL-PROD ---> NTJP-PROD"</li>
+    <li>Tjänstekonsumenterna visas.</li>
+    <li>Filtrera vidare genom att exempelvis välja ett specifikt tjänstekontrakt.</li>
+</ol>
+<h4>Exempel 3: Vilka enheter tillhandahåller tidbokning</h4>
+<ol>
+    <li>Välj tjänstekontraktet MakeBooking</li>
+    <li>Studera listan av logiska adresser</li>
+</ol>
+<h4>Exempel 4: Till vilka enheter kan man skicka en remiss</h4>
+<ol>
+    <li>Välj tjänstekontraktet "ProcessRequest"</li>
+    <li>Studera listan av logiska adresser</li>
+</ol>
+<h4>Exempel 5: Vilka e-Tjänster stöds av Knivsta Vårdcentral?</h4>
+<ol>
+    <li>Trcyk CTRL-F och sök fram den logiska adressen för Knivsta vårdcentral.</li>
+    <li>Klicka på den.</li>
+    <li>Studera listan av tjänstekontrakt.</li>
+</ol>
+
+<p>
+    <a href="mailto:hippokrates@skoview.se" target="_top">Maila gärna synpunkter</a>.
+</p>
+<p>
+
+</p>
+<h3>Historik</h3>
+<h4>2020-02-24: Version 7-RC1</h4>
+<ul>
+    <li>Fullständigt ombyggd, nu baserad på <a href="https://kotlinlang.org/">Kotlin</a> och <a href="https://github.com/rjaros/kvision">KVision</a>.</li>
+    <li>Fritextsökningen genomför nu samtidigt en filtrering. Den ersätter många gånger behovet av att explicit välja ett objekt.</li>
+    <li>Smärre grafiska förändringar.</li>
+    <li>För övrigt skall denna version fungera på samma sätt som version 6.</li>
+</ul>
+<h4>2018-11-13: Version 6.1</h4>
+<ul>
+    <li>Stöd för att kunna välja en hel tjänstedomän.</li>
+    <li>Sökfältet för tjänstekontrakt tillåter att även söka efter tjänstedomäner.</li>
+</ul>
+<h4>2018-09-15: Version 6.0</h4>
+<ul>
+    <li>URL-informationen har förbättrats</li>
+    <li>Kraftiga förbättringar av versionering, bygg-, driftsättnings- och driftsprocesser</li>
+    <li>Helt nya acceptanstest- och produktionsmiljöer</li>
+</ul>
+<h4>2018-06-01: Version 5.2</h4>
+<ul>
+    <li>Stöd för att spara och distribuera URL-er med genomförda utsökningar. Vill man visa en viss utsökning kan man helt enkelt skicka aktuell URL i stället för ett skärmurlipp.</li>
+    <li>Totalerna som visas överst i varje kolumn baseras nu på valt datum.</li>
+    <li>Versionsinformation är tillagd ovan.</li>
+    <li>Korrekta URL-er (utan path-information)</li>
+    <li>Prestandaförbättringar.</li>
+</ul>
+<h4>2018-02-08: Felrättning</h4>
+<ul>
+    <li>Tillagd information nu synlig dagen efter (inte efter två dagar som tidigare)</li>
+    <li>Bortagna integrationer slår igenom dagen efter</li>
+    <li>Hårdare kontroll och filtering av att tjänstekontraktens namnrymd är korrekt och följer RIV-TA</li>
+</ul>
+<h4>2017-12-11: Hippokrates Searchview Version 5.0</h4>
+<ul>
+    <li>Historik tillbaka till 2016-03-14.</li>
+    <li>Dedikerade sökfält för tjänstekonsumenter, -producenter, -kontrakt och logiska adresser.</li>
+    <li>Ny databasstruktur vilket bla ger en prestandaförbättring.</li>
+    <li>Enbart majorversionen visas av tjänstekontrakt. Det beror på att minor-versionen inte är signifikant ur ett tjänsteplattformsperspektiv.</li>
+    <li>Knapp för att visa statistik. Gäller för de tjänsteplattformar som tillhandahållit statistiskt data, initialt SLL-PROD.</li>
+</ul>
+<h4>2017-08-27: Felrättning</h4>
+<ul>
+    <li>Vid filtrering kommer användaren automatiskt till toppen av sidan.</li>
+</ul>
+<h4>2017-06-05: Anpassning till Vårdgivarguiden</h4>
+<ul>
+    <li>Nytt tema anpassat till Vårdgivarguiden.</li>
+    <li>Webbläsarens sökfunktion i Firefox och Internet Explorer skall nu fungera.</li>
+</ul>
+<h4>2016-12-15: Hippokrates Multivew Version 4.0</h4>
+<li>En ny vy, kravställd av SLL, som visar integrationer över en eller flera tjänsteplattformar.
+</li>
+<h4>2016-09-30: Version 3.0</h4>
+<li>Helt ny databasbaserad backend. All information och förändringar från alla anslutna TAK-ar sparas i en databas.</li>
+<li>Ett nytt javascript-api kopplat till databasen.</li>
+<li>Denna version innehöll inga funktionella förändringar och driftsattes inte publikt.</li>
+<h4>2016-09-28: Version 2.0.3</h4>
+<ul>
+    <li>Förtydligande tillagt kring det aktella API-felet.</li>
+</ul>
+<h4>2016-09-17: Version 2.0.2</h4>
+<ul>
+    <li>Varningstext tillagd pga felaktigheter i TAK-apit.</li>
+</ul>
+<h4>2016-09-17: Version 2.0.1</h4>
+<ul>
+    <li>Rättat till några skönhetsfläckar</li>
+</ul>
+<h4>2016-08-24</h4>
+<ul>
+    <li>Uppkoppling mot ny instans av TAK-api</li>
+    <li>Historikfunktionen återställd</li>
+</ul>
+<h4>2016-06-09</h4>
+<ul>
+    <li>Tvingande omladdning av TAK-data vid varje val av TAK för att säkra att det inte ligger gammal information cachad i browsern.</li>
+</ul>
+<h4>2016-04-21</h4>
+<ul>
+    <li>Logiken för filtrering förändrat. Nu visas även vägval (kombinationen tjänstekontrakt och logisk adress) även om ingen tjänstekonsument har anropsbehörighet.</li>
+    <li>Initial laddindikering för TAK-menyn visas.</li>
+    <li>Sortering av objekt även efter en filtrering.</li>
+</ul>
+<h4>2016-03-30</h4>
+<ul>
+    <li>Stöd för Firefox. Nu testad med Chrome (Linux och Android), Firefox (Linux) och Internet Explorer 11 (Win7). Användare av Safari får gärna återkoppla om det finns problem.</li>
+    <li>Tydligare indikering när informationen laddas.</li>
+    <li>Cursor indikerar var man kan klicka.</li>
+    <li>Ändrat format på ULR-er.</li>
+</ul>
+<h4>2016-03-14</h4>
+<ul>
+    <li>Historik. TAK-ar från detta datum kan visas.</li>
+</ul>
+<h4>2016-02-15</h4>
+<ul>
+    <li>Första publika versionen.</li>
+</ul>
+</body>
+</html>
