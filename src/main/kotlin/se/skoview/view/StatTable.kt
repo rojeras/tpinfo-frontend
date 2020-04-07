@@ -18,6 +18,7 @@ package se.skoview.view
 
 import pl.treksoft.kvision.core.*
 import pl.treksoft.kvision.core.Color.Companion.hex
+import pl.treksoft.kvision.form.InputSize
 import pl.treksoft.kvision.form.select.selectInput
 import pl.treksoft.kvision.form.select.simpleSelectInput
 import pl.treksoft.kvision.form.text.TextInputType
@@ -27,8 +28,13 @@ import pl.treksoft.kvision.modal.Modal
 import pl.treksoft.kvision.modal.ModalSize
 import pl.treksoft.kvision.panel.*
 import pl.treksoft.kvision.state.stateBinding
+import pl.treksoft.kvision.table.TableType
+import pl.treksoft.kvision.table.cell
+import pl.treksoft.kvision.table.row
+import pl.treksoft.kvision.table.table
 import pl.treksoft.kvision.utils.perc
 import pl.treksoft.kvision.utils.px
+import pl.treksoft.kvision.utils.rem
 import pl.treksoft.kvision.utils.vw
 import se.skoview.app.store
 import se.skoview.data.*
@@ -36,7 +42,7 @@ import kotlin.browser.document
 import kotlin.browser.window
 import kotlin.math.min
 
-object HippoTablePage : SimplePanel() {
+object StatTablePage : SimplePanel() {
 
     init {
         // font-family: Georgia,Times New Roman,Times,serif;
@@ -44,8 +50,8 @@ object HippoTablePage : SimplePanel() {
         // Page header
         vPanel {
             div {
-                h2("Hippo - integrationer via tjänsteplattform/ar för nationell e-hälsa")
-                div("Integrationer för tjänsteplattformar vars tjänstadresseringskatalog (TAK) är tillgänglig i Ineras TAK-api visas.")
+                h2("Antal meddelanden genom SLL:s regionala tjänsteplattform")
+                div("Detaljerad statistik med diagram och möjlighet att ladda ner informationen för egna analyser.")
             }.apply {
                 //width = 100.perc
                 background = Background(Color.hex(0x113d3d))
@@ -54,9 +60,8 @@ object HippoTablePage : SimplePanel() {
                 marginTop = 5.px
             }
         }
-        // Date selector
 
-        //hPanel { clear = Clear.BOTH
+        // Date selector
         flexPanel(
             FlexDir.ROW, FlexWrap.WRAP, FlexJustify.SPACEBETWEEN, FlexAlignItems.CENTER,
             spacing = 5
@@ -64,38 +69,72 @@ object HippoTablePage : SimplePanel() {
             clear = Clear.BOTH
             margin = 0.px
             background = Background(Color.hex(0xf6efe9))
-
-            // Select date
-
             div {
                 align = Align.LEFT
             }.stateBinding(store) { state ->
-                simpleSelectInput(
-                    options = state.updateDates.sortedByDescending { it }.map { Pair(it, it) },
-                    value = state.dateEffective
+                table(
+                    listOf(),
+                    setOf(TableType.BORDERED, TableType.SMALL)
                 ) {
-                    addCssStyle(formControlXs)
-                    background = Background(Color.name(Col.WHITE))
-                }.onEvent {
-                    change = {
-                        store.dispatch { dispatch, getState ->
-                            dispatch(HippoAction.DateSelected(DateType.EFFECTIVE, self.value ?: ""))
-                            loadIntegrations(getState())
+                    row {
+                        cell { +"Startdatum:" }
+                        cell {
+                            simpleSelectInput(
+                                options = state.statisticsDates.sortedByDescending { it }.map { Pair(it, it) },
+                                value = state.dateEffective
+                            ) {
+                                addCssStyle(formControlXs)
+                                background = Background(Color.name(Col.WHITE))
+                            }.onEvent {
+                                change = {
+                                    store.dispatch { dispatch, getState ->
+                                        dispatch(HippoAction.DateSelected(DateType.EFFECTIVE, self.value ?: ""))
+                                        loadStatistics(getState())
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    row {
+                        cell { +"Slutdatum:" }
+                        cell {
+                            simpleSelectInput(
+                                options = state.statisticsDates.sortedByDescending { it }.map { Pair(it, it) },
+                                value = state.dateEnd
+                            ) {
+                                addCssStyle(formControlXs)
+                                background = Background(Color.name(Col.WHITE))
+                            }.onEvent {
+                                change = {
+                                    store.dispatch { dispatch, getState ->
+                                        dispatch(HippoAction.DateSelected(DateType.END, self.value ?: ""))
+                                        loadStatistics(getState())
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    row {
+                        cell { +"Visa:" }
+                        cell {
+                            simpleSelectInput(
+                                options = listOf("RTP Prod").map { Pair(it, it) },
+                                value = state.dateEnd
+                            ) {
+                                addCssStyle(formControlXs)
+                                background = Background(Color.name(Col.WHITE))
+                            }.onEvent {
+                                change = {
+                                    store.dispatch { dispatch, getState ->
+                                        dispatch(HippoAction.DateSelected(DateType.END, self.value ?: ""))
+                                        loadStatistics(getState())
+                                    }
+                                }
+                            }
                         }
                     }
                 }
-                /*
-                add(
-                    DateSelectWidget(
-                        DateType.EFFECTIVE_AND_END,
-                        state.updateDates,
-                        state.dateEffective,
-                        Color.name(Col.BLUE)
-                    )
-                )
-                */
             }
-
 
             // Statistics button
             div {
@@ -151,7 +190,7 @@ object HippoTablePage : SimplePanel() {
         }
     }
 }
-
+/*
 class HippoItemsView(type: ItemType, heading: String, bredd: Int = 20) : VPanel() {
     init {
         //background = Background(Col.LIGHTCYAN)
@@ -384,3 +423,4 @@ private fun Container.showMoreItemsButton(type: ItemType, size: Int, maxItemsToS
         }
     }
 }
+ */

@@ -16,8 +16,6 @@
  */
 package se.skoview.data
 
-import kotlin.reflect.KClass
-
 fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
     //println("=====>>> ${action::class}")
     //console.log(state)
@@ -87,14 +85,29 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
                 vLogicalAddressesMax = 100
             )
         }
+        is HippoAction.DoneDownloadStatistics -> {
+            state.copy(
+                callsConsumer = action.callsConsumer,
+                callsProducer = action.callsProducer,
+                callsLogicalAddress = action.callsLogicalAddress,
+                callsDomain = action.callsDomain,
+                callsContract = action.callsContract
+            )
+        }
         is HippoAction.ErrorDownloadIntegrations -> state.copy(
             downloadIntegrationStatus = AsyncActionStatus.ERROR,
             errorMessage = action.errorMessage
         )
-        is HippoAction.DateSelected -> state.copy(
-            dateEffective = action.selectedDate,
-            dateEnd = action.selectedDate
-        )
+        is HippoAction.DateSelected -> {
+            when (action.dateType) {
+                DateType.EFFECTIVE -> state.copy(dateEffective = action.selectedDate)
+                DateType.END -> state.copy(dateEnd = action.selectedDate)
+                DateType.EFFECTIVE_AND_END -> state.copy(
+                    dateEffective = action.selectedDate,
+                    dateEnd = action.selectedDate
+                )
+            }
+        }
         is HippoAction.ViewUpdated -> state.copy(
             vServiceConsumers = action.integrationLists.serviceConsumers,
             vServiceDomains = action.integrationLists.serviceDomains,
@@ -153,7 +166,7 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
 
     //console.log(newState)
     println("<<<===== ${action::class}")
-    //console.log(finalState)
+    console.log(finalState)
 
     return finalState
 }
