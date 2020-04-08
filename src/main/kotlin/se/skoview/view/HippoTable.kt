@@ -16,10 +16,12 @@
  */
 package se.skoview.view
 
+import com.github.snabbdom._set
 import pl.treksoft.kvision.core.*
 import pl.treksoft.kvision.core.Color.Companion.hex
 import pl.treksoft.kvision.form.InputSize
 import pl.treksoft.kvision.form.select.selectInput
+import pl.treksoft.kvision.form.text.TextInput
 import pl.treksoft.kvision.form.text.TextInputType
 import pl.treksoft.kvision.form.text.textInput
 import pl.treksoft.kvision.html.*
@@ -39,6 +41,26 @@ import kotlin.math.min
 object HippoTablePage : SimplePanel() {
 
     init {
+/*
+        // ---------------------------------------------------------------------------------------------
+        textInput(type = TextInputType.SEARCH) {
+            onEvent {
+                var timeout = 0
+                input = {
+                    window.clearTimeout(timeout)
+                    val value = self.value ?: ""
+                    timeout = window.setTimeout({
+                       println("Search value: $value")
+                    }, 500)
+                }
+            }
+        }
+
+        val aaa: String? = document.getElementById("sss")!!.innerHTML = "Hello"
+        // ---------------------------------------------------------------------------------------------
+ */
+
+
         // font-family: Georgia,Times New Roman,Times,serif;
         fontFamily = "Times New Roman"
         // Page header
@@ -151,12 +173,14 @@ object HippoTablePage : SimplePanel() {
 
 class HippoItemsView(type: ItemType, heading: String, bredd: Int = 20) : VPanel() {
     init {
+
+
         //background = Background(Col.LIGHTCYAN)
         width = bredd.vw
         margin = 3.px
-        div {
-            searchField(type)
-        }
+
+        val textSearchField = searchField(type)
+
         div {}.stateBinding(store) { state ->
             if (
                 state.currentAction != HippoAction.ViewUpdated::class &&
@@ -258,7 +282,7 @@ class HippoItemsView(type: ItemType, heading: String, bredd: Int = 20) : VPanel(
                                         state.vServiceContracts.size == 1
                                     ) {
                                         insertResetButton(item, ItemType.CONTRACT)
-                                    } else itemSelect(item, ItemType.CONTRACT)
+                                    } else itemSelect(item, ItemType.CONTRACT, textSearchField)
 
                                 } else if (item::class.simpleName == "ServiceDomain") {
                                     +"<b>${item.description}</b>"
@@ -269,7 +293,7 @@ class HippoItemsView(type: ItemType, heading: String, bredd: Int = 20) : VPanel(
                                         state.vServiceDomains.size == 1
                                     ) {
                                         insertResetButton(item, ItemType.DOMAIN)
-                                    } else itemSelect(item, ItemType.DOMAIN)
+                                    } else itemSelect(item, ItemType.DOMAIN, textSearchField)
 
                                 } else {
                                     val itemText =
@@ -284,19 +308,20 @@ class HippoItemsView(type: ItemType, heading: String, bredd: Int = 20) : VPanel(
                                         vList.size == 1
                                     ) {
                                         insertResetButton(item, type)
-                                    } else itemSelect(item, type)
+                                    } else itemSelect(item, type, textSearchField)
                                 }
                             }
                         }
                 }
                 showMoreItemsButton(type, filteredList.size, maxNoItems)
+
             }
         }
     }
 }
 
-private fun Container.searchField(type: ItemType) {
-    textInput(type = TextInputType.SEARCH) {
+private fun Container.searchField(type: ItemType): TextInput {
+    return textInput(type = TextInputType.SEARCH) {
         when (type) {
             ItemType.CONSUMER -> placeholder = "Sök tjänstekonsument..."
             ItemType.CONTRACT -> placeholder = "Sök tjänstekontrakt/domän..."
@@ -305,7 +330,8 @@ private fun Container.searchField(type: ItemType) {
             ItemType.PLATTFORM_CHAIN -> placeholder = "Sök tjänsteplattform(ar)..."
             else -> placeholder == "Internal error in searchField()"
         }
-        //value = currentValue
+        id = "searchField_${type}"
+        println("Search field: $name")
         onEvent {
             var timeout = 0
             input = {
@@ -323,12 +349,18 @@ private fun Container.searchField(type: ItemType) {
     }
 }
 
-private fun Div.itemSelect(item: BaseItem, type: ItemType) {
+private fun Div.itemSelect(item: BaseItem, type: ItemType, searchField: TextInput) {
     onEvent {
         click = {
+            // Lets begin with clearing the search field for this type
+            // Hotfix 7.0.8 clear search field when item is selected
+            searchField.value = null
+            searchField.background = Background(Color.name(Col.WHITE))
+
             store.dispatch { _, getState ->
+                // Hotfix 7.0.8 clear search field when item is selected
+                store.dispatch(HippoAction.FilterItems(type, "")) // v7.0.8
                 store.dispatch(HippoAction.ItemSelected(type, item))
-                //createViewData(getState())
                 loadIntegrations(getState())
             }
         }
