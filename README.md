@@ -23,3 +23,41 @@ Whenever you want to produce a minified "production" version of your code pass i
 ### Packaging
 * browserWebpack - Bundles the compiled js files into `build/distributions`
 * zip - Packages a zip archive with all required files into `build/libs/*.zip`
+
+##Hotfix
+1. Check out the running version through its tag
+    ```
+    git co -b hotfix_7.0.8 v7.0.7`
+    ```
+1. Fix the problem and verify/test
+1. Add the changed files and commit the change
+    ```
+    git add src/main/kotlin/se/skoview/view/HippoTable.kt
+    git ci -m "Implemented hotfix 7.0.8, clear search field after select"
+    ```
+1. Merge the change to the develop branch (the branch which should be put in production)
+    ```
+    git co develop
+    git merge --no-ff hotfix_7.0.8
+    ```
+1. Tag the branch
+    ```
+    git tag -a v7.0.8 -m "Implemented hotfix 7.0.8, clear search field after select"
+    ```
+1. Test the fix in a local container
+    ```
+    bin/buildDockerImage.kts -c -r
+    ```
+1. Push the image to NoGui docker registry
+    ```
+    bin/buildDockerImage.kts  -p
+    ```
+1. Start the container in tpinfo-a
+    ```
+    [larroj@tpinfo-a-web01 bin]$ docker container kill 5df76370cfdc
+    [larroj@tpinfo-a-web01 bin]$ ./docker-run-kvfrontend.sh 
+    Please provide kvfrontend container tag as parameter
+    [   larroj@tpinfo-a-web01 bin]$ ./docker-run-kvfrontend.sh v7.0.8
+    ```
+1. Verify
+1. Merge the hotfix to the current development head branch
