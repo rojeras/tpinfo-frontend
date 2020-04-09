@@ -26,6 +26,12 @@ enum class AsyncActionStatus {
     ERROR
 }
 
+enum class DateType {
+    EFFECTIVE,
+    END,
+    EFFECTIVE_AND_END
+}
+
 //@Serializable
 data class HippoState(
     // Status information
@@ -70,22 +76,21 @@ data class HippoState(
     val vPlattformChains: List<PlattformChain>,
     val vLogicalAddresses: List<LogicalAddress>,
 
-    // Text search filter
-    val consumerFilter: String,
-    val producerFilter: String,
-    val contractFilter: String,
-    val domainFilter: String,
-    val logicalAddressFilter: String,
-    val plattformChainFilter: String,
-
     // Max number of items to display
     val vServiceConsumersMax: Int,
     val vServiceProducersMax: Int,
     val vLogicalAddressesMax: Int,
-    val vServiceContractsMax: Int
+    val vServiceContractsMax: Int,
+
+    // Statistics information
+    val callsConsumer: Map<Int, Int>,
+    val callsProducer: Map<Int, Int>,
+    val callsLogicalAddress: Map<Int, Int>,
+    val callsDomain: Map<Int, Int>,
+    val callsContract: Map<Int, Int>
 )
 
-fun HippoState.isItemFiltered(itemType: ItemType, id: Int): Boolean {
+fun HippoState.isItemSelected(itemType: ItemType, id: Int): Boolean {
     return when (itemType) {
         ItemType.CONSUMER -> this.selectedConsumers.contains(id)
         ItemType.DOMAIN -> this.selectedDomains.contains(id)
@@ -133,16 +138,15 @@ fun getInitialState(): HippoState {
         listOf(),
         listOf(),
         listOf(),
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
         100,
         100,
         100,
-        500
+        500,
+        mapOf(),
+        mapOf(),
+        mapOf(),
+        mapOf(),
+        mapOf()
     )
 }
 

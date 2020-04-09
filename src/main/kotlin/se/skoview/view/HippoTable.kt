@@ -16,11 +16,11 @@
  */
 package se.skoview.view
 
-import com.github.snabbdom._set
 import pl.treksoft.kvision.core.*
 import pl.treksoft.kvision.core.Color.Companion.hex
-import pl.treksoft.kvision.form.InputSize
-import pl.treksoft.kvision.form.select.selectInput
+import pl.treksoft.kvision.data.BaseDataComponent
+import pl.treksoft.kvision.data.dataContainer
+import pl.treksoft.kvision.form.select.simpleSelectInput
 import pl.treksoft.kvision.form.text.TextInput
 import pl.treksoft.kvision.form.text.TextInputType
 import pl.treksoft.kvision.form.text.textInput
@@ -28,6 +28,7 @@ import pl.treksoft.kvision.html.*
 import pl.treksoft.kvision.modal.Modal
 import pl.treksoft.kvision.modal.ModalSize
 import pl.treksoft.kvision.panel.*
+import pl.treksoft.kvision.state.observableListOf
 import pl.treksoft.kvision.state.stateBinding
 import pl.treksoft.kvision.utils.perc
 import pl.treksoft.kvision.utils.px
@@ -38,28 +39,29 @@ import kotlin.browser.document
 import kotlin.browser.window
 import kotlin.math.min
 
+class TextSearchInfo: BaseDataComponent() {
+    var widgetTextSearchField = TextInput()
+    val textSearchFilterObsList = observableListOf("")
+
+    fun set(characters: String) {
+        if (characters.isEmpty()) clear()
+        else {
+            textSearchFilterObsList[0] = characters
+            widgetTextSearchField.value = characters
+            widgetTextSearchField.background = Background(Color.name(Col.LIGHTGRAY))
+        }
+    }
+
+    fun clear() {
+        widgetTextSearchField.background = Background(Color.name(Col.WHITE))
+        widgetTextSearchField.value = null
+        textSearchFilterObsList[0] = ""
+    }
+}
+
 object HippoTablePage : SimplePanel() {
 
     init {
-/*
-        // ---------------------------------------------------------------------------------------------
-        textInput(type = TextInputType.SEARCH) {
-            onEvent {
-                var timeout = 0
-                input = {
-                    window.clearTimeout(timeout)
-                    val value = self.value ?: ""
-                    timeout = window.setTimeout({
-                       println("Search value: $value")
-                    }, 500)
-                }
-            }
-        }
-
-        val aaa: String? = document.getElementById("sss")!!.innerHTML = "Hello"
-        // ---------------------------------------------------------------------------------------------
- */
-
 
         // font-family: Georgia,Times New Roman,Times,serif;
         fontFamily = "Times New Roman"
@@ -70,14 +72,14 @@ object HippoTablePage : SimplePanel() {
                 div("Integrationer för tjänsteplattformar vars tjänstadresseringskatalog (TAK) är tillgänglig i Ineras TAK-api visas.")
             }.apply {
                 //width = 100.perc
-                background = Background(Color.hex(0x113d3d))
+                background = Background(hex(0x113d3d))
                 align = Align.CENTER
                 color = Color.name(Col.WHITE)
                 marginTop = 5.px
             }
         }
-        // Date selector
 
+        // Date selector
         //hPanel { clear = Clear.BOTH
         flexPanel(
             FlexDir.ROW, FlexWrap.WRAP, FlexJustify.SPACEBETWEEN, FlexAlignItems.CENTER,
@@ -85,36 +87,29 @@ object HippoTablePage : SimplePanel() {
         ) {
             clear = Clear.BOTH
             margin = 0.px
-            background = Background(Color.hex(0xf6efe9))
+            background = Background(hex(0xf6efe9))
+
+            // Select date
+
             div {
                 align = Align.LEFT
-                //background = Background(Col.BLUEVIOLET)
             }.stateBinding(store) { state ->
-                // Lets scroll to top here
-                //document.body!!.scrollTop = 0.toDouble()
-                //document.documentElement!!.scrollTop = 0.toDouble() // All other browsers
-                div {
-                    height = 40.px
-                    val dateOptionList = state.updateDates.map { Pair(it, it) }
-                    selectInput(
-                        options = dateOptionList,
-                        value = state.dateEffective
-                    ) {
-                        background = Background(Color.name(Col.BLUE))
-                        //if (state.updateDates.size < state.integrationDates.size) Background(Color.name(Col.LIGHTGRAY))
-                        //else Background(Color.name(Col.WHITE))
-                        selectWidth = CssSize(150, UNIT.px)
-                        size = InputSize.SMALL
-                    }.onEvent {
-                        change = {
-                            store.dispatch { dispatch, getState ->
-                                dispatch(HippoAction.DateSelected(self.value ?: ""))
-                                loadIntegrations(getState())
-                            }
+                simpleSelectInput(
+                    options = state.updateDates.sortedByDescending { it }.map { Pair(it, it) },
+                    value = state.dateEffective
+                ) {
+                    addCssStyle(formControlXs)
+                    background = Background(Color.name(Col.WHITE))
+                }.onEvent {
+                    change = {
+                        store.dispatch { dispatch, getState ->
+                            dispatch(HippoAction.DateSelected(DateType.EFFECTIVE, self.value ?: ""))
+                            loadIntegrations(getState())
                         }
                     }
                 }
             }
+
 
             // Statistics button
             div {
@@ -174,17 +169,16 @@ object HippoTablePage : SimplePanel() {
 class HippoItemsView(type: ItemType, heading: String, bredd: Int = 20) : VPanel() {
     init {
 
-
-        //background = Background(Col.LIGHTCYAN)
         width = bredd.vw
         margin = 3.px
 
-        val textSearchField = searchField(type)
+        // Render the search field
+        val textSearchInfo = TextSearchInfo()
+        searchField(type, textSearchInfo)
 
         div {}.stateBinding(store) { state ->
             if (
                 state.currentAction != HippoAction.ViewUpdated::class &&
-                state.currentAction != HippoAction.FilterItems::class &&
                 state.currentAction != HippoAction.SetVMax::class &&
                 state.currentAction != HippoAction.ApplicationStarted::class
             ) return@stateBinding
@@ -197,131 +191,130 @@ class HippoItemsView(type: ItemType, heading: String, bredd: Int = 20) : VPanel(
                 document.documentElement!!.scrollTop = 0.toDouble() // All other browsers
             }
 
-            div {
-                // todo: Kolla om dessa kan göras till val eller definieras inom if-satsen nedan
-                var vList = listOf<BaseItem>()
-                var maxCounter = -1
-                var maxNoItems = -1
-                var textFilter = ""
+            // todo: Kolla om dessa kan göras till val eller definieras inom if-satsen nedan
+            var vList = listOf<BaseItem>()
+            var maxCounter = -1
+            var maxNoItems = -1
 
-                //background = Background(Col.LIGHTSTEELBLUE)
-                when (type) {
-                    ItemType.CONSUMER -> {
-                        vList = state.vServiceConsumers
-                        maxCounter = state.maxCounters.consumers
-                        maxNoItems = state.vServiceConsumersMax
-                        textFilter = state.consumerFilter
-                    }
-                    ItemType.PRODUCER -> {
-                        vList = state.vServiceProducers
-                        maxCounter = state.maxCounters.producers
-                        maxNoItems = state.vServiceProducersMax
-                        textFilter = state.producerFilter
-                    }
-                    ItemType.PLATTFORM_CHAIN -> {
-                        vList = state.vPlattformChains
-                        maxCounter = state.maxCounters.plattformChains
-                        maxNoItems = 100
-                        textFilter = state.plattformChainFilter
-                    }
-                    ItemType.LOGICAL_ADDRESS -> {
-                        vList = state.vLogicalAddresses
-                        maxCounter = state.maxCounters.logicalAddress
-                        maxNoItems = state.vLogicalAddressesMax
-                        textFilter = state.logicalAddressFilter
-                    }
-                    ItemType.CONTRACT -> {
-                        vList = state.vDomainsAndContracts
-                        maxCounter = state.maxCounters.contracts
-                        maxNoItems = state.vServiceContractsMax
-                        textFilter = state.contractFilter
-                    }
-                    else -> println("Error in HippoItemsView class, type = $type")
+            //background = Background(Col.LIGHTSTEELBLUE)
+            when (type) {
+                ItemType.CONSUMER -> {
+                    vList = state.vServiceConsumers
+                    maxCounter = state.maxCounters.consumers
+                    maxNoItems = state.vServiceConsumersMax
                 }
+                ItemType.PRODUCER -> {
+                    vList = state.vServiceProducers
+                    maxCounter = state.maxCounters.producers
+                    maxNoItems = state.vServiceProducersMax
+                }
+                ItemType.PLATTFORM_CHAIN -> {
+                    vList = state.vPlattformChains
+                    maxCounter = state.maxCounters.plattformChains
+                    maxNoItems = 100
+                }
+                ItemType.LOGICAL_ADDRESS -> {
+                    vList = state.vLogicalAddresses
+                    maxCounter = state.maxCounters.logicalAddress
+                    maxNoItems = state.vLogicalAddressesMax
+                }
+                ItemType.CONTRACT -> {
+                    vList = state.vDomainsAndContracts
+                    maxCounter = state.maxCounters.contracts
+                    maxNoItems = state.vServiceContractsMax
+                }
+                else -> println("Error in HippoItemsView class, type = $type")
+            }
 
-                // Perform the free text search filtering
-                val filteredList =
-                    if (textFilter.isNotEmpty())
-                        vList.filter { it.searchField.contains(textFilter, true) }
-                    else
-                        vList
+            dataContainer(textSearchInfo.textSearchFilterObsList, { textFilter, _, _ ->
+                println("In dataContainer, type = $type, textFilter = $textFilter")
+                //textFilter = element
 
-                // Count current number of items displayed. For contracts we must calculate explicitly to remove domain items
-                val noFilteredItems =
-                    if (type == ItemType.CONTRACT) filteredList.filter { it::class.simpleName == "ServiceContract" }.size
-                    else filteredList.size
-
-                // Render the heading and counts
-                h5("<b>$heading (${noFilteredItems}/${maxCounter})</b>")
-                    .apply {
-                        color = Color.hex(0x227777)
-                        rich = true
-                    }
-
-                // Render the list of items
                 div {
-                    borderLeft = Border(1.px, BorderStyle.SOLID, Color.name(Col.GRAY))
-                    borderRight = Border(1.px, BorderStyle.SOLID, Color.name(Col.GRAY))
-                    borderBottom = Border(1.px, BorderStyle.SOLID, Color.name(Col.GRAY))
-                    if (filteredList.size < vList.size) background = Background(Color.name(Col.LIGHTGRAY))
+                    // Perform the free text search filtering
+                    val filteredList =
+                        if (textFilter.isNotEmpty())
+                            vList.filter { it.searchField.contains(textFilter, true) }
+                        else
+                            vList
 
-                    filteredList
-                        .subList(0, min(filteredList.size, maxNoItems))
-                        .map { item ->
-                            div(
-                                classes = setOf("pointer"),
-                                rich = true
-                            ) {
-                                wordBreak = WordBreak.BREAKALL
+                    // Count current number of items displayed. For contracts we must calculate explicitly to remove domain items
+                    val noFilteredItems =
+                        if (type == ItemType.CONTRACT) filteredList.filter { it::class.simpleName == "ServiceContract" }.size
+                        else filteredList.size
 
-                                // Difference for contracts, domains and rest
-                                if (item::class.simpleName == "ServiceContract") {
-                                    +item.description
-                                    if (
-                                        state.isItemFiltered(ItemType.CONTRACT, item.id) &&
-                                        state.vServiceContracts.size == 1
-                                    ) {
-                                        insertResetButton(item, ItemType.CONTRACT)
-                                    } else itemSelect(item, ItemType.CONTRACT, textSearchField)
+                    // Render the heading and counts
+                    h5("<b>$heading (${noFilteredItems}/${maxCounter})</b>")
+                        .apply {
+                            color = hex(0x227777)
+                            rich = true
+                        }
 
-                                } else if (item::class.simpleName == "ServiceDomain") {
-                                    +"<b>${item.description}</b>"
-                                    borderTop = Border(1.px, BorderStyle.SOLID, Color.name(Col.GRAY))
+                    // Render the list of items
+                    div {
+                        borderLeft = Border(1.px, BorderStyle.SOLID, Color.name(Col.GRAY))
+                        borderRight = Border(1.px, BorderStyle.SOLID, Color.name(Col.GRAY))
+                        borderBottom = Border(1.px, BorderStyle.SOLID, Color.name(Col.GRAY))
+                        if (filteredList.size < vList.size) background = Background(Color.name(Col.LIGHTGRAY))
 
-                                    if (
-                                        state.isItemFiltered(ItemType.DOMAIN, item.id) &&
-                                        state.vServiceDomains.size == 1
-                                    ) {
-                                        insertResetButton(item, ItemType.DOMAIN)
-                                    } else itemSelect(item, ItemType.DOMAIN, textSearchField)
+                        filteredList
+                            .subList(0, min(filteredList.size, maxNoItems))
+                            .map { item ->
+                                div(
+                                    classes = setOf("pointer"),
+                                    rich = true
+                                ) {
+                                    wordBreak = WordBreak.BREAKALL
 
-                                } else {
-                                    val itemText =
-                                        if (type == ItemType.PLATTFORM_CHAIN) item.name
-                                        else "<i>${item.description}</i><br>${item.name}"
+                                    // Difference for contracts, domains and rest
+                                    if (item::class.simpleName == "ServiceContract") {
+                                        +item.description
+                                        if (
+                                            state.isItemSelected(ItemType.CONTRACT, item.id) &&
+                                            state.vServiceContracts.size == 1
+                                        ) {
+                                            insertResetButton(item, ItemType.CONTRACT)
+                                        } else itemSelect(item, ItemType.CONTRACT, textSearchInfo)
 
-                                    +itemText
-                                    borderTop = Border(1.px, BorderStyle.SOLID, Color.name(Col.GRAY))
+                                    } else if (item::class.simpleName == "ServiceDomain") {
+                                        +"<b>${item.description}</b>"
+                                        borderTop = Border(1.px, BorderStyle.SOLID, Color.name(Col.GRAY))
 
-                                    if (
-                                        state.isItemFiltered(type, item.id) &&
-                                        vList.size == 1
-                                    ) {
-                                        insertResetButton(item, type)
-                                    } else itemSelect(item, type, textSearchField)
+                                        if (
+                                            state.isItemSelected(ItemType.DOMAIN, item.id) &&
+                                            state.vServiceDomains.size == 1
+                                        ) {
+                                            insertResetButton(item, ItemType.DOMAIN)
+                                        } else itemSelect(item, ItemType.DOMAIN, textSearchInfo)
+
+                                    } else {
+                                        val itemText =
+                                            if (type == ItemType.PLATTFORM_CHAIN) item.name
+                                            else "<i>${item.description}</i><br>${item.name}"
+
+                                        +itemText
+                                        borderTop = Border(1.px, BorderStyle.SOLID, Color.name(Col.GRAY))
+
+                                        if (
+                                            state.isItemSelected(type, item.id) &&
+                                            vList.size == 1
+                                        ) {
+                                            insertResetButton(item, type)
+                                        } else itemSelect(item, type, textSearchInfo)
+                                    }
                                 }
                             }
-                        }
-                }
-                showMoreItemsButton(type, filteredList.size, maxNoItems)
+                    }
+                    showMoreItemsButton(type, filteredList.size, maxNoItems)
 
-            }
+                }
+            }) // end of dataContainer
         }
     }
 }
 
-private fun Container.searchField(type: ItemType): TextInput {
-    return textInput(type = TextInputType.SEARCH) {
+private fun Container.searchField(type: ItemType, textSearchInfo: TextSearchInfo) {
+    textSearchInfo.widgetTextSearchField = textInput(type = TextInputType.SEARCH) {
         when (type) {
             ItemType.CONSUMER -> placeholder = "Sök tjänstekonsument..."
             ItemType.CONTRACT -> placeholder = "Sök tjänstekontrakt/domän..."
@@ -330,36 +323,27 @@ private fun Container.searchField(type: ItemType): TextInput {
             ItemType.PLATTFORM_CHAIN -> placeholder = "Sök tjänsteplattform(ar)..."
             else -> placeholder == "Internal error in searchField()"
         }
-        id = "searchField_${type}"
-        println("Search field: $name")
         onEvent {
             var timeout = 0
             input = {
                 window.clearTimeout(timeout)
                 val value = self.value ?: ""
+
                 timeout = window.setTimeout({
-                    store.dispatch { dispatch, getState ->
-                        if (value.isNotEmpty()) self.background = Background(Color.name(Col.LIGHTGRAY))
-                        else self.background = Background(Color.name(Col.WHITE))
-                        dispatch(HippoAction.FilterItems(type, value))
-                    }
-                }, 500)
+                    textSearchInfo.set(value)
+                }, 300)
+
             }
         }
     }
 }
 
-private fun Div.itemSelect(item: BaseItem, type: ItemType, searchField: TextInput) {
+private fun Div.itemSelect(item: BaseItem, type: ItemType, textSearchInfo: TextSearchInfo) {
     onEvent {
         click = {
-            // Lets begin with clearing the search field for this type
-            // Hotfix 7.0.8 clear search field when item is selected
-            searchField.value = null
-            searchField.background = Background(Color.name(Col.WHITE))
+            textSearchInfo.clear()
 
             store.dispatch { _, getState ->
-                // Hotfix 7.0.8 clear search field when item is selected
-                store.dispatch(HippoAction.FilterItems(type, "")) // v7.0.8
                 store.dispatch(HippoAction.ItemSelected(type, item))
                 loadIntegrations(getState())
             }
@@ -394,8 +378,6 @@ private fun Div.insertResetButton(item: BaseItem, type: ItemType) {
 private fun Container.showMoreItemsButton(type: ItemType, size: Int, maxItemsToShow: Int) {
     if (size > maxItemsToShow) {
         div {
-            //color = Color(Col.RED)
-            //+"Ytterligare ${size - maxItemsToShow} rader tillgängliga via sökning eller filtrering"
             val linesLeft = size - maxItemsToShow
             val moreLinesToShow = min(linesLeft, 500)
             val actualLinesToShow = moreLinesToShow + maxItemsToShow
@@ -405,7 +387,6 @@ private fun Container.showMoreItemsButton(type: ItemType, size: Int, maxItemsToS
                 onClick {
                     store.dispatch { dispatch, getState ->
                         dispatch(HippoAction.SetVMax(type, actualLinesToShow))
-                        //createViewData(getState())
 
                     }
                 }

@@ -49,6 +49,7 @@ fun areAllBaseItemsLoaded(store: ReduxStore<HippoState, HippoAction>) {
         store.dispatch { _, getState ->
             store.dispatch(HippoAction.DoneDownloadBaseItems)
             loadIntegrations(getState())
+            //loadStatistics(getState())
         }
 }
 

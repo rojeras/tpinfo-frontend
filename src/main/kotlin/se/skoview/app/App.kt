@@ -26,10 +26,23 @@ import pl.treksoft.kvision.startApplication
 import pl.treksoft.kvision.utils.perc
 import se.skoview.data.*
 import se.skoview.view.HippoTablePage
+import se.skoview.view.StatTablePage
 import se.skoview.view.setUrlFilter
 import kotlin.browser.window
 
+// todo: Add the initial loading of integrations and stat data to be on demand from the respective view - not from areAllBaseItemsLoaded()
+// todo: Re-implementera grundläggande statistik (så att den gamla frontend helt kan fasas ut). Visa mha StackPanel. Börja med chartjs och se om det är ok med 2D-paj
+// todo: Lägg till möjlighet att enkelt visa ett meddelande till användaren vid uppstart
 // todo: Verifiera att zip bygger en produktionsversion
+// todo: Visa antal användare sensate 24 timmarna
+// todo: Lägg in stöd för Navigo routing
+// todo: Börja använda Karma och enhetstester
+// todo: Lös detta med att visa SE för vägval
+// todo: Tag fram mock för hur integrationer ska presenteras där det kan finnas flera LA
+// todo: Lös trädklättringen, kanske mha HSA-trädet
+// todo: Titta på Tabulator igen
+// todo: Fritextsökningen måste snabbas upp
+
 // done: Addera licensinformationen
 // done: Fixa BASEURL så att den inte är hårdkodad mot tpinfo-a
 // done: Fixa så det går att kopiera text utan att itemet väljs bort
@@ -50,13 +63,6 @@ import kotlin.browser.window
 // done: Länk till statistiken
 // done: Fixa till färgerna
 // done: Aktivera Google Analytics
-// todo: Visa antal användare sensate 24 timmarna
-// todo: Steg 1 Driftsätt K-hippo (rhippo)
-// todo: Steg 2 Lös detta med att visa SE
-// todo: Steg 3 Tag fram mock för hur integrationer ska presenteras där det kan finnas flera LA
-// todo: Steg 4 Lös trädklättringen, kanske mha HSA-trädet
-// todo: Lägg till möjlighet att enkelt visa ett meddelande till användaren vid uppstart
-
 // done: Publicera rhippo på hippokrates.se
 // done: Markera om ingen träff i sökning på nåt sätt
 // Och efter produktionssättningen, i 1.1
@@ -86,6 +92,7 @@ class App : Application() {
 
             vPanel {
                 add(HippoTablePage)
+                //add(StatTablePage)
             }.apply {
                 width = 100.perc
             }

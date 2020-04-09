@@ -31,19 +31,24 @@ sealed class HippoAction : RAction {
     object StartDownloadBaseItems : HippoAction()
     object DoneDownloadBaseItems : HippoAction()
     data class ErrorDownloadBaseItems(val errorMessage: String) : HippoAction()
-    //object StartDownloadIntegrations : HippoAction()
     data class DoneDownloadIntegrations(
         val integrationArrs: List<Integration>,
         val maxCounters: MaxCounter,
         val updateDates: List<String>
     ) : HippoAction()
+    data class DoneDownloadStatistics(
+        val callsConsumer: Map<Int, Int>,
+        val callsProducer: Map<Int, Int>,
+        val callsLogicalAddress: Map<Int, Int>,
+        val callsDomain: Map<Int, Int>,
+        val callsContract: Map<Int, Int>
+    ) : HippoAction()
     data class ErrorDownloadIntegrations(val errorMessage: String) : HippoAction()
-    data class DateSelected(val selectedDate: String) : HippoAction()
+    data class DateSelected(val dateType: DateType, val selectedDate: String) : HippoAction()
     data class ItemSelected(
         val viewType: ItemType,
         val baseItem: BaseItem
     ) : HippoAction()
     data class ViewUpdated(val integrationLists: IntegrationLists) : HippoAction()
-    data class FilterItems(val type: ItemType, val filterString: String) : HippoAction()
     data class SetVMax(val type: ItemType, val size: Int): HippoAction()
 }

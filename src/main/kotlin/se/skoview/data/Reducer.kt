@@ -16,25 +16,10 @@
  */
 package se.skoview.data
 
-import kotlin.reflect.KClass
-
 fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
     //println("=====>>> ${action::class}")
     //console.log(state)
     val newState = when (action) {
-        is HippoAction.FilterItems -> {
-            when (action.type) {
-                ItemType.CONSUMER -> state.copy(consumerFilter = action.filterString)
-                ItemType.CONTRACT -> state.copy(contractFilter = action.filterString)
-                ItemType.LOGICAL_ADDRESS -> state.copy(logicalAddressFilter = action.filterString)
-                ItemType.PRODUCER -> state.copy(producerFilter = action.filterString)
-                ItemType.PLATTFORM_CHAIN -> state.copy(plattformChainFilter = action.filterString)
-                else -> {
-                    println("Internal error i the filter reducer")
-                    state
-                }
-            }
-        }
         is HippoAction.ApplicationStarted -> state.copy(
             applicationStarted = true
         )
@@ -87,14 +72,29 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
                 vLogicalAddressesMax = 100
             )
         }
+        is HippoAction.DoneDownloadStatistics -> {
+            state.copy(
+                callsConsumer = action.callsConsumer,
+                callsProducer = action.callsProducer,
+                callsLogicalAddress = action.callsLogicalAddress,
+                callsDomain = action.callsDomain,
+                callsContract = action.callsContract
+            )
+        }
         is HippoAction.ErrorDownloadIntegrations -> state.copy(
             downloadIntegrationStatus = AsyncActionStatus.ERROR,
             errorMessage = action.errorMessage
         )
-        is HippoAction.DateSelected -> state.copy(
-            dateEffective = action.selectedDate,
-            dateEnd = action.selectedDate
-        )
+        is HippoAction.DateSelected -> {
+            when (action.dateType) {
+                DateType.EFFECTIVE -> state.copy(dateEffective = action.selectedDate)
+                DateType.END -> state.copy(dateEnd = action.selectedDate)
+                DateType.EFFECTIVE_AND_END -> state.copy(
+                    dateEffective = action.selectedDate,
+                    dateEnd = action.selectedDate
+                )
+            }
+        }
         is HippoAction.ViewUpdated -> state.copy(
             vServiceConsumers = action.integrationLists.serviceConsumers,
             vServiceDomains = action.integrationLists.serviceDomains,
@@ -108,7 +108,7 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
 
             val id = action.baseItem.id
 
-            val newList = if (state.isItemFiltered(itemType = action.viewType, id = id)) listOf() else listOf(id)
+            val newList = if (state.isItemSelected(itemType = action.viewType, id = id)) listOf() else listOf(id)
 
             when (action.viewType) {
                 ItemType.CONSUMER -> state.copy(
@@ -153,7 +153,7 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
 
     //console.log(newState)
     println("<<<===== ${action::class}")
-    //console.log(finalState)
+    console.log(finalState)
 
     return finalState
 }
