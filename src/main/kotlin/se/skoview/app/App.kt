@@ -31,7 +31,7 @@ import se.skoview.view.setUrlFilter
 import kotlin.browser.window
 
 // todo: Add the initial loading of integrations and stat data to be on demand from the respective view - not from areAllBaseItemsLoaded()
-// todo: Re-implementera grundläggande statistik (så att den gamla frontend helt kan fasas ut). Visa mha StackPanel.
+// todo: Re-implementera grundläggande statistik (så att den gamla frontend helt kan fasas ut). Visa mha StackPanel. Börja med chartjs och se om det är ok med 2D-paj
 // todo: Lägg till möjlighet att enkelt visa ett meddelande till användaren vid uppstart
 // todo: Verifiera att zip bygger en produktionsversion
 // todo: Visa antal användare sensate 24 timmarna
@@ -40,6 +40,8 @@ import kotlin.browser.window
 // todo: Lös detta med att visa SE för vägval
 // todo: Tag fram mock för hur integrationer ska presenteras där det kan finnas flera LA
 // todo: Lös trädklättringen, kanske mha HSA-trädet
+// todo: Titta på Tabulator igen
+// todo: Fritextsökningen måste snabbas upp
 
 // done: Addera licensinformationen
 // done: Fixa BASEURL så att den inte är hårdkodad mot tpinfo-a
@@ -89,8 +91,8 @@ class App : Application() {
         root("hippo") {
 
             vPanel {
-                //add(HippoTablePage)
-                add(StatTablePage)
+                add(HippoTablePage)
+                //add(StatTablePage)
             }.apply {
                 width = 100.perc
             }

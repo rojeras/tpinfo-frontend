@@ -20,19 +20,6 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
     //println("=====>>> ${action::class}")
     //console.log(state)
     val newState = when (action) {
-        is HippoAction.FilterItems -> {
-            when (action.type) {
-                ItemType.CONSUMER -> state.copy(consumerFilter = action.filterString)
-                ItemType.CONTRACT -> state.copy(contractFilter = action.filterString)
-                ItemType.LOGICAL_ADDRESS -> state.copy(logicalAddressFilter = action.filterString)
-                ItemType.PRODUCER -> state.copy(producerFilter = action.filterString)
-                ItemType.PLATTFORM_CHAIN -> state.copy(plattformChainFilter = action.filterString)
-                else -> {
-                    println("Internal error i the filter reducer")
-                    state
-                }
-            }
-        }
         is HippoAction.ApplicationStarted -> state.copy(
             applicationStarted = true
         )
@@ -121,7 +108,7 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
 
             val id = action.baseItem.id
 
-            val newList = if (state.isItemFiltered(itemType = action.viewType, id = id)) listOf() else listOf(id)
+            val newList = if (state.isItemSelected(itemType = action.viewType, id = id)) listOf() else listOf(id)
 
             when (action.viewType) {
                 ItemType.CONSUMER -> state.copy(

@@ -31,7 +31,6 @@ sealed class HippoAction : RAction {
     object StartDownloadBaseItems : HippoAction()
     object DoneDownloadBaseItems : HippoAction()
     data class ErrorDownloadBaseItems(val errorMessage: String) : HippoAction()
-    //object StartDownloadIntegrations : HippoAction()
     data class DoneDownloadIntegrations(
         val integrationArrs: List<Integration>,
         val maxCounters: MaxCounter,
@@ -51,6 +50,5 @@ sealed class HippoAction : RAction {
         val baseItem: BaseItem
     ) : HippoAction()
     data class ViewUpdated(val integrationLists: IntegrationLists) : HippoAction()
-    data class FilterItems(val type: ItemType, val filterString: String) : HippoAction()
     data class SetVMax(val type: ItemType, val size: Int): HippoAction()
 }
