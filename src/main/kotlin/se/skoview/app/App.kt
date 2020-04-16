@@ -30,9 +30,11 @@ import se.skoview.view.StatTablePage
 import se.skoview.view.setUrlFilter
 import kotlin.browser.window
 
+// todo: Check if it is possible to make each column in hippo scrollable - without showing a scrollbar
 // todo: Add the initial loading of integrations and stat data to be on demand from the respective view - not from areAllBaseItemsLoaded()
 // todo: Re-implementera grundläggande statistik (så att den gamla frontend helt kan fasas ut). Visa mha StackPanel. Börja med chartjs och se om det är ok med 2D-paj
 // todo: Lägg till möjlighet att enkelt visa ett meddelande till användaren vid uppstart
+// todo: Skriv ut versionsnummer på sidan
 // todo: Verifiera att zip bygger en produktionsversion
 // todo: Visa antal användare sensate 24 timmarna
 // todo: Lägg in stöd för Navigo routing
