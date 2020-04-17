@@ -30,6 +30,13 @@ import se.skoview.view.StatTablePage
 import se.skoview.view.setUrlFilter
 import kotlin.browser.window
 
+// UJ kommentarer:
+// done: Sidan är större än tidigare version – måste bli lika bred som tidigare version.
+// done: Texterna inom rutorna ligger för nära ramarna.
+// done: Felstavningar i ”Om hippo”, ändra ”hippo” till ”Hippo”.
+// todo: Varför poppar rutan ”SLL statistiktjänst” upp – finns väl ingen anledning till det.
+// done: ”Återställ tjänsteplattform(ar)” bör flyttas ned någon centimeter.
+
 // todo: Check if it is possible to make each column in hippo scrollable - without showing a scrollbar
 // todo: Add the initial loading of integrations and stat data to be on demand from the respective view - not from areAllBaseItemsLoaded()
 // todo: Re-implementera grundläggande statistik (så att den gamla frontend helt kan fasas ut). Visa mha StackPanel. Börja med chartjs och se om det är ok med 2D-paj
