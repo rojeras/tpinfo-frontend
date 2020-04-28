@@ -26,10 +26,19 @@ import pl.treksoft.kvision.startApplication
 import pl.treksoft.kvision.utils.perc
 import se.skoview.data.*
 import se.skoview.view.HippoTablePage
-import se.skoview.view.StatTablePage
 import se.skoview.view.setUrlFilter
 import kotlin.browser.window
 
+// Urbans puckar
+// done: Sidan är större än tidigare version – måste bli lika bred som tidigare version.
+// done: Texterna inom rutorna ligger för nära ramarna.
+// done: Felstavningar i ”Om hippo”, ändra ”hippo” till ”Hippo”.
+// todo: "Återställ tjänsteplattform(ar)" bör flyttas ned någon centimeter.
+
+// todo: Check link to statistics
+// todo: Show messages to user
+// todo: Make it possible to participate in discussion, maybe through slack channel
+// todo: Make it possible to see diffs, that is, changes between certain dates (from John)
 // todo: Check if it is possible to make each column in hippo scrollable - without showing a scrollbar
 // todo: Add the initial loading of integrations and stat data to be on demand from the respective view - not from areAllBaseItemsLoaded()
 // todo: Re-implementera grundläggande statistik (så att den gamla frontend helt kan fasas ut). Visa mha StackPanel. Börja med chartjs och se om det är ok med 2D-paj

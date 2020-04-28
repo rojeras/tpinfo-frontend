@@ -67,6 +67,7 @@ object HippoTablePage : SimplePanel() {
         fontFamily = "Times New Roman"
         // Page header
         vPanel {
+            //marginRight = 5.px
             div {
                 h2("Hippo - integrationer via tjänsteplattform/ar för nationell e-hälsa")
                 div("Integrationer för tjänsteplattformar vars tjänstadresseringskatalog (TAK) är tillgänglig i Ineras TAK-api visas.")
@@ -136,14 +137,14 @@ object HippoTablePage : SimplePanel() {
             div {
                 //background = Background(Col.LIGHTSKYBLUE)
                 align = Align.RIGHT
-                val modal = Modal("Om hippo")
+                val modal = Modal("Om Hippo")
                 modal.iframe(src = "about.html", iframeHeight = 400, iframeWidth = 700)
                 modal.size = ModalSize.LARGE
                 //modal.add(H(require("img/dog.jpg")))
                 modal.addButton(Button("Stäng").onClick {
                     modal.hide()
                 })
-                button("Om hippo", style = ButtonStyle.INFO).onClick {
+                button("Om Hippo", style = ButtonStyle.INFO).onClick {
                     size = ButtonSize.SMALL
                     modal.show()
                 }.apply {
@@ -159,7 +160,7 @@ object HippoTablePage : SimplePanel() {
 
             add(HippoItemsView(ItemType.CONSUMER, "Tjänstekonsumenter"))
             add(HippoItemsView(ItemType.CONTRACT, "Tjänstekontrakt"))
-            add(HippoItemsView(ItemType.PLATTFORM_CHAIN, "Tjänsteplattformar", 18))
+            add(HippoItemsView(ItemType.PLATTFORM_CHAIN, "Tjänsteplattformar", 19))
             add(HippoItemsView(ItemType.PRODUCER, "Tjänsteproducenter"))
             add(HippoItemsView(ItemType.LOGICAL_ADDRESS, "Logiska adresser"))
         }
@@ -169,7 +170,7 @@ object HippoTablePage : SimplePanel() {
 class HippoItemsView(type: ItemType, heading: String, bredd: Int = 20) : VPanel() {
     init {
 
-        width = bredd.vw
+        width = (bredd - 0.5).vw
         margin = 3.px
 
         // Render the search field
@@ -217,6 +218,7 @@ class HippoItemsView(type: ItemType, heading: String, bredd: Int = 20) : VPanel(
                     vList = state.vLogicalAddresses
                     maxCounter = state.maxCounters.logicalAddress
                     maxNoItems = state.vLogicalAddressesMax
+                    marginRight = 10.px
                 }
                 ItemType.CONTRACT -> {
                     vList = state.vDomainsAndContracts
@@ -265,6 +267,7 @@ class HippoItemsView(type: ItemType, heading: String, bredd: Int = 20) : VPanel(
                                     rich = true
                                 ) {
                                     wordBreak = WordBreak.BREAKALL
+                                    margin = 5.px
 
                                     // Difference for contracts, domains and rest
                                     if (item::class.simpleName == "ServiceContract") {
