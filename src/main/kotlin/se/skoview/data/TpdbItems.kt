@@ -39,12 +39,12 @@ fun loadBaseItems(store: ReduxStore<HippoState, HippoAction>) {
 
 fun areAllBaseItemsLoaded(store: ReduxStore<HippoState, HippoAction>) {
     if (LogicalAddress.isLoaded &&
-        PlattformChain.isLoaded &&
-        Plattform.isLoaded &&
-        ServiceComponent.isLoaded &&
-        ServiceContract.isLoaded &&
-        ServiceDomain.isLoaded &&
-        BaseDates.isLoaded
+            PlattformChain.isLoaded &&
+            Plattform.isLoaded &&
+            ServiceComponent.isLoaded &&
+            ServiceContract.isLoaded &&
+            ServiceDomain.isLoaded &&
+            BaseDates.isLoaded
     )
         store.dispatch { _, getState ->
             store.dispatch(HippoAction.DoneDownloadBaseItems)
@@ -90,10 +90,10 @@ object BaseDates {
 
 @Serializable
 data class ServiceComponent(
-    override val id: Int = -1,
-    override val hsaId: String = "",
-    override val description: String = "",
-    val synonym: String? = null
+        override val id: Int = -1,
+        override val hsaId: String = "",
+        override val description: String = "",
+        val synonym: String? = null
 ) : BaseItem() {
 
     init {
@@ -101,6 +101,7 @@ data class ServiceComponent(
     }
 
     override val name: String = hsaId
+
     //override val itemType = ItemType.COMPONENT
     override val searchField = "$name $description"
 
@@ -129,20 +130,19 @@ data class ServiceComponent(
             getAsyncTpDb(type) { response ->
                 println("Size of response is: ${response.length}")
                 val json = Json(JsonConfiguration.Stable)
-                val serviceComponents: List<ServiceComponent> =
-                    json.parse(ServiceComponent.serializer().list, response)
+                json.parse(ServiceComponent.serializer().list, response)
 
                 isLoaded = true
-                callback
+                callback()
             }
         }
     }
 }
 
 data class LogicalAddress constructor(
-    override val id: Int,
-    override val name: String,
-    override val description: String
+        override val id: Int,
+        override val name: String,
+        override val description: String
 ) : BaseItem() {
 
     init {
@@ -161,9 +161,9 @@ data class LogicalAddress constructor(
         fun load(callback: () -> Unit) {
             @Serializable
             data class LogicalAddressJsonParse constructor(
-                val id: Int,
-                val logicalAddress: String,
-                val description: String
+                    val id: Int,
+                    val logicalAddress: String,
+                    val description: String
             )
 
             val type = "logicalAddress"
@@ -180,11 +180,11 @@ data class LogicalAddress constructor(
 }
 
 data class ServiceContract(
-    override val id: Int,
-    val serviceDomainId: Int,
-    override val name: String,
-    val namespace: String,
-    val major: Int
+        override val id: Int,
+        val serviceDomainId: Int,
+        override val name: String,
+        val namespace: String,
+        val major: Int
 ) : BaseItem() {
     private val domain: ServiceDomain?
 
@@ -194,6 +194,7 @@ data class ServiceContract(
     }
 
     override var searchField: String = namespace
+
     //override val itemType = ItemType.CONTRACT
     override val description = "$name v$major"
 
@@ -207,11 +208,11 @@ data class ServiceContract(
         fun load(callback: () -> Unit) {
             @Serializable
             data class ServiceContractJsonParse(
-                val id: Int,
-                val serviceDomainId: Int,
-                val name: String,
-                val namespace: String,
-                val major: Int
+                    val id: Int,
+                    val serviceDomainId: Int,
+                    val name: String,
+                    val namespace: String,
+                    val major: Int
             )
 
             val type = "contracts"
@@ -284,7 +285,7 @@ data class ServiceDomain(override val id: Int, override val name: String) : Base
 }
 
 data class Plattform(override val id: Int, val platform: String, val environment: String, val snapshotTime: String) :
-    BaseItem() {
+        BaseItem() {
     //override val itemType = ItemType.PLATTFORM
     override val name: String = "$platform-$environment"
     override val description = ""
@@ -302,10 +303,10 @@ data class Plattform(override val id: Int, val platform: String, val environment
         fun load(callback: () -> Unit) {
             @Serializable
             data class PlattformJsonParse(
-                val id: Int,
-                val platform: String,
-                val environment: String,
-                val snapshotTime: String
+                    val id: Int,
+                    val platform: String,
+                    val environment: String,
+                    val snapshotTime: String
             )
 
             val type = "plattforms"
@@ -325,6 +326,7 @@ data class Plattform(override val id: Int, val platform: String, val environment
 data class PlattformChain(val first: Int, val middle: Int?, val last: Int) : BaseItem() {
 
     private val firstPlattform = Plattform.map[first]
+
     //private val middlePlattform = Plattform.map[middle]
     private val lastPlattform = Plattform.map[last]
 

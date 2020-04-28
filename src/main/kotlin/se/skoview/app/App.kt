@@ -29,11 +29,12 @@ import se.skoview.view.HippoTablePage
 import se.skoview.view.setUrlFilter
 import kotlin.browser.window
 
-// Urbans puckar
+// UJ kommentarer:
 // done: Sidan är större än tidigare version – måste bli lika bred som tidigare version.
 // done: Texterna inom rutorna ligger för nära ramarna.
 // done: Felstavningar i ”Om hippo”, ändra ”hippo” till ”Hippo”.
-// todo: "Återställ tjänsteplattform(ar)" bör flyttas ned någon centimeter.
+// todo: Varför poppar rutan ”SLL statistiktjänst” upp – finns väl ingen anledning till det.
+// done: ”Återställ tjänsteplattform(ar)” bör flyttas ned någon centimeter.
 
 // todo: Check link to statistics
 // todo: Show messages to user

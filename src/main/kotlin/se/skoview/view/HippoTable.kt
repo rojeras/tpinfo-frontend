@@ -87,7 +87,7 @@ object HippoTablePage : SimplePanel() {
             spacing = 5
         ) {
             clear = Clear.BOTH
-            margin = 0.px
+            margin = 5.px
             background = Background(hex(0xf6efe9))
 
             // Select date
@@ -110,7 +110,6 @@ object HippoTablePage : SimplePanel() {
                     }
                 }
             }
-
 
             // Statistics button
             div {
@@ -156,6 +155,8 @@ object HippoTablePage : SimplePanel() {
 
         // The whole item table
         hPanel {
+            //margin = 5.px
+            //marginRight = 25.px
             background = Background(hex(0xffffff))
 
             add(HippoItemsView(ItemType.CONSUMER, "Tjänstekonsumenter"))
@@ -170,8 +171,8 @@ object HippoTablePage : SimplePanel() {
 class HippoItemsView(type: ItemType, heading: String, bredd: Int = 20) : VPanel() {
     init {
 
-        width = (bredd - 0.5).vw
-        margin = 3.px
+        width = (bredd-0.5).vw
+        margin = (0.3).vw
 
         // Render the search field
         val textSearchInfo = TextSearchInfo()
@@ -218,7 +219,7 @@ class HippoItemsView(type: ItemType, heading: String, bredd: Int = 20) : VPanel(
                     vList = state.vLogicalAddresses
                     maxCounter = state.maxCounters.logicalAddress
                     maxNoItems = state.vLogicalAddressesMax
-                    marginRight = 10.px
+                    //marginRight = 10.px
                 }
                 ItemType.CONTRACT -> {
                     vList = state.vDomainsAndContracts
@@ -266,6 +267,7 @@ class HippoItemsView(type: ItemType, heading: String, bredd: Int = 20) : VPanel(
                                     classes = setOf("pointer"),
                                     rich = true
                                 ) {
+                                    margin = 5.px
                                     wordBreak = WordBreak.BREAKALL
                                     margin = 5.px
 
@@ -365,6 +367,7 @@ private fun Div.insertResetButton(item: BaseItem, type: ItemType) {
     }
     div {
         button(buttonText, style = ButtonStyle.PRIMARY) {
+            marginTop = 20.px
             width = 100.perc
             background = Background(Color.name(Col.GRAY))
             onClick {
@@ -388,7 +391,7 @@ private fun Container.showMoreItemsButton(type: ItemType, size: Int, maxItemsToS
                 width = 100.perc
                 background = Background(Color.name(Col.GRAY))
                 onClick {
-                    store.dispatch { dispatch, getState ->
+                    store.dispatch { dispatch, _ ->
                         dispatch(HippoAction.SetVMax(type, actualLinesToShow))
 
                     }
