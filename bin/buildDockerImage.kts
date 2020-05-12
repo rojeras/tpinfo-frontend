@@ -121,7 +121,7 @@ println("Unzip")
 lExec("unzip -d $zipDirName $buildZipFile", quiet = true)
 
 // Append version info as comment at end of index.html
-File(indexHtmlFile).appendText(versionInfo)
+//File(indexHtmlFile).appendText(versionInfo)
 
 // Edit index.html and include correct version info (stored in gitDescribe variable)
 val file = File(indexHtmlFile)
@@ -129,11 +129,13 @@ val tempFile = createTempFile()
 val regex = Regex("""<meta id="hippoVersion" content="0.0.0">""")
 tempFile.printWriter().use { writer ->
     file.forEachLine { line ->
+        println(line)
         writer.println(when {
-            regex.matches(line) -> """<meta id="hippoVersion" content="$gitDescribe">"""
+            regex.matches(line.trim()) -> """<meta id="hippoVersion" content="$gitDescribe">"""
             else -> line
         })
     }
+    writer.print(versionInfo)
 }
 check(file.delete() && tempFile.renameTo(file)) { "failed to replace file" }
 // ------------------------------------------------------------------------------
