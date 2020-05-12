@@ -101,7 +101,7 @@ val versionInfo = """
     <!--
     Build information
     -----------------
-    Build:      $gitDescribe
+    Version:    $gitDescribe
     Build time: $dateTime
     Git branch: $gitBranch
     Git hash:   $gitHash
@@ -120,7 +120,23 @@ File(zipDirName).walkBottomUp().forEach {
 println("Unzip")
 lExec("unzip -d $zipDirName $buildZipFile", quiet = true)
 
+// Append version info as comment at end of index.html
 File(indexHtmlFile).appendText(versionInfo)
+
+// Edit index.html and include correct version info (stored in gitDescribe variable)
+val file = File(indexHtmlFile)
+val tempFile = createTempFile()
+val regex = Regex("""<meta id="hippoVersion" content="0.0.0">""")
+tempFile.printWriter().use { writer ->
+    file.forEachLine { line ->
+        writer.println(when {
+            regex.matches(line) -> """<meta id="hippoVersion" content="$gitDescribe">"""
+            else -> line
+        })
+    }
+}
+check(file.delete() && tempFile.renameTo(file)) { "failed to replace file" }
+// ------------------------------------------------------------------------------
 
 lExec("docker build --rm -t $localImageTag .", quiet = false)
 

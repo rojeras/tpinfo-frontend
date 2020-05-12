@@ -24,10 +24,13 @@ import pl.treksoft.kvision.redux.createReduxStore
 import pl.treksoft.kvision.require
 import pl.treksoft.kvision.startApplication
 import pl.treksoft.kvision.utils.perc
-import se.skoview.data.*
+import se.skoview.data.getInitialState
+import se.skoview.data.hippoReducer
+import se.skoview.data.loadBaseItems
 import se.skoview.view.HippoTablePage
 import se.skoview.view.setUrlFilter
 import kotlin.browser.window
+
 
 // UJ kommentarer:
 // done: Sidan är större än tidigare version – måste bli lika bred som tidigare version.
@@ -111,7 +114,6 @@ class App : Application() {
         }
 
         println("Executing on: ${window.location.hostname}")
-
         // A listener that sets the URL after each state change
         store.subscribe { state ->
             setUrlFilter(state)

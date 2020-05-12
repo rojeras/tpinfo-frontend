@@ -35,6 +35,7 @@ import pl.treksoft.kvision.utils.px
 import pl.treksoft.kvision.utils.vw
 import se.skoview.app.store
 import se.skoview.data.*
+import se.skoview.lib.getVersion
 import kotlin.browser.document
 import kotlin.browser.window
 import kotlin.math.min
@@ -143,7 +144,7 @@ object HippoTablePage : SimplePanel() {
                 modal.addButton(Button("Stäng").onClick {
                     modal.hide()
                 })
-                button("Om Hippo", style = ButtonStyle.INFO).onClick {
+                button("Om Hippo ${getVersion("hippoVersion")}", style = ButtonStyle.INFO).onClick {
                     size = ButtonSize.SMALL
                     modal.show()
                 }.apply {

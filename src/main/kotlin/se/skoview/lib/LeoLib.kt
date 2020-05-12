@@ -16,18 +16,10 @@
  */
 package se.skoview.lib
 
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
 import org.w3c.xhr.XMLHttpRequest
-import pl.treksoft.kvision.core.Color
-import pl.treksoft.kvision.rest.RestClient
-import se.skoview.data.BaseItem
+import kotlin.browser.document
 import kotlin.browser.window
 import kotlin.js.Date
-import kotlin.math.absoluteValue
-
 
 fun getAsync(url: String, callback: (String) -> Unit) {
     console.log("getAsync(): URL: $url")
@@ -120,12 +112,14 @@ fun getDatesLastMonth(): Pair<Date, Date> {
 
     return Pair(firstDay, Date(lastDay))
 }
-/*
-fun getColorForObject(obj: Any): Color {
-    val cValue = obj.hashCode().absoluteValue
-    val fValue = cValue.toDouble() / Int.MAX_VALUE.toDouble()
-    val col = (fValue * 256 * 256 * 256 - 1).toInt()
-    //return Color(col)
-    return Color(col)
+
+fun getVersion(versionName: String = "hippoVersion"): String {
+    val versionElement = document.getElementById(versionName)
+
+    val version =
+    if (versionElement != null) versionElement.getAttribute("content") ?: "-1.-1.-1"
+    else "-2.-2.-2"
+
+    return version
 }
-*/
+
