@@ -110,7 +110,8 @@ val versionInfo = """
 
 File("versionInfo.txt").writeText(versionInfo)
 // -------------------------------------------------------------------------------------------
-if (Largument.isSet("clean")) lExec("./gradlew clean")
+// If the image is to be pushed (QA/Production) then we should always do a "git clean"
+if (Largument.isSet("clean") || Largument.isSet("push")) lExec("./gradlew clean")
 
 lExec("./gradlew zip")
 File(zipDirName).walkBottomUp().forEach {
