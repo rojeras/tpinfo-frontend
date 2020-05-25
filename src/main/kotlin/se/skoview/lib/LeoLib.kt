@@ -17,9 +17,11 @@
 package se.skoview.lib
 
 import org.w3c.xhr.XMLHttpRequest
+import pl.treksoft.kvision.core.Color
 import kotlin.browser.document
 import kotlin.browser.window
 import kotlin.js.Date
+import kotlin.math.absoluteValue
 
 fun getAsync(url: String, callback: (String) -> Unit) {
     console.log("getAsync(): URL: $url")
@@ -123,3 +125,9 @@ fun getVersion(versionName: String = "hippoVersion"): String {
     return version
 }
 
+fun getColorForObject(obj: Any): Color {
+    val cValue = obj.hashCode().absoluteValue
+    val fValue = cValue.toDouble() / Int.MAX_VALUE.toDouble()
+    val col = (fValue * 256 * 256 * 256 - 1).toInt()
+    return Color.hex(col)
+}

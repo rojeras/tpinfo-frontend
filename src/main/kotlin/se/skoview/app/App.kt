@@ -17,18 +17,23 @@
 package se.skoview.app
 
 import pl.treksoft.kvision.Application
+import pl.treksoft.kvision.core.Border
+import pl.treksoft.kvision.core.BorderStyle
+import pl.treksoft.kvision.core.Col
 import pl.treksoft.kvision.pace.Pace
 import pl.treksoft.kvision.panel.root
+import pl.treksoft.kvision.panel.tabPanel
 import pl.treksoft.kvision.panel.vPanel
 import pl.treksoft.kvision.redux.createReduxStore
 import pl.treksoft.kvision.require
 import pl.treksoft.kvision.startApplication
+import pl.treksoft.kvision.utils.auto
 import pl.treksoft.kvision.utils.perc
+import pl.treksoft.kvision.utils.px
 import se.skoview.data.getInitialState
 import se.skoview.data.hippoReducer
 import se.skoview.data.loadBaseItems
-import se.skoview.view.HippoTablePage
-import se.skoview.view.setUrlFilter
+import se.skoview.view.*
 import kotlin.browser.window
 
 
@@ -36,7 +41,7 @@ import kotlin.browser.window
 // done: Sidan är större än tidigare version – måste bli lika bred som tidigare version.
 // done: Texterna inom rutorna ligger för nära ramarna.
 // done: Felstavningar i ”Om hippo”, ändra ”hippo” till ”Hippo”.
-// todo: Varför poppar rutan ”SLL statistiktjänst” upp – finns väl ingen anledning till det.
+// done: Varför poppar rutan ”SLL statistiktjänst” upp – finns väl ingen anledning till det.
 // done: ”Återställ tjänsteplattform(ar)” bör flyttas ned någon centimeter.
 
 // todo: Check link to statistics
@@ -105,12 +110,26 @@ class App : Application() {
 
         root("hippo") {
 
+            tabPanel(scrollableTabs = true) {
+                width = 90.perc
+                margin = 20.px
+                marginLeft = auto
+                marginRight = auto
+                padding = 20.px
+                //border = Border(2.px, BorderStyle.SOLID, Col.SILVER)
+                //addTab("Hippo7", HippoTablePage(), "fa-table", route = "/hippo")
+                addTab("Statistik7", StatPage(), "fa-chart", route = "/stat")
+            }.apply { width = 100.perc }
+
+            /*
             vPanel {
-                add(HippoTablePage)
+                //add(HippoTablePage)
                 //add(StatTablePage)
+                //add(StatPage)
             }.apply {
                 width = 100.perc
             }
+            */
         }
 
         println("Executing on: ${window.location.hostname}")
@@ -123,4 +142,3 @@ class App : Application() {
         loadBaseItems(store)
     }
 }
-

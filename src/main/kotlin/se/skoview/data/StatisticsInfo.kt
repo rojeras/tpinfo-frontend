@@ -27,12 +27,25 @@ fun loadStatistics(state: HippoState) {
     val parameters = "statistics$urlParameters"
 
     // todo: Clean away this fakes instansiation. Needed to be able to use the var in the final dispatch.
-    var statisticsCache = StatisticsCache("dummy", mapOf(), mapOf(), mapOf(), mapOf(), mapOf())
+    //var statisticsCache = StatisticsCache(parameters, mapOf(), mapOf(), mapOf(), mapOf(), mapOf())
 
     // Check if the statistics info is available in the cache
     if (StatisticsCache.map.containsKey(parameters)) {
         println("Statistics found in cache")
-        statisticsCache = StatisticsCache.map[parameters]!!
+        val statisticsCache = StatisticsCache.map[parameters]!!
+
+        store.dispatch { _, getState ->
+            store.dispatch(
+                HippoAction.DoneDownloadStatistics(
+                    statisticsCache.callsConsumer,
+                    statisticsCache.callsProducer,
+                    statisticsCache.callsLogicalAddress,
+                    statisticsCache.callsDomain,
+                    statisticsCache.callsContract
+                )
+            )
+            createViewData(getState())
+        }
     } else {
         println(">>> Statistics data NOT found in cache - will download")
         console.log(parameters)
@@ -58,7 +71,7 @@ fun loadStatistics(state: HippoState) {
             }
             println("Number of statistics records: ${statisticsArrArr.size}")
 
-            statisticsCache = StatisticsCache(
+            val statisticsCache = StatisticsCache(
                 parameters,
                 ackConsumerMap,
                 ackProducerMap,
@@ -66,20 +79,22 @@ fun loadStatistics(state: HippoState) {
                 ackDomainMap,
                 ackContractMap
             )
+
+            store.dispatch { _, getState ->
+                store.dispatch(
+                    HippoAction.DoneDownloadStatistics(
+                        statisticsCache.callsConsumer,
+                        statisticsCache.callsProducer,
+                        statisticsCache.callsLogicalAddress,
+                        statisticsCache.callsDomain,
+                        statisticsCache.callsContract
+                    )
+                )
+                createViewData(getState())
+            }
         }
     }
-    store.dispatch { _, getState ->
-        store.dispatch(
-            HippoAction.DoneDownloadStatistics(
-                statisticsCache.callsConsumer,
-                statisticsCache.callsProducer,
-                statisticsCache.callsLogicalAddress,
-                statisticsCache.callsDomain,
-                statisticsCache.callsContract
-            )
-        )
-        createViewData(getState())
-    }
+
 }
 
 private fun updateCallsArr(callsArr: MutableMap<Int, Int>, itemId: Int, calls: Int) {
