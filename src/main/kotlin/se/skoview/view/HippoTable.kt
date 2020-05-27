@@ -158,13 +158,18 @@ object HippoTablePage : SimplePanel() {
         hPanel {
             //margin = 5.px
             //marginRight = 25.px
+
+            position = Position.ABSOLUTE
+            width = 100.perc
+            overflow = Overflow.AUTO
+
             background = Background(hex(0xffffff))
 
-            add(HippoItemsView(ItemType.CONSUMER, "Tjänstekonsumenter"))
-            add(HippoItemsView(ItemType.CONTRACT, "Tjänstekontrakt"))
+            add(HippoItemsView(ItemType.CONSUMER, "Tjänstekonsumenter", 20))
+            add(HippoItemsView(ItemType.CONTRACT, "Tjänstekontrakt", 20))
             add(HippoItemsView(ItemType.PLATTFORM_CHAIN, "Tjänsteplattformar", 19))
-            add(HippoItemsView(ItemType.PRODUCER, "Tjänsteproducenter"))
-            add(HippoItemsView(ItemType.LOGICAL_ADDRESS, "Logiska adresser"))
+            add(HippoItemsView(ItemType.PRODUCER, "Tjänsteproducenter", 20))
+            add(HippoItemsView(ItemType.LOGICAL_ADDRESS, "Logiska adresser", 20))
         }
     }
 }

@@ -110,6 +110,7 @@ class App : Application() {
 
         root("hippo") {
 
+            /*
             tabPanel(scrollableTabs = true) {
                 width = 90.perc
                 margin = 20.px
@@ -120,16 +121,16 @@ class App : Application() {
                 //addTab("Hippo7", HippoTablePage(), "fa-table", route = "/hippo")
                 addTab("Statistik7", StatPage(), "fa-chart", route = "/stat")
             }.apply { width = 100.perc }
+            */
 
-            /*
             vPanel {
-                //add(HippoTablePage)
+                add(HippoTablePage)
                 //add(StatTablePage)
                 //add(StatPage)
             }.apply {
                 width = 100.perc
             }
-            */
+
         }
 
         println("Executing on: ${window.location.hostname}")
