@@ -157,13 +157,15 @@ object HippoTablePage : SimplePanel() {
         // The whole item table
         hPanel {
             //margin = 5.px
-            //marginRight = 25.px
 
             position = Position.ABSOLUTE
             width = 100.perc
             overflow = Overflow.AUTO
 
+            //marginRight = 24.px
+
             background = Background(hex(0xffffff))
+            //background = Background(hex(0xff0000))
 
             add(HippoItemsView(ItemType.CONSUMER, "Tjänstekonsumenter", 20))
             add(HippoItemsView(ItemType.CONTRACT, "Tjänstekontrakt", 20))
@@ -225,7 +227,7 @@ class HippoItemsView(type: ItemType, heading: String, bredd: Int = 20) : VPanel(
                     vList = state.vLogicalAddresses
                     maxCounter = state.maxCounters.logicalAddress
                     maxNoItems = state.vLogicalAddressesMax
-                    //marginRight = 10.px
+                    marginRight = 10.px
                 }
                 ItemType.CONTRACT -> {
                     vList = state.vDomainsAndContracts
@@ -329,7 +331,10 @@ private fun Container.searchField(type: ItemType, textSearchInfo: TextSearchInfo
         when (type) {
             ItemType.CONSUMER -> placeholder = "Sök tjänstekonsument..."
             ItemType.CONTRACT -> placeholder = "Sök tjänstekontrakt/domän..."
-            ItemType.LOGICAL_ADDRESS -> placeholder = "Sök logisk adress..."
+            ItemType.LOGICAL_ADDRESS -> {
+                //marginRight = 20.px
+                placeholder = "Sök logisk adress..."
+            }
             ItemType.PRODUCER -> placeholder = "Sök tjänsteproducent..."
             ItemType.PLATTFORM_CHAIN -> placeholder = "Sök tjänsteplattform(ar)..."
             else -> placeholder == "Internal error in searchField()"
