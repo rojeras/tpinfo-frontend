@@ -105,7 +105,8 @@ object HippoTablePage : SimplePanel() {
                 }.onEvent {
                     change = {
                         store.dispatch { dispatch, getState ->
-                            dispatch(HippoAction.DateSelected(DateType.EFFECTIVE, self.value ?: ""))
+                            //dispatch(HippoAction.DateSelected(DateType.EFFECTIaE, self.value ?: ""))
+                            dispatch(HippoAction.DateSelected(DateType.EFFECTIVE_AND_END, self.value ?: ""))
                             loadIntegrations(getState())
                         }
                     }

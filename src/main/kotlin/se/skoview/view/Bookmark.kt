@@ -82,6 +82,8 @@ fun HippoState.getBookmark(): String {
         bookmark += "S" + date2DaysSinceEpoch(this.dateEffective)
         bookmark += "E" + date2DaysSinceEpoch(this.dateEnd)
     }
+    println("dateEnd=${this.dateEnd}")
+    println("updateDates[0]=${this.updateDates[0]}")
 
     // Separate plattforms now stored in filter, not the chain
     for (pcId in this.selectedPlattformChains) {

@@ -44,6 +44,8 @@ import kotlin.browser.window
 // done: Varför poppar rutan ”SLL statistiktjänst” upp – finns väl ingen anledning till det.
 // done: ”Återställ tjänsteplattform(ar)” bör flyttas ned någon centimeter.
 
+// todo: Bug: Selected dates not included in URL filter
+// todo: Opera does not add any filter to URL, remove its mention in index.html
 // todo: Check link to statistics
 // todo: Show messages to user
 // todo: Make it possible to participate in discussion, maybe through slack channel
@@ -54,15 +56,15 @@ import kotlin.browser.window
 // todo: Lägg till möjlighet att enkelt visa ett meddelande till användaren vid uppstart
 // todo: Skriv ut versionsnummer på sidan
 // todo: Verifiera att zip bygger en produktionsversion
-// todo: Visa antal användare sensate 24 timmarna
+// todo: Visa antal användare senaste 24 timmarna
 // todo: Lägg in stöd för Navigo routing
 // todo: Börja använda Karma och enhetstester
 // todo: Lös detta med att visa SE för vägval
 // todo: Tag fram mock för hur integrationer ska presenteras där det kan finnas flera LA
 // todo: Lös trädklättringen, kanske mha HSA-trädet
 // todo: Titta på Tabulator igen
-// todo: Fritextsökningen måste snabbas upp
 
+// done: Fritextsökningen måste snabbas upp
 // done: Addera licensinformationen
 // done: Fixa BASEURL så att den inte är hårdkodad mot tpinfo-a
 // done: Fixa så det går att kopiera text utan att itemet väljs bort
