@@ -30,9 +30,7 @@ import pl.treksoft.kvision.startApplication
 import pl.treksoft.kvision.utils.auto
 import pl.treksoft.kvision.utils.perc
 import pl.treksoft.kvision.utils.px
-import se.skoview.data.getInitialState
-import se.skoview.data.hippoReducer
-import se.skoview.data.loadBaseItems
+import se.skoview.data.*
 import se.skoview.view.*
 import kotlin.browser.window
 
@@ -110,31 +108,6 @@ class App : Application() {
 
     override fun start() {
 
-        root("hippo") {
-
-            /*
-            tabPanel(scrollableTabs = true) {
-                width = 90.perc
-                margin = 20.px
-                marginLeft = auto
-                marginRight = auto
-                padding = 20.px
-                //border = Border(2.px, BorderStyle.SOLID, Col.SILVER)
-                //addTab("Hippo7", HippoTablePage(), "fa-table", route = "/hippo")
-                addTab("Statistik7", StatPage(), "fa-chart", route = "/stat")
-            }.apply { width = 100.perc }
-            */
-
-            vPanel {
-                add(HippoTablePage)
-                //add(StatTablePage)
-                //add(StatPage)
-            }.apply {
-                width = 100.perc
-            }
-
-        }
-
         println("Executing on: ${window.location.hostname}")
         // A listener that sets the URL after each state change
         store.subscribe { state ->
@@ -143,5 +116,37 @@ class App : Application() {
 
         Pace.init()
         loadBaseItems(store)
+        store.subscribe { state ->
+            if (state.currentAction == HippoAction.DoneDownloadBaseItems::class) {
+                startHippo()
+                //startStat()
+            }
+        }
     }
+
+    fun startHippo() {
+        loadIntegrations(store.getState())
+        root("hippo") {
+            vPanel {
+                //add(HippoTablePage)
+                add(HippoTablePage)
+            }.apply {
+                width = 100.perc
+            }
+
+        }
+    }
+
+    fun startStat() {
+        loadStatistics(store.getState())
+        root("hippo") {
+            vPanel {
+                add(StatPage)
+            }.apply {
+                width = 100.perc
+            }
+
+        }
+    }
+
 }

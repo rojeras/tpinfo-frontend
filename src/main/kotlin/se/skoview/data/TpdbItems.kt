@@ -16,6 +16,7 @@
  */
 package se.skoview.data
 
+import kotlinx.serialization.PrimitiveKind
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonConfiguration
@@ -39,18 +40,14 @@ fun loadBaseItems(store: ReduxStore<HippoState, HippoAction>) {
 
 fun areAllBaseItemsLoaded(store: ReduxStore<HippoState, HippoAction>) {
     if (LogicalAddress.isLoaded &&
-            PlattformChain.isLoaded &&
-            Plattform.isLoaded &&
-            ServiceComponent.isLoaded &&
-            ServiceContract.isLoaded &&
-            ServiceDomain.isLoaded &&
-            BaseDates.isLoaded
+        PlattformChain.isLoaded &&
+        Plattform.isLoaded &&
+        ServiceComponent.isLoaded &&
+        ServiceContract.isLoaded &&
+        ServiceDomain.isLoaded &&
+        BaseDates.isLoaded
     )
-        store.dispatch { _, getState ->
-            store.dispatch(HippoAction.DoneDownloadBaseItems)
-            loadIntegrations(getState())
-            //loadStatistics(getState())
-        }
+        store.dispatch(HippoAction.DoneDownloadBaseItems)
 }
 
 abstract class BaseItem {
@@ -90,10 +87,10 @@ object BaseDates {
 
 @Serializable
 data class ServiceComponent(
-        override val id: Int = -1,
-        override val hsaId: String = "",
-        override val description: String = "",
-        val synonym: String? = null
+    override val id: Int = -1,
+    override val hsaId: String = "",
+    override val description: String = "",
+    val synonym: String? = null
 ) : BaseItem() {
 
     init {
@@ -140,9 +137,9 @@ data class ServiceComponent(
 }
 
 data class LogicalAddress constructor(
-        override val id: Int,
-        override val name: String,
-        override val description: String
+    override val id: Int,
+    override val name: String,
+    override val description: String
 ) : BaseItem() {
 
     init {
@@ -161,9 +158,9 @@ data class LogicalAddress constructor(
         fun load(callback: () -> Unit) {
             @Serializable
             data class LogicalAddressJsonParse constructor(
-                    val id: Int,
-                    val logicalAddress: String,
-                    val description: String
+                val id: Int,
+                val logicalAddress: String,
+                val description: String
             )
 
             val type = "logicalAddress"
@@ -180,11 +177,11 @@ data class LogicalAddress constructor(
 }
 
 data class ServiceContract(
-        override val id: Int,
-        val serviceDomainId: Int,
-        override val name: String,
-        val namespace: String,
-        val major: Int
+    override val id: Int,
+    val serviceDomainId: Int,
+    override val name: String,
+    val namespace: String,
+    val major: Int
 ) : BaseItem() {
     private val domain: ServiceDomain?
 
@@ -208,11 +205,11 @@ data class ServiceContract(
         fun load(callback: () -> Unit) {
             @Serializable
             data class ServiceContractJsonParse(
-                    val id: Int,
-                    val serviceDomainId: Int,
-                    val name: String,
-                    val namespace: String,
-                    val major: Int
+                val id: Int,
+                val serviceDomainId: Int,
+                val name: String,
+                val namespace: String,
+                val major: Int
             )
 
             val type = "contracts"
@@ -285,7 +282,7 @@ data class ServiceDomain(override val id: Int, override val name: String) : Base
 }
 
 data class Plattform(override val id: Int, val platform: String, val environment: String, val snapshotTime: String) :
-        BaseItem() {
+    BaseItem() {
     //override val itemType = ItemType.PLATTFORM
     override val name: String = "$platform-$environment"
     override val description = ""
@@ -303,10 +300,10 @@ data class Plattform(override val id: Int, val platform: String, val environment
         fun load(callback: () -> Unit) {
             @Serializable
             data class PlattformJsonParse(
-                    val id: Int,
-                    val platform: String,
-                    val environment: String,
-                    val snapshotTime: String
+                val id: Int,
+                val platform: String,
+                val environment: String,
+                val snapshotTime: String
             )
 
             val type = "plattforms"

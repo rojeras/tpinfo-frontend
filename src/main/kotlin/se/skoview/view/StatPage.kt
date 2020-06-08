@@ -23,7 +23,6 @@ import pl.treksoft.kvision.utils.*
 import se.skoview.app.store
 import se.skoview.data.*
 import se.skoview.lib.getColorForObject
-import kotlin.browser.window
 
 object StatPage : SimplePanel() {
 
@@ -34,19 +33,19 @@ object StatPage : SimplePanel() {
     val logicalAddressChart: Chart
     val contractChart: Chart
 
-    fun getChartConfigConsumer(): Configuration {
+    private fun getChartConfigConsumer(): Configuration {
         return getChartConfig(ItemType.CONSUMER, SInfo.consumerSInfoList)
     }
 
-    fun getChartConfigProducer(): Configuration {
+    private fun getChartConfigProducer(): Configuration {
         return getChartConfig(ItemType.PRODUCER, SInfo.producerSInfoList)
     }
 
-    fun getChartConfigLogicalAddress(): Configuration {
+    private fun getChartConfigLogicalAddress(): Configuration {
         return getChartConfig(ItemType.LOGICAL_ADDRESS, SInfo.logicalAddressSInfoList)
     }
 
-    fun getChartConfigContract(): Configuration {
+    private fun getChartConfigContract(): Configuration {
         return getChartConfig(ItemType.CONTRACT, SInfo.contractSInfoList)
     }
 
@@ -172,6 +171,7 @@ object StatPage : SimplePanel() {
                     listOf(),
                     setOf(TableType.BORDERED, TableType.SMALL)
                 ) {
+                    // Star tdate
                     row {
                         cell { +"Startdatum:" }
                         cell {
@@ -191,6 +191,7 @@ object StatPage : SimplePanel() {
                             }
                         }
                     }
+                    // End date
                     row {
                         cell { +"Slutdatum:" }
                         cell {
@@ -210,19 +211,23 @@ object StatPage : SimplePanel() {
                             }
                         }
                     }
+                    // Select TP
                     row {
                         cell { +"Visa:" }
                         cell {
                             simpleSelectInput(
-                                options = listOf("RTP Prod").map { Pair(it, it) },
+                                //options = listOf("RTP Prod", "RTP QA").map { Pair(it, it) },
+                                options = listOf(Pair("3", "RTP Prod"), Pair("4", "RTP QA") ) ,
                                 value = state.dateEnd
                             ) {
                                 addCssStyle(formControlXs)
                                 background = Background(Color.name(Col.WHITE))
                             }.onEvent {
                                 change = {
+                                    val selectedTp = (self.value ?: "").toInt()
+                                    val pChain = PlattformChain.calculateId(first = selectedTp, middle = null, last = selectedTp)
                                     store.dispatch { dispatch, getState ->
-                                        dispatch(HippoAction.DateSelected(DateType.END, self.value ?: ""))
+                                        dispatch(HippoAction.ItemSelected(ItemType.PLATTFORM_CHAIN, PlattformChain.map[pChain]!!))
                                         loadStatistics(getState())
                                     }
                                 }
@@ -237,7 +242,7 @@ object StatPage : SimplePanel() {
             div {
                 //background = Background(Col.LIGHTSKYBLUE)
                 align = Align.RIGHT
-                val modal = Modal("Om hippo")
+                val modal = Modal("Om Statistikfunktionen")
                 modal.iframe(src = "about.html", iframeHeight = 400, iframeWidth = 700)
                 modal.size = ModalSize.LARGE
                 //modal.add(H(require("img/dog.jpg")))
@@ -265,6 +270,7 @@ object StatPage : SimplePanel() {
                 vPanel() {
 
                     add(consumerChart)
+                    console.log(SInfo.consumerSInfoList)
                     add(
                         ChartLabelTable(
                             ItemType.CONSUMER,
