@@ -28,6 +28,7 @@ import pl.treksoft.kvision.html.*
 import pl.treksoft.kvision.modal.Modal
 import pl.treksoft.kvision.modal.ModalSize
 import pl.treksoft.kvision.panel.*
+import pl.treksoft.kvision.state.bind
 import pl.treksoft.kvision.state.observableListOf
 import pl.treksoft.kvision.state.stateBinding
 import pl.treksoft.kvision.utils.perc
@@ -95,7 +96,7 @@ object HippoTablePage : SimplePanel() {
 
             div {
                 align = Align.LEFT
-            }.stateBinding(store) { state ->
+            }.bind(store) { state ->
                 simpleSelectInput(
                     options = state.updateDates.sortedByDescending { it }.map { Pair(it, it) },
                     value = state.dateEffective
@@ -117,7 +118,7 @@ object HippoTablePage : SimplePanel() {
             div {
                 align = Align.CENTER
                 //background = Background(Col.LIGHTSTEELBLUE)
-            }.stateBinding(store) { state ->
+            }.bind(store) { state ->
                 val sllRtpProdId = 3
                 val chainId = if (state.vPlattformChains.size == 1) state.vPlattformChains[0].id else -1
                 if (chainId > 0) {
@@ -187,12 +188,12 @@ class HippoItemsView(type: ItemType, heading: String, bredd: Int = 20) : VPanel(
         val textSearchInfo = TextSearchInfo()
         searchField(type, textSearchInfo)
 
-        div {}.stateBinding(store) { state ->
+        div {}.bind(store) { state ->
             if (
                 state.currentAction != HippoAction.ViewUpdated::class &&
                 state.currentAction != HippoAction.SetVMax::class &&
                 state.currentAction != HippoAction.ApplicationStarted::class
-            ) return@stateBinding
+            ) return@bind
 
             if (type == ItemType.CONSUMER) println("Will now render")
 

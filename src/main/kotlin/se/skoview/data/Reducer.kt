@@ -160,6 +160,35 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
                 )
             }
         }
+        is HippoAction.ItemIdSelected -> {
+
+            val id = action.id
+
+            val newList =
+                if (state.isItemSelected(itemType = action.viewType, id = id)) listOf()
+                else listOf(id)
+
+            when (action.viewType) {
+                ItemType.CONSUMER -> state.copy(
+                    selectedConsumers = newList
+                )
+                ItemType.DOMAIN -> state.copy(
+                    selectedDomains = newList
+                )
+                ItemType.CONTRACT -> state.copy(
+                    selectedContracts = newList
+                )
+                ItemType.PLATTFORM_CHAIN -> state.copy(
+                    selectedPlattformChains = newList
+                )
+                ItemType.LOGICAL_ADDRESS -> state.copy(
+                    selectedLogicalAddresses = newList
+                )
+                ItemType.PRODUCER -> state.copy(
+                    selectedProducers = newList
+                )
+            }
+        }
         is HippoAction.SetVMax -> {
             when (action.type) {
                 ItemType.CONSUMER -> state.copy(

@@ -3,6 +3,7 @@ package se.skoview.view
 import com.github.snabbdom._get
 import pl.treksoft.kvision.chart.*
 import pl.treksoft.kvision.core.*
+import pl.treksoft.kvision.core.Position
 import pl.treksoft.kvision.data.BaseDataComponent
 import pl.treksoft.kvision.form.select.simpleSelectInput
 import pl.treksoft.kvision.html.*
@@ -62,6 +63,10 @@ object StatPage : SimplePanel() {
                 onClick = { _, activeElements ->
                     val sliceIx = activeElements[0]._get("_index") as Int
                     val itemId: Int = itemSInfoList.recordList[sliceIx].itemId
+                    store.dispatch { _, getState ->
+                        store.dispatch(HippoAction.ItemIdSelected(itemType, itemId))
+                        loadStatistics(getState())
+                    }
                     //filter.toggle(itemType, itemId)
                     //StatisticsInfo.mkStatisticsInfo(filter) { SInfo.view(it) }
                     "" // This lambda returns Any, which mean the last line must be an expression
@@ -73,25 +78,7 @@ object StatPage : SimplePanel() {
 
     init {
         println("In CharTab():init()")
-        //getDatesLastMonth()
-        // Default date range is "last month"
-        /*
-        val datePair = getDatesLastMonth()
-        filter.setDate(type = ItemType.DATE_EFFECTIVE, date = datePair.first)
-        filter.setDate(type = ItemType.DATE_END, date = datePair.second)
-        filter.dump()
-        //filter.dateEffective = datePair.first
-        //filter.dateEnd = datePair.second
-        val plattformId = 3
-        filter.set(ItemType.PLATTFORM, plattformId)
-
-        StatisticsInfo.mkStatisticsInfo(filter) { SInfo.view(it) }
-        */
-        //loadStatistics(store.getState())
-        //SInfo.view(store.getState())
-
         this.marginTop = 10.px
-
 
 
         //vPanel {
@@ -121,17 +108,15 @@ object StatPage : SimplePanel() {
          */
         //StatTablePage.fontFamily = "Times New Roman"
         // Page header
-        vPanel {
-            div {
-                h2("Antal meddelanden genom SLL:s regionala tjänsteplattform")
-                div("Detaljerad statistik med diagram och möjlighet att ladda ner informationen för egna analyser.")
-            }.apply {
-                //width = 100.perc
-                background = Background(Color.hex(0x113d3d))
-                align = Align.CENTER
-                color = Color.name(Col.WHITE)
-                marginTop = 5.px
-            }
+        div {
+            h2("Antal meddelanden genom SLL:s regionala tjänsteplattform")
+            div("Detaljerad statistik med diagram och möjlighet att ladda ner informationen för egna analyser.")
+        }.apply {
+            //width = 100.perc
+            background = Background(Color.hex(0x113d3d))
+            align = Align.CENTER
+            color = Color.name(Col.WHITE)
+            marginTop = 5.px
         }
 
         // Date selector
@@ -262,80 +247,93 @@ object StatPage : SimplePanel() {
             contractChart.configuration = getChartConfigContract()
         }
 
+        // The whole item table
         hPanel() {
+            //@Suppress("UnsafeCastFromDynamic")
 
-            @Suppress("UnsafeCastFromDynamic")
+            position = Position.ABSOLUTE
+            width = 100.perc
+            overflow = Overflow.AUTO
+            background = Background(Color.hex(0xffffff))
+        }.bind(store) { state ->
+            //hPanel {
+            SInfo.view(state)
+            simplePanel() {
 
-            div {
-                align = Align.LEFT
-                // }.stateBinding(store) { state ->
-            }.bind(store) { state ->
-                //hPanel {
-                SInfo.view(state)
-                vPanel() {
+                add(consumerChart)
+                println("consumerSInfoList:")
+                console.log(SInfo.consumerSInfoList)
 
-                    add(consumerChart)
-                    println("consumerSInfoList:")
-                    console.log(SInfo.consumerSInfoList)
+                add(
+                    ChartLabelTable(
+                        ItemType.CONSUMER,
+                        SInfo.consumerSInfoList.recordList,
+                        "description",
+                        "color",
+                        "calls",
+                        "Tjänstekonsumenter"
 
-                    add(
-                        ChartLabelTable(
-                            ItemType.CONSUMER,
-                            SInfo.consumerSInfoList.recordList,
-                            "description",
-                            "color",
-                            "calls",
-                            "Tjänstekonsumenter"
-
-                        )
                     )
+                )
 
 
-                }
-                /*
-                vPanel {
-                    add(contractChart)
-                    add(
-                        ChartLabelTable(
-                            ItemType.CONTRACT,
-                            SInfo.contractSInfoList.recordList,
-                            "description",
-                            "color",
-                            "calls",
-                            "Tjänstekontrakt"
-                        )
-                    )
-                }
-                vPanel {
-                    add(logicalAddressChart)
-                    add(
-                        ChartLabelTable(
-                            ItemType.LOGICAL_ADDRESS,
-                            SInfo.logicalAddressSInfoList.recordList,
-                            "description",
-                            "color",
-                            "calls",
-                            "Logiska adresser"
-                        )
-                    )
-                }
-
-                vPanel {
-                    add(producerChart)
-                    add(
-                        ChartLabelTable(
-                            ItemType.PRODUCER,
-                            SInfo.producerSInfoList.recordList,
-                            "description",
-                            "color",
-                            "calls",
-                            "Tjänsteproducenter"
-                        )
-                    )
-                }
-                */
-                //}
+            }.apply {
+                width = 24.vw
+                margin = (0.3).vw
             }
+
+            simplePanel {
+                add(contractChart)
+                add(
+                    ChartLabelTable(
+                        ItemType.CONTRACT,
+                        SInfo.contractSInfoList.recordList,
+                        "description",
+                        "color",
+                        "calls",
+                        "Tjänstekontrakt"
+                    )
+                )
+            }.apply {
+                width = 24.vw
+                margin = (0.3).vw
+            }
+
+            simplePanel {
+                add(logicalAddressChart)
+                add(
+                    ChartLabelTable(
+                        ItemType.LOGICAL_ADDRESS,
+                        SInfo.logicalAddressSInfoList.recordList,
+                        "description",
+                        "color",
+                        "calls",
+                        "Logiska adresser"
+                    )
+                )
+            }.apply {
+                width = 24.vw
+                margin = (0.3).vw
+            }
+
+            simplePanel {
+                add(producerChart)
+                add(
+                    ChartLabelTable(
+                        ItemType.PRODUCER,
+                        SInfo.producerSInfoList.recordList,
+                        "description",
+                        "color",
+                        "calls",
+                        "Tjänsteproducenter"
+                    )
+                )
+            }.apply {
+                width = 24.vw
+                margin = (0.3).vw
+            }
+
+            //}
         }
     }
 }
@@ -409,19 +407,11 @@ open class ChartLabelTable(
                     console.log(row)
                     val item = row.getData() as SInfoRecord
                     if (item.calls > -1) {
-                        store.dispatch(HippoAction.ItemSelected(viewType = itemType, ))
-                        /*
-                        val filterType = itemType  //ItemType.CONSUMER
-                val actualType = item.itemType
-                if (actualType == ItemType.DOMAIN) {
-                    filterType = ItemType.DOMAIN
-                }
-                 */
-                        //filter.toggle(filterType, item.itemId)
-                        //val iI = StatisticsInfo.mkStatisticsInfo(filter) { SInfo.view(it) }
-                        //console.log(iI)
+                        store.dispatch { _, getState ->
+                            store.dispatch(HippoAction.ItemIdSelected(itemType, item.itemId))
+                            loadStatistics(getState())
+                        }
                     }
-
                 }
             ),
             types = setOf(TableType.BORDERED, TableType.STRIPED, TableType.HOVER)//,

@@ -49,6 +49,10 @@ sealed class HippoAction : RAction {
         val viewType: ItemType,
         val baseItem: BaseItem
     ) : HippoAction()
+    data class ItemIdSelected(
+        val viewType: ItemType,
+        val id: Int
+    ) : HippoAction()
     data class ViewUpdated(val integrationLists: IntegrationLists) : HippoAction()
     data class SetVMax(val type: ItemType, val size: Int): HippoAction()
 }
