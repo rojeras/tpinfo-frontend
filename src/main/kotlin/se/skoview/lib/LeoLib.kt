@@ -106,8 +106,6 @@ fun getDatesLastMonth(): Pair<Date, Date> {
     }
 
     val firstDay = Date("${yyyy}-${month}-01")
-    println("firstDay: $firstDay")
-    println("firstDay.toISOString(): ${firstDay.toISOString()}")
 
     val lastDate = Date(yyyy, mm, 0)
     val lastDay = "$yyyy-$month-${lastDate.getDate()}"

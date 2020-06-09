@@ -35,7 +35,6 @@ data class BookmarkInformation(
 
 // Let the URL mirror the current state
 fun setUrlFilter(state: HippoState) {
-    val bookmark = state.getBookmark()
     val hostname = window.location.hostname
     val protocol = window.location.protocol
     val port = window.location.port
@@ -44,10 +43,23 @@ fun setUrlFilter(state: HippoState) {
     val portSpec = if (port.isNotEmpty()) ":$port" else ""
     var newUrl = "$protocol//$hostname$portSpec$pathname"
 
-    if (bookmark.length > 1) {
-        newUrl += "?filter=$bookmark"
+
+    val bookmark = state.getBookmark()
+    val filterString =
+        if (bookmark.length > 1) "?filter=$bookmark"
+        else ""
+
+    // And if the current URL contains "app=statistik" then it should be kept (once)
+    val href = window.location.href
+
+    var statString = ""
+    if (href.contains("app=statistik")) {
+        statString =
+            if (filterString.isEmpty()) "?app=statistik"
+            else "&app=statistik"
     }
-    window.history.pushState(newUrl, "hippo-utforska integrationer", newUrl)
+
+    window.history.pushState(newUrl, "hippo-utforska integrationer", newUrl + filterString + statString)
 }
 
 fun HippoState.getBookmark(): String {

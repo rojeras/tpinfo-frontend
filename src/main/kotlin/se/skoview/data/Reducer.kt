@@ -16,19 +16,48 @@
  */
 package se.skoview.data
 
+import se.skoview.app.store
+import se.skoview.data.PlattformChain.Companion.calculateId
+import se.skoview.lib.getDatesLastMonth
+import se.skoview.lib.toSwedishDate
+
 fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
     //println("=====>>> ${action::class}")
     //console.log(state)
     val newState = when (action) {
-        is HippoAction.ApplicationStarted -> state.copy(
-            applicationStarted = true
-        )
+        is HippoAction.ApplicationStarted -> {
+            // If dates not set by URL at startup the default are set here
+            val dEffective: String
+            val dEnd: String
+            val pChainId: List<Int>
+            val app: HippoApplication
+            when (action.App) {
+                HippoApplication.HIPPO -> {
+                    dEffective = if (state.dateEffective == "") BaseDates.integrationDates[0] else state.dateEffective
+                    dEnd = dEffective
+                    pChainId = state.selectedPlattformChains
+                    app = HippoApplication.HIPPO
+                }
+                HippoApplication.STATISTIK -> {
+                    app = HippoApplication.STATISTIK
+                    val datePair = getDatesLastMonth()
+                    dEffective = datePair.first.toSwedishDate()
+                    // todo: Following should not be hard coded like this
+                    pChainId = listOf(calculateId(first = 3, middle = null, last = 3))
+                    dEnd = datePair.second.toSwedishDate()
+                }
+            }
+            state.copy(
+                applicationStarted = app,
+                dateEffective = dEffective,
+                selectedPlattformChains = pChainId,
+                dateEnd = dEnd
+            )
+        }
         is HippoAction.StartDownloadBaseItems -> state.copy(
             downloadBaseItemStatus = AsyncActionStatus.INITIALIZED
         )
         is HippoAction.DoneDownloadBaseItems -> {
-            // If dates not set by URL at startup the default to latest date
-            val newDate = if (state.dateEffective == "") BaseDates.integrationDates[0] else state.dateEffective
 
             state.copy(
                 downloadBaseItemStatus = AsyncActionStatus.COMPLETED,
@@ -39,10 +68,10 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
                 serviceContracts = ServiceContract.map,
                 serviceDomains = ServiceDomain.map,
                 plattforms = Plattform.map,
-                plattformChains = PlattformChain.map,
+                plattformChains = PlattformChain.map
 
-                dateEffective = newDate,
-                dateEnd = newDate
+                //dateEffective = newDate,
+                //dateEnd = newDate
             )
         }
         is HippoAction.ErrorDownloadBaseItems -> state.copy(

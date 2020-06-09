@@ -27,7 +27,7 @@ import se.skoview.view.IntegrationLists
  */
 
 sealed class HippoAction : RAction {
-    object ApplicationStarted : HippoAction()
+    data class ApplicationStarted(val App: HippoApplication) : HippoAction()
     object StartDownloadBaseItems : HippoAction()
     object DoneDownloadBaseItems : HippoAction()
     data class ErrorDownloadBaseItems(val errorMessage: String) : HippoAction()

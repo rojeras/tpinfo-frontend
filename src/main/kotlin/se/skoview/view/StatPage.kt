@@ -10,10 +10,7 @@ import pl.treksoft.kvision.html.Align
 import pl.treksoft.kvision.modal.Modal
 import pl.treksoft.kvision.modal.ModalSize
 import pl.treksoft.kvision.panel.*
-import pl.treksoft.kvision.state.ObservableList
-import pl.treksoft.kvision.state.ObservableListWrapper
-import pl.treksoft.kvision.state.observableListOf
-import pl.treksoft.kvision.state.stateBinding
+import pl.treksoft.kvision.state.*
 import pl.treksoft.kvision.table.TableType
 import pl.treksoft.kvision.table.cell
 import pl.treksoft.kvision.table.row
@@ -90,31 +87,12 @@ object StatPage : SimplePanel() {
 
         StatisticsInfo.mkStatisticsInfo(filter) { SInfo.view(it) }
         */
-        loadStatistics(store.getState())
-        SInfo.view(store.getState())
+        //loadStatistics(store.getState())
+        //SInfo.view(store.getState())
 
         this.marginTop = 10.px
 
-        consumerChart = Chart(getChartConfigConsumer())
-        producerChart = Chart(getChartConfigProducer())
-        logicalAddressChart = Chart(getChartConfigLogicalAddress())
-        contractChart = Chart(getChartConfigContract())
 
-        SInfo.consumerSInfoList.recordList.onUpdate += {
-            consumerChart.configuration = getChartConfigConsumer()
-        }
-
-        SInfo.producerSInfoList.recordList.onUpdate += {
-            producerChart.configuration = getChartConfigProducer()
-        }
-
-        SInfo.logicalAddressSInfoList.recordList.onUpdate += {
-            logicalAddressChart.configuration = getChartConfigLogicalAddress()
-        }
-
-        SInfo.contractSInfoList.recordList.onUpdate += {
-            contractChart.configuration = getChartConfigContract()
-        }
 
         //vPanel {
         //gridPanel( templateColumns = "50% 50%", columnGap = 20, rowGap = 20 ) {
@@ -166,7 +144,8 @@ object StatPage : SimplePanel() {
             background = Background(Color.hex(0xf6efe9))
             div {
                 align = Align.LEFT
-            }.stateBinding(store) { state ->
+                //}.stateBinding(store) { state ->
+            }.bind(store) { state ->
                 table(
                     listOf(),
                     setOf(TableType.BORDERED, TableType.SMALL)
@@ -190,6 +169,32 @@ object StatPage : SimplePanel() {
                                 }
                             }
                         }
+                        cell { +"Plattform:" }
+                        cell {
+                            simpleSelectInput(
+                                //options = listOf("RTP Prod", "RTP QA").map { Pair(it, it) },
+                                options = listOf(Pair("3", "RTP Prod"), Pair("4", "RTP QA")),
+                                value = state.dateEnd
+                            ) {
+                                addCssStyle(formControlXs)
+                                background = Background(Color.name(Col.WHITE))
+                            }.onEvent {
+                                change = {
+                                    val selectedTp = (self.value ?: "").toInt()
+                                    val pChain =
+                                        PlattformChain.calculateId(first = selectedTp, middle = null, last = selectedTp)
+                                    store.dispatch { dispatch, getState ->
+                                        dispatch(
+                                            HippoAction.ItemSelected(
+                                                ItemType.PLATTFORM_CHAIN,
+                                                PlattformChain.map[pChain]!!
+                                            )
+                                        )
+                                        loadStatistics(getState())
+                                    }
+                                }
+                            }
+                        }
                     }
                     // End date
                     row {
@@ -205,29 +210,6 @@ object StatPage : SimplePanel() {
                                 change = {
                                     store.dispatch { dispatch, getState ->
                                         dispatch(HippoAction.DateSelected(DateType.END, self.value ?: ""))
-                                        loadStatistics(getState())
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    // Select TP
-                    row {
-                        cell { +"Visa:" }
-                        cell {
-                            simpleSelectInput(
-                                //options = listOf("RTP Prod", "RTP QA").map { Pair(it, it) },
-                                options = listOf(Pair("3", "RTP Prod"), Pair("4", "RTP QA") ) ,
-                                value = state.dateEnd
-                            ) {
-                                addCssStyle(formControlXs)
-                                background = Background(Color.name(Col.WHITE))
-                            }.onEvent {
-                                change = {
-                                    val selectedTp = (self.value ?: "").toInt()
-                                    val pChain = PlattformChain.calculateId(first = selectedTp, middle = null, last = selectedTp)
-                                    store.dispatch { dispatch, getState ->
-                                        dispatch(HippoAction.ItemSelected(ItemType.PLATTFORM_CHAIN, PlattformChain.map[pChain]!!))
                                         loadStatistics(getState())
                                     }
                                 }
@@ -259,18 +241,43 @@ object StatPage : SimplePanel() {
             }
         }
 
+        consumerChart = Chart(getChartConfigConsumer())
+        producerChart = Chart(getChartConfigProducer())
+        logicalAddressChart = Chart(getChartConfigLogicalAddress())
+        contractChart = Chart(getChartConfigContract())
+
+        SInfo.consumerSInfoList.recordList.onUpdate += {
+            consumerChart.configuration = getChartConfigConsumer()
+        }
+
+        SInfo.producerSInfoList.recordList.onUpdate += {
+            producerChart.configuration = getChartConfigProducer()
+        }
+
+        SInfo.logicalAddressSInfoList.recordList.onUpdate += {
+            logicalAddressChart.configuration = getChartConfigLogicalAddress()
+        }
+
+        SInfo.contractSInfoList.recordList.onUpdate += {
+            contractChart.configuration = getChartConfigContract()
+        }
+
         hPanel() {
 
             @Suppress("UnsafeCastFromDynamic")
 
             div {
                 align = Align.LEFT
-            }.stateBinding(store) { state ->
+                // }.stateBinding(store) { state ->
+            }.bind(store) { state ->
                 //hPanel {
+                SInfo.view(state)
                 vPanel() {
 
                     add(consumerChart)
+                    println("consumerSInfoList:")
                     console.log(SInfo.consumerSInfoList)
+
                     add(
                         ChartLabelTable(
                             ItemType.CONSUMER,
@@ -285,6 +292,7 @@ object StatPage : SimplePanel() {
 
 
                 }
+                /*
                 vPanel {
                     add(contractChart)
                     add(
@@ -325,6 +333,7 @@ object StatPage : SimplePanel() {
                         )
                     )
                 }
+                */
                 //}
             }
         }
@@ -400,8 +409,9 @@ open class ChartLabelTable(
                     console.log(row)
                     val item = row.getData() as SInfoRecord
                     if (item.calls > -1) {
-                        val filterType = itemType  //ItemType.CONSUMER
+                        store.dispatch(HippoAction.ItemSelected(viewType = itemType, ))
                         /*
+                        val filterType = itemType  //ItemType.CONSUMER
                 val actualType = item.itemType
                 if (actualType == ItemType.DOMAIN) {
                     filterType = ItemType.DOMAIN
@@ -409,7 +419,6 @@ open class ChartLabelTable(
                  */
                         //filter.toggle(filterType, item.itemId)
                         //val iI = StatisticsInfo.mkStatisticsInfo(filter) { SInfo.view(it) }
-                        println("statisticsInfo after select:")
                         //console.log(iI)
                     }
 
@@ -461,7 +470,8 @@ class SInfoRecord(
 
 class SInfoList(val itemType: ItemType) {
 
-    val recordList: ObservableListWrapper<SInfoRecord> = observableListOf<SInfoRecord>() as ObservableListWrapper<SInfoRecord>
+    val recordList: ObservableListWrapper<SInfoRecord> =
+        observableListOf<SInfoRecord>() as ObservableListWrapper<SInfoRecord>
 
     fun callList(): List<Int> {
         return recordList.map { it.calls }

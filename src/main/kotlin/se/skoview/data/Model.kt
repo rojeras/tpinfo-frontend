@@ -32,11 +32,16 @@ enum class DateType {
     EFFECTIVE_AND_END
 }
 
+enum class HippoApplication {
+    HIPPO,
+    STATISTIK
+}
+
 //@Serializable
 data class HippoState(
     // Status information
     val currentAction: KClass<out HippoAction>,
-    val applicationStarted: Boolean,
+    val applicationStarted: HippoApplication?,
     val downloadBaseItemStatus: AsyncActionStatus,
     val downloadIntegrationStatus: AsyncActionStatus,
     val errorMessage: String?,
@@ -108,7 +113,7 @@ fun getInitialState(): HippoState {
 
     return HippoState(
         HippoAction.ApplicationStarted::class,
-        false,
+        null,
         AsyncActionStatus.NOT_INITIALIZED,
         AsyncActionStatus.NOT_INITIALIZED,
         null,

@@ -32,6 +32,7 @@ import pl.treksoft.kvision.utils.perc
 import pl.treksoft.kvision.utils.px
 import se.skoview.data.*
 import se.skoview.view.*
+import kotlin.browser.document
 import kotlin.browser.window
 
 
@@ -107,8 +108,14 @@ class App : Application() {
     }
 
     override fun start() {
+        val startUrl = window.location.href
+        println("window.location.href: ${startUrl}")
 
-        println("Executing on: ${window.location.hostname}")
+        // If hostname or path contains "statistik" then we start the statistik app, else hippo
+        val isStatApp =
+            if (startUrl.contains("statistik")) true
+            else false
+
         // A listener that sets the URL after each state change
         store.subscribe { state ->
             setUrlFilter(state)
@@ -116,15 +123,18 @@ class App : Application() {
 
         Pace.init()
         loadBaseItems(store)
+
         store.subscribe { state ->
             if (state.currentAction == HippoAction.DoneDownloadBaseItems::class) {
-                startHippo()
-                //startStat()
+                if (isStatApp) startStat()
+                else startHippo(state)
             }
         }
     }
 
-    fun startHippo() {
+    fun startHippo(state: HippoState) {
+        store.dispatch(HippoAction.ApplicationStarted(HippoApplication.HIPPO))
+
         loadIntegrations(store.getState())
         root("hippo") {
             vPanel {
@@ -138,6 +148,7 @@ class App : Application() {
     }
 
     fun startStat() {
+        store.dispatch(HippoAction.ApplicationStarted(HippoApplication.STATISTIK))
         loadStatistics(store.getState())
         root("hippo") {
             vPanel {
