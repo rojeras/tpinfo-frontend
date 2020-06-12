@@ -63,9 +63,17 @@ object StatPage : SimplePanel() {
                 onClick = { _, activeElements ->
                     val sliceIx = activeElements[0]._get("_index") as Int
                     val itemId: Int = itemSInfoList.recordList[sliceIx].itemId
-                    store.dispatch { _, getState ->
-                        store.dispatch(HippoAction.ItemIdSelected(itemType, itemId))
-                        loadStatistics(getState())
+                    if (store.getState().isItemSelected(itemType, itemId)) {
+                        store.dispatch { _, getState ->
+                            store.dispatch(HippoAction.ItemIdDeselectedAll(itemType))
+                            loadStatistics(getState())
+                        }
+                    } else {
+                        store.dispatch { _, getState ->
+                            store.dispatch(HippoAction.ItemIdSelected(itemType, itemId))
+                            loadStatistics(getState())
+                        }
+
                     }
                     //filter.toggle(itemType, itemId)
                     //StatisticsInfo.mkStatisticsInfo(filter) { SInfo.view(it) }
@@ -104,6 +112,11 @@ object StatPage : SimplePanel() {
                 align = Align.LEFT
                 //}.stateBinding(store) { state ->
             }.bind(store) { state ->
+                if (
+                    state.currentAction != HippoAction.ViewUpdated::class &&
+                    state.currentAction != HippoAction.ItemIdSelected::class
+                ) return@bind
+                println("After bind in header")
                 table(
                     listOf(),
                     setOf(TableType.BORDERED, TableType.SMALL)
@@ -129,23 +142,27 @@ object StatPage : SimplePanel() {
                         }
                         cell { +"Plattform:" }
                         cell {
-                            val selectedTp = Plattform.map[PlattformChain.map[state.selectedPlattformChains[0]]!!.last]!!.name
+                            val selectedPlattformId =
+                                PlattformChain.map[state.selectedPlattformChains[0]]!!.last.toString()
                             simpleSelectInput(
                                 options = state.statisticsPlattforms.map { Pair(it.key.toString(), it.value.name) },
-                                value = selectedTp
+                                //value = selectedPlattformChain!!.name
+                                value = selectedPlattformId
                             ) {
                                 addCssStyle(formControlXs)
                                 background = Background(Color.name(Col.WHITE))
                             }.onEvent {
                                 change = {
                                     val selectedTp = (self.value ?: "").toInt()
-                                    val pChain =
+                                    val pChainId =
                                         PlattformChain.calculateId(first = selectedTp, middle = null, last = selectedTp)
+                                    store.dispatch(HippoAction.ItemIdDeselectedAll(ItemType.PLATTFORM_CHAIN))
                                     store.dispatch { dispatch, getState ->
                                         dispatch(
                                             HippoAction.ItemIdSelected(
                                                 ItemType.PLATTFORM_CHAIN,
-                                                pChain!!
+                                                //pChain!!
+                                                pChainId
                                             )
                                         )
                                         loadStatistics(getState())
@@ -175,8 +192,8 @@ object StatPage : SimplePanel() {
                         }
                     }
                 }
-                val antal = state.callsDomain.map { it.value }.sum()
-                span { +"Totalt antal anrop för detta urval är: $antal" }.apply { align = Align.CENTER }
+                val calls = state.callsDomain.map { it.value }.sum()
+                span { +"Totalt antal anrop för detta urval är: $calls" }.apply { align = Align.CENTER }
             }
 
             // About button
@@ -230,7 +247,8 @@ object StatPage : SimplePanel() {
             background = Background(Color.hex(0xffffff))
         }.bind(store) { state ->
             if (
-                state.currentAction != HippoAction.ViewUpdated::class
+                state.currentAction != HippoAction.ViewUpdated::class &&
+                state.currentAction != HippoAction.ItemIdSelected::class
             ) return@bind
             //hPanel {
             println("Time to update the view...")
@@ -318,23 +336,35 @@ open class ChartLabelTable(
     heading: String
 ) : SimplePanel() {
     init {
+
+        val firstCol =
+        if (
+            itemSInfoList.size == 1 &&
+            store.getState().isItemSelected(itemType, itemSInfoList[0].itemId)
+        )
+            ColumnDefinition(
+                title = "",
+                formatter = Formatter.BUTTONCROSS
+            )
+        else
+            ColumnDefinition<Any>(
+            title = "",
+            field = colorField,
+            width = "(0.3).px",
+            formatter = Formatter.COLOR
+        )
+
         tabulator(
             itemSInfoList,
             options = TabulatorOptions(
-                //layout = Layout.FITDATAFILL,
                 layout = Layout.FITCOLUMNS,
                 columns = listOf(
-                    ColumnDefinition(
-                        title = "",
-                        field = colorField,
-                        width = "(0.3).px",
-                        formatter = Formatter.COLOR
-                    ),
+                    firstCol,
                     ColumnDefinition(
                         heading,
                         dataField,
-                        //topCalc = Calc.COUNT,
-                        //topCalcFormatter = Formatter.COLOR,
+                        topCalc = Calc.COUNT,
+                        topCalcFormatter = Formatter.COLOR,
                         headerFilter = Editor.INPUT,
                         //cellClick = {e, cell -> console.log(cell.getRow()) },
                         editable = { false },
@@ -371,9 +401,16 @@ open class ChartLabelTable(
                     console.log(row)
                     val item = row.getData() as SInfoRecord
                     if (item.calls > -1) {
-                        store.dispatch { _, getState ->
-                            store.dispatch(HippoAction.ItemIdSelected(itemType, item.itemId))
-                            loadStatistics(getState())
+                        if (store.getState().isItemSelected(item.itemType, item.itemId)) {
+                            store.dispatch { _, getState ->
+                                store.dispatch(HippoAction.ItemIdDeselectedAll(itemType))
+                                loadStatistics(getState())
+                            }
+                        } else {
+                            store.dispatch { _, getState ->
+                                store.dispatch(HippoAction.ItemIdSelected(itemType, item.itemId))
+                                loadStatistics(getState())
+                            }
                         }
                     }
                 }
@@ -473,4 +510,3 @@ class SInfoList(val itemType: ItemType) {
         this.recordList.addAll(callsTmp)
     }
 }
-

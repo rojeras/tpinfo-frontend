@@ -16,6 +16,7 @@
  */
 package se.skoview.data
 
+import kotlinx.serialization.PrimitiveKind
 import pl.treksoft.kvision.redux.RAction
 import se.skoview.view.IntegrationLists
 
@@ -45,14 +46,24 @@ sealed class HippoAction : RAction {
     ) : HippoAction()
     data class ErrorDownloadIntegrations(val errorMessage: String) : HippoAction()
     data class DateSelected(val dateType: DateType, val selectedDate: String) : HippoAction()
+    /*
     data class ItemSelected(
         val viewType: ItemType,
         val baseItem: BaseItem
     ) : HippoAction()
+     */
     data class ItemIdSelected(
         val viewType: ItemType,
         val id: Int
     ) : HippoAction()
+    data class ItemIdDeselected(
+        val viewType: ItemType,
+        val id: Int
+    ): HippoAction()
+    data class ItemIdDeselectedAll(
+        val viewType: ItemType
+    ): HippoAction()
+
     data class ViewUpdated(val integrationLists: IntegrationLists) : HippoAction()
     data class SetVMax(val type: ItemType, val size: Int): HippoAction()
 }

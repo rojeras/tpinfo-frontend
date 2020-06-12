@@ -362,7 +362,7 @@ private fun Div.itemSelect(item: BaseItem, type: ItemType, textSearchInfo: TextS
             textSearchInfo.clear()
 
             store.dispatch { _, getState ->
-                store.dispatch(HippoAction.ItemSelected(type, item))
+                store.dispatch(HippoAction.ItemIdSelected(type, item.id))
                 loadIntegrations(getState())
             }
         }
@@ -385,7 +385,7 @@ private fun Div.insertResetButton(item: BaseItem, type: ItemType) {
             background = Background(Color.name(Col.GRAY))
             onClick {
                 store.dispatch { dispatch, getState ->
-                    dispatch(HippoAction.ItemSelected(type, item))
+                    dispatch(HippoAction.ItemIdDeselected(type, item.id))
                     //createViewData(getState())
                     loadIntegrations(getState())
                 }

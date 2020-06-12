@@ -133,6 +133,7 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
             vLogicalAddresses = action.integrationLists.logicalAddresses,
             vServiceProducers = action.integrationLists.serviceProducers
         )
+        /*
         is HippoAction.ItemSelected -> {
 
             val id = action.baseItem.id
@@ -150,7 +151,8 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
                     selectedContracts = newList
                 )
                 ItemType.PLATTFORM_CHAIN -> state.copy(
-                    selectedPlattformChains = newList
+                    selectedPlattformChains = newList,
+                    selectedPlattformName = newList[0]!!.name
                 )
                 ItemType.LOGICAL_ADDRESS -> state.copy(
                     selectedLogicalAddresses = newList
@@ -160,33 +162,109 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
                 )
             }
         }
+         */
         is HippoAction.ItemIdSelected -> {
 
             val id = action.id
 
-            val newList =
-                if (state.isItemSelected(itemType = action.viewType, id = id)) listOf()
-                else listOf(id)
+            when (action.viewType) {
+                ItemType.CONSUMER -> {
+                    val newList = listOf(state.selectedConsumers, listOf(id)).flatten().distinct()
+                    state.copy(
+                        selectedConsumers = newList
+                    )
+                }
+                ItemType.DOMAIN -> {
+                    val newList = listOf(state.selectedDomains, listOf(id)).flatten().distinct()
+                    state.copy(
+                        selectedDomains = newList
+                    )
+                }
+                ItemType.CONTRACT -> {
+                    val newList = listOf(state.selectedContracts, listOf(id)).flatten().distinct()
+                    state.copy(
+                        selectedContracts = newList
+                    )
+                }
+                ItemType.PLATTFORM_CHAIN -> {
+                    val newList = listOf(state.selectedPlattformChains, listOf(id)).flatten().distinct()
+                    state.copy(
+                        selectedPlattformChains = newList
+                        //selectedPlattformName = PlattformChain.map[newList[0]]!!.name
+                    )
+                }
+                ItemType.LOGICAL_ADDRESS -> {
+                    val newList = listOf(state.selectedLogicalAddresses, listOf(id)).flatten().distinct()
+                    state.copy(
+                        selectedLogicalAddresses = newList
+                    )
+                }
+                ItemType.PRODUCER -> {
+                    val newList = listOf(state.selectedProducers, listOf(id)).flatten().distinct()
+                    state.copy(
+                        selectedProducers = newList
+                    )
+                }
+            }
+        }
+        is HippoAction.ItemIdDeselected -> {
+
+            val id = action.id
 
             when (action.viewType) {
-                ItemType.CONSUMER -> state.copy(
-                    selectedConsumers = newList
-                )
-                ItemType.DOMAIN -> state.copy(
-                    selectedDomains = newList
-                )
-                ItemType.CONTRACT -> state.copy(
-                    selectedContracts = newList
-                )
-                ItemType.PLATTFORM_CHAIN -> state.copy(
-                    selectedPlattformChains = newList
-                )
-                ItemType.LOGICAL_ADDRESS -> state.copy(
-                    selectedLogicalAddresses = newList
-                )
-                ItemType.PRODUCER -> state.copy(
-                    selectedProducers = newList
-                )
+                ItemType.CONSUMER -> {
+                    val newList = state.selectedConsumers as MutableList<Int>
+                    newList.remove(id)
+                    state.copy(
+                        selectedConsumers = newList
+                    )
+                }
+                ItemType.DOMAIN -> {
+                    val newList = state.selectedDomains as MutableList<Int>
+                    newList.remove(id)
+                    state.copy(
+                        selectedDomains = newList
+                    )
+                }
+                ItemType.CONTRACT -> {
+                    val newList = state.selectedContracts as MutableList<Int>
+                    newList.remove(id)
+                    state.copy(
+                        selectedContracts = newList
+                    )
+                }
+                ItemType.PLATTFORM_CHAIN -> {
+                    val newList = state.selectedPlattformChains as MutableList<Int>
+                    newList.remove(id)
+                    state.copy(
+                        selectedPlattformChains = newList
+                        //selectedPlattformName = PlattformChain.map[newList[0]]!!.name
+                    )
+                }
+                ItemType.LOGICAL_ADDRESS -> {
+                    val newList = state.selectedLogicalAddresses as MutableList<Int>
+                    newList.remove(id)
+                    state.copy(
+                        selectedLogicalAddresses = newList
+                    )
+                }
+                ItemType.PRODUCER -> {
+                    val newList = state.selectedProducers as MutableList<Int>
+                    newList.remove(id)
+                    state.copy(
+                        selectedProducers = newList
+                    )
+                }
+            }
+        }
+        is HippoAction.ItemIdDeselectedAll -> {
+            when (action.viewType) {
+                ItemType.CONSUMER -> state.copy( selectedConsumers = listOf() )
+                ItemType.DOMAIN -> state.copy( selectedDomains = listOf() )
+                ItemType.CONTRACT -> state.copy( selectedContracts = listOf() )
+                ItemType.PLATTFORM_CHAIN -> state.copy( selectedPlattformChains = listOf() )
+                ItemType.LOGICAL_ADDRESS -> state.copy( selectedLogicalAddresses = listOf() )
+                ItemType.PRODUCER -> state.copy( selectedProducers = listOf() )
             }
         }
         is HippoAction.SetVMax -> {

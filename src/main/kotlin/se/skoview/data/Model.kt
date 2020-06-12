@@ -67,6 +67,7 @@ data class HippoState(
     val selectedContracts: List<Int>,
     val selectedDomains: List<Int>,
     val selectedPlattformChains: List<Int>,
+    val selectedPlattformName: String,
 
     // Integrations data
     val integrationArrs: List<Integration>,
@@ -135,6 +136,7 @@ fun getInitialState(): HippoState {
         bookmarkInformation.selectedContracts,
         bookmarkInformation.selectedDomains,
         bookmarkInformation.selectedPlattformChains,
+        "",
         listOf(),
         MaxCounter(0, 0, 0, 0, 0, 0),
         listOf(),
