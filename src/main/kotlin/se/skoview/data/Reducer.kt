@@ -68,8 +68,8 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
                 serviceContracts = ServiceContract.map,
                 serviceDomains = ServiceDomain.map,
                 plattforms = Plattform.map,
-                plattformChains = PlattformChain.map
-
+                plattformChains = PlattformChain.map,
+                statisticsPlattforms = StatisticsPlattform.map
                 //dateEffective = newDate,
                 //dateEnd = newDate
             )

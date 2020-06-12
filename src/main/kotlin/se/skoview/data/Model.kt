@@ -55,6 +55,7 @@ data class HippoState(
     val serviceDomains: Map<Int, ServiceDomain>,
     val plattforms: Map<Int, Plattform>,
     val plattformChains: Map<Int, PlattformChain>,
+    val statisticsPlattforms: Map<Int, StatisticsPlattform>,
 
     // Filter parameters
     val dateEffective: String,
@@ -119,6 +120,7 @@ fun getInitialState(): HippoState {
         null,
         listOf(),
         listOf(),
+        mapOf(),
         mapOf(),
         mapOf(),
         mapOf(),

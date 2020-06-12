@@ -16,11 +16,9 @@
  */
 package se.skoview.data
 
-import kotlinx.serialization.PrimitiveKind
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonConfiguration
-import kotlinx.serialization.list
 import pl.treksoft.kvision.redux.ReduxStore
 import se.skoview.lib.getAsyncTpDb
 import kotlinx.serialization.builtins.*
@@ -36,6 +34,7 @@ fun loadBaseItems(store: ReduxStore<HippoState, HippoAction>) {
     LogicalAddress.load { areAllBaseItemsLoaded(store) }
     Plattform.load { areAllBaseItemsLoaded(store) }
     PlattformChain.load { areAllBaseItemsLoaded(store) }
+    StatisticsPlattform.load { areAllBaseItemsLoaded(store) }
 }
 
 fun areAllBaseItemsLoaded(store: ReduxStore<HippoState, HippoAction>) {
@@ -45,7 +44,8 @@ fun areAllBaseItemsLoaded(store: ReduxStore<HippoState, HippoAction>) {
         ServiceComponent.isLoaded &&
         ServiceContract.isLoaded &&
         ServiceDomain.isLoaded &&
-        BaseDates.isLoaded
+        BaseDates.isLoaded &&
+        StatisticsPlattform.isLoaded
     )
         store.dispatch(HippoAction.DoneDownloadBaseItems)
 }
@@ -78,7 +78,6 @@ object BaseDates {
             for (statistics in items.dates.statistics) {
                 statisticsDates.add(statistics)
             }
-
             isLoaded = true
             callback()
         }
@@ -393,5 +392,43 @@ data class PlattformChain(val first: Int, val middle: Int?, val last: Int) : Bas
     }
 }
 
+// List of plattforms containing statistics information
+data class StatisticsPlattform(override val id: Int, val platform: String, val environment: String) :
+    BaseItem() {
+    override val name: String = "$platform-$environment"
+    override val description = ""
+    override val searchField: String = name
+    override fun toString(): String = name
+
+    init {
+        map[id] = this
+    }
+
+    companion object {
+        val map = hashMapOf<Int, StatisticsPlattform>()
+        var isLoaded = false
+
+        fun load(callback: () -> Unit) {
+            @Serializable
+            data class StatisticsPlattformJsonParse(
+                val id: Int,
+                val platform: String,
+                val environment: String,
+                val snapshotTime: String
+            )
+
+            val type = "statPlattforms"
+            getAsyncTpDb(type) { response ->
+                val items = JSON.parse<Array<StatisticsPlattformJsonParse>>(response)
+                items.forEach { item ->
+                    StatisticsPlattform(item.id, item.platform, item.environment)
+                }
+                isLoaded = true
+                callback()
+            }
+        }
+    }
+
+}
 
 

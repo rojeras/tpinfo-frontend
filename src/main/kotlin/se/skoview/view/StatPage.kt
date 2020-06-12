@@ -80,33 +80,6 @@ object StatPage : SimplePanel() {
         println("In CharTab():init()")
         this.marginTop = 10.px
 
-
-        //vPanel {
-        //gridPanel( templateColumns = "50% 50%", columnGap = 20, rowGap = 20 ) {
-        /*
-        div {
-            h2("KStat - statistik baserad på SLL RTPs")
-        }.apply {
-            width = 100.perc
-            background = Background(Col.DARKGREEN)
-            align = Align.CENTER
-            color = Color(Col.WHITE)
-        }
-        hPanel {
-            span("Tjänsteplattform: ")
-            add(SelectTp())
-            span("Från datum: ")
-            add(SEffectiveDateSelectPanel(StatisticsInfo.getSdateOtionsList()))
-            span("Till datum: ")
-            add(SEndDateSelectPanel(StatisticsInfo.getSdateOtionsList()))
-        }.apply {
-            width = 100.perc
-            background = Background(Col.GRAY)
-            //align = Align.CENTER
-            color = Color(Col.WHITE)
-        }
-         */
-        //StatTablePage.fontFamily = "Times New Roman"
         // Page header
         div {
             h2("Antal meddelanden genom SLL:s regionala tjänsteplattform")
@@ -156,10 +129,10 @@ object StatPage : SimplePanel() {
                         }
                         cell { +"Plattform:" }
                         cell {
+                            val selectedTp = Plattform.map[PlattformChain.map[state.selectedPlattformChains[0]]!!.last]!!.name
                             simpleSelectInput(
-                                //options = listOf("RTP Prod", "RTP QA").map { Pair(it, it) },
-                                options = listOf(Pair("3", "RTP Prod"), Pair("4", "RTP QA")),
-                                value = state.dateEnd
+                                options = state.statisticsPlattforms.map { Pair(it.key.toString(), it.value.name) },
+                                value = selectedTp
                             ) {
                                 addCssStyle(formControlXs)
                                 background = Background(Color.name(Col.WHITE))
@@ -170,9 +143,9 @@ object StatPage : SimplePanel() {
                                         PlattformChain.calculateId(first = selectedTp, middle = null, last = selectedTp)
                                     store.dispatch { dispatch, getState ->
                                         dispatch(
-                                            HippoAction.ItemSelected(
+                                            HippoAction.ItemIdSelected(
                                                 ItemType.PLATTFORM_CHAIN,
-                                                PlattformChain.map[pChain]!!
+                                                pChain!!
                                             )
                                         )
                                         loadStatistics(getState())
@@ -202,8 +175,9 @@ object StatPage : SimplePanel() {
                         }
                     }
                 }
+                val antal = state.callsDomain.map { it.value }.sum()
+                span { +"Totalt antal anrop för detta urval är: $antal" }.apply { align = Align.CENTER }
             }
-
 
             // About button
             div {
@@ -246,7 +220,6 @@ object StatPage : SimplePanel() {
         SInfo.contractSInfoList.recordList.onUpdate += {
             contractChart.configuration = getChartConfigContract()
         }
-
         // The whole item table
         hPanel() {
             //@Suppress("UnsafeCastFromDynamic")
@@ -256,14 +229,17 @@ object StatPage : SimplePanel() {
             overflow = Overflow.AUTO
             background = Background(Color.hex(0xffffff))
         }.bind(store) { state ->
+            if (
+                state.currentAction != HippoAction.ViewUpdated::class
+            ) return@bind
             //hPanel {
+            println("Time to update the view...")
             SInfo.view(state)
             simplePanel() {
-
-                add(consumerChart)
-                println("consumerSInfoList:")
+                add(consumerChart).apply {
+                    width = 100.perc
+                }
                 console.log(SInfo.consumerSInfoList)
-
                 add(
                     ChartLabelTable(
                         ItemType.CONSUMER,
@@ -272,14 +248,13 @@ object StatPage : SimplePanel() {
                         "color",
                         "calls",
                         "Tjänstekonsumenter"
-
                     )
                 )
-
 
             }.apply {
                 width = 24.vw
                 margin = (0.3).vw
+                background = Background(Color.name(Col.BEIGE))
             }
 
             simplePanel {
@@ -298,7 +273,6 @@ object StatPage : SimplePanel() {
                 width = 24.vw
                 margin = (0.3).vw
             }
-
             simplePanel {
                 add(logicalAddressChart)
                 add(
@@ -315,7 +289,6 @@ object StatPage : SimplePanel() {
                 width = 24.vw
                 margin = (0.3).vw
             }
-
             simplePanel {
                 add(producerChart)
                 add(
@@ -332,8 +305,6 @@ object StatPage : SimplePanel() {
                 width = 24.vw
                 margin = (0.3).vw
             }
-
-            //}
         }
     }
 }
@@ -347,16 +318,6 @@ open class ChartLabelTable(
     heading: String
 ) : SimplePanel() {
     init {
-        //background = Background(Col.BLUE)
-
-        println("In ChartLabelTable")
-        console.log(itemType)
-        console.log(itemSInfoList)
-        console.log(dataField)
-        console.log(colorField)
-        console.log(callsField)
-        console.log(heading)
-
         tabulator(
             itemSInfoList,
             options = TabulatorOptions(
@@ -366,8 +327,8 @@ open class ChartLabelTable(
                     ColumnDefinition(
                         title = "",
                         field = colorField,
-                        formatter = Formatter.COLOR,
-                        width = "10.px"
+                        width = "(0.3).px",
+                        formatter = Formatter.COLOR
                     ),
                     ColumnDefinition(
                         heading,
@@ -377,24 +338,27 @@ open class ChartLabelTable(
                         headerFilter = Editor.INPUT,
                         //cellClick = {e, cell -> console.log(cell.getRow()) },
                         editable = { false },
-                        width = "120.px",
+                        //width = "20.vw",
+                        widthGrow = 3,
+                        formatter = Formatter.TEXTAREA
+                        /*
                         formatterComponentFunction = { _, _, item ->
                             Div(item.description) {
 
-                                /*
-                                if (filter.isItemFiltered(item.itemType, item.itemId)) {
-                                    background = Background(Col.LIGHTSTEELBLUE)
+                                if (store.getState().isItemSelected(item.itemType, item.itemId)) {
+                                    background = Background(Color.name(Col.LIGHTSTEELBLUE))
                                 }
-                                 */
+
                             }
                         }
+                         */
                         //cellDblClick = { _, cell -> cell.edit(true) }
                     ),
                     ColumnDefinition(
-                        title = "Antal anrop",
-                        field = callsField,
-                        width = "30.px"
-
+                        widthGrow = 1,
+                        title = "Antal",
+                        field = callsField
+                        //width = "5.vw"
                     )
                 ),
                 pagination = PaginationMode.LOCAL,
