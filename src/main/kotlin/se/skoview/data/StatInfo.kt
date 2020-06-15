@@ -44,7 +44,7 @@ fun loadStatistics(state: HippoState) {
                     statisticsCache.callsContract
                 )
             )
-            createViewData(getState())
+            //createViewData(getState())
         }
     } else {
         println(">>> Statistics data NOT found in cache - will download")
@@ -90,7 +90,7 @@ fun loadStatistics(state: HippoState) {
                         statisticsCache.callsContract
                     )
                 )
-                createViewData(getState())
+                //createViewData(getState())
             }
         }
     }

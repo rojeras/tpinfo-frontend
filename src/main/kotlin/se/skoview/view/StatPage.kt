@@ -5,6 +5,7 @@ import pl.treksoft.kvision.chart.*
 import pl.treksoft.kvision.core.*
 import pl.treksoft.kvision.core.Position
 import pl.treksoft.kvision.data.BaseDataComponent
+import pl.treksoft.kvision.form.select.SimpleSelectInput
 import pl.treksoft.kvision.form.select.simpleSelectInput
 import pl.treksoft.kvision.html.*
 import pl.treksoft.kvision.html.Align
@@ -88,6 +89,27 @@ object StatPage : SimplePanel() {
         println("In CharTab():init()")
         this.marginTop = 10.px
 
+        consumerChart = Chart(getChartConfigConsumer())
+        producerChart = Chart(getChartConfigProducer())
+        logicalAddressChart = Chart(getChartConfigLogicalAddress())
+        contractChart = Chart(getChartConfigContract())
+
+        SInfo.consumerSInfoList.recordList.onUpdate += {
+            consumerChart.configuration = getChartConfigConsumer()
+        }
+
+        SInfo.producerSInfoList.recordList.onUpdate += {
+            producerChart.configuration = getChartConfigProducer()
+        }
+
+        SInfo.logicalAddressSInfoList.recordList.onUpdate += {
+            logicalAddressChart.configuration = getChartConfigLogicalAddress()
+        }
+
+        SInfo.contractSInfoList.recordList.onUpdate += {
+            contractChart.configuration = getChartConfigContract()
+        }
+
         // Page header
         div {
             h2("Antal meddelanden genom SLL:s regionala tjänsteplattform")
@@ -113,7 +135,8 @@ object StatPage : SimplePanel() {
                 //}.stateBinding(store) { state ->
             }.bind(store) { state ->
                 if (
-                    state.currentAction != HippoAction.ViewUpdated::class &&
+                    state.currentAction != HippoAction.DoneDownloadStatistics::class &&
+                    //state.currentAction != HippoAction.ViewUpdated::class //&&
                     state.currentAction != HippoAction.ItemIdSelected::class
                 ) return@bind
                 println("After bind in header")
@@ -217,40 +240,18 @@ object StatPage : SimplePanel() {
             }
         }
 
-        consumerChart = Chart(getChartConfigConsumer())
-        producerChart = Chart(getChartConfigProducer())
-        logicalAddressChart = Chart(getChartConfigLogicalAddress())
-        contractChart = Chart(getChartConfigContract())
-
-        SInfo.consumerSInfoList.recordList.onUpdate += {
-            consumerChart.configuration = getChartConfigConsumer()
-        }
-
-        SInfo.producerSInfoList.recordList.onUpdate += {
-            producerChart.configuration = getChartConfigProducer()
-        }
-
-        SInfo.logicalAddressSInfoList.recordList.onUpdate += {
-            logicalAddressChart.configuration = getChartConfigLogicalAddress()
-        }
-
-        SInfo.contractSInfoList.recordList.onUpdate += {
-            contractChart.configuration = getChartConfigContract()
-        }
         // The whole item table
         hPanel() {
             //@Suppress("UnsafeCastFromDynamic")
-
             position = Position.ABSOLUTE
             width = 100.perc
             overflow = Overflow.AUTO
             background = Background(Color.hex(0xffffff))
         }.bind(store) { state ->
             if (
-                state.currentAction != HippoAction.ViewUpdated::class &&
+                state.currentAction != HippoAction.DoneDownloadStatistics::class &&
                 state.currentAction != HippoAction.ItemIdSelected::class
             ) return@bind
-            //hPanel {
             println("Time to update the view...")
             SInfo.view(state)
             simplePanel() {
@@ -338,21 +339,21 @@ open class ChartLabelTable(
     init {
 
         val firstCol =
-        if (
-            itemSInfoList.size == 1 &&
-            store.getState().isItemSelected(itemType, itemSInfoList[0].itemId)
-        )
-            ColumnDefinition(
-                title = "",
-                formatter = Formatter.BUTTONCROSS
+            if (
+                itemSInfoList.size == 1 &&
+                store.getState().isItemSelected(itemType, itemSInfoList[0].itemId)
             )
-        else
-            ColumnDefinition<Any>(
-            title = "",
-            field = colorField,
-            width = "(0.3).px",
-            formatter = Formatter.COLOR
-        )
+                ColumnDefinition(
+                    title = "",
+                    formatter = Formatter.BUTTONCROSS
+                )
+            else
+                ColumnDefinition<Any>(
+                    title = "",
+                    field = colorField,
+                    width = "(0.3).px",
+                    formatter = Formatter.COLOR
+                )
 
         tabulator(
             itemSInfoList,
@@ -423,27 +424,6 @@ open class ChartLabelTable(
 
 // ---------------------------------------------------------------------------------------------
 
-/**
- * The singleton for the data displayed in the view
- * It is updated through the view() method with an statisticsInfo object as parameter.
- */
-
-object SInfo : BaseDataComponent() {
-    var consumerSInfoList = SInfoList(ItemType.CONSUMER)
-    var producerSInfoList = SInfoList(ItemType.PRODUCER)
-    var logicalAddressSInfoList = SInfoList(ItemType.LOGICAL_ADDRESS)
-    var contractSInfoList = SInfoList(ItemType.CONTRACT)
-
-    fun view(state: HippoState) {
-        println("In the SInfo.view()")
-        consumerSInfoList.populate(state.callsConsumer)
-        producerSInfoList.populate(state.callsProducer)
-        logicalAddressSInfoList.populate(state.callsLogicalAddress)
-        contractSInfoList.populate(state.callsContract)
-
-    }
-}
-
 class SInfoRecord(
     val itemType: ItemType,
     val itemId: Int,
@@ -461,8 +441,7 @@ class SInfoRecord(
 
 class SInfoList(val itemType: ItemType) {
 
-    val recordList: ObservableListWrapper<SInfoRecord> =
-        observableListOf<SInfoRecord>() as ObservableListWrapper<SInfoRecord>
+    val recordList: ObservableListWrapper<SInfoRecord> = observableListOf<SInfoRecord>() as ObservableListWrapper<SInfoRecord>
 
     fun callList(): List<Int> {
         return recordList.map { it.calls }
@@ -508,5 +487,26 @@ class SInfoList(val itemType: ItemType) {
 
         this.recordList.clear()
         this.recordList.addAll(callsTmp)
+    }
+}
+
+/**
+ * The singleton for the data displayed in the view
+ * It is updated through the view() method with an statisticsInfo object as parameter.
+ */
+
+object SInfo : BaseDataComponent() {
+    var consumerSInfoList = SInfoList(ItemType.CONSUMER)
+    var producerSInfoList = SInfoList(ItemType.PRODUCER)
+    var logicalAddressSInfoList = SInfoList(ItemType.LOGICAL_ADDRESS)
+    var contractSInfoList = SInfoList(ItemType.CONTRACT)
+
+    fun view(state: HippoState) {
+        println("In the SInfo.view()")
+        consumerSInfoList.populate(state.callsConsumer)
+        producerSInfoList.populate(state.callsProducer)
+        logicalAddressSInfoList.populate(state.callsLogicalAddress)
+        contractSInfoList.populate(state.callsContract)
+
     }
 }
