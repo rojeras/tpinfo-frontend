@@ -5,7 +5,6 @@ import pl.treksoft.kvision.chart.*
 import pl.treksoft.kvision.core.*
 import pl.treksoft.kvision.core.Position
 import pl.treksoft.kvision.data.BaseDataComponent
-import pl.treksoft.kvision.form.select.SimpleSelectInput
 import pl.treksoft.kvision.form.select.simpleSelectInput
 import pl.treksoft.kvision.html.*
 import pl.treksoft.kvision.html.Align
@@ -21,7 +20,9 @@ import pl.treksoft.kvision.tabulator.*
 import pl.treksoft.kvision.utils.*
 import se.skoview.app.store
 import se.skoview.data.*
+import se.skoview.lib.thousands
 import se.skoview.lib.getColorForObject
+import se.skoview.lib.getVersion
 
 object StatPage : SimplePanel() {
 
@@ -135,9 +136,9 @@ object StatPage : SimplePanel() {
                 //}.stateBinding(store) { state ->
             }.bind(store) { state ->
                 if (
-                    state.currentAction != HippoAction.DoneDownloadStatistics::class &&
-                    //state.currentAction != HippoAction.ViewUpdated::class //&&
-                    state.currentAction != HippoAction.ItemIdSelected::class
+                    state.currentAction != HippoAction.DoneDownloadStatistics::class //&&
+                //state.currentAction != HippoAction.ViewUpdated::class //&&
+                //state.currentAction != HippoAction.ItemIdSelected::class
                 ) return@bind
                 println("After bind in header")
                 table(
@@ -216,7 +217,8 @@ object StatPage : SimplePanel() {
                     }
                 }
                 val calls = state.callsDomain.map { it.value }.sum()
-                span { +"Totalt antal anrop för detta urval är: $calls" }.apply { align = Align.CENTER }
+                val tCalls = calls.toString().thousands()
+                span { +"Totalt antal anrop för detta urval är: $tCalls" }.apply { align = Align.CENTER }
             }
 
             // About button
@@ -230,7 +232,7 @@ object StatPage : SimplePanel() {
                 modal.addButton(Button("Stäng").onClick {
                     modal.hide()
                 })
-                button("Om Statistik", style = ButtonStyle.INFO).onClick {
+                button("Om Statistik ${getVersion("hippoVersion")}", style = ButtonStyle.INFO).onClick {
                     size = ButtonSize.SMALL
                     modal.show()
                 }.apply {
@@ -249,8 +251,8 @@ object StatPage : SimplePanel() {
             background = Background(Color.hex(0xffffff))
         }.bind(store) { state ->
             if (
-                state.currentAction != HippoAction.DoneDownloadStatistics::class &&
-                state.currentAction != HippoAction.ItemIdSelected::class
+                state.currentAction != HippoAction.DoneDownloadStatistics::class //&&
+            //state.currentAction != HippoAction.ItemIdSelected::class
             ) return@bind
             println("Time to update the view...")
             SInfo.view(state)
@@ -273,7 +275,7 @@ object StatPage : SimplePanel() {
             }.apply {
                 width = 24.vw
                 margin = (0.3).vw
-                background = Background(Color.name(Col.BEIGE))
+                //background = Background(Color.name(Col.BEIGE))
             }
 
             simplePanel {
@@ -286,6 +288,23 @@ object StatPage : SimplePanel() {
                         "color",
                         "calls",
                         "Tjänstekontrakt"
+                    )
+                )
+            }.apply {
+                width = 24.vw
+                margin = (0.3).vw
+            }
+
+            simplePanel {
+                add(producerChart)
+                add(
+                    ChartLabelTable(
+                        ItemType.PRODUCER,
+                        SInfo.producerSInfoList.recordList,
+                        "description",
+                        "color",
+                        "calls",
+                        "Tjänsteproducenter"
                     )
                 )
             }.apply {
@@ -308,22 +327,6 @@ object StatPage : SimplePanel() {
                 width = 24.vw
                 margin = (0.3).vw
             }
-            simplePanel {
-                add(producerChart)
-                add(
-                    ChartLabelTable(
-                        ItemType.PRODUCER,
-                        SInfo.producerSInfoList.recordList,
-                        "description",
-                        "color",
-                        "calls",
-                        "Tjänsteproducenter"
-                    )
-                )
-            }.apply {
-                width = 24.vw
-                margin = (0.3).vw
-            }
         }
     }
 }
@@ -338,6 +341,7 @@ open class ChartLabelTable(
 ) : SimplePanel() {
     init {
 
+        // Color or red cross if item is selected
         val firstCol =
             if (
                 itemSInfoList.size == 1 &&
@@ -362,8 +366,8 @@ open class ChartLabelTable(
                 columns = listOf(
                     firstCol,
                     ColumnDefinition(
-                        heading,
-                        dataField,
+                        title = heading,
+                        field = dataField,
                         topCalc = Calc.COUNT,
                         topCalcFormatter = Formatter.COLOR,
                         headerFilter = Editor.INPUT,
@@ -388,7 +392,9 @@ open class ChartLabelTable(
                     ColumnDefinition(
                         widthGrow = 1,
                         title = "Antal",
+                        align = pl.treksoft.kvision.tabulator.Align.RIGHT,
                         field = callsField
+
                         //width = "5.vw"
                     )
                 ),
@@ -441,7 +447,8 @@ class SInfoRecord(
 
 class SInfoList(val itemType: ItemType) {
 
-    val recordList: ObservableListWrapper<SInfoRecord> = observableListOf<SInfoRecord>() as ObservableListWrapper<SInfoRecord>
+    val recordList: ObservableListWrapper<SInfoRecord> =
+        observableListOf<SInfoRecord>() as ObservableListWrapper<SInfoRecord>
 
     fun callList(): List<Int> {
         return recordList.map { it.calls }
@@ -461,20 +468,34 @@ class SInfoList(val itemType: ItemType) {
         val callsTmp = mutableListOf<SInfoRecord>()
 
         var item: BaseItem?
+        var desc: String = ""
         for (entry in ackMapTmp) {
-            item = when (this.itemType) {
-                ItemType.CONSUMER -> ServiceComponent.map[entry.key]
-                ItemType.PRODUCER -> ServiceComponent.map[entry.key]
-                ItemType.LOGICAL_ADDRESS -> LogicalAddress.map[entry.key]
-                ItemType.CONTRACT -> ServiceContract.map[entry.key]
+            when (this.itemType) {
+                ItemType.CONSUMER -> {
+                    item = ServiceComponent.map[entry.key]
+                    desc = "${item!!.description} (${item.hsaId})"
+                }
+                ItemType.PRODUCER -> {
+                    item = ServiceComponent.map[entry.key]
+                    desc = "${item!!.description} (${item.hsaId})"
+                }
+                ItemType.LOGICAL_ADDRESS -> {
+                    item = LogicalAddress.map[entry.key]
+                    desc = "${item!!.description} (${item.name})"
+                }
+                ItemType.CONTRACT -> {
+                    item = ServiceContract.map[entry.key]
+                    desc = item!!.description
+                }
                 else -> error("Unknown itemType in populate!")
             }
             //println("${item!!.description} has calls: ${ackMapTmp[entry.key]}")
+
             callsTmp.add(
                 SInfoRecord(
                     this.itemType,
                     item!!.id,
-                    item.description,
+                    desc,
                     ackMapTmp[entry.key] ?: error("ackMapTmp is null"),
                     0
                 )

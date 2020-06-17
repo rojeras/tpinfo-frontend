@@ -43,8 +43,7 @@ fun getAsyncTpDb(url: String, callback: (String) -> Unit) {
     // tpdb is assumed to be on the 'qa.integrationer.tjansteplattform.se' server if we run in development or test environment
     val baseUrl = if (currentHost.contains("localhost") || currentHost.contains("www.hippokrates.se")) {
         "https://qa.integrationer.tjansteplattform.se/tpdb/tpdbapi.php/api/v1/"
-    }
-    else {
+    } else {
         "$currentProtocol//$currentHost/../tpdb/tpdbapi.php/api/v1/"
     }
     val fullUrl = baseUrl + url
@@ -117,8 +116,8 @@ fun getVersion(versionName: String = "hippoVersion"): String {
     val versionElement = document.getElementById(versionName)
 
     val version =
-    if (versionElement != null) versionElement.getAttribute("content") ?: "-1.-1.-1"
-    else "-2.-2.-2"
+        if (versionElement != null) versionElement.getAttribute("content") ?: "-1.-1.-1"
+        else "-2.-2.-2"
 
     return version
 }
@@ -128,4 +127,16 @@ fun getColorForObject(obj: Any): Color {
     val fValue = cValue.toDouble() / Int.MAX_VALUE.toDouble()
     val col = (fValue * 256 * 256 * 256 - 1).toInt()
     return Color.hex(col)
+}
+
+fun String.thousands(): String {
+    val s1 = this.reversed()
+    val s2List = s1.chunked(3)
+    var s3: String = ""
+
+    for (item in s2List) {
+        s3 += item + " "
+    }
+
+    return s3.trim().reversed()
 }

@@ -35,34 +35,41 @@ import se.skoview.view.*
 import kotlin.browser.document
 import kotlin.browser.window
 
+// Common
 
-// UJ kommentarer:
-// done: Sidan är större än tidigare version – måste bli lika bred som tidigare version.
-// done: Texterna inom rutorna ligger för nära ramarna.
-// done: Felstavningar i ”Om hippo”, ändra ”hippo” till ”Hippo”.
-// done: Varför poppar rutan ”SLL statistiktjänst” upp – finns väl ingen anledning till det.
-// done: ”Återställ tjänsteplattform(ar)” bör flyttas ned någon centimeter.
-
-// todo: Bug: Selected dates not included in URL filter
-// todo: Opera does not add any filter to URL, remove its mention in index.html
-// todo: Check link to statistics
 // todo: Show messages to user
 // todo: Make it possible to participate in discussion, maybe through slack channel
-// todo: Make it possible to see diffs, that is, changes between certain dates (from John)
-// todo: Check if it is possible to make each column in hippo scrollable - without showing a scrollbar
-// todo: Add the initial loading of integrations and stat data to be on demand from the respective view - not from areAllBaseItemsLoaded()
-// todo: Re-implementera grundläggande statistik (så att den gamla frontend helt kan fasas ut). Visa mha StackPanel. Börja med chartjs och se om det är ok med 2D-paj
-// todo: Lägg till möjlighet att enkelt visa ett meddelande till användaren vid uppstart
-// todo: Skriv ut versionsnummer på sidan
 // todo: Verifiera att zip bygger en produktionsversion
 // todo: Visa antal användare senaste 24 timmarna
 // todo: Lägg in stöd för Navigo routing
 // todo: Börja använda Karma och enhetstester
+
+// Hippo
+
+// todo: Opera does not add any filter to URL, remove its mention in index.html
+// todo: Check link to statistics
+// todo: Make it possible to see diffs, that is, changes between certain dates (from John)
+// todo: Check if it is possible to make each column in hippo scrollable - without showing a scrollbar
 // todo: Lös detta med att visa SE för vägval
 // todo: Tag fram mock för hur integrationer ska presenteras där det kan finnas flera LA
 // todo: Lös trädklättringen, kanske mha HSA-trädet
 // todo: Titta på Tabulator igen
 
+// Statistik
+
+// todo: Fixa skärmuppdateringen så att det inte blinkar och försvinner ibland
+// todo: Addera vy för "Över tid"
+// todo: Export till CSV
+// todo: Fixa "about" för statistiken
+// todo: Inkludera synonymer
+// todo: Förvalda vyer som i gamla statistiken
+// done: Visa HSA-idn (sökbara)
+
+// Done
+
+// done: Skriv ut versionsnummer på sidan
+// done: Add the initial loading of integrations and stat data to be on demand from the respective view - not from areAllBaseItemsLoaded()
+// done: Bug: Selected dates not included in URL filter
 // done: Fritextsökningen måste snabbas upp
 // done: Addera licensinformationen
 // done: Fixa BASEURL så att den inte är hårdkodad mot tpinfo-a
@@ -91,6 +98,12 @@ import kotlin.browser.window
 // done: Färger på rubrikerna
 // done: Frys rubrikraden
 // done: Lägg till knapp som tar bort gränsen över hur många items som visar. Dvs en "visa alla"-knapp som dyker upp isf den röda texten.
+// UJ kommentarer:
+// done: Sidan är större än tidigare version – måste bli lika bred som tidigare version.
+// done: Texterna inom rutorna ligger för nära ramarna.
+// done: Felstavningar i ”Om hippo”, ändra ”hippo” till ”Hippo”.
+// done: Varför poppar rutan ”SLL statistiktjänst” upp – finns väl ingen anledning till det.
+// done: ”Återställ tjänsteplattform(ar)” bör flyttas ned någon centimeter.
 
 // Initialize the redux store
 val store = createReduxStore(
