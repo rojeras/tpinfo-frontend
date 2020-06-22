@@ -189,15 +189,18 @@ class HippoItemsView(type: ItemType, heading: String, bredd: Int = 20) : VPanel(
         searchField(type, textSearchInfo)
 
         div {}.bind(store) { state ->
+            /*
             if (
                 state.currentAction != HippoAction.ViewUpdated::class &&
                 state.currentAction != HippoAction.SetVMax::class &&
                 state.currentAction != HippoAction.ApplicationStarted::class
             ) return@bind
+             */
 
-            if (type == ItemType.CONSUMER) println("Will now render")
+            //if (type == ItemType.CONSUMER)
+                println("Will now render ${type}")
 
-            // Go to to for most rendering actions
+            // Go to top for most rendering actions
             if (state.currentAction != HippoAction.SetVMax::class) {
                 document.body!!.scrollTop = 0.toDouble()
                 document.documentElement!!.scrollTop = 0.toDouble() // All other browsers

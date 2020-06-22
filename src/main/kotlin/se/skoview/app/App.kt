@@ -57,6 +57,7 @@ import kotlin.browser.window
 
 // Statistik
 
+// todo: Fixa till datahanteringen så att det blir en renare redux-koppling till vad som visas
 // todo: Fixa skärmuppdateringen så att det inte blinkar och försvinner ibland
 // todo: Addera vy för "Över tid"
 // todo: Export till CSV

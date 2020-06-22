@@ -50,12 +50,13 @@ fun getAsyncTpDb(url: String, callback: (String) -> Unit) {
     console.log("URL: $fullUrl")
 
     val xmlHttp = XMLHttpRequest()
-    xmlHttp.open("GET", fullUrl)
-    xmlHttp.onload = {
+    //xmlHttp.onload = {
+    xmlHttp.onreadystatechange = {
         if (xmlHttp.readyState == 4.toShort() && xmlHttp.status == 200.toShort()) {
             callback.invoke(xmlHttp.responseText)
         }
     }
+    xmlHttp.open("GET", fullUrl, true)
     xmlHttp.send()
 }
 

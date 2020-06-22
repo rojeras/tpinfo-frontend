@@ -27,11 +27,12 @@ import se.skoview.lib.getVersion
 object StatPage : SimplePanel() {
 
     //private val filter: Filter = Filter()
-
     val consumerChart: Chart
     val producerChart: Chart
     val logicalAddressChart: Chart
     val contractChart: Chart
+
+    var noCalls: Int = -1
 
     private fun getChartConfigConsumer(): Configuration {
         return getChartConfig(ItemType.CONSUMER, SInfo.consumerSInfoList)
@@ -77,8 +78,6 @@ object StatPage : SimplePanel() {
                         }
 
                     }
-                    //filter.toggle(itemType, itemId)
-                    //StatisticsInfo.mkStatisticsInfo(filter) { SInfo.view(it) }
                     "" // This lambda returns Any, which mean the last line must be an expression
                 }
             )
@@ -88,6 +87,7 @@ object StatPage : SimplePanel() {
 
     init {
         println("In CharTab():init()")
+
         this.marginTop = 10.px
 
         consumerChart = Chart(getChartConfigConsumer())
@@ -133,13 +133,14 @@ object StatPage : SimplePanel() {
             background = Background(Color.hex(0xf6efe9))
             div {
                 align = Align.LEFT
-                //}.stateBinding(store) { state ->
             }.bind(store) { state ->
+                /*
                 if (
                     state.currentAction != HippoAction.DoneDownloadStatistics::class //&&
                 //state.currentAction != HippoAction.ViewUpdated::class //&&
                 //state.currentAction != HippoAction.ItemIdSelected::class
                 ) return@bind
+                 */
                 println("After bind in header")
                 table(
                     listOf(),
@@ -250,16 +251,16 @@ object StatPage : SimplePanel() {
             overflow = Overflow.AUTO
             background = Background(Color.hex(0xffffff))
         }.bind(store) { state ->
+            /*
             if (
                 state.currentAction != HippoAction.DoneDownloadStatistics::class //&&
             //state.currentAction != HippoAction.ItemIdSelected::class
             ) return@bind
+             */
             println("Time to update the view...")
             SInfo.view(state)
             simplePanel() {
-                add(consumerChart).apply {
-                    width = 100.perc
-                }
+                //add(consumerChart).apply { width = 100.perc }
                 console.log(SInfo.consumerSInfoList)
                 add(
                     ChartLabelTable(
@@ -279,7 +280,7 @@ object StatPage : SimplePanel() {
             }
 
             simplePanel {
-                add(contractChart)
+                //add(contractChart)
                 add(
                     ChartLabelTable(
                         ItemType.CONTRACT,
@@ -296,7 +297,7 @@ object StatPage : SimplePanel() {
             }
 
             simplePanel {
-                add(producerChart)
+                //add(producerChart)
                 add(
                     ChartLabelTable(
                         ItemType.PRODUCER,
@@ -312,7 +313,7 @@ object StatPage : SimplePanel() {
                 margin = (0.3).vw
             }
             simplePanel {
-                add(logicalAddressChart)
+                //add(logicalAddressChart)
                 add(
                     ChartLabelTable(
                         ItemType.LOGICAL_ADDRESS,
