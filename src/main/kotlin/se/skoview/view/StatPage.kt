@@ -27,10 +27,13 @@ import se.skoview.lib.getVersion
 object StatPage : SimplePanel() {
 
     //private val filter: Filter = Filter()
+    /*
     val consumerChart: Chart
     val producerChart: Chart
     val logicalAddressChart: Chart
     val contractChart: Chart
+
+    var lastConsumerChartX: Chart? = null
 
     var noCalls: Int = -1
 
@@ -49,8 +52,13 @@ object StatPage : SimplePanel() {
     private fun getChartConfigContract(): Configuration {
         return getChartConfig(ItemType.CONTRACT, SInfo.contractSInfoList)
     }
-
-    private fun getChartConfig(itemType: ItemType, itemSInfoList: SInfoList): Configuration {
+    */
+    private fun getChartConfig(
+        itemType: ItemType,
+        itemSInfoList: SInfoList,
+        animationTime: Int = 0
+    ): Configuration {
+        println("In getChartConfig(animationeTime=$animationTime)")
         val configuration = Configuration(
             ChartType.PIE,
             listOf(
@@ -61,6 +69,7 @@ object StatPage : SimplePanel() {
             ),
             itemSInfoList.descList(),
             options = ChartOptions(
+                animation = AnimationOptions(duration = animationTime),
                 //responsive = false,
                 legend = LegendOptions(display = false),
                 onClick = { _, activeElements ->
@@ -90,6 +99,7 @@ object StatPage : SimplePanel() {
 
         this.marginTop = 10.px
 
+        /*
         consumerChart = Chart(getChartConfigConsumer())
         producerChart = Chart(getChartConfigProducer())
         logicalAddressChart = Chart(getChartConfigLogicalAddress())
@@ -110,6 +120,7 @@ object StatPage : SimplePanel() {
         SInfo.contractSInfoList.recordList.onUpdate += {
             contractChart.configuration = getChartConfigContract()
         }
+         */
 
         // Page header
         div {
@@ -251,17 +262,25 @@ object StatPage : SimplePanel() {
             overflow = Overflow.AUTO
             background = Background(Color.hex(0xffffff))
         }.bind(store) { state ->
-            /*
-            if (
-                state.currentAction != HippoAction.DoneDownloadStatistics::class //&&
-            //state.currentAction != HippoAction.ItemIdSelected::class
-            ) return@bind
-             */
+            //if (state.currentAction != HippoAction.DoneDownloadStatistics::class) return@bind
             println("Time to update the view...")
-            SInfo.view(state)
+
+
+            val animateTime =
+                if (state.currentAction == HippoAction.DoneDownloadStatistics::class) {
+                    SInfo.view(state)
+                    console.log(SInfo.consumerSInfoList)
+                    println("Chart will now change")
+                    1300
+                } else {
+                    println("Chart will NOT change")
+                    0
+                }
+
             simplePanel() {
-                //add(consumerChart).apply { width = 100.perc }
-                console.log(SInfo.consumerSInfoList)
+                val consumerChartX =
+                    Chart(getChartConfig(ItemType.CONSUMER, SInfo.consumerSInfoList, animationTime = animateTime))
+                add(consumerChartX).apply { width = 100.perc }
                 add(
                     ChartLabelTable(
                         ItemType.CONSUMER,
@@ -280,7 +299,8 @@ object StatPage : SimplePanel() {
             }
 
             simplePanel {
-                //add(contractChart)
+                val contractChartX = Chart(getChartConfig(ItemType.CONTRACT, SInfo.contractSInfoList, animationTime = animateTime))
+                add(contractChartX)
                 add(
                     ChartLabelTable(
                         ItemType.CONTRACT,
@@ -297,7 +317,8 @@ object StatPage : SimplePanel() {
             }
 
             simplePanel {
-                //add(producerChart)
+                val producerChartX = Chart(getChartConfig(ItemType.PRODUCER, SInfo.producerSInfoList, animationTime = animateTime))
+                add(producerChartX)
                 add(
                     ChartLabelTable(
                         ItemType.PRODUCER,
@@ -313,7 +334,8 @@ object StatPage : SimplePanel() {
                 margin = (0.3).vw
             }
             simplePanel {
-                //add(logicalAddressChart)
+                val logicalAddressChartX = Chart(getChartConfig(ItemType.LOGICAL_ADDRESS, SInfo.logicalAddressSInfoList, animationTime = animateTime))
+                add(logicalAddressChartX)
                 add(
                     ChartLabelTable(
                         ItemType.LOGICAL_ADDRESS,
@@ -334,7 +356,8 @@ object StatPage : SimplePanel() {
 
 open class ChartLabelTable(
     itemType: ItemType,
-    itemSInfoList: ObservableList<SInfoRecord>,
+    //itemSInfoList: ObservableList<SInfoRecord>,
+    itemSInfoList: List<SInfoRecord>,
     dataField: String = "description",
     colorField: String = "color",
     callsField: String = "calls",
@@ -448,8 +471,8 @@ class SInfoRecord(
 
 class SInfoList(val itemType: ItemType) {
 
-    val recordList: ObservableListWrapper<SInfoRecord> =
-        observableListOf<SInfoRecord>() as ObservableListWrapper<SInfoRecord>
+    //val recordList: ObservableListWrapper<SInfoRecord> = observableListOf<SInfoRecord>() as ObservableListWrapper<SInfoRecord>
+    val recordList = mutableListOf<SInfoRecord>()
 
     fun callList(): List<Int> {
         return recordList.map { it.calls }
@@ -473,6 +496,7 @@ class SInfoList(val itemType: ItemType) {
         for (entry in ackMapTmp) {
             when (this.itemType) {
                 ItemType.CONSUMER -> {
+                    println("In populate consumer")
                     item = ServiceComponent.map[entry.key]
                     desc = "${item!!.description} (${item.hsaId})"
                 }

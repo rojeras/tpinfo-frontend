@@ -41,7 +41,7 @@ import kotlin.browser.document
 import kotlin.browser.window
 import kotlin.math.min
 
-class TextSearchInfo: BaseDataComponent() {
+class TextSearchInfo : BaseDataComponent() {
     var widgetTextSearchField = TextInput()
     val textSearchFilterObsList = observableListOf("")
 
@@ -181,7 +181,7 @@ object HippoTablePage : SimplePanel() {
 class HippoItemsView(type: ItemType, heading: String, bredd: Int = 20) : VPanel() {
     init {
 
-        width = (bredd-0.5).vw
+        width = (bredd - 0.5).vw
         margin = (0.3).vw
 
         // Render the search field
@@ -198,7 +198,7 @@ class HippoItemsView(type: ItemType, heading: String, bredd: Int = 20) : VPanel(
              */
 
             //if (type == ItemType.CONSUMER)
-                println("Will now render ${type}")
+            println("Will now render ${type}")
 
             // Go to top for most rendering actions
             if (state.currentAction != HippoAction.SetVMax::class) {
@@ -243,7 +243,7 @@ class HippoItemsView(type: ItemType, heading: String, bredd: Int = 20) : VPanel(
             }
 
             dataContainer(textSearchInfo.textSearchFilterObsList, { textFilter, _, _ ->
-                println("In dataContainer, type = $type, textFilter = $textFilter")
+                println("In dataContainer, type = $type, textFilter = '$textFilter'")
                 //textFilter = element
 
                 div {
