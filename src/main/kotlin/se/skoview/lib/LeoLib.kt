@@ -116,11 +116,8 @@ fun getDatesLastMonth(): Pair<Date, Date> {
 fun getVersion(versionName: String = "hippoVersion"): String {
     val versionElement = document.getElementById(versionName)
 
-    val version =
-        if (versionElement != null) versionElement.getAttribute("content") ?: "-1.-1.-1"
-        else "-2.-2.-2"
-
-    return version
+    return if (versionElement != null) versionElement.getAttribute("content") ?: "-1.-1.-1"
+    else "-2.-2.-2"
 }
 
 fun getColorForObject(obj: Any): Color {
@@ -133,10 +130,10 @@ fun getColorForObject(obj: Any): Color {
 fun String.thousands(): String {
     val s1 = this.reversed()
     val s2List = s1.chunked(3)
-    var s3: String = ""
+    var s3 = ""
 
     for (item in s2List) {
-        s3 += item + " "
+        s3 += "$item "
     }
 
     return s3.trim().reversed()

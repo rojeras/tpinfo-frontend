@@ -30,7 +30,7 @@ data class IntegrationLists(
     val logicalAddresses: List<LogicalAddress>
 )
 
-fun createViewData(state: HippoState) {
+fun createHippoViewData(state: HippoState) {
     //val filteredIntegrations = filterViewData(state)
     val filteredIntegrations = state.integrationArrs
 

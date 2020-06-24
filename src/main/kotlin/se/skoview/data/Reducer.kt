@@ -16,7 +16,6 @@
  */
 package se.skoview.data
 
-import se.skoview.app.store
 import se.skoview.data.PlattformChain.Companion.calculateId
 import se.skoview.lib.getDatesLastMonth
 import se.skoview.lib.toSwedishDate
@@ -259,13 +258,23 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
         }
         is HippoAction.ItemIdDeselectedAll -> {
             when (action.viewType) {
-                ItemType.CONSUMER -> state.copy( selectedConsumers = listOf() )
-                ItemType.DOMAIN -> state.copy( selectedDomains = listOf() )
-                ItemType.CONTRACT -> state.copy( selectedContracts = listOf() )
-                ItemType.PLATTFORM_CHAIN -> state.copy( selectedPlattformChains = listOf() )
-                ItemType.LOGICAL_ADDRESS -> state.copy( selectedLogicalAddresses = listOf() )
-                ItemType.PRODUCER -> state.copy( selectedProducers = listOf() )
+                ItemType.CONSUMER -> state.copy(selectedConsumers = listOf())
+                ItemType.DOMAIN -> state.copy(selectedDomains = listOf())
+                ItemType.CONTRACT -> state.copy(selectedContracts = listOf())
+                ItemType.PLATTFORM_CHAIN -> state.copy(selectedPlattformChains = listOf())
+                ItemType.LOGICAL_ADDRESS -> state.copy(selectedLogicalAddresses = listOf())
+                ItemType.PRODUCER -> state.copy(selectedProducers = listOf())
             }
+        }
+        is HippoAction.ItemDeselectedAllForAllTypes -> {
+            state.copy(
+                selectedConsumers = listOf(),
+                selectedDomains = listOf(),
+                selectedContracts = listOf(),
+                selectedPlattformChains = listOf(),
+                selectedLogicalAddresses = listOf(),
+                selectedProducers = listOf()
+            )
         }
         is HippoAction.SetVMax -> {
             when (action.type) {

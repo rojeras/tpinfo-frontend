@@ -16,7 +16,6 @@
  */
 package se.skoview.data
 
-import kotlinx.serialization.PrimitiveKind
 import pl.treksoft.kvision.redux.RAction
 import se.skoview.view.IntegrationLists
 
@@ -63,7 +62,7 @@ sealed class HippoAction : RAction {
     data class ItemIdDeselectedAll(
         val viewType: ItemType
     ): HippoAction()
-
+    object ItemDeselectedAllForAllTypes: HippoAction()
     data class ViewUpdated(val integrationLists: IntegrationLists) : HippoAction()
     data class SetVMax(val type: ItemType, val size: Int): HippoAction()
 }

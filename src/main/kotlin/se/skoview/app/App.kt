@@ -17,22 +17,15 @@
 package se.skoview.app
 
 import pl.treksoft.kvision.Application
-import pl.treksoft.kvision.core.Border
-import pl.treksoft.kvision.core.BorderStyle
-import pl.treksoft.kvision.core.Col
 import pl.treksoft.kvision.pace.Pace
 import pl.treksoft.kvision.panel.root
-import pl.treksoft.kvision.panel.tabPanel
 import pl.treksoft.kvision.panel.vPanel
 import pl.treksoft.kvision.redux.createReduxStore
 import pl.treksoft.kvision.require
 import pl.treksoft.kvision.startApplication
-import pl.treksoft.kvision.utils.auto
 import pl.treksoft.kvision.utils.perc
-import pl.treksoft.kvision.utils.px
 import se.skoview.data.*
 import se.skoview.view.*
-import kotlin.browser.document
 import kotlin.browser.window
 
 // Common
@@ -123,12 +116,11 @@ class App : Application() {
 
     override fun start() {
         val startUrl = window.location.href
-        println("window.location.href: ${startUrl}")
+        println("window.location.href: $startUrl")
 
         // If hostname or path contains "statistik" then we start the statistik app, else hippo
         val isStatApp =
-            if (startUrl.contains("statistik")) true
-            else false
+            startUrl.contains("statistik")
 
         // A listener that sets the URL after each state change
         store.subscribe { state ->
@@ -141,12 +133,12 @@ class App : Application() {
         store.subscribe { state ->
             if (state.currentAction == HippoAction.DoneDownloadBaseItems::class) {
                 if (isStatApp) startStat()
-                else startHippo(state)
+                else startHippo()
             }
         }
     }
 
-    fun startHippo(state: HippoState) {
+    fun startHippo() {
         store.dispatch(HippoAction.ApplicationStarted(HippoApplication.HIPPO))
 
         loadIntegrations(store.getState())

@@ -21,7 +21,7 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonConfiguration
 import se.skoview.app.store
 import se.skoview.lib.getAsyncTpDb
-import se.skoview.view.createViewData
+import se.skoview.view.createHippoViewData
 
 enum class ItemType {
     CONSUMER,
@@ -49,9 +49,7 @@ data class Integration(
     val serviceDomainId: Int,
     val serviceConsumerId: Int,
     val serviceProducerId: Int
-) {
-    val plattformChainId = PlattformChain.calculateId(firstTpId, middleTpId, lastTpId)
-}
+)
 
 @Serializable
 data class MaxCounter(
@@ -97,7 +95,7 @@ fun loadIntegrations(state: HippoState) {
                     integrationsCache.updateDates
                 )
             )
-            createViewData(getState())
+            createHippoViewData(getState())
         }
     } else {
         println(">>> Integrations NOT found in cache - will download")
@@ -131,7 +129,7 @@ fun loadIntegrations(state: HippoState) {
                         integrationInfo.updateDates
                     )
                 )
-                createViewData(getState())
+                createHippoViewData(getState())
             }
         }
     }
@@ -171,8 +169,8 @@ fun HippoState.getParams(): String {
     for (pcId in this.selectedPlattformChains) {
         val firstId = PlattformChain.map[pcId]?.first
         val lastId = PlattformChain.map[pcId]?.last
-        params += "&firstPlattformId=" + firstId
-        params += "&lastPlattformId=" + lastId
+        params += "&firstPlattformId=$firstId"
+        params += "&lastPlattformId=$lastId"
     }
 
     return params

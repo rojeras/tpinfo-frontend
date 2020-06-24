@@ -1,9 +1,7 @@
 package se.skoview.data
 
-import kotlinx.serialization.Serializable
 import se.skoview.app.store
 import se.skoview.lib.getAsyncTpDb
-import se.skoview.view.createViewData
 
 data class StatisticsCache(
     val key: String,
@@ -34,7 +32,7 @@ fun loadStatistics(state: HippoState) {
         println("Statistics found in cache")
         val statisticsCache = StatisticsCache.map[parameters]!!
 
-        store.dispatch { _, getState ->
+        store.dispatch { _, _ ->
             store.dispatch(
                 HippoAction.DoneDownloadStatistics(
                     statisticsCache.callsConsumer,
@@ -44,7 +42,7 @@ fun loadStatistics(state: HippoState) {
                     statisticsCache.callsContract
                 )
             )
-            //createViewData(getState())
+            //SInfo.createStatViewData(getState())
         }
     } else {
         println(">>> Statistics data NOT found in cache - will download")
@@ -80,7 +78,7 @@ fun loadStatistics(state: HippoState) {
                 ackContractMap
             )
 
-            store.dispatch { _, getState ->
+            store.dispatch { _, _ ->
                 store.dispatch(
                     HippoAction.DoneDownloadStatistics(
                         statisticsCache.callsConsumer,
@@ -90,7 +88,7 @@ fun loadStatistics(state: HippoState) {
                         statisticsCache.callsContract
                     )
                 )
-                //createViewData(getState())
+                //SInfo.createStatViewData(getState())
             }
         }
     }
