@@ -61,7 +61,7 @@ class SInfoList(private val itemType: ItemType) {
                     item = ServiceContract.map[entry.key]
                     desc = item!!.description
                 }
-                else -> error("Unknown itemType in populate!")
+                else -> error("Unknown itemType in populate()!")
             }
             //println("${item!!.description} has calls: ${ackMapTmp[entry.key]}")
 
