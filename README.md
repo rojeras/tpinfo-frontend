@@ -41,6 +41,16 @@ So the flow is mostly about something like this:
 
     With bigger apps I use StackPanel to separate different parts of the application (different urls activate different stack children, showing the correct view)
 
+##Remote access to devserver
+To access the devserver from another computer (Windows) on the same lan.
+
+In webpack.config.d/webpack.js add:
+
+``
+config.devServer.host = '0.0.0.0';
+``
+
+inside `if (config.devServer)`
 
 ##Hotfix
 1. Check out the running version through its tag

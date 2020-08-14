@@ -160,16 +160,19 @@ object HippoTablePage : SimplePanel() {
         hPanel {
             //margin = 5.px
 
-            position = Position.ABSOLUTE
-            width = 100.perc
-            overflow = Overflow.AUTO
+            //position = Position.ABSOLUTE
+            //width = 100.perc
+            //overflow = Overflow.AUTO
 
             //marginRight = 24.px
 
-            background = Background(hex(0xffffff))
-            //background = Background(hex(0xff0000))
+            //background = Background(hex(0xffffff))
+            background = Background(hex(0xff0000))
 
-            add(HippoItemsView(ItemType.CONSUMER, "Tjänstekonsumenter", 20))
+            val cons = HippoItemsView(ItemType.CONSUMER, "Tjänstekonsumenter", 20)
+            cons.apply { background = Background(hex(0xffff0f)) }
+            add(cons)
+            //add(HippoItemsView(ItemType.CONSUMER, "Tjänstekonsumenter", 20))
             add(HippoItemsView(ItemType.CONTRACT, "Tjänstekontrakt", 20))
             add(HippoItemsView(ItemType.PLATTFORM_CHAIN, "Tjänsteplattformar", 19))
             add(HippoItemsView(ItemType.PRODUCER, "Tjänsteproducenter", 20))
@@ -180,9 +183,11 @@ object HippoTablePage : SimplePanel() {
 
 class HippoItemsView(type: ItemType, heading: String, bredd: Int = 20) : VPanel() {
     init {
-
-        width = (bredd - 0.5).vw
+        background = Background((hex(0x0fffff)))
+        //width = (bredd - 0.9).vw
+        //width = (bredd-0.5).perc
         margin = (0.3).vw
+        wordBreak = WordBreak.BREAKALL
 
         // Render the search field
         val textSearchInfo = TextSearchInfo()
@@ -281,7 +286,7 @@ class HippoItemsView(type: ItemType, heading: String, bredd: Int = 20) : VPanel(
                                     rich = true
                                 ) {
                                     margin = 5.px
-                                    wordBreak = WordBreak.BREAKALL
+                                    //wordBreak = WordBreak.BREAKALL
                                     margin = 5.px
 
                                     // Difference for contracts, domains and rest

@@ -12,4 +12,5 @@ if (config.devServer) {
         warnings: false
     };
     config.devServer.clientLogLevel = 'error';
+    config.devServer.host = '0.0.0.0';
 }

@@ -43,14 +43,11 @@ sealed class HippoAction : RAction {
         val callsDomain: Map<Int, Int>,
         val callsContract: Map<Int, Int>
     ) : HippoAction()
+    data class DoneDownloadHistory(
+        val historyMap: Map<String, Int>
+    ): HippoAction()
     data class ErrorDownloadIntegrations(val errorMessage: String) : HippoAction()
     data class DateSelected(val dateType: DateType, val selectedDate: String) : HippoAction()
-    /*
-    data class ItemSelected(
-        val viewType: ItemType,
-        val baseItem: BaseItem
-    ) : HippoAction()
-     */
     data class ItemIdSelected(
         val viewType: ItemType,
         val id: Int
@@ -65,4 +62,5 @@ sealed class HippoAction : RAction {
     object ItemDeselectedAllForAllTypes: HippoAction()
     data class ViewUpdated(val integrationLists: IntegrationLists) : HippoAction()
     data class SetVMax(val type: ItemType, val size: Int): HippoAction()
+    data class ShowTimeGraph(val isShown: Boolean): HippoAction()
 }

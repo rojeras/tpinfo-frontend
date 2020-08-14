@@ -17,16 +17,34 @@
 package se.skoview.app
 
 import pl.treksoft.kvision.Application
+import pl.treksoft.kvision.core.*
 import pl.treksoft.kvision.pace.Pace
 import pl.treksoft.kvision.panel.root
 import pl.treksoft.kvision.panel.vPanel
 import pl.treksoft.kvision.redux.createReduxStore
 import pl.treksoft.kvision.require
 import pl.treksoft.kvision.startApplication
+import pl.treksoft.kvision.utils.auto
+import pl.treksoft.kvision.utils.minus
 import pl.treksoft.kvision.utils.perc
+import pl.treksoft.kvision.utils.px
 import se.skoview.data.*
 import se.skoview.view.*
 import kotlin.browser.window
+
+/**
+Övergripande tankar inför sommaruppehållet 2020
+ - Red ut redux-thunk. Bör kunna göra mycket av dispatchandet enklare och centrerat. Nu sker för mycket ute lokalt i komponenterna.
+ - https://daveceddia.com/what-is-a-thunk/
+ - Måste reda ut trigger för när tidsgrafen ska visas. Ska det vara checkboxen självt eller det faktum att det finns historiskt data tillgängligt
+ - Linejegrafen måste animeras när nytt data blir tillgängligt, se https://www.chartjs.org/samples/latest/scales/logarithmic/line.html
+ - Radio buttons för att styra om synonymer ska visas
+ - Förval - jobb påbörjat i StatPreSelect.kt
+ - Sedan saknas bara knappen för "ladda ner fil"
+
+*/
+
+
 
 // Common
 
@@ -50,13 +68,13 @@ import kotlin.browser.window
 
 // Statistik
 
-// todo: Fixa till datahanteringen så att det blir en renare redux-koppling till vad som visas
-// todo: Fixa skärmuppdateringen så att det inte blinkar och försvinner ibland
 // todo: Addera vy för "Över tid"
 // todo: Export till CSV
 // todo: Fixa "about" för statistiken
-// todo: Inkludera synonymer
+// todo: Inkludera synonymer. Överväg tr-funktionen för att även anpassa "Tjänstekonsument" -> "Anropande system" osv
 // todo: Förvalda vyer som i gamla statistiken
+// done: Fixa till datahanteringen så att det blir en renare redux-koppling till vad som visas
+// done: Fixa skärmuppdateringen så att det inte blinkar och försvinner ibland
 // done: Visa HSA-idn (sökbara)
 
 // Done
@@ -147,7 +165,13 @@ class App : Application() {
                 //add(HippoTablePage)
                 add(HippoTablePage)
             }.apply {
-                width = 100.perc
+                //width = 100.perc
+                //width = 80.perc
+                //margin = 20.px
+                //marginLeft = auto
+                //marginRight = auto
+                //padding = 20.px
+                //border = Border(2.px, BorderStyle.SOLID, Color.name(Col.SILVER))
             }
 
         }
@@ -156,14 +180,13 @@ class App : Application() {
     fun startStat() {
         store.dispatch(HippoAction.ApplicationStarted(HippoApplication.STATISTIK))
         loadStatistics(store.getState())
+        //loadHistory(store.getState())
         root("hippo") {
             vPanel {
                 add(StatPage)
             }.apply {
                 width = 100.perc
             }
-
         }
     }
-
 }

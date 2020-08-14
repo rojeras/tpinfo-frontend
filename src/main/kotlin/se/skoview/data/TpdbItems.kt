@@ -56,6 +56,7 @@ abstract class BaseItem {
     abstract val searchField: String
     abstract val id: Int
     open val hsaId = ""
+    abstract val synonym: String?
 }
 
 object BaseDates {
@@ -89,7 +90,7 @@ data class ServiceComponent(
     override val id: Int = -1,
     override val hsaId: String = "",
     override val description: String = "",
-    val synonym: String? = null
+    override val synonym: String? = null
 ) : BaseItem() {
 
     init {
@@ -138,7 +139,8 @@ data class ServiceComponent(
 data class LogicalAddress constructor(
     override val id: Int,
     override val name: String,
-    override val description: String
+    override val description: String,
+    override val synonym: String? = null
 ) : BaseItem() {
 
     init {
@@ -159,14 +161,15 @@ data class LogicalAddress constructor(
             data class LogicalAddressJsonParse constructor(
                 val id: Int,
                 val logicalAddress: String,
-                val description: String
+                val description: String,
+                val synonym: String
             )
 
             val type = "logicalAddress"
             getAsyncTpDb(type) { response ->
                 val items = JSON.parse<Array<LogicalAddressJsonParse>>(response)
                 items.forEach { item ->
-                    LogicalAddress(item.id, item.logicalAddress, item.description)
+                    LogicalAddress(item.id, item.logicalAddress, item.description, item.synonym)
                 }
                 isLoaded = true
                 callback()
@@ -180,7 +183,8 @@ data class ServiceContract(
     val serviceDomainId: Int,
     override val name: String,
     val namespace: String,
-    val major: Int
+    val major: Int,
+    override val synonym: String? = null
 ) : BaseItem() {
     private val domain: ServiceDomain?
 
@@ -208,14 +212,15 @@ data class ServiceContract(
                 val serviceDomainId: Int,
                 val name: String,
                 val namespace: String,
-                val major: Int
+                val major: Int,
+                val synonym: String
             )
 
             val type = "contracts"
             getAsyncTpDb(type) { response ->
                 val items = JSON.parse<Array<ServiceContractJsonParse>>(response)
                 items.forEach { item ->
-                    ServiceContract(item.id, item.serviceDomainId, item.name, item.namespace, item.major)
+                    ServiceContract(item.id, item.serviceDomainId, item.name, item.namespace, item.major, item.synonym)
                 }
                 isLoaded = true
 
@@ -229,7 +234,11 @@ data class ServiceContract(
     }
 }
 
-data class ServiceDomain(override val id: Int, override val name: String) : BaseItem() {
+data class ServiceDomain(
+    override val id: Int,
+    override val name: String,
+    override val synonym: String? = null
+) : BaseItem() {
     //override val itemType = ItemType.DOMAIN
     var contracts: MutableSet<ServiceContract> = mutableSetOf()
 
@@ -250,13 +259,13 @@ data class ServiceDomain(override val id: Int, override val name: String) : Base
 
         fun load(callback: () -> Unit) {
             @Serializable
-            data class ServiceDomainJsonParse(val id: Int, val domainName: String)
+            data class ServiceDomainJsonParse(val id: Int, val domainName: String, val synonym: String)
 
             val type = "domains"
             getAsyncTpDb(type) { response ->
                 val items = JSON.parse<Array<ServiceDomainJsonParse>>(response)
                 items.forEach { item ->
-                    ServiceDomain(item.id, item.domainName)
+                    ServiceDomain(item.id, item.domainName, item.synonym)
                 }
                 isLoaded = true
                 if (ServiceContract.isLoaded) {
@@ -280,7 +289,13 @@ data class ServiceDomain(override val id: Int, override val name: String) : Base
     }
 }
 
-data class Plattform(override val id: Int, val platform: String, val environment: String, val snapshotTime: String) :
+data class Plattform(
+    override val id: Int,
+    val platform: String,
+    val environment: String,
+    val snapshotTime: String,
+    override val synonym: String? = null
+) :
     BaseItem() {
     //override val itemType = ItemType.PLATTFORM
     override val name: String = "$platform-$environment"
@@ -302,14 +317,15 @@ data class Plattform(override val id: Int, val platform: String, val environment
                 val id: Int,
                 val platform: String,
                 val environment: String,
-                val snapshotTime: String
+                val snapshotTime: String,
+                val synonym: String
             )
 
             val type = "plattforms"
             getAsyncTpDb(type) { response ->
                 val items = JSON.parse<Array<PlattformJsonParse>>(response)
                 items.forEach { item ->
-                    Plattform(item.id, item.platform, item.environment, item.snapshotTime)
+                    Plattform(item.id, item.platform, item.environment, item.snapshotTime, item.synonym)
                 }
                 isLoaded = true
                 callback()
@@ -319,7 +335,12 @@ data class Plattform(override val id: Int, val platform: String, val environment
 
 }
 
-data class PlattformChain(val first: Int, val middle: Int?, val last: Int) : BaseItem() {
+data class PlattformChain(
+    val first: Int,
+    val middle: Int?,
+    val last: Int,
+    override val synonym: String? = null
+) : BaseItem() {
 
     private val firstPlattform = Plattform.map[first]
 
@@ -393,7 +414,12 @@ data class PlattformChain(val first: Int, val middle: Int?, val last: Int) : Bas
 }
 
 // List of plattforms containing statistics information
-data class StatisticsPlattform(override val id: Int, val platform: String, val environment: String) :
+data class StatisticsPlattform(
+    override val id: Int,
+    val platform: String,
+    val environment: String,
+    override val synonym: String? = null
+) :
     BaseItem() {
     override val name: String = "$platform-$environment"
     override val description = ""
@@ -414,14 +440,15 @@ data class StatisticsPlattform(override val id: Int, val platform: String, val e
                 val id: Int,
                 val platform: String,
                 val environment: String,
-                val snapshotTime: String
+                val snapshotTime: String,
+                val synonym: String
             )
 
             val type = "statPlattforms"
             getAsyncTpDb(type) { response ->
                 val items = JSON.parse<Array<StatisticsPlattformJsonParse>>(response)
                 items.forEach { item ->
-                    StatisticsPlattform(item.id, item.platform, item.environment)
+                    StatisticsPlattform(item.id, item.platform, item.environment, item.synonym)
                 }
                 isLoaded = true
                 callback()

@@ -1,9 +1,25 @@
+/**
+ * Copyright (C) 2013-2020 Lars Erik Röjerås
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package se.skoview.view
 
-import com.github.snabbdom._get
 import pl.treksoft.kvision.chart.*
 import pl.treksoft.kvision.core.*
 import pl.treksoft.kvision.core.Position
+import pl.treksoft.kvision.form.check.*
 import pl.treksoft.kvision.form.select.simpleSelectInput
 import pl.treksoft.kvision.html.*
 import pl.treksoft.kvision.html.Align
@@ -21,6 +37,8 @@ import se.skoview.app.store
 import se.skoview.data.*
 import se.skoview.lib.thousands
 import se.skoview.lib.getVersion
+
+// todo: Try to move this class inside the StatPage class
 
 object StatPage : SimplePanel() {
 
@@ -84,7 +102,6 @@ object StatPage : SimplePanel() {
                                 else ""
                             simpleSelectInput(
                                 options = state.statisticsPlattforms.map { Pair(it.key.toString(), it.value.name) },
-                                //value = selectedPlattformChain!!.name
                                 value = selectedPlattformId
                             ) {
                                 addCssStyle(formControlXs)
@@ -95,17 +112,26 @@ object StatPage : SimplePanel() {
                                     val pChainId =
                                         PlattformChain.calculateId(first = selectedTp, middle = null, last = selectedTp)
                                     store.dispatch(HippoAction.ItemDeselectedAllForAllTypes)
-                                    store.dispatch { dispatch, getState ->
-                                        dispatch(
-                                            HippoAction.ItemIdSelected(
-                                                ItemType.PLATTFORM_CHAIN,
-                                                //pChain!!
-                                                pChainId
-                                            )
+                                    //store.dispatch { dispatch, getState ->
+                                    store.dispatch(
+                                        HippoAction.ItemIdSelected(
+                                            ItemType.PLATTFORM_CHAIN,
+                                            pChainId
                                         )
-                                        loadStatistics(getState())
-                                    }
+                                    )
+                                    loadStatistics(store.getState())
+                                    //}
                                 }
+                            }
+                        }
+
+                        // Show time graph
+                        cell { +"Visa tidsgraf" }
+                        cell {
+                            checkBoxInput(
+                                value = state.showTimeGraph
+                            ).onClick {
+                                store.dispatch(HippoAction.ShowTimeGraph(value))
                             }
                         }
                     }
@@ -127,6 +153,52 @@ object StatPage : SimplePanel() {
                                     }
                                 }
                             }
+                        }
+
+                        cell { +"Förval:" }
+                        cell {
+                            val selectedPlattformId =
+                                if (state.selectedPlattformChains.size > 0)
+                                    PlattformChain.map[state.selectedPlattformChains[0]]!!.last.toString()
+                                else ""
+                            simpleSelectInput(
+                                options = state.statisticsPlattforms.map { Pair(it.key.toString(), it.value.name) },
+                                value = selectedPlattformId
+                            ) {
+                                addCssStyle(formControlXs)
+                                background = Background(Color.name(Col.WHITE))
+                            }.onEvent {
+                                change = {
+                                    val selectedTp = (self.value ?: "").toInt()
+                                    val pChainId =
+                                        PlattformChain.calculateId(first = selectedTp, middle = null, last = selectedTp)
+                                    store.dispatch(HippoAction.ItemDeselectedAllForAllTypes)
+                                    store.dispatch { dispatch, getState ->
+                                        dispatch(
+                                            HippoAction.ItemIdSelected(
+                                                ItemType.PLATTFORM_CHAIN,
+                                                pChainId
+                                            )
+                                        )
+                                        loadStatistics(getState())
+                                    }
+                                }
+                            }
+                        }
+                        cell {
+                            radio(
+                                name = "synSetting",
+                                label = "Vanliga namn"
+                            ).onClick {
+                                println("Vanliga: $value")
+                            }
+                            radio(
+                                name = "synSetting",
+                                label = "Tekniska namn"
+                            ).onClick {
+                                println("Tekniska: $value")
+                            }
+
                         }
                     }
                 }
@@ -156,6 +228,20 @@ object StatPage : SimplePanel() {
             }
         }
 
+        // The development over time - graph
+        simplePanel {
+        }.bind(store) { state ->
+            if (state.showTimeGraph) {
+                val lineChart =
+                    Chart(getLineChartConfig(state.historyMap, animationTime = 1300))
+                add(lineChart)
+                    .apply {
+                        width = 100.perc
+                        height = 20.vw
+                    }
+            }
+        }
+
         // The whole item table
         hPanel() {
             //@Suppress("UnsafeCastFromDynamic")
@@ -181,7 +267,13 @@ object StatPage : SimplePanel() {
 
             simplePanel() {
                 val consumerChartX =
-                    Chart(getChartConfig(ItemType.CONSUMER, SInfo.consumerSInfoList, animationTime = animateTime))
+                    Chart(
+                        getPieChartConfig(
+                            ItemType.CONSUMER,
+                            SInfo.consumerSInfoList,
+                            animationTime = animateTime
+                        )
+                    )
                 add(consumerChartX).apply { width = 100.perc }
                 add(
                     ChartLabelTable(
@@ -202,7 +294,13 @@ object StatPage : SimplePanel() {
 
             simplePanel {
                 val contractChartX =
-                    Chart(getChartConfig(ItemType.CONTRACT, SInfo.contractSInfoList, animationTime = animateTime))
+                    Chart(
+                        getPieChartConfig(
+                            ItemType.CONTRACT,
+                            SInfo.contractSInfoList,
+                            animationTime = animateTime
+                        )
+                    )
                 add(contractChartX)
                 add(
                     ChartLabelTable(
@@ -221,7 +319,13 @@ object StatPage : SimplePanel() {
 
             simplePanel {
                 val producerChartX =
-                    Chart(getChartConfig(ItemType.PRODUCER, SInfo.producerSInfoList, animationTime = animateTime))
+                    Chart(
+                        getPieChartConfig(
+                            ItemType.PRODUCER,
+                            SInfo.producerSInfoList,
+                            animationTime = animateTime
+                        )
+                    )
                 add(producerChartX)
                 add(
                     ChartLabelTable(
@@ -239,7 +343,7 @@ object StatPage : SimplePanel() {
             }
             simplePanel {
                 val logicalAddressChartX = Chart(
-                    getChartConfig(
+                    getPieChartConfig(
                         ItemType.LOGICAL_ADDRESS,
                         SInfo.logicalAddressSInfoList,
                         animationTime = animateTime
@@ -263,6 +367,7 @@ object StatPage : SimplePanel() {
         }
     }
 }
+
 
 open class ChartLabelTable(
     itemType: ItemType,
@@ -358,42 +463,4 @@ open class ChartLabelTable(
     }
 }
 
-private fun getChartConfig(
-    itemType: ItemType,
-    itemSInfoList: SInfoList,
-    animationTime: Int = 0
-): Configuration {
-    val configuration = Configuration(
-        ChartType.PIE,
-        listOf(
-            DataSets(
-                data = itemSInfoList.callList(),
-                backgroundColor = itemSInfoList.colorList()
-            )
-        ),
-        itemSInfoList.descList(),
-        options = ChartOptions(
-            animation = AnimationOptions(duration = animationTime),
-            //responsive = false,
-            legend = LegendOptions(display = false),
-            onClick = { _, activeElements ->
-                val sliceIx = activeElements[0]._get("_index") as Int
-                val itemId: Int = itemSInfoList.recordList[sliceIx].itemId
-                if (store.getState().isItemSelected(itemType, itemId)) {
-                    store.dispatch { _, getState ->
-                        store.dispatch(HippoAction.ItemIdDeselectedAll(itemType))
-                        loadStatistics(getState())
-                    }
-                } else {
-                    store.dispatch { _, getState ->
-                        store.dispatch(HippoAction.ItemIdSelected(itemType, itemId))
-                        loadStatistics(getState())
-                    }
 
-                }
-                "" // This lambda returns Any, which mean the last line must be an expression
-            }
-        )
-    )
-    return configuration
-}

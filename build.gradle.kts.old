@@ -3,11 +3,9 @@ import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 import org.jetbrains.kotlin.gradle.tasks.KotlinJsDce
 
-/**  Removed when migrating to KVision 3.12.0
 buildscript {
     extra.set("production", (findProperty("prod") ?: findProperty("production") ?: "false") == "true")
 }
-*/
 
 plugins {
     val kotlinVersion: String by System.getProperties()
@@ -41,11 +39,10 @@ val kvisionVersion: String by System.getProperties()
 
 // Custom Properties
 val webDir = file("src/main/web")
-//val isProductionBuild = project.extra.get("production") as Boolean
+val isProductionBuild = project.extra.get("production") as Boolean
 
 kotlin {
     target {
-        /** Removed migrating fto 3.13.0
         compilations.all {
             kotlinOptions {
                 moduleKind = "umd"
@@ -55,7 +52,6 @@ kotlin {
                 }
             }
         }
-        */
         browser {
             runTask {
                 outputFileName = "main.bundle.js"
@@ -69,10 +65,6 @@ kotlin {
                     contentBase = listOf("$buildDir/processedResources/Js/main")
                 )
             }
-            // Added webpackTask migrating to KVision 3.12.0
-            webpackTask {
-                outputFileName = "main.bundle.js"
-            }
             testTask {
                 useKarma {
                     useChromeHeadless()
@@ -85,8 +77,6 @@ kotlin {
         implementation(npm("po2json"))
         implementation(npm("grunt"))
         implementation(npm("grunt-pot"))
-
-        implementation(npm("react-awesome-button"))
 
         implementation("pl.treksoft:kvision:$kvisionVersion")
         implementation("pl.treksoft:kvision-bootstrap:$kvisionVersion")
@@ -112,15 +102,6 @@ kotlin {
         implementation("pl.treksoft:kvision-testutils:$kvisionVersion:tests")
     }
     sourceSets["main"].resources.srcDir(webDir)
-}
-
-fun getNodeJsBinaryExecutable(): String {
-    val nodeDir = NodeJsRootPlugin.apply(project).nodeJsSetupTask.destination
-    val isWindows = System.getProperty("os.name").toLowerCase().contains("windows")
-    val nodeBinDir = if (isWindows) nodeDir else nodeDir.resolve("bin")
-    val command = NodeJsRootPlugin.apply(project).nodeCommand
-    val finalCommand = if (isWindows && command == "node") "node.exe" else command
-    return nodeBinDir.resolve(finalCommand).absolutePath
 }
 
 tasks {
@@ -169,9 +150,9 @@ tasks {
         }
     }
     create("generatePotFile", Exec::class) {
-        dependsOn("compileKotlinJs", "generateGruntfile")
+        dependsOn("kotlinNpmInstall", "generateGruntfile")
         workingDir = file("$buildDir/js")
-        executable = getNodeJsBinaryExecutable()
+        executable = NodeJsRootPlugin.apply(project).nodeCommand
         args("$buildDir/js/node_modules/grunt/bin/grunt", "pot")
         inputs.files(kotlin.sourceSets["main"].kotlin.files)
         outputs.file("$projectDir/src/main/resources/i18n/messages.pot")
@@ -180,14 +161,14 @@ tasks {
 afterEvaluate {
     tasks {
         getByName("processResources", Copy::class) {
-            dependsOn("compileKotlinJs")
+            dependsOn("kotlinNpmInstall")
             exclude("**/*.pot")
             doLast("Convert PO to JSON") {
                 destinationDir.walkTopDown().filter {
                     it.isFile && it.extension == "po"
                 }.forEach {
                     exec {
-                        executable = getNodeJsBinaryExecutable()
+                        executable = NodeJsRootPlugin.apply(project).nodeCommand
                         args(
                             "$buildDir/js/node_modules/po2json/bin/po2json",
                             it.absolutePath,

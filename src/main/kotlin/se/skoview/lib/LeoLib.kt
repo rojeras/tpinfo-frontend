@@ -41,7 +41,7 @@ fun getAsyncTpDb(url: String, callback: (String) -> Unit) {
     val currentProtocol = window.location.protocol
     val currentHost = window.location.host
     // tpdb is assumed to be on the 'qa.integrationer.tjansteplattform.se' server if we run in development or test environment
-    val baseUrl = if (currentHost.contains("localhost") || currentHost.contains("www.hippokrates.se")) {
+    val baseUrl = if (currentHost.contains("localhost") || currentHost.contains("192.168.0.") || currentHost.contains("www.hippokrates.se")) {
         "https://qa.integrationer.tjansteplattform.se/tpdb/tpdbapi.php/api/v1/"
     } else {
         "$currentProtocol//$currentHost/../tpdb/tpdbapi.php/api/v1/"

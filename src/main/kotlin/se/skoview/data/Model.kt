@@ -94,7 +94,12 @@ data class HippoState(
     val callsProducer: Map<Int, Int>,
     val callsLogicalAddress: Map<Int, Int>,
     val callsDomain: Map<Int, Int>,
-    val callsContract: Map<Int, Int>
+    val callsContract: Map<Int, Int>,
+
+    // History information
+    val historyMap: Map<String, Int>,
+    val showTimeGraph: Boolean
+
 )
 
 fun HippoState.isItemSelected(itemType: ItemType, id: Int): Boolean {
@@ -155,7 +160,9 @@ fun getInitialState(): HippoState {
         mapOf(),
         mapOf(),
         mapOf(),
-        mapOf()
+        mapOf(),
+        mapOf(),
+        false
     )
 }
 

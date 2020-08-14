@@ -109,6 +109,10 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
                 callsContract = action.callsContract
             )
         }
+        is HippoAction.DoneDownloadHistory -> {
+            println("In reducer DonwDownloadHistory")
+            state.copy(historyMap = action.historyMap)
+        }
         is HippoAction.ErrorDownloadIntegrations -> state.copy(
             downloadIntegrationStatus = AsyncActionStatus.ERROR,
             errorMessage = action.errorMessage
@@ -293,6 +297,9 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
                 }
             }
         }
+        is HippoAction.ShowTimeGraph -> {
+            state.copy(showTimeGraph = action.isShown)
+        }
     }
     val finalState = newState.copy(currentAction = action::class)
 
@@ -303,3 +310,7 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
     return finalState
 }
 
+// todo: Maybe add common reducer logic in private functions here
+// Would make it possible to do a number of state updates within the same action
+
+// todo: Maybe add HippoThunk creators here
