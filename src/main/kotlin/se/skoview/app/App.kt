@@ -18,16 +18,15 @@ package se.skoview.app
 
 import pl.treksoft.kvision.Application
 import pl.treksoft.kvision.core.*
+import pl.treksoft.kvision.html.span
 import pl.treksoft.kvision.pace.Pace
+import pl.treksoft.kvision.panel.hPanel
 import pl.treksoft.kvision.panel.root
 import pl.treksoft.kvision.panel.vPanel
 import pl.treksoft.kvision.redux.createReduxStore
 import pl.treksoft.kvision.require
 import pl.treksoft.kvision.startApplication
-import pl.treksoft.kvision.utils.auto
-import pl.treksoft.kvision.utils.minus
-import pl.treksoft.kvision.utils.perc
-import pl.treksoft.kvision.utils.px
+import pl.treksoft.kvision.utils.*
 import se.skoview.data.*
 import se.skoview.view.*
 import kotlin.browser.window
@@ -161,17 +160,37 @@ class App : Application() {
 
         loadIntegrations(store.getState())
         root("hippo") {
+            /*
+            hPanel {
+                background = Background(Color.name(Col.BLUE))
+                width = 100.perc
+                height = 500.px
+                vPanel {
+                    background = Background(Color.name(Col.BEIGE))
+                    width = 20.perc
+                    height = 500.px
+                    span("Left")
+                }
+                vPanel {
+                    background = Background(Color.name(Col.GREEN))
+                    width = 80.perc
+                    height = 500.px
+                    span("Right")
+                }
+            }
+             */
             vPanel {
-                //add(HippoTablePage)
                 add(HippoTablePage)
             }.apply {
-                //width = 100.perc
-                //width = 80.perc
-                //margin = 20.px
-                //marginLeft = auto
-                //marginRight = auto
-                //padding = 20.px
-                //border = Border(2.px, BorderStyle.SOLID, Color.name(Col.SILVER))
+                width = 100.perc
+                /*
+                width = 80.perc
+                margin = 20.px
+                marginLeft = auto
+                marginRight = auto
+                padding = 20.px
+                border = Border(2.px, BorderStyle.SOLID, Color.name(Col.SILVER))
+                 */
             }
 
         }

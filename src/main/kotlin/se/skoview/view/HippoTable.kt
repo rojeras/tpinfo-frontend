@@ -30,7 +30,6 @@ import pl.treksoft.kvision.modal.ModalSize
 import pl.treksoft.kvision.panel.*
 import pl.treksoft.kvision.state.bind
 import pl.treksoft.kvision.state.observableListOf
-import pl.treksoft.kvision.state.stateBinding
 import pl.treksoft.kvision.utils.perc
 import pl.treksoft.kvision.utils.px
 import pl.treksoft.kvision.utils.vw
@@ -158,34 +157,31 @@ object HippoTablePage : SimplePanel() {
 
         // The whole item table
         hPanel {
+        //flexPanel {
             //margin = 5.px
 
             //position = Position.ABSOLUTE
-            //width = 100.perc
-            //overflow = Overflow.AUTO
+            //width = 95.vw
+            overflow = Overflow.HIDDEN
 
             //marginRight = 24.px
 
-            //background = Background(hex(0xffffff))
-            background = Background(hex(0xff0000))
+            //background = Background(hex(0xff0000))
 
-            val cons = HippoItemsView(ItemType.CONSUMER, "Tjänstekonsumenter", 20)
-            cons.apply { background = Background(hex(0xffff0f)) }
-            add(cons)
-            //add(HippoItemsView(ItemType.CONSUMER, "Tjänstekonsumenter", 20))
-            add(HippoItemsView(ItemType.CONTRACT, "Tjänstekontrakt", 20))
-            add(HippoItemsView(ItemType.PLATTFORM_CHAIN, "Tjänsteplattformar", 19))
-            add(HippoItemsView(ItemType.PRODUCER, "Tjänsteproducenter", 20))
-            add(HippoItemsView(ItemType.LOGICAL_ADDRESS, "Logiska adresser", 20))
+            add(HippoItemsView(ItemType.CONSUMER, "Tjänstekonsumenter", 21))//, grow = 1)
+            add(HippoItemsView(ItemType.CONTRACT, "Tjänstekontrakt", 21))//, grow = 1)
+            add(HippoItemsView(ItemType.PLATTFORM_CHAIN, "Tjänsteplattformar", 16))//, grow = 1)
+            add(HippoItemsView(ItemType.PRODUCER, "Tjänsteproducenter", 21))//, grow = 1)
+            add(HippoItemsView(ItemType.LOGICAL_ADDRESS, "Logiska adresser", 21))//, grow = 1)
         }
     }
 }
 
 class HippoItemsView(type: ItemType, heading: String, bredd: Int = 20) : VPanel() {
     init {
-        background = Background((hex(0x0fffff)))
-        //width = (bredd - 0.9).vw
-        //width = (bredd-0.5).perc
+        //background = Background((hex(0x0fffff)))
+        width = (bredd - 0.5).vw
+        overflow = Overflow.HIDDEN
         margin = (0.3).vw
         wordBreak = WordBreak.BREAKALL
 
