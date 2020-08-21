@@ -14,16 +14,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package se.skoview.view
+package se.skoview.data
 
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.builtins.list
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonConfiguration
 import se.skoview.app.store
-import se.skoview.data.HippoAction
-import se.skoview.data.HippoState
-import se.skoview.data.getParams
 import se.skoview.lib.getAsyncTpDb
 
 @Serializable
@@ -51,22 +47,10 @@ fun loadHistory(state: HippoState) {
 
     // Check if the statistics info is available in the cache
     if (HistoryCache.map.containsKey(parameters)) {
-        println("History found in cache")
-        val historyCache = HistoryCache.map[parameters]!!
-
-        store.dispatch { _, _ ->
-            HippoAction.DoneDownloadHistory(historyCache.historyMap)
-        }
-        /*
-        store.dispatch { _, _ ->
-            store.dispatch(
-                HippoAction.DoneDownloadHistory(
-                    historyCache.historyMap
-                )
-            )
-            //SInfo.createStatViewData(getState())
-        }
-        */
+        println(">>> History data found in cache")
+        store.dispatch(
+            HippoAction.DoneDownloadHistory(HistoryCache.map[parameters]!!.historyMap)
+        )
     } else {
         println(">>> History data NOT found in cache - will download")
         console.log(parameters)
@@ -88,28 +72,9 @@ fun loadHistory(state: HippoState) {
 
             println("time to dispatch")
             store.dispatch(
-                HippoAction.DoneDownloadHistory(history.history)
+                HippoAction.DoneDownloadHistory(HistoryCache.map[parameters]!!.historyMap)
             )
-            //console.log(history)
-
-            //println("History records: ${historyList[0].history}")
-
-            /*
-            store.dispatch { _, _ ->
-                store.dispatch(
-                    HippoAction.DoneDownloadStatistics(
-                        statisticsCache.historyMap,
-                        statisticsCache.callsProducer,
-                        statisticsCache.callsLogicalAddress,
-                        statisticsCache.callsDomain,
-                        statisticsCache.callsContract
-                    )
-                )
-                //SInfo.createStatViewData(getState())
-            }
-             */
         }
     }
-
 }
 

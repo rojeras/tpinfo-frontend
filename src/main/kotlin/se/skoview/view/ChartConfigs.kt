@@ -18,6 +18,7 @@ package se.skoview.view
 
 import com.github.snabbdom._get
 import pl.treksoft.kvision.chart.*
+import pl.treksoft.kvision.utils.obj
 import se.skoview.app.store
 import se.skoview.data.HippoAction
 import se.skoview.data.ItemType
@@ -66,19 +67,22 @@ fun getPieChartConfig(
 }
 
 fun getLineChartConfig(
-    historyMap: Map<String, Int> ,
+    historyMap: Map<String, Int>,
     animationTime: Int = 0
 ): Configuration {
     val configuration = Configuration(
         ChartType.LINE,
         listOf(
             DataSets(
+                label = "Antal anrop per dag",
                 data = historyMap.values.toList()
             )
         ),
         historyMap.keys.toList(),
         options = ChartOptions(
-            animation = AnimationOptions(duration = animationTime)
+            animation = AnimationOptions(duration = animationTime),
+            //responsive = false
+            maintainAspectRatio = false
         )
     )
     return configuration

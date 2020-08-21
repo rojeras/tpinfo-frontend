@@ -18,7 +18,6 @@ package se.skoview.data
 
 import se.skoview.app.store
 import se.skoview.lib.getAsyncTpDb
-import se.skoview.view.loadHistory
 
 data class StatisticsCache(
     val key: String,
@@ -49,7 +48,7 @@ fun loadStatistics(state: HippoState) {
         println("Statistics found in cache")
         val statisticsCache = StatisticsCache.map[parameters]!!
 
-        store.dispatch { _, _ ->
+        //store.dispatch { _, _ ->
             store.dispatch(
                 HippoAction.DoneDownloadStatistics(
                     statisticsCache.callsConsumer,
@@ -60,7 +59,7 @@ fun loadStatistics(state: HippoState) {
                 )
             )
             //SInfo.createStatViewData(getState())
-        }
+        //}
     } else {
         println(">>> Statistics data NOT found in cache - will download")
         console.log(parameters)
@@ -95,7 +94,7 @@ fun loadStatistics(state: HippoState) {
                 ackContractMap
             )
 
-            store.dispatch { _, _ ->
+            //store.dispatch { _, _ ->
                 store.dispatch(
                     HippoAction.DoneDownloadStatistics(
                         statisticsCache.callsConsumer,
@@ -106,10 +105,10 @@ fun loadStatistics(state: HippoState) {
                     )
                 )
                 //SInfo.createStatViewData(getState())
-            }
+            //}
         }
     }
-    loadHistory(state)
+    if (state.showTimeGraph) loadHistory(state)
 
 }
 

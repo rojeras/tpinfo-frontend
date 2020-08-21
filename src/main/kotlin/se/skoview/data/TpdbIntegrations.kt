@@ -87,7 +87,7 @@ fun loadIntegrations(state: HippoState) {
         println("Integrations found in cache")
         val integrationsCache = IntegrationCache.map[parameters]
         // todo: Make sure to remove the !! below
-        store.dispatch { _, getState ->
+        //store.dispatch { _, getState ->
             store.dispatch(
                 HippoAction.DoneDownloadIntegrations(
                     integrationsCache!!.integrationArr,
@@ -95,8 +95,8 @@ fun loadIntegrations(state: HippoState) {
                     integrationsCache.updateDates
                 )
             )
-            createHippoViewData(getState())
-        }
+            createHippoViewData(store.getState())
+        //}
     } else {
         println(">>> Integrations NOT found in cache - will download")
         //console.log(parameters)
@@ -120,7 +120,7 @@ fun loadIntegrations(state: HippoState) {
                 IntegrationCache(parameters, integrationArrs, integrationInfo.maxCounters, integrationInfo.updateDates)
             }
             println("Number of integrations: ${integrationArrs.size}")
-            store.dispatch { _, getState ->
+            //store.dispatch { _, getState ->
 
                 store.dispatch(
                     HippoAction.DoneDownloadIntegrations(
@@ -129,8 +129,8 @@ fun loadIntegrations(state: HippoState) {
                         integrationInfo.updateDates
                     )
                 )
-                createHippoViewData(getState())
-            }
+                createHippoViewData(store.getState())
+            //}
         }
     }
 }

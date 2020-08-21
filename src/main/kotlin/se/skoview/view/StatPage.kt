@@ -23,6 +23,7 @@ import pl.treksoft.kvision.form.check.*
 import pl.treksoft.kvision.form.select.simpleSelectInput
 import pl.treksoft.kvision.html.*
 import pl.treksoft.kvision.html.Align
+import pl.treksoft.kvision.i18n.tr
 import pl.treksoft.kvision.modal.Modal
 import pl.treksoft.kvision.modal.ModalSize
 import pl.treksoft.kvision.panel.*
@@ -59,7 +60,6 @@ object StatPage : SimplePanel() {
             marginTop = 5.px
         }
 
-        // Date selector
         flexPanel(
             FlexDir.ROW, FlexWrap.WRAP, FlexJustify.SPACEBETWEEN, FlexAlignItems.CENTER,
             spacing = 5
@@ -87,10 +87,10 @@ object StatPage : SimplePanel() {
                                 background = Background(Color.name(Col.WHITE))
                             }.onEvent {
                                 change = {
-                                    store.dispatch { dispatch, getState ->
-                                        dispatch(HippoAction.DateSelected(DateType.EFFECTIVE, self.value ?: ""))
-                                        loadStatistics(getState())
-                                    }
+                                    //store.dispatch { dispatch, getState ->
+                                    store.dispatch(HippoAction.DateSelected(DateType.EFFECTIVE, self.value ?: ""))
+                                    loadStatistics(store.getState())
+                                    //}
                                 }
                             }
                         }
@@ -126,13 +126,14 @@ object StatPage : SimplePanel() {
                         }
 
                         // Show time graph
-                        cell { +"Visa tidsgraf" }
                         cell {
                             checkBoxInput(
                                 value = state.showTimeGraph
                             ).onClick {
+                                if (value) loadHistory(state)
                                 store.dispatch(HippoAction.ShowTimeGraph(value))
                             }
+                            +" Visa tidsgraf"
                         }
                     }
                     // End date
@@ -147,10 +148,10 @@ object StatPage : SimplePanel() {
                                 background = Background(Color.name(Col.WHITE))
                             }.onEvent {
                                 change = {
-                                    store.dispatch { dispatch, getState ->
-                                        dispatch(HippoAction.DateSelected(DateType.END, self.value ?: ""))
-                                        loadStatistics(getState())
-                                    }
+                                    //store.dispatch { dispatch, getState ->
+                                    store.dispatch(HippoAction.DateSelected(DateType.END, self.value ?: ""))
+                                    loadStatistics(store.getState())
+                                    //}
                                 }
                             }
                         }
@@ -173,15 +174,15 @@ object StatPage : SimplePanel() {
                                     val pChainId =
                                         PlattformChain.calculateId(first = selectedTp, middle = null, last = selectedTp)
                                     store.dispatch(HippoAction.ItemDeselectedAllForAllTypes)
-                                    store.dispatch { dispatch, getState ->
-                                        dispatch(
-                                            HippoAction.ItemIdSelected(
-                                                ItemType.PLATTFORM_CHAIN,
-                                                pChainId
-                                            )
+                                    //store.dispatch { dispatch, getState ->
+                                    store.dispatch(
+                                        HippoAction.ItemIdSelected(
+                                            ItemType.PLATTFORM_CHAIN,
+                                            pChainId
                                         )
-                                        loadStatistics(getState())
-                                    }
+                                    )
+                                    loadStatistics(store.getState())
+                                    //}
                                 }
                             }
                         }
@@ -228,19 +229,80 @@ object StatPage : SimplePanel() {
             }
         }
 
-        // The development over time - graph
-        simplePanel {
-        }.bind(store) { state ->
-            if (state.showTimeGraph) {
-                val lineChart =
-                    Chart(getLineChartConfig(state.historyMap, animationTime = 1300))
-                add(lineChart)
-                    .apply {
-                        width = 100.perc
-                        height = 20.vw
+        simplePanel { }.bind(store) { state ->
+            if (state.showTimeGraph && state.historyMap.isNotEmpty()) {
+                val animateTime =
+                    if (state.currentAction == HippoAction.DoneDownloadHistory::class) {
+                        //SInfo.createStatViewData(state)
+                        println("Chart will now change")
+                        1300
+                    } else {
+                        println("Chart will NOT change")
+                        0
                     }
+
+                println("Will display time graph")
+                val xAxis = state.historyMap.keys.toList()
+                val yAxis = state.historyMap.values.toList()
+                console.log(xAxis)
+                console.log(yAxis)
+                chart(
+                    Configuration(
+                        ChartType.LINE,
+                        listOf(
+                            DataSets(
+                                label = "Antal anrop per dag",
+                                data = yAxis
+                            )
+                        ),
+                        xAxis,
+                        options = ChartOptions(
+                            animation = AnimationOptions(duration = animateTime),
+                            legend = LegendOptions(display = true),
+                            responsive = true,
+                            maintainAspectRatio = false
+                        )
+                    )
+                ).apply {
+                    height = 28.vh
+                    width = 97.vw
+                    //background = Background(Color.name(Col.AZURE))
+                }
             }
         }
+        /*
+        // The time graph
+        simplePanel {
+        }.bind(store) { state ->
+            if (state.showTimeGraph && state.historyMap.isNotEmpty()) {
+                val lineChart =
+                    //Chart(getLineChartConfig(state.historyMap, animationTime = 1300))
+                    Chart(
+                        Configuration(
+                            ChartType.SCATTER,
+                            listOf(
+                                DataSets(
+                                    label = "Antal anrop per dag",
+                                    data = state.historyMap.values.toList()
+                                )
+                            ),
+                            state.historyMap.keys.toList(),
+                            options = ChartOptions(
+                               legend = LegendOptions(display = true),
+                                animation = AnimationOptions(duration = 1300),
+                                responsive = true,
+                                maintainAspectRatio = false
+                            )
+                        )
+                    )
+                add(lineChart).apply {
+                    height = 28.vh
+                    width = 97.vw
+                    background = Background(Color.name(Col.AZURE))
+                }
+            }
+        }
+         */
 
         // The whole item table
         hPanel() {
@@ -250,6 +312,7 @@ object StatPage : SimplePanel() {
             overflow = Overflow.AUTO
             background = Background(Color.hex(0xffffff))
         }.bind(store) { state ->
+
             //if (state.currentAction == HippoAction.DoneDownloadStatistics::class) {
             println("Time to update the view...")
             SInfo.createStatViewData(state)
@@ -444,15 +507,15 @@ open class ChartLabelTable(
                     val item = row.getData() as SInfoRecord
                     if (item.calls > -1) {
                         if (store.getState().isItemSelected(item.itemType, item.itemId)) {
-                            store.dispatch { _, getState ->
-                                store.dispatch(HippoAction.ItemIdDeselectedAll(itemType))
-                                loadStatistics(getState())
-                            }
+                            //store.dispatch { _, getState ->
+                            store.dispatch(HippoAction.ItemIdDeselectedAll(itemType))
+                            loadStatistics(store.getState())
+                            //}
                         } else {
-                            store.dispatch { _, getState ->
-                                store.dispatch(HippoAction.ItemIdSelected(itemType, item.itemId))
-                                loadStatistics(getState())
-                            }
+                            //store.dispatch { _, getState ->
+                            store.dispatch(HippoAction.ItemIdSelected(itemType, item.itemId))
+                            loadStatistics(store.getState())
+                            //}
                         }
                     }
                 }

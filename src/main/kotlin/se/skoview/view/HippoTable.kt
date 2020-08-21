@@ -388,11 +388,11 @@ private fun Div.insertResetButton(item: BaseItem, type: ItemType) {
             width = 100.perc
             background = Background(Color.name(Col.GRAY))
             onClick {
-                store.dispatch { dispatch, getState ->
-                    dispatch(HippoAction.ItemIdDeselected(type, item.id))
+                //store.dispatch { dispatch, getState ->
+                    store.dispatch(HippoAction.ItemIdDeselected(type, item.id))
                     //createViewData(getState())
-                    loadIntegrations(getState())
-                }
+                    loadIntegrations(store.getState())
+                //}
             }
         }
     }
@@ -408,10 +408,10 @@ private fun Container.showMoreItemsButton(type: ItemType, size: Int, maxItemsToS
                 width = 100.perc
                 background = Background(Color.name(Col.GRAY))
                 onClick {
-                    store.dispatch { dispatch, _ ->
-                        dispatch(HippoAction.SetVMax(type, actualLinesToShow))
+                    //store.dispatch { dispatch, _ ->
+                        store.dispatch(HippoAction.SetVMax(type, actualLinesToShow))
 
-                    }
+                    //}
                 }
             }
         }

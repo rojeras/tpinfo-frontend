@@ -17,10 +17,7 @@
 package se.skoview.app
 
 import pl.treksoft.kvision.Application
-import pl.treksoft.kvision.core.*
-import pl.treksoft.kvision.html.span
 import pl.treksoft.kvision.pace.Pace
-import pl.treksoft.kvision.panel.hPanel
 import pl.treksoft.kvision.panel.root
 import pl.treksoft.kvision.panel.vPanel
 import pl.treksoft.kvision.redux.createReduxStore
@@ -33,8 +30,8 @@ import kotlin.browser.window
 
 /**
 Övergripande tankar inför sommaruppehållet 2020
- - Red ut redux-thunk. Bör kunna göra mycket av dispatchandet enklare och centrerat. Nu sker för mycket ute lokalt i komponenterna.
- - https://daveceddia.com/what-is-a-thunk/
+ v Red ut redux-thunk. Bör kunna göra mycket av dispatchandet enklare och centrerat. Nu sker för mycket ute lokalt i komponenterna.
+ v https://daveceddia.com/what-is-a-thunk/ - Behövs troligen inte nu när vi jobbar i Kotlin. Ropa på funktionen direkt
  - Måste reda ut trigger för när tidsgrafen ska visas. Ska det vara checkboxen självt eller det faktum att det finns historiskt data tillgängligt
  - Linejegrafen måste animeras när nytt data blir tillgängligt, se https://www.chartjs.org/samples/latest/scales/logarithmic/line.html
  - Radio buttons för att styra om synonymer ska visas
