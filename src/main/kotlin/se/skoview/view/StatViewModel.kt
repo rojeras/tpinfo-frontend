@@ -16,7 +16,9 @@
  */
 package se.skoview.view
 
+import pl.treksoft.kvision.core.Col
 import pl.treksoft.kvision.core.Color
+import pl.treksoft.kvision.core.Color.Companion.name
 import pl.treksoft.kvision.data.BaseDataComponent
 import se.skoview.data.*
 import se.skoview.lib.getColorForObject
@@ -29,11 +31,17 @@ class SInfoRecord(
     val calls: Int
     //val responseTime: Int
 ) {
-    val color: Color = getColorForObject(description)
-
-    init {
-        // A random color is assigned to each object (based on hash value of description field)
-    }
+    val color: Color =
+            when (itemType) {
+                ItemType.CONSUMER -> Color.hex(ServiceComponent.map[itemId]!!.colorValue)
+                ItemType.CONTRACT -> Color.hex(ServiceContract.map[itemId]!!.colorValue)
+                ItemType.PRODUCER -> Color.hex(ServiceComponent.map[itemId]!!.colorValue)
+                ItemType.LOGICAL_ADDRESS -> Color.hex(LogicalAddress.map[itemId]!!.colorValue)
+                else -> {
+                    println("Error in SInfoRecord, ItemType = $itemType")
+                   Color.name(Col.BLACK)
+                }
+            }
 }
 
 class SInfoList(private val itemType: ItemType) {
@@ -52,7 +60,7 @@ class SInfoList(private val itemType: ItemType) {
         return recordList.map { it.description }
     }
 
-    fun populate(ackMap: Map<Int, Int>) {
+    fun populate(ackMap: Map<Int, Int>, showSynonyms: Boolean) {
         // Will go via a temp collection
         val ackMapTmp = ackMap.toList().sortedBy { (_, value) -> value }.reversed().toMap()
         val callsTmp = mutableListOf<SInfoRecord>()
@@ -64,14 +72,14 @@ class SInfoList(private val itemType: ItemType) {
                 ItemType.CONSUMER -> {
                     item = ServiceComponent.map[entry.key]
                     desc =
-                        if (item!!.synonym != null) item.synonym.toString()
-                        else "${item.description} (${item.hsaId})"
+                        if (showSynonyms && item!!.synonym != null) item.synonym.toString()
+                        else "${item!!.description} (${item.hsaId})"
                 }
                 ItemType.PRODUCER -> {
                     item = ServiceComponent.map[entry.key]
                     desc =
-                        if (item!!.synonym != null) item.synonym.toString()
-                        else "${item.description} (${item.hsaId})"
+                        if (showSynonyms && item!!.synonym != null) item.synonym.toString()
+                        else "${item!!.description} (${item.hsaId})"
                 }
                 ItemType.LOGICAL_ADDRESS -> {
                     item = LogicalAddress.map[entry.key]
@@ -80,8 +88,8 @@ class SInfoList(private val itemType: ItemType) {
                 ItemType.CONTRACT -> {
                     item = ServiceContract.map[entry.key]
                     desc =
-                        if (item!!.synonym != null) item.synonym.toString()
-                        else item.description
+                        if (showSynonyms && item!!.synonym != null) item.synonym.toString()
+                        else item!!.description
                     //desc = item!!.description
                 }
                 else -> error("Unknown itemType in populate()!")
@@ -121,10 +129,10 @@ object SInfo : BaseDataComponent() {
 
     fun createStatViewData(state: HippoState) {
         println("In the SInfo.createStatViewData()")
-        consumerSInfoList.populate(state.callsConsumer)
-        producerSInfoList.populate(state.callsProducer)
-        logicalAddressSInfoList.populate(state.callsLogicalAddress)
-        contractSInfoList.populate(state.callsContract)
+        consumerSInfoList.populate(state.callsConsumer, ! state.showTechnicalTerms)
+        producerSInfoList.populate(state.callsProducer, ! state.showTechnicalTerms)
+        logicalAddressSInfoList.populate(state.callsLogicalAddress, ! state.showTechnicalTerms)
+        contractSInfoList.populate(state.callsContract, ! state.showTechnicalTerms)
 
     }
 }

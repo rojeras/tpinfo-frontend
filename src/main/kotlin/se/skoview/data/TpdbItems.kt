@@ -22,6 +22,7 @@ import kotlinx.serialization.json.JsonConfiguration
 import pl.treksoft.kvision.redux.ReduxStore
 import se.skoview.lib.getAsyncTpDb
 import kotlinx.serialization.builtins.*
+import pl.treksoft.kvision.core.Color
 
 fun loadBaseItems(store: ReduxStore<HippoState, HippoAction>) {
     console.log("Will now load BaseItems")
@@ -93,8 +94,12 @@ data class ServiceComponent(
     override val synonym: String? = null
 ) : BaseItem() {
 
+    var colorValue: Int = (0..(256*256*256)-1).random()
+
     init {
         map[id] = this
+        //colorValue = (0..(256*256*256)-1).random()
+        if (id > maxId) maxId = id
     }
 
     override val name: String = hsaId
@@ -114,10 +119,10 @@ data class ServiceComponent(
     override fun hashCode(): Int {
         return id
     }
-
+    //fun color() = Color.hex(colorValue)
     companion object {
         val map = hashMapOf<Int, ServiceComponent>()
-
+        var maxId = 0
         var isLoaded = false
 
         fun load(callback: () -> Unit) {
@@ -143,8 +148,11 @@ data class LogicalAddress constructor(
     override val synonym: String? = null
 ) : BaseItem() {
 
+    var colorValue: Int = (0..(256*256*256)-1).random()
     init {
         map[id] = this
+
+        if (id > LogicalAddress.maxId) LogicalAddress.maxId = id
     }
 
     override val searchField = "$name $description"
@@ -153,7 +161,7 @@ data class LogicalAddress constructor(
 
     companion object {
         val map = hashMapOf<Int, LogicalAddress>()
-
+        var maxId = 0
         var isLoaded = false
 
         fun load(callback: () -> Unit) {
@@ -188,9 +196,12 @@ data class ServiceContract(
 ) : BaseItem() {
     private val domain: ServiceDomain?
 
+    var colorValue: Int = (0..(256*256*256)-1).random()
     init {
         map[id] = this
         domain = ServiceDomain.map[serviceDomainId]
+
+        if (id > ServiceContract.maxId) ServiceContract.maxId = id
     }
 
     override var searchField: String = namespace
@@ -202,6 +213,8 @@ data class ServiceContract(
 
     companion object {
         val map = hashMapOf<Int, ServiceContract>()
+
+        var maxId = 0
 
         var isLoaded = false
 
@@ -242,11 +255,14 @@ data class ServiceDomain(
     //override val itemType = ItemType.DOMAIN
     var contracts: MutableSet<ServiceContract> = mutableSetOf()
 
+    var colorValue: Int = (0..(256*256*256)-1).random()
     override val description = name
 
     init {
         // todo: Add logic to populate contracts
         map[id] = this
+
+        if (id > ServiceDomain.maxId) ServiceDomain.maxId = id
     }
 
     override val searchField: String = name
@@ -255,6 +271,7 @@ data class ServiceDomain(
 
     companion object {
         val map = hashMapOf<Int, ServiceDomain>()
+        var maxId = 0
         var isLoaded = false
 
         fun load(callback: () -> Unit) {
@@ -302,13 +319,16 @@ data class Plattform(
     override val description = ""
     override val searchField: String = name
     override fun toString(): String = name
+    var colorValue: Int = (0..(256*256*256)-1).random()
 
     init {
         map[id] = this
+        if (id > Plattform.maxId) Plattform.maxId = id
     }
 
     companion object {
         val map = hashMapOf<Int, Plattform>()
+        var maxId = 0
         var isLoaded = false
 
         fun load(callback: () -> Unit) {
@@ -342,6 +362,7 @@ data class PlattformChain(
     override val synonym: String? = null
 ) : BaseItem() {
 
+    var colorValue: Int = (0..(256*256*256)-1).random()
     private val firstPlattform = Plattform.map[first]
 
     //private val middlePlattform = Plattform.map[middle]
@@ -355,6 +376,8 @@ data class PlattformChain(
     init {
         //name = calculateName()
         map[id] = this
+
+        if (id > PlattformChain.maxId) PlattformChain.maxId = id
     }
 
     override fun toString(): String = firstPlattform!!.name + "->" + lastPlattform!!.name
@@ -370,6 +393,7 @@ data class PlattformChain(
 
     companion object {
         val map = hashMapOf<Int, PlattformChain>()
+        var maxId = 0
         var isLoaded = false
 
         fun load(callback: () -> Unit) {
@@ -421,6 +445,7 @@ data class StatisticsPlattform(
     override val synonym: String? = null
 ) :
     BaseItem() {
+    var colorValue: Int = (0..(256*256*256)-1).random()
     override val name: String = "$platform-$environment"
     override val description = ""
     override val searchField: String = name
@@ -428,10 +453,13 @@ data class StatisticsPlattform(
 
     init {
         map[id] = this
+
+        if (id > StatisticsPlattform.maxId) StatisticsPlattform.maxId = id
     }
 
     companion object {
         val map = hashMapOf<Int, StatisticsPlattform>()
+        var maxId = 0
         var isLoaded = false
 
         fun load(callback: () -> Unit) {
@@ -455,7 +483,6 @@ data class StatisticsPlattform(
             }
         }
     }
-
 }
 
 

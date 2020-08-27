@@ -19,6 +19,7 @@ package se.skoview.data
 import se.skoview.data.PlattformChain.Companion.calculateId
 import se.skoview.lib.getDatesLastMonth
 import se.skoview.lib.toSwedishDate
+import se.skoview.view.StatPreSelect
 
 fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
     //println("=====>>> ${action::class}")
@@ -275,7 +276,7 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
                 selectedConsumers = listOf(),
                 selectedDomains = listOf(),
                 selectedContracts = listOf(),
-                selectedPlattformChains = listOf(),
+                //selectedPlattformChains = listOf(),
                 selectedLogicalAddresses = listOf(),
                 selectedProducers = listOf()
             )
@@ -299,6 +300,28 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
         }
         is HippoAction.ShowTimeGraph -> {
             state.copy(showTimeGraph = action.isShown)
+        }
+        is HippoAction.ShowTechnicalTerms -> {
+            state.copy(
+                showTechnicalTerms = action.isShown,
+                consumerLabel = "Tjänstekonsumenter",
+                contractLabel = "Tjänstekontrakt",
+                producerLabel = "Tjänsteproducenter",
+                laLabel = "Logiska adresser"
+            )
+        }
+        is HippoAction.PreSelectedSelected -> {
+            val preName = action.label
+            val preObject = StatPreSelect.selfStore[preName]
+            val preLabelMap = preObject!!.labelMap
+
+            state.copy(
+                statPreSelect = action.label,
+                consumerLabel = preLabelMap[ItemType.CONSUMER]!!,
+                contractLabel = preLabelMap[ItemType.CONTRACT]!!,
+                producerLabel = preLabelMap[ItemType.PRODUCER]!!,
+                laLabel = preLabelMap[ItemType.LOGICAL_ADDRESS]!!
+            )
         }
     }
     val finalState = newState.copy(currentAction = action::class)

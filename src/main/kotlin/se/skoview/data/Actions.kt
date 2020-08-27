@@ -63,4 +63,6 @@ sealed class HippoAction : RAction {
     data class ViewUpdated(val integrationLists: IntegrationLists) : HippoAction()
     data class SetVMax(val type: ItemType, val size: Int): HippoAction()
     data class ShowTimeGraph(val isShown: Boolean): HippoAction()
+    data class ShowTechnicalTerms(val isShown: Boolean): HippoAction()
+    data class PreSelectedSelected(val label: String): HippoAction()
 }

@@ -121,10 +121,14 @@ fun getVersion(versionName: String = "hippoVersion"): String {
 }
 
 fun getColorForObject(obj: Any): Color {
+    /*
     val cValue = obj.hashCode().absoluteValue
     val fValue = cValue.toDouble() / Int.MAX_VALUE.toDouble()
     val col = (fValue * 256 * 256 * 256 - 1).toInt()
     return Color.hex(col)
+    */
+    val max = (256 * 256 * 256) - 1
+    return Color.hex((0..max).random())
 }
 
 fun String.thousands(): String {

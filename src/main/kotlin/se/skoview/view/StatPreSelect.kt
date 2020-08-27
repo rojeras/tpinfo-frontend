@@ -16,29 +16,55 @@
  */
 package se.skoview.view
 
+import se.skoview.data.ItemType
+
 data class StatPreSelect(
     val label: String,
-    val selectedConsumers: List<Int> = listOf(),
-    val selectedProducers: List<Int> = listOf(),
-    val selectedLogicalAddresses: List<Int> = listOf(),
-    val selectedContracts: List<Int> = listOf(),
-    val selectedDomains: List<Int> = listOf()
+    val selectedItemsMap: HashMap<ItemType, List<Int>>, // = hashMapOf<ItemType, List<Int>>()
+    val labelMap: HashMap<ItemType, String>
 ) {
     init {
-        map[label] = this
+        selfStore[label] = this
     }
 
     companion object {
-        val map = hashMapOf<String, StatPreSelect>()
+        val selfStore = hashMapOf<String, StatPreSelect>()
 
         fun initialize() {
             StatPreSelect(
-                label = "Tidbokning",
-                selectedDomains = listOf(11)
+                "-",
+                hashMapOf(),
+                hashMapOf(
+                    ItemType.CONSUMER to "Applikationer",
+                    ItemType.CONTRACT to "Tjänster",
+                    ItemType.PRODUCER to "Informationskällor",
+                    ItemType.LOGICAL_ADDRESS to "Adresser"
+                )
+            )
+            StatPreSelect(
+                "Bokade tider",
+                hashMapOf(ItemType.CONTRACT to listOf(117, 118, 114)),
+                hashMapOf(
+                    ItemType.CONSUMER to "Tidbokningsapplikation",
+                    ItemType.CONTRACT to "Typ av bokning",
+                    ItemType.PRODUCER to "Tidbokningsystem",
+                    ItemType.LOGICAL_ADDRESS to "Enhet"
+                )
+            )
+            StatPreSelect(
+                "Skickade remisser",
+                hashMapOf(ItemType.CONTRACT to listOf(215)),
+                hashMapOf(
+                    ItemType.CONSUMER to "Remitterande system",
+                    ItemType.CONTRACT to "Remisstyp",
+                    ItemType.PRODUCER to "Remissmottagande system",
+                    ItemType.LOGICAL_ADDRESS to "Remitterad mottagning"
+                )
             )
         }
     }
 }
+
 
 
 

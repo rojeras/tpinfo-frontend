@@ -64,14 +64,21 @@ import kotlin.browser.window
 
 // Statistik
 
-// todo: Addera vy för "Över tid"
+// todo: Völjer man item som är del av en preselect så försvinner valet. Kolla Remissvyn.
 // todo: Export till CSV
 // todo: Fixa "about" för statistiken
-// todo: Inkludera synonymer. Överväg tr-funktionen för att även anpassa "Tjänstekonsument" -> "Anropande system" osv
-// todo: Förvalda vyer som i gamla statistiken
+// todo: Flera förvalda vyer som i gamla statistiken
+// todo: Se över scrollbars och paging
+// todo: Se över prestanda, speciellt kring hantering av tidsgraf
+// done: Varför slår inte "Remisstyp" igenom
+// done: Addera vy för "Över tid"
+// done: Inkludera synonymer. Överväg tr-funktionen för att även anpassa "Tjänstekonsument" -> "Anropande system" osv
 // done: Fixa till datahanteringen så att det blir en renare redux-koppling till vad som visas
 // done: Fixa skärmuppdateringen så att det inte blinkar och försvinner ibland
 // done: Visa HSA-idn (sökbara)
+
+// TPDB
+// todo: domainId not supported in stat call: https://qa.integrationer.tjansteplattform.se/tpdb/tpdbapi.php/api/v1/statistics?dummy&dateEffective=2020-07-01&dateEnd=2020-07-31&domainId=11
 
 // Done
 
@@ -195,6 +202,8 @@ class App : Application() {
 
     fun startStat() {
         store.dispatch(HippoAction.ApplicationStarted(HippoApplication.STATISTIK))
+        StatPreSelect.initialize()
+        store.dispatch(HippoAction.PreSelectedSelected("-"))
         loadStatistics(store.getState())
         //loadHistory(store.getState())
         root("hippo") {

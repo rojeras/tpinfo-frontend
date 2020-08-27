@@ -98,7 +98,15 @@ data class HippoState(
 
     // History information
     val historyMap: Map<String, Int>,
-    val showTimeGraph: Boolean
+    val showTimeGraph: Boolean,
+
+    // View controllers
+    val showTechnicalTerms: Boolean,
+    val statPreSelect: String,
+    val consumerLabel: String,
+    val contractLabel: String,
+    val producerLabel: String,
+    val laLabel: String
 
 )
 
@@ -162,7 +170,13 @@ fun getInitialState(): HippoState {
         mapOf(),
         mapOf(),
         mapOf(),
-        false
+        false,
+        false,
+        "",
+        "",
+        "",
+        "",
+        ""
     )
 }
 

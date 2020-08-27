@@ -88,6 +88,8 @@ kotlin {
 
         implementation(npm("react-awesome-button"))
 
+        implementation(npm("file-saver", "2.0.2"))
+
         implementation("pl.treksoft:kvision:$kvisionVersion")
         implementation("pl.treksoft:kvision-bootstrap:$kvisionVersion")
         implementation("pl.treksoft:kvision-bootstrap-css:$kvisionVersion")

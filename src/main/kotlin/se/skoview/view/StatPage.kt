@@ -16,6 +16,8 @@
  */
 package se.skoview.view
 
+import org.w3c.files.Blob
+import org.w3c.files.BlobPropertyBag
 import pl.treksoft.kvision.chart.*
 import pl.treksoft.kvision.core.*
 import pl.treksoft.kvision.core.Position
@@ -23,10 +25,10 @@ import pl.treksoft.kvision.form.check.*
 import pl.treksoft.kvision.form.select.simpleSelectInput
 import pl.treksoft.kvision.html.*
 import pl.treksoft.kvision.html.Align
-import pl.treksoft.kvision.i18n.tr
 import pl.treksoft.kvision.modal.Modal
 import pl.treksoft.kvision.modal.ModalSize
 import pl.treksoft.kvision.panel.*
+import pl.treksoft.kvision.require
 import pl.treksoft.kvision.state.*
 import pl.treksoft.kvision.table.TableType
 import pl.treksoft.kvision.table.cell
@@ -111,6 +113,7 @@ object StatPage : SimplePanel() {
                                     val selectedTp = (self.value ?: "").toInt()
                                     val pChainId =
                                         PlattformChain.calculateId(first = selectedTp, middle = null, last = selectedTp)
+                                    store.dispatch(HippoAction.ItemIdDeselectedAll(ItemType.PLATTFORM_CHAIN))
                                     store.dispatch(HippoAction.ItemDeselectedAllForAllTypes)
                                     //store.dispatch { dispatch, getState ->
                                     store.dispatch(
@@ -158,49 +161,46 @@ object StatPage : SimplePanel() {
 
                         cell { +"Förval:" }
                         cell {
-                            val selectedPlattformId =
-                                if (state.selectedPlattformChains.size > 0)
-                                    PlattformChain.map[state.selectedPlattformChains[0]]!!.last.toString()
-                                else ""
+                            val selectedPreSelect = state.statPreSelect
                             simpleSelectInput(
-                                options = state.statisticsPlattforms.map { Pair(it.key.toString(), it.value.name) },
-                                value = selectedPlattformId
+                                options = StatPreSelect.selfStore.map { Pair(it.key, it.key) },
+                                value = selectedPreSelect
                             ) {
                                 addCssStyle(formControlXs)
                                 background = Background(Color.name(Col.WHITE))
                             }.onEvent {
                                 change = {
-                                    val selectedTp = (self.value ?: "").toInt()
-                                    val pChainId =
-                                        PlattformChain.calculateId(first = selectedTp, middle = null, last = selectedTp)
+                                    val selectedPreSelect: String = self.value ?: "-"
+                                    println("Selected pre-select: '$selectedPreSelect'")
+                                    store.dispatch(HippoAction.PreSelectedSelected(selectedPreSelect))
+                                    if (state.showTechnicalTerms) { // Restore technical labels
+                                        store.dispatch(HippoAction.ShowTechnicalTerms(state.showTechnicalTerms))
+                                    }
                                     store.dispatch(HippoAction.ItemDeselectedAllForAllTypes)
-                                    //store.dispatch { dispatch, getState ->
-                                    store.dispatch(
-                                        HippoAction.ItemIdSelected(
-                                            ItemType.PLATTFORM_CHAIN,
-                                            pChainId
-                                        )
-                                    )
+                                    val selectedItemsMap = StatPreSelect.selfStore[selectedPreSelect]!!.selectedItemsMap
+                                    for ((itemType, itemIdList) in selectedItemsMap) {
+                                        itemIdList.forEach {
+                                            store.dispatch(HippoAction.ItemIdSelected(itemType, it))
+                                        }
+                                    }
                                     loadStatistics(store.getState())
-                                    //}
                                 }
                             }
                         }
                         cell {
-                            radio(
-                                name = "synSetting",
-                                label = "Vanliga namn"
+                            checkBoxInput(
+                                value = state.showTechnicalTerms
                             ).onClick {
-                                println("Vanliga: $value")
+                                //if (value) loadHistory(state)
+                                println("In showTechnicalTerms, value = $value")
+                                store.dispatch(HippoAction.ShowTechnicalTerms(value))
+                                if (!value) { // Restore labels for current preselect
+                                    store.dispatch(HippoAction.PreSelectedSelected(state.statPreSelect))
+                                }
                             }
-                            radio(
-                                name = "synSetting",
-                                label = "Tekniska namn"
-                            ).onClick {
-                                println("Tekniska: $value")
-                            }
-
+                            +" Tekniska termer"
                         }
+
                     }
                 }
                 val calls = state.callsDomain.map { it.value }.sum()
@@ -209,9 +209,16 @@ object StatPage : SimplePanel() {
             }
 
             // About button
-            div {
+            vPanel {
+                button("Exportera").onClick {
+                    exportStatData(store.getState())
+                }.apply {
+                    addBsBgColor(BsBgColor.LIGHT)
+                    addBsColor(BsColor.BLACK50)
+                    marginBottom = 5.px
+                }
                 //background = Background(Col.LIGHTSKYBLUE)
-                align = Align.RIGHT
+                //align = Align.RIGHT
                 val modal = Modal("Om Statistikfunktionen")
                 modal.iframe(src = "about.html", iframeHeight = 400, iframeWidth = 700)
                 modal.size = ModalSize.LARGE
@@ -226,6 +233,7 @@ object StatPage : SimplePanel() {
                     addBsBgColor(BsBgColor.LIGHT)
                     addBsColor(BsColor.BLACK50)
                 }
+
             }
         }
 
@@ -233,11 +241,8 @@ object StatPage : SimplePanel() {
             if (state.showTimeGraph && state.historyMap.isNotEmpty()) {
                 val animateTime =
                     if (state.currentAction == HippoAction.DoneDownloadHistory::class) {
-                        //SInfo.createStatViewData(state)
-                        println("Chart will now change")
                         1300
                     } else {
-                        println("Chart will NOT change")
                         0
                     }
 
@@ -270,39 +275,6 @@ object StatPage : SimplePanel() {
                 }
             }
         }
-        /*
-        // The time graph
-        simplePanel {
-        }.bind(store) { state ->
-            if (state.showTimeGraph && state.historyMap.isNotEmpty()) {
-                val lineChart =
-                    //Chart(getLineChartConfig(state.historyMap, animationTime = 1300))
-                    Chart(
-                        Configuration(
-                            ChartType.SCATTER,
-                            listOf(
-                                DataSets(
-                                    label = "Antal anrop per dag",
-                                    data = state.historyMap.values.toList()
-                                )
-                            ),
-                            state.historyMap.keys.toList(),
-                            options = ChartOptions(
-                               legend = LegendOptions(display = true),
-                                animation = AnimationOptions(duration = 1300),
-                                responsive = true,
-                                maintainAspectRatio = false
-                            )
-                        )
-                    )
-                add(lineChart).apply {
-                    height = 28.vh
-                    width = 97.vw
-                    background = Background(Color.name(Col.AZURE))
-                }
-            }
-        }
-         */
 
         // The whole item table
         hPanel() {
@@ -345,7 +317,7 @@ object StatPage : SimplePanel() {
                         "description",
                         "color",
                         "calls",
-                        "Tjänstekonsumenter"
+                        state.consumerLabel
                     )
                 )
 
@@ -372,7 +344,7 @@ object StatPage : SimplePanel() {
                         "description",
                         "color",
                         "calls",
-                        "Tjänstekontrakt"
+                        state.contractLabel
                     )
                 )
             }.apply {
@@ -397,7 +369,7 @@ object StatPage : SimplePanel() {
                         "description",
                         "color",
                         "calls",
-                        "Tjänsteproducenter"
+                        state.producerLabel
                     )
                 )
             }.apply {
@@ -420,7 +392,7 @@ object StatPage : SimplePanel() {
                         "description",
                         "color",
                         "calls",
-                        "Logiska adresser"
+                        state.laLabel
                     )
                 )
             }.apply {
@@ -434,7 +406,6 @@ object StatPage : SimplePanel() {
 
 open class ChartLabelTable(
     itemType: ItemType,
-    //itemSInfoList: ObservableList<SInfoRecord>,
     itemSInfoList: List<SInfoRecord>,
     dataField: String = "description",
     colorField: String = "color",
@@ -442,7 +413,6 @@ open class ChartLabelTable(
     heading: String
 ) : SimplePanel() {
     init {
-
         // Color or red cross if item is selected
         val firstCol =
             if (
@@ -450,11 +420,13 @@ open class ChartLabelTable(
                 store.getState().isItemSelected(itemType, itemSInfoList[0].itemId)
             )
                 ColumnDefinition(
+                    headerSort = false,
                     title = "",
                     formatter = Formatter.BUTTONCROSS
                 )
             else
                 ColumnDefinition<Any>(
+                    headerSort = false,
                     title = "",
                     field = colorField,
                     width = "(0.3).px",
@@ -468,11 +440,13 @@ open class ChartLabelTable(
                 columns = listOf(
                     firstCol,
                     ColumnDefinition(
+                        headerSort = false,
                         title = heading,
                         field = dataField,
                         topCalc = Calc.COUNT,
                         topCalcFormatter = Formatter.COLOR,
                         headerFilter = Editor.INPUT,
+                        headerFilterPlaceholder = "Sök ${heading.toLowerCase()}",
                         //cellClick = {e, cell -> console.log(cell.getRow()) },
                         editable = { false },
                         //width = "20.vw",

@@ -16,6 +16,8 @@
  */
 package se.skoview.data
 
+import org.w3c.files.Blob
+import org.w3c.files.BlobPropertyBag
 import se.skoview.app.store
 import se.skoview.lib.getAsyncTpDb
 
@@ -49,16 +51,16 @@ fun loadStatistics(state: HippoState) {
         val statisticsCache = StatisticsCache.map[parameters]!!
 
         //store.dispatch { _, _ ->
-            store.dispatch(
-                HippoAction.DoneDownloadStatistics(
-                    statisticsCache.callsConsumer,
-                    statisticsCache.callsProducer,
-                    statisticsCache.callsLogicalAddress,
-                    statisticsCache.callsDomain,
-                    statisticsCache.callsContract
-                )
+        store.dispatch(
+            HippoAction.DoneDownloadStatistics(
+                statisticsCache.callsConsumer,
+                statisticsCache.callsProducer,
+                statisticsCache.callsLogicalAddress,
+                statisticsCache.callsDomain,
+                statisticsCache.callsContract
             )
-            //SInfo.createStatViewData(getState())
+        )
+        //SInfo.createStatViewData(getState())
         //}
     } else {
         println(">>> Statistics data NOT found in cache - will download")
@@ -95,16 +97,16 @@ fun loadStatistics(state: HippoState) {
             )
 
             //store.dispatch { _, _ ->
-                store.dispatch(
-                    HippoAction.DoneDownloadStatistics(
-                        statisticsCache.callsConsumer,
-                        statisticsCache.callsProducer,
-                        statisticsCache.callsLogicalAddress,
-                        statisticsCache.callsDomain,
-                        statisticsCache.callsContract
-                    )
+            store.dispatch(
+                HippoAction.DoneDownloadStatistics(
+                    statisticsCache.callsConsumer,
+                    statisticsCache.callsProducer,
+                    statisticsCache.callsLogicalAddress,
+                    statisticsCache.callsDomain,
+                    statisticsCache.callsContract
                 )
-                //SInfo.createStatViewData(getState())
+            )
+            //SInfo.createStatViewData(getState())
             //}
         }
     }
@@ -115,5 +117,36 @@ fun loadStatistics(state: HippoState) {
 private fun updateCallsArr(callsArr: MutableMap<Int, Int>, itemId: Int, calls: Int) {
     if (callsArr[itemId] == null) callsArr[itemId] = 0
     callsArr[itemId] = callsArr[itemId]!!.plus(calls)
+}
 
+fun exportStatData(state: HippoState) {
+
+    val selectedPlattformChainId = state.selectedPlattformChains[0]
+    val selectedTpId = PlattformChain.map[selectedPlattformChainId]!!.last
+    val selectedTpName = Plattform.map[selectedTpId]!!.name
+
+    //val selectedContractIdList = state.selectedContracts
+    //val selectedContractList: List<String> = selectedContractIdList.map { ServiceContract.map[it]!!.name }
+    val selectedContractList: List<String> = state.selectedContracts.map { ServiceContract.map[it]!!.name }
+
+    var csvData = """
+     Informationen är baserad på följande filtrering:
+     
+     Från datum: ${state.dateEffective}
+     Till datum: ${state.dateEnd}
+     Aktuell tjänsteplattform: $selectedTpName
+     Tjänstekonsumenter: ${state.selectedConsumers.map { ServiceComponent.map[it]!!.name }.joinToString()}
+     Tjänstekontrakt: ${state.selectedContracts.map { ServiceContract.map[it]!!.name }.joinToString()}
+     Logiska adresser: ${state.selectedLogicalAddresses.map { LogicalAddress.map[it]!!.name }.joinToString()}
+     Tjänsteproducenter: ${state.selectedProducers.map { ServiceComponent.map[it]!!.name }.joinToString()}
+     
+     consumerHsa; consumerDescription; calls; plattform; domain; contract; logicalAddress; logicalAddressDescription; producerHsa; producerDescription;
+    """.trimIndent()
+
+    // todo: Need to save the statisticsArrArr and use to produce the data in the CSV file
+
+    val fileSaver = pl.treksoft.kvision.require("file-saver")
+    val csv =
+        Blob(arrayOf(csvData), BlobPropertyBag("text/csv;charset=utf-8,\uFEFF"))
+    fileSaver.saveAs(csv, "tp-anropsstatistik.csv")
 }
