@@ -14,12 +14,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package se.skoview.data
+package se.skoview.common
 
-import se.skoview.data.PlattformChain.Companion.calculateId
-import se.skoview.lib.getDatesLastMonth
-import se.skoview.lib.toSwedishDate
-import se.skoview.view.StatPreSelect
+import se.skoview.common.PlattformChain.Companion.calculateId
+import se.skoview.stat.StatPreSelect
+import se.skoview.stat.StatisticsBlob
 
 fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
     //println("=====>>> ${action::class}")
@@ -102,12 +101,9 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
             )
         }
         is HippoAction.DoneDownloadStatistics -> {
+            val statBlob = StatisticsBlob(action.statisticsArrArr)
             state.copy(
-                callsConsumer = action.callsConsumer,
-                callsProducer = action.callsProducer,
-                callsLogicalAddress = action.callsLogicalAddress,
-                callsDomain = action.callsDomain,
-                callsContract = action.callsContract
+                statBlob = statBlob
             )
         }
         is HippoAction.DoneDownloadHistory -> {
@@ -137,36 +133,7 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
             vLogicalAddresses = action.integrationLists.logicalAddresses,
             vServiceProducers = action.integrationLists.serviceProducers
         )
-        /*
-        is HippoAction.ItemSelected -> {
 
-            val id = action.baseItem.id
-
-            val newList = if (state.isItemSelected(itemType = action.viewType, id = id)) listOf() else listOf(id)
-
-            when (action.viewType) {
-                ItemType.CONSUMER -> state.copy(
-                    selectedConsumers = newList
-                )
-                ItemType.DOMAIN -> state.copy(
-                    selectedDomains = newList
-                )
-                ItemType.CONTRACT -> state.copy(
-                    selectedContracts = newList
-                )
-                ItemType.PLATTFORM_CHAIN -> state.copy(
-                    selectedPlattformChains = newList,
-                    selectedPlattformName = newList[0]!!.name
-                )
-                ItemType.LOGICAL_ADDRESS -> state.copy(
-                    selectedLogicalAddresses = newList
-                )
-                ItemType.PRODUCER -> state.copy(
-                    selectedProducers = newList
-                )
-            }
-        }
-         */
         is HippoAction.ItemIdSelected -> {
 
             val id = action.id

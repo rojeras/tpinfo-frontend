@@ -14,10 +14,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package se.skoview.view
+package se.skoview.hippo
 
 import se.skoview.app.store
-import se.skoview.data.*
+import se.skoview.common.*
 
 // todo: Speed up and simplify
 data class IntegrationLists(

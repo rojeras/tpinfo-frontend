@@ -14,10 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package se.skoview.view
+package se.skoview.stat
 
-import org.w3c.files.Blob
-import org.w3c.files.BlobPropertyBag
 import pl.treksoft.kvision.chart.*
 import pl.treksoft.kvision.core.*
 import pl.treksoft.kvision.core.Position
@@ -28,7 +26,6 @@ import pl.treksoft.kvision.html.Align
 import pl.treksoft.kvision.modal.Modal
 import pl.treksoft.kvision.modal.ModalSize
 import pl.treksoft.kvision.panel.*
-import pl.treksoft.kvision.require
 import pl.treksoft.kvision.state.*
 import pl.treksoft.kvision.table.TableType
 import pl.treksoft.kvision.table.cell
@@ -37,9 +34,10 @@ import pl.treksoft.kvision.table.table
 import pl.treksoft.kvision.tabulator.*
 import pl.treksoft.kvision.utils.*
 import se.skoview.app.store
-import se.skoview.data.*
-import se.skoview.lib.thousands
-import se.skoview.lib.getVersion
+import se.skoview.common.*
+import se.skoview.common.thousands
+import se.skoview.common.getVersion
+import se.skoview.app.formControlXs
 
 // todo: Try to move this class inside the StatPage class
 
@@ -136,7 +134,7 @@ object StatPage : SimplePanel() {
                                 if (value) loadHistory(state)
                                 store.dispatch(HippoAction.ShowTimeGraph(value))
                             }
-                            +" Visa tidsgraf"
+                            +" Visa utveckling över tid"
                         }
                     }
                     // End date
@@ -203,7 +201,7 @@ object StatPage : SimplePanel() {
 
                     }
                 }
-                val calls = state.callsDomain.map { it.value }.sum()
+                val calls = state.statBlob.callsDomain.map { it.value }.sum()
                 val tCalls = calls.toString().thousands()
                 span { +"Totalt antal anrop för detta urval är: $tCalls" }.apply { align = Align.CENTER }
             }
@@ -446,7 +444,8 @@ open class ChartLabelTable(
                         topCalc = Calc.COUNT,
                         topCalcFormatter = Formatter.COLOR,
                         headerFilter = Editor.INPUT,
-                        headerFilterPlaceholder = "Sök ${heading.toLowerCase()}",
+                        //headerFilterPlaceholder = "Sök ${heading.toLowerCase()}",
+                        headerFilterPlaceholder = "Sök...",
                         //cellClick = {e, cell -> console.log(cell.getRow()) },
                         editable = { false },
                         //width = "20.vw",

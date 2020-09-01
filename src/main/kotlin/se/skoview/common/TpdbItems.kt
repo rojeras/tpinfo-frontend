@@ -14,15 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package se.skoview.data
+package se.skoview.common
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonConfiguration
 import pl.treksoft.kvision.redux.ReduxStore
-import se.skoview.lib.getAsyncTpDb
 import kotlinx.serialization.builtins.*
-import pl.treksoft.kvision.core.Color
 
 fun loadBaseItems(store: ReduxStore<HippoState, HippoAction>) {
     console.log("Will now load BaseItems")
@@ -132,7 +130,7 @@ data class ServiceComponent(
             getAsyncTpDb(type) { response ->
                 println("Size of response is: ${response.length}")
                 val json = Json(JsonConfiguration.Stable)
-                json.parse(ServiceComponent.serializer().list, response)
+                json.parse(serializer().list, response)
 
                 isLoaded = true
                 callback()

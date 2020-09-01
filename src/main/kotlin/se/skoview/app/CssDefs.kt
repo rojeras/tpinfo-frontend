@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package se.skoview.view
+package se.skoview.app
 
 import pl.treksoft.kvision.core.Background
 import pl.treksoft.kvision.core.Col

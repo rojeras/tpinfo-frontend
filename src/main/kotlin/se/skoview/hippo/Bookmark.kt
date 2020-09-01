@@ -14,10 +14,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package se.skoview.view
+package se.skoview.hippo
 
-import se.skoview.data.HippoState
-import se.skoview.data.PlattformChain
+import se.skoview.common.HippoState
+import se.skoview.common.PlattformChain
 import kotlin.browser.document
 import kotlin.browser.window
 import kotlin.js.Date

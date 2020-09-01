@@ -14,14 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package se.skoview.lib
+package se.skoview.common
 
 import org.w3c.xhr.XMLHttpRequest
 import pl.treksoft.kvision.core.Color
 import kotlin.browser.document
 import kotlin.browser.window
 import kotlin.js.Date
-import kotlin.math.absoluteValue
 
 fun getAsync(url: String, callback: (String) -> Unit) {
     console.log("getAsync(): URL: $url")

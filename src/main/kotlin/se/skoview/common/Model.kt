@@ -14,9 +14,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package se.skoview.data
+package se.skoview.common
 
-import se.skoview.view.parseBookmark
+import se.skoview.hippo.parseBookmark
+import se.skoview.stat.StatisticsBlob
 import kotlin.reflect.KClass
 
 enum class AsyncActionStatus {
@@ -90,11 +91,15 @@ data class HippoState(
     val vServiceContractsMax: Int,
 
     // Statistics information
+    val statBlob: StatisticsBlob,
+    /*
+    val statisticsArrArr: Array<Array<Int>>,
     val callsConsumer: Map<Int, Int>,
     val callsProducer: Map<Int, Int>,
     val callsLogicalAddress: Map<Int, Int>,
     val callsDomain: Map<Int, Int>,
     val callsContract: Map<Int, Int>,
+     */
 
     // History information
     val historyMap: Map<String, Int>,
@@ -164,11 +169,15 @@ fun getInitialState(): HippoState {
         100,
         100,
         500,
+        StatisticsBlob(arrayOf(arrayOf())),
+        /*
+        arrayOf(arrayOf()),
         mapOf(),
         mapOf(),
         mapOf(),
         mapOf(),
         mapOf(),
+         */
         mapOf(),
         false,
         false,

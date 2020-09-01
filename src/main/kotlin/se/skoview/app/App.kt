@@ -24,8 +24,11 @@ import pl.treksoft.kvision.redux.createReduxStore
 import pl.treksoft.kvision.require
 import pl.treksoft.kvision.startApplication
 import pl.treksoft.kvision.utils.*
-import se.skoview.data.*
-import se.skoview.view.*
+import se.skoview.common.*
+import se.skoview.hippo.*
+import se.skoview.stat.StatPage
+import se.skoview.stat.StatPreSelect
+import se.skoview.stat.loadStatistics
 import kotlin.browser.window
 
 /**
@@ -64,13 +67,52 @@ import kotlin.browser.window
 
 // Statistik
 
+// todo: Knapp för att komma till hippo
+// todo: Flera förvalda vyer som i gamla statistiken. Journalen.
 // todo: Völjer man item som är del av en preselect så försvinner valet. Kolla Remissvyn.
-// todo: Export till CSV
 // todo: Fixa "about" för statistiken
-// todo: Flera förvalda vyer som i gamla statistiken
+// todo: Se över synonymerna. Måste passa med de olika förvalen
+// todo: Om förvalen baseras på konsumenter och producenter måste det anges separat för de olika plattformarna
+// todo: Förvalen måste återställas till default om användaren väljer bort något av de förvalda objekten
 // todo: Se över scrollbars och paging
 // todo: Se över prestanda, speciellt kring hantering av tidsgraf
-// done: Varför slår inte "Remisstyp" igenom
+// todo: Begränsa datumlistorna så att man inte kan välja start/slutdatum "på vel sida" om varandra
+// done: Export till CSV
+// done: Troligen bättre att vara mer konsekvent med färgerna. Kanske ha en lista för de första 100, och sedan slumpa.
+/* Google chart color list. They restart with the first i all are used. Ref: https://stackoverflow.com/questions/32131668/from-where-can-i-get-list-of-all-color-patterns-used-by-google-charts
+#3366cc
+#dc3912
+#ff9900
+#109618
+#990099
+#0099c6
+#dd4477
+#66aa00
+#b82e2e
+#316395
+#994499
+#22aa99
+#aaaa11
+#6633cc
+#e67300
+#8b0707
+#651067
+#329262
+#5574a6
+#3b3eac
+#b77322
+#16d620
+#b91383
+#f4359e
+#9c5935
+#a9c413
+#2a778d
+#668d1c
+#bea413
+#0c5922
+#743411
+ */
+// todo: Den förenklade varianten skulle kunna se ut som idag med en paj. När användaren gör ett val av ett element i den första pajjen går man över till det avancerade läget.
 // done: Addera vy för "Över tid"
 // done: Inkludera synonymer. Överväg tr-funktionen för att även anpassa "Tjänstekonsument" -> "Anropande system" osv
 // done: Fixa till datahanteringen så att det blir en renare redux-koppling till vad som visas
@@ -135,7 +177,9 @@ class App : Application() {
         require("css/hippo.css")
     }
 
+
     override fun start() {
+
         val startUrl = window.location.href
         println("window.location.href: $startUrl")
 
@@ -214,4 +258,5 @@ class App : Application() {
             }
         }
     }
+
 }

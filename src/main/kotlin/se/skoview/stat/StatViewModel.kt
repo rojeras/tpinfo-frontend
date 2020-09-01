@@ -14,14 +14,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package se.skoview.view
+package se.skoview.stat
 
 import pl.treksoft.kvision.core.Col
 import pl.treksoft.kvision.core.Color
-import pl.treksoft.kvision.core.Color.Companion.name
 import pl.treksoft.kvision.data.BaseDataComponent
-import se.skoview.data.*
-import se.skoview.lib.getColorForObject
+import se.skoview.common.*
 
 
 class SInfoRecord(
@@ -31,17 +29,21 @@ class SInfoRecord(
     val calls: Int
     //val responseTime: Int
 ) {
+    var color: Color = Color.name(Col.BLACK)
+
+    /*
     val color: Color =
-            when (itemType) {
-                ItemType.CONSUMER -> Color.hex(ServiceComponent.map[itemId]!!.colorValue)
-                ItemType.CONTRACT -> Color.hex(ServiceContract.map[itemId]!!.colorValue)
-                ItemType.PRODUCER -> Color.hex(ServiceComponent.map[itemId]!!.colorValue)
-                ItemType.LOGICAL_ADDRESS -> Color.hex(LogicalAddress.map[itemId]!!.colorValue)
-                else -> {
-                    println("Error in SInfoRecord, ItemType = $itemType")
-                   Color.name(Col.BLACK)
-                }
+        when (itemType) {
+            ItemType.CONSUMER -> Color.hex(ServiceComponent.map[itemId]!!.colorValue)
+            ItemType.CONTRACT -> Color.hex(ServiceContract.map[itemId]!!.colorValue)
+            ItemType.PRODUCER -> Color.hex(ServiceComponent.map[itemId]!!.colorValue)
+            ItemType.LOGICAL_ADDRESS -> Color.hex(LogicalAddress.map[itemId]!!.colorValue)
+            else -> {
+                println("Error in SInfoRecord, ItemType = $itemType")
+                Color.name(Col.BLACK)
             }
+        }
+    */
 }
 
 class SInfoList(private val itemType: ItemType) {
@@ -52,7 +54,9 @@ class SInfoList(private val itemType: ItemType) {
         return recordList.map { it.calls }
     }
 
+    // todo: Maybe this is the correct place to return the Google chart colors in the right order
     fun colorList(): List<Color> {
+        //return mkColorList(recordList.size)
         return recordList.map { it.color }
     }
 
@@ -95,7 +99,6 @@ class SInfoList(private val itemType: ItemType) {
                 else -> error("Unknown itemType in populate()!")
             }
             //println("${item!!.description} has calls: ${ackMapTmp[entry.key]}")
-
             callsTmp.add(
                 SInfoRecord(
                     this.itemType,
@@ -110,6 +113,18 @@ class SInfoList(private val itemType: ItemType) {
         // Sort the recordList in reverse order based on number of calls
         callsTmp.sortBy { it.calls }
         callsTmp.reverse()
+
+        // Populate the color fields
+        val colorList = mkColorList(callsTmp.size)
+        console.log(callsTmp)
+        console.log(colorList)
+        var colorIx = 0
+        for (item in callsTmp) {
+            item.color = colorList[colorIx]
+            colorIx += 1
+            if (colorIx > 30) colorIx = 0
+        }
+        // todo: Place to go through the sorted list and set the color
 
         this.recordList.clear()
         this.recordList.addAll(callsTmp)
@@ -128,11 +143,58 @@ object SInfo : BaseDataComponent() {
     var contractSInfoList = SInfoList(ItemType.CONTRACT)
 
     fun createStatViewData(state: HippoState) {
-        println("In the SInfo.createStatViewData()")
-        consumerSInfoList.populate(state.callsConsumer, ! state.showTechnicalTerms)
-        producerSInfoList.populate(state.callsProducer, ! state.showTechnicalTerms)
-        logicalAddressSInfoList.populate(state.callsLogicalAddress, ! state.showTechnicalTerms)
-        contractSInfoList.populate(state.callsContract, ! state.showTechnicalTerms)
+        consumerSInfoList.populate(state.statBlob.callsConsumer, !state.showTechnicalTerms)
+        producerSInfoList.populate(state.statBlob.callsProducer, !state.showTechnicalTerms)
+        logicalAddressSInfoList.populate(state.statBlob.callsLogicalAddress, !state.showTechnicalTerms)
+        contractSInfoList.populate(state.statBlob.callsContract, !state.showTechnicalTerms)
 
     }
+}
+
+fun mkColorList(size: Int): List<Color> {
+   /* Google chart color scheme */
+    val gColor: Array<Color> = arrayOf( //arrayOf<Color>()
+        Color.hex("3366cc".toInt(radix = 16)),
+        Color.hex("dc3912".toInt(radix = 16)),
+        Color.hex("ff9900".toInt(radix = 16)),
+        Color.hex("109618".toInt(radix = 16)),
+        Color.hex("990099".toInt(radix = 16)),
+        Color.hex("0099c6".toInt(radix = 16)),
+        Color.hex("dd4477".toInt(radix = 16)),
+        Color.hex("66aa00".toInt(radix = 16)),
+        Color.hex("b82e2e".toInt(radix = 16)),
+        Color.hex("316395".toInt(radix = 16)),
+        Color.hex("994499".toInt(radix = 16)),
+        Color.hex("22aa99".toInt(radix = 16)),
+        Color.hex("aaaa11".toInt(radix = 16)),
+        Color.hex("6633cc".toInt(radix = 16)),
+        Color.hex("e67300".toInt(radix = 16)),
+        Color.hex("8b0707".toInt(radix = 16)),
+        Color.hex("651067".toInt(radix = 16)),
+        Color.hex("329262".toInt(radix = 16)),
+        Color.hex("5574a6".toInt(radix = 16)),
+        Color.hex("3b3eac".toInt(radix = 16)),
+        Color.hex("b77322".toInt(radix = 16)),
+        Color.hex("16d620".toInt(radix = 16)),
+        Color.hex("b91383".toInt(radix = 16)),
+        Color.hex("f4359e".toInt(radix = 16)),
+        Color.hex("9c5935".toInt(radix = 16)),
+        Color.hex("a9c413".toInt(radix = 16)),
+        Color.hex("2a778d".toInt(radix = 16)),
+        Color.hex("668d1c".toInt(radix = 16)),
+        Color.hex("bea413".toInt(radix = 16)),
+        Color.hex("0c5922".toInt(radix = 16)),
+        Color.hex("743411".toInt(radix = 16))
+    )
+
+    val colorList: MutableList<Color> = mutableListOf()
+    var gColorIx = 0
+
+    repeat (size) {
+        colorList.add(gColor[gColorIx])
+        gColorIx += 1
+        if (gColorIx > 30) gColorIx = 0
+    }
+
+    return colorList
 }

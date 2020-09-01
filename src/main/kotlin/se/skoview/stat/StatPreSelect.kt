@@ -14,9 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package se.skoview.view
+package se.skoview.stat
 
-import se.skoview.data.ItemType
+import se.skoview.common.ItemType
 
 data class StatPreSelect(
     val label: String,
@@ -28,7 +28,7 @@ data class StatPreSelect(
     }
 
     companion object {
-        val selfStore = hashMapOf<String, StatPreSelect>()
+        val selfStore = mutableMapOf<String, StatPreSelect>()
 
         fun initialize() {
             StatPreSelect(
@@ -59,6 +59,26 @@ data class StatPreSelect(
                     ItemType.CONTRACT to "Remisstyp",
                     ItemType.PRODUCER to "Remissmottagande system",
                     ItemType.LOGICAL_ADDRESS to "Remitterad mottagning"
+                )
+            )
+            StatPreSelect(
+                "Journalen",
+                hashMapOf(ItemType.CONSUMER to listOf(865)),
+                hashMapOf(
+                    ItemType.CONSUMER to "Applikation",
+                    ItemType.CONTRACT to "Information",
+                    ItemType.PRODUCER to "Journalsystem",
+                    ItemType.LOGICAL_ADDRESS to "Journalsystemets adress"
+                )
+            )
+            StatPreSelect(
+                "Nationell patientöversikt (NPÖ)",
+                hashMapOf(ItemType.CONSUMER to listOf(434, 693)),
+                hashMapOf(
+                    ItemType.CONSUMER to "Applikation",
+                    ItemType.CONTRACT to "Information",
+                    ItemType.PRODUCER to "Journalsystem",
+                    ItemType.LOGICAL_ADDRESS to "Journalsystemets adress"
                 )
             )
         }

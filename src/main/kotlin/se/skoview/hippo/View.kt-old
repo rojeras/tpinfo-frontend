@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package se.skoview.view
+package se.skoview.hippo
 
 import pl.treksoft.kvision.core.*
 import pl.treksoft.kvision.form.InputSize
@@ -26,7 +26,7 @@ import pl.treksoft.kvision.panel.vPanel
 import pl.treksoft.kvision.state.stateBinding
 import pl.treksoft.kvision.utils.perc
 import pl.treksoft.kvision.utils.px
-import se.skoview.data.*
+import se.skoview.common.*
 
 data class ViewInformation(
     val baseItem: BaseItem,

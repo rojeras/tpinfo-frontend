@@ -14,10 +14,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package se.skoview.data
+package se.skoview.common
 
 import pl.treksoft.kvision.redux.RAction
-import se.skoview.view.IntegrationLists
+import se.skoview.hippo.IntegrationLists
 
 /** According to: https://github.com/redux-utilities/flux-standard-action
  * An action object should have a type and contain:
@@ -37,11 +37,14 @@ sealed class HippoAction : RAction {
         val updateDates: List<String>
     ) : HippoAction()
     data class DoneDownloadStatistics(
+        val statisticsArrArr: Array<Array<Int>>
+        /*
         val callsConsumer: Map<Int, Int>,
         val callsProducer: Map<Int, Int>,
         val callsLogicalAddress: Map<Int, Int>,
         val callsDomain: Map<Int, Int>,
         val callsContract: Map<Int, Int>
+         */
     ) : HippoAction()
     data class DoneDownloadHistory(
         val historyMap: Map<String, Int>

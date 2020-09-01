@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package se.skoview.view
+package se.skoview.hippo
 
 import pl.treksoft.kvision.core.*
 import pl.treksoft.kvision.core.Color.Companion.hex
@@ -33,9 +33,10 @@ import pl.treksoft.kvision.state.observableListOf
 import pl.treksoft.kvision.utils.perc
 import pl.treksoft.kvision.utils.px
 import pl.treksoft.kvision.utils.vw
+import se.skoview.app.formControlXs
 import se.skoview.app.store
-import se.skoview.data.*
-import se.skoview.lib.getVersion
+import se.skoview.common.*
+import se.skoview.common.getVersion
 import kotlin.browser.document
 import kotlin.browser.window
 import kotlin.math.min

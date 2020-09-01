@@ -14,16 +14,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package se.skoview.view
+package se.skoview.stat
 
 import com.github.snabbdom._get
 import pl.treksoft.kvision.chart.*
-import pl.treksoft.kvision.utils.obj
 import se.skoview.app.store
-import se.skoview.data.HippoAction
-import se.skoview.data.ItemType
-import se.skoview.data.isItemSelected
-import se.skoview.data.loadStatistics
+import se.skoview.common.HippoAction
+import se.skoview.common.ItemType
+import se.skoview.common.isItemSelected
 
 
 fun getPieChartConfig(
@@ -41,6 +39,7 @@ fun getPieChartConfig(
         ),
         itemSInfoList.descList(),
         options = ChartOptions(
+            elements = ElementsOptions(arc = ArcOptions(borderWidth = 0)),
             animation = AnimationOptions(duration = animationTime),
             //responsive = false,
             legend = LegendOptions(display = false),
