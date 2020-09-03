@@ -115,7 +115,7 @@ fun exportStatData(state: HippoState) {
             }\n"
 
     if (state.selectedProducers.size > 0)
-        csvData += " Tjänsteproducenter: ${
+        csvData += "Tjänsteproducenter: ${
             state.selectedProducers.map { ServiceComponent.map[it]!!.name }.joinToString()
         }\n"
 
