@@ -14,12 +14,22 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package se.skoview.common
+package se.skoview.stat
 
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonConfiguration
+import kotlinx.serialization.builtins.MapSerializer
 import se.skoview.app.store
+import se.skoview.common.HippoAction
+import se.skoview.common.HippoState
+import se.skoview.common.getAsyncTpDb
+import se.skoview.common.getParams
+
+@Serializable
+data class HistoryEntry(
+    val aDate: String,
+    val numberOf: Int
+)
 
 @Serializable
 data class HistoryInfo(
@@ -29,8 +39,7 @@ data class HistoryInfo(
 data class HistoryCache(
     val key: String,
     val historyMap: Map<String, Int>
-
-    ) {
+) {
     init {
         map[key] = this
     }
@@ -53,26 +62,34 @@ fun loadHistory(state: HippoState) {
     } else {
         println(">>> History data NOT found in cache - will download")
         console.log(parameters)
+        /* Orginalversion som fungerar
+                    val json = Json(JsonConfiguration.Stable)
+            val history = json.parse(HistoryInfo.serializer(), response)
+         */
         getAsyncTpDb(parameters) { response ->
             println(">>> Size of fetched history data is: ${response.length}")
-
-            val json = Json(JsonConfiguration.Stable)
-            val history = json.parse(HistoryInfo.serializer(), response)
-
-            for ((key, value ) in history.history) {
-                println("$key : $value")
+            //val json = Json(JsonConfiguration.Stable)
+            val history = JSON.parse<HistoryInfo>(response)
+            console.log(history.history)
+            val historyMap = mutableMapOf<String, Int>()
+            for (item in history.history) {
+                println("Varv")
+                //println(item)
             }
-
+            /*
             // Store in cache
             HistoryCache(
                 parameters,
                 history.history
             )
+             */
 
-            println("time to dispatch")
+            println("Time to Dispatch")
+            /*
             store.dispatch(
                 HippoAction.DoneDownloadHistory(HistoryCache.map[parameters]!!.historyMap)
             )
+             */
         }
     }
 }

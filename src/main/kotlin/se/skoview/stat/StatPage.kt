@@ -18,6 +18,7 @@ package se.skoview.stat
 
 import pl.treksoft.kvision.chart.*
 import pl.treksoft.kvision.core.*
+import pl.treksoft.kvision.core.FlexWrap
 import pl.treksoft.kvision.core.Position
 import pl.treksoft.kvision.form.check.*
 import pl.treksoft.kvision.form.select.simpleSelectInput
@@ -157,7 +158,7 @@ object StatPage : SimplePanel() {
                             }
                         }
 
-                        cell { +"Förval:" }
+                        cell { +"Visa:" }
                         cell {
                             val selectedPreSelect = state.statPreSelect
                             simpleSelectInput(
@@ -235,6 +236,7 @@ object StatPage : SimplePanel() {
             }
         }
 
+        // Below is the code to show the different graphs for the advanced version
         simplePanel { }.bind(store) { state ->
             if (state.showTimeGraph && state.historyMap.isNotEmpty()) {
                 val animateTime =
@@ -247,8 +249,6 @@ object StatPage : SimplePanel() {
                 println("Will display time graph")
                 val xAxis = state.historyMap.keys.toList()
                 val yAxis = state.historyMap.values.toList()
-                console.log(xAxis)
-                console.log(yAxis)
                 chart(
                     Configuration(
                         ChartType.LINE,
@@ -446,7 +446,6 @@ open class ChartLabelTable(
                         headerFilter = Editor.INPUT,
                         //headerFilterPlaceholder = "Sök ${heading.toLowerCase()}",
                         headerFilterPlaceholder = "Sök...",
-                        //cellClick = {e, cell -> console.log(cell.getRow()) },
                         editable = { false },
                         //width = "20.vw",
                         widthGrow = 3,
@@ -476,7 +475,6 @@ open class ChartLabelTable(
                 //dataTree = true,
                 selectable = true,
                 rowSelected = { row ->
-                    console.log(row)
                     val item = row.getData() as SInfoRecord
                     if (item.calls > -1) {
                         if (store.getState().isItemSelected(item.itemType, item.itemId)) {

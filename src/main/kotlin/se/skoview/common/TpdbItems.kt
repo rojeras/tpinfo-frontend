@@ -23,7 +23,7 @@ import pl.treksoft.kvision.redux.ReduxStore
 import kotlinx.serialization.builtins.*
 
 fun loadBaseItems(store: ReduxStore<HippoState, HippoAction>) {
-    console.log("Will now load BaseItems")
+    println("Will now load BaseItems")
     store.dispatch(HippoAction.StartDownloadBaseItems)
 
     BaseDates.load { areAllBaseItemsLoaded(store) }
@@ -129,8 +129,11 @@ data class ServiceComponent(
 
             getAsyncTpDb(type) { response ->
                 println("Size of response is: ${response.length}")
-                val json = Json(JsonConfiguration.Stable)
-                json.parse(serializer().list, response)
+                //val json = Json(JsonConfiguration.Stable)
+                val items = JSON.parse<Array<ServiceComponent>>(response)
+                items.forEach { item ->
+                    ServiceComponent(item.id, item.hsaId, item.description, item.synonym)
+                }
 
                 isLoaded = true
                 callback()
@@ -234,7 +237,6 @@ data class ServiceContract(
                     ServiceContract(item.id, item.serviceDomainId, item.name, item.namespace, item.major, item.synonym)
                 }
                 isLoaded = true
-
 
                 if (ServiceDomain.isLoaded) {
                     ServiceDomain.attachContractsToDomains()
@@ -416,22 +418,6 @@ data class PlattformChain(
             val saveM: Int = middle ?: 0
             return (first * 10000) + saveM * 100 + last
         }
-
-        /*
-        fun calculateSeparatePlattformIds(plattformChainId: Int): Triple<Int, Int, Int> {
-            var id = plattformChainId
-
-            val first = id / 10000
-            id -= first
-            val middle = id / 100
-            id -= middle
-            val last = id
-
-            println("$plattformChainId converted to Triple<$first, $middle, $last")
-
-            return Triple(first, middle, last)
-        }
-         */
     }
 }
 

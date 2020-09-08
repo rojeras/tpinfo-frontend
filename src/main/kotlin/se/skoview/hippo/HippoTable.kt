@@ -18,6 +18,7 @@ package se.skoview.hippo
 
 import pl.treksoft.kvision.core.*
 import pl.treksoft.kvision.core.Color.Companion.hex
+import pl.treksoft.kvision.core.FlexWrap
 import pl.treksoft.kvision.data.BaseDataComponent
 import pl.treksoft.kvision.data.dataContainer
 import pl.treksoft.kvision.form.select.simpleSelectInput
@@ -85,6 +86,7 @@ object HippoTablePage : SimplePanel() {
         // Date selector
         //hPanel { clear = Clear.BOTH
         flexPanel(
+            //FlexDir.ROW, FlexWrap.WRAP, FlexJustify.SPACEBETWEEN, FlexAlignItems.CENTER, // Before upgrading to 3.13.1
             FlexDir.ROW, FlexWrap.WRAP, FlexJustify.SPACEBETWEEN, FlexAlignItems.CENTER,
             spacing = 5
         ) {
@@ -191,16 +193,6 @@ class HippoItemsView(type: ItemType, heading: String, bredd: Int = 20) : VPanel(
         searchField(type, textSearchInfo)
 
         div {}.bind(store) { state ->
-            /*
-            if (
-                state.currentAction != HippoAction.ViewUpdated::class &&
-                state.currentAction != HippoAction.SetVMax::class &&
-                state.currentAction != HippoAction.ApplicationStarted::class
-            ) return@bind
-             */
-
-            //if (type == ItemType.CONSUMER)
-            println("Will now render ${type}")
 
             // Go to top for most rendering actions
             if (state.currentAction != HippoAction.SetVMax::class) {
@@ -245,8 +237,6 @@ class HippoItemsView(type: ItemType, heading: String, bredd: Int = 20) : VPanel(
             }
 
             dataContainer(textSearchInfo.textSearchFilterObsList, { textFilter, _, _ ->
-                println("In dataContainer, type = $type, textFilter = '$textFilter'")
-                //textFilter = element
 
                 div {
                     // Perform the free text search filtering

@@ -63,8 +63,9 @@ fun setUrlFilter(state: HippoState) {
 }
 
 fun HippoState.getBookmark(): String {
+    println("getBookmars(), updateDates:")
+    println("Length ${this.updateDates.size}")
     if (this.updateDates.isEmpty() || this.dateEffective == "") return ""
-
     var bookmark = ""
 
     bookmark += if (this.selectedConsumers.isNotEmpty()) this.selectedConsumers.joinToString(
@@ -89,14 +90,10 @@ fun HippoState.getBookmark(): String {
     ) else ""
 
     // Exclude dates if dateEnd == current date (first in updateDates list)
-
     if (this.dateEnd != this.updateDates[0]) {
         bookmark += "S" + date2DaysSinceEpoch(this.dateEffective)
         bookmark += "E" + date2DaysSinceEpoch(this.dateEnd)
     }
-    println("dateEnd=${this.dateEnd}")
-    println("updateDates[0]=${this.updateDates[0]}")
-
     // Separate plattforms now stored in filter, not the chain
     for (pcId in this.selectedPlattformChains) {
         val firstId = PlattformChain.map[pcId]?.first
@@ -104,9 +101,7 @@ fun HippoState.getBookmark(): String {
         bookmark += "F$firstId"
         bookmark += "L$lastId"
     }
-
     return bookmark
-
 }
 
 fun parseBookmark(): BookmarkInformation {

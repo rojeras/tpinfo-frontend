@@ -34,7 +34,7 @@ sealed class HippoAction : RAction {
     data class DoneDownloadIntegrations(
         val integrationArrs: List<Integration>,
         val maxCounters: MaxCounter,
-        val updateDates: List<String>
+        val updateDates: Array<String>
     ) : HippoAction()
     data class DoneDownloadStatistics(
         val statisticsArrArr: Array<Array<Int>>

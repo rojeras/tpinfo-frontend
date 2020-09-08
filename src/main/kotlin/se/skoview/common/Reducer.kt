@@ -22,7 +22,6 @@ import se.skoview.stat.StatisticsBlob
 
 fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
     //println("=====>>> ${action::class}")
-    //console.log(state)
     val newState = when (action) {
         is HippoAction.ApplicationStarted -> {
             // If dates not set by URL at startup the default are set here
@@ -85,16 +84,13 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
         }
          */
         is HippoAction.DoneDownloadIntegrations -> {
-            val dates: MutableList<String> = mutableListOf()
             // Must ensure the selected date is part of the list of all dates
             // Otherwise the date selector might be empty
-            dates.addAll(action.updateDates)
-            dates.add(state.dateEffective)
             state.copy(
                 downloadIntegrationStatus = AsyncActionStatus.COMPLETED,
                 integrationArrs = action.integrationArrs,
                 maxCounters = action.maxCounters,
-                updateDates = dates.distinct().sortedDescending(), //action.updateDates
+                updateDates = action.updateDates.toList(),
                 vServiceConsumersMax = 100,
                 vServiceProducersMax = 100,
                 vLogicalAddressesMax = 100
@@ -293,7 +289,6 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
     }
     val finalState = newState.copy(currentAction = action::class)
 
-    //console.log(newState)
     println("<<<===== ${action::class}")
     console.log(finalState)
 

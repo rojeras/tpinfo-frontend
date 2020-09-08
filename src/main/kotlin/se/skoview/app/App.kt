@@ -64,9 +64,11 @@ import kotlin.browser.window
 // todo: Tag fram mock för hur integrationer ska presenteras där det kan finnas flera LA
 // todo: Lös trädklättringen, kanske mha HSA-trädet
 // todo: Titta på Tabulator igen
+// todo: Hippo kanske skulle uppdateras varje dygn om browsern skulle vara öppen över natten
 
 // Statistik
 
+// todo: Den förenklade varianten skulle kunna se ut som idag med en paj. När användaren gör ett val av ett element i den första pajjen går man över till det avancerade läget.
 // todo: Knapp för att komma till hippo
 // todo: Flera förvalda vyer som i gamla statistiken. Journalen.
 // todo: Völjer man item som är del av en preselect så försvinner valet. Kolla Remissvyn.
@@ -77,7 +79,6 @@ import kotlin.browser.window
 // todo: Se över scrollbars och paging
 // todo: Se över prestanda, speciellt kring hantering av tidsgraf
 // todo: Begränsa datumlistorna så att man inte kan välja start/slutdatum "på vel sida" om varandra
-// todo: Den förenklade varianten skulle kunna se ut som idag med en paj. När användaren gör ett val av ett element i den första pajjen går man över till det avancerade läget.
 // todo: Och så visa svarstider
 // done: Export till CSV
 // done: Troligen bättre att vara mer konsekvent med färgerna. Kanske ha en lista för de första 100, och sedan slumpa.

@@ -116,8 +116,6 @@ class SInfoList(private val itemType: ItemType) {
 
         // Populate the color fields
         val colorList = mkColorList(callsTmp.size)
-        console.log(callsTmp)
-        console.log(colorList)
         var colorIx = 0
         for (item in callsTmp) {
             item.color = colorList[colorIx]

@@ -2,6 +2,7 @@ import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootPlugin
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 import org.jetbrains.kotlin.gradle.tasks.KotlinJsDce
+import  org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType.js
 
 /**  Removed when migrating to KVision 3.12.0
 buildscript {
@@ -24,13 +25,6 @@ repositories {
     maven { url = uri("https://dl.bintray.com/kotlin/kotlin-eap") }
     maven { url = uri("https://kotlin.bintray.com/kotlinx") }
     maven { url = uri("https://dl.bintray.com/kotlin/kotlin-js-wrappers") }
-    maven {
-        url = uri("https://dl.bintray.com/gbaldeck/kotlin")
-        metadataSources {
-            mavenPom()
-            artifact()
-        }
-    }
     maven { url = uri("https://dl.bintray.com/rjaros/kotlin") }
     mavenLocal()
 }
@@ -44,21 +38,11 @@ val webDir = file("src/main/web")
 //val isProductionBuild = project.extra.get("production") as Boolean
 
 kotlin {
-    target {
-        /** Removed migrating fto 3.13.0
-        compilations.all {
-            kotlinOptions {
-                moduleKind = "umd"
-                sourceMap = !isProductionBuild
-                if (!isProductionBuild) {
-                    sourceMapEmbedSources = "always"
-                }
-            }
-        }
-        */
+    js {
         browser {
             runTask {
                 outputFileName = "main.bundle.js"
+                sourceMaps = false
                 devServer = KotlinWebpackConfig.DevServer(
                     open = false,
                     port = 2000,
@@ -66,7 +50,7 @@ kotlin {
                         "/kv/*" to "http://localhost:8080",
                         "/kvws/*" to mapOf("target" to "ws://localhost:8080", "ws" to true)
                     ),
-                    contentBase = listOf("$buildDir/processedResources/Js/main")
+                    contentBase = listOf("$buildDir/processedResources/js/main")
                 )
             }
             // Added webpackTask migrating to KVision 3.12.0
@@ -79,17 +63,11 @@ kotlin {
                 }
             }
         }
+        binaries.executable()
     }
     sourceSets["main"].dependencies {
-        implementation(kotlin("stdlib-js"))
-        implementation(npm("po2json"))
-        implementation(npm("grunt"))
-        implementation(npm("grunt-pot"))
-
-        implementation(npm("react-awesome-button"))
-
+        implementation(npm("react-awesome-button", "*"))
         implementation(npm("file-saver", "2.0.2"))
-
         implementation("pl.treksoft:kvision:$kvisionVersion")
         implementation("pl.treksoft:kvision-bootstrap:$kvisionVersion")
         implementation("pl.treksoft:kvision-bootstrap-css:$kvisionVersion")
@@ -117,7 +95,8 @@ kotlin {
 }
 
 fun getNodeJsBinaryExecutable(): String {
-    val nodeDir = NodeJsRootPlugin.apply(project).nodeJsSetupTask.destination
+    //val nodeDir = NodeJsRootPlugin.apply(project).nodeJsSetupTask.destination
+    val nodeDir = NodeJsRootPlugin.apply(project).nodeJsSetupTaskProvider.get().destination
     val isWindows = System.getProperty("os.name").toLowerCase().contains("windows")
     val nodeBinDir = if (isWindows) nodeDir else nodeDir.resolve("bin")
     val command = NodeJsRootPlugin.apply(project).nodeCommand
@@ -142,37 +121,8 @@ tasks {
             }
         }
     }
-    create("generateGruntfile") {
-        outputs.file("$buildDir/js/Gruntfile.js")
-        doLast {
-            file("$buildDir/js/Gruntfile.js").run {
-                writeText(
-                    """
-                    module.exports = function (grunt) {
-                        grunt.initConfig({
-                            pot: {
-                                options: {
-                                    text_domain: "messages",
-                                    dest: "../../src/main/resources/i18n/",
-                                    keywords: ["tr", "ntr:1,2", "gettext", "ngettext:1,2"],
-                                    encoding: "UTF-8"
-                                },
-                                files: {
-                                    src: ["../../src/main/kotlin/**/*.kt"],
-                                    expand: true,
-                                },
-                            }
-                        });
-                        grunt.loadNpmTasks("grunt-pot");
-                    };
-                """.trimIndent()
-                )
-            }
-        }
-    }
     create("generatePotFile", Exec::class) {
-        dependsOn("compileKotlinJs", "generateGruntfile")
-        workingDir = file("$buildDir/js")
+        dependsOn("compileKotlinJs")
         executable = getNodeJsBinaryExecutable()
         args("$buildDir/js/node_modules/grunt/bin/grunt", "pot")
         inputs.files(kotlin.sourceSets["main"].kotlin.files)
@@ -191,33 +141,13 @@ afterEvaluate {
                     exec {
                         executable = getNodeJsBinaryExecutable()
                         args(
-                            "$buildDir/js/node_modules/po2json/bin/po2json",
+                            "$buildDir/js/node_modules/gettext.js/bin/po2json",
                             it.absolutePath,
-                            "${it.parent}/${it.nameWithoutExtension}.json",
-                            "-f",
-                            "jed1.x"
+                            "${it.parent}/${it.nameWithoutExtension}.json"
                         )
                         println("Converted ${it.name} to ${it.nameWithoutExtension}.json")
                     }
                     it.delete()
-                }
-                copy {
-                    file("$buildDir/tmp/expandedArchives/").listFiles()?.forEach {
-                        if (it.isDirectory && it.name.startsWith("kvision")) {
-                            val kvmodule = it.name.split("-$kvisionVersion").first()
-                            from(it) {
-                                include("css/**")
-                                include("img/**")
-                                include("js/**")
-                                if (kvmodule == "kvision") {
-                                    into("kvision/$kvisionVersion")
-                                } else {
-                                    into("kvision-$kvmodule/$kvisionVersion")
-                                }
-                            }
-                        }
-                    }
-                    into(file(buildDir.path + "/js/packages_imported"))
                 }
             }
         }

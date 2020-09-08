@@ -33,9 +33,9 @@ enum class ItemType {
 
 @Serializable
 data class IntegrationInfo(
-    val integrations: List<List<Int?>>,
+    val integrations: Array<Array<Int?>>,
     val maxCounters: MaxCounter,
-    val updateDates: List<String>
+    val updateDates: Array<String>
 )
 
 @Serializable
@@ -64,7 +64,7 @@ data class IntegrationCache(
     val key: String,
     val integrationArr: List<Integration>,
     val maxCounters: MaxCounter,
-    val updateDates: List<String>
+    val updateDates: Array<String>
 ) {
     init {
         map[key] = this
@@ -76,36 +76,28 @@ data class IntegrationCache(
 }
 
 fun loadIntegrations(state: HippoState) {
-    //store.dispatch(HippoAction.StartDownloadIntegrations)
-    //setUrlFilter(state)
     val urlParameters = state.getParams()
     val parameters = "integrations$urlParameters"
 
-    // Check if the integration info is available in the cache
     if (IntegrationCache.map.containsKey(parameters)) {
-        println("Integrations found in cache")
+        println(">>> Integrations found in cache")
         val integrationsCache = IntegrationCache.map[parameters]
         // todo: Make sure to remove the !! below
-        //store.dispatch { _, getState ->
-            store.dispatch(
-                HippoAction.DoneDownloadIntegrations(
-                    integrationsCache!!.integrationArr,
-                    integrationsCache.maxCounters,
-                    integrationsCache.updateDates
-                )
+        store.dispatch(
+            HippoAction.DoneDownloadIntegrations(
+                integrationsCache!!.integrationArr,
+                integrationsCache.maxCounters,
+                integrationsCache.updateDates
             )
-            createHippoViewData(store.getState())
-        //}
+        )
+        createHippoViewData(store.getState())
     } else {
         println(">>> Integrations NOT found in cache - will download")
-        //console.log(parameters)
         getAsyncTpDb(parameters) { response ->
             println(">>> Size of fetched integrations is: ${response.length}")
-            val json = Json(JsonConfiguration.Stable)
-            val integrationInfo: IntegrationInfo = json.parse(IntegrationInfo.serializer(), response)
-            //console.log(integrationInfo)
+            val integrationInfo: IntegrationInfo = JSON.parse<IntegrationInfo>(response)
             val integrationArrs: MutableList<Integration> = mutableListOf()
-            for (arr: List<Int?> in integrationInfo.integrations) {
+            for (arr: Array<Int?> in integrationInfo.integrations) {
                 val one: Int = arr[1] ?: -1
                 val two: Int? = arr[2]
                 val three: Int = arr[3] ?: -1
@@ -116,20 +108,19 @@ fun loadIntegrations(state: HippoState) {
                 val eight: Int = arr[8] ?: -1
 
                 integrationArrs.add(Integration(one, two, three, four, five, six, seven, eight))
-                IntegrationCache(parameters, integrationArrs, integrationInfo.maxCounters, integrationInfo.updateDates)
             }
-            println("Number of integrations: ${integrationArrs.size}")
-            //store.dispatch { _, getState ->
 
-                store.dispatch(
-                    HippoAction.DoneDownloadIntegrations(
-                        integrationArrs,
-                        integrationInfo.maxCounters,
-                        integrationInfo.updateDates
-                    )
+            IntegrationCache(parameters, integrationArrs, integrationInfo.maxCounters, integrationInfo.updateDates)
+
+            println("Number of integrations: ${integrationArrs.size}")
+            store.dispatch(
+                HippoAction.DoneDownloadIntegrations(
+                    integrationArrs,
+                    integrationInfo.maxCounters,
+                    integrationInfo.updateDates
                 )
-                createHippoViewData(store.getState())
-            //}
+            )
+            createHippoViewData(store.getState())
         }
     }
 }
@@ -174,3 +165,4 @@ fun HippoState.getParams(): String {
 
     return params
 }
+
