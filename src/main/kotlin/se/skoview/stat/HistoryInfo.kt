@@ -19,6 +19,7 @@ package se.skoview.stat
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.MapSerializer
+import kotlinx.serialization.json.Json
 import se.skoview.app.store
 import se.skoview.common.HippoAction
 import se.skoview.common.HippoState
@@ -68,28 +69,27 @@ fun loadHistory(state: HippoState) {
          */
         getAsyncTpDb(parameters) { response ->
             println(">>> Size of fetched history data is: ${response.length}")
-            //val json = Json(JsonConfiguration.Stable)
-            val history = JSON.parse<HistoryInfo>(response)
+            val json = Json {}
+            val history = json.decodeFromString(HistoryInfo.serializer(), response)
             console.log(history.history)
             val historyMap = mutableMapOf<String, Int>()
-            for (item in history.history) {
-                println("Varv")
-                //println(item)
+            for ((key, value ) in history.history) {
+                println("$key : $value")
             }
-            /*
+
             // Store in cache
             HistoryCache(
                 parameters,
                 history.history
             )
-             */
+
 
             println("Time to Dispatch")
-            /*
+
             store.dispatch(
                 HippoAction.DoneDownloadHistory(HistoryCache.map[parameters]!!.historyMap)
             )
-             */
+
         }
     }
 }
