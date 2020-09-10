@@ -68,4 +68,5 @@ sealed class HippoAction : RAction {
     data class ShowTimeGraph(val isShown: Boolean): HippoAction()
     data class ShowTechnicalTerms(val isShown: Boolean): HippoAction()
     data class PreSelectedSelected(val label: String): HippoAction()
+    data class StatAdvancedMode(val isAdvanced: Boolean): HippoAction()
 }

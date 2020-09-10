@@ -16,29 +16,24 @@
  */
 package se.skoview.stat
 
-import pl.treksoft.kvision.chart.*
 import pl.treksoft.kvision.core.*
-import pl.treksoft.kvision.core.FlexWrap
-import pl.treksoft.kvision.core.Position
-import pl.treksoft.kvision.form.check.*
+import pl.treksoft.kvision.form.check.checkBoxInput
 import pl.treksoft.kvision.form.select.simpleSelectInput
 import pl.treksoft.kvision.html.*
-import pl.treksoft.kvision.html.Align
 import pl.treksoft.kvision.modal.Modal
 import pl.treksoft.kvision.modal.ModalSize
-import pl.treksoft.kvision.panel.*
-import pl.treksoft.kvision.state.*
+import pl.treksoft.kvision.panel.SimplePanel
+import pl.treksoft.kvision.panel.flexPanel
+import pl.treksoft.kvision.panel.vPanel
+import pl.treksoft.kvision.state.bind
 import pl.treksoft.kvision.table.TableType
 import pl.treksoft.kvision.table.cell
 import pl.treksoft.kvision.table.row
 import pl.treksoft.kvision.table.table
-import pl.treksoft.kvision.tabulator.*
-import pl.treksoft.kvision.utils.*
+import pl.treksoft.kvision.utils.px
+import se.skoview.app.formControlXs
 import se.skoview.app.store
 import se.skoview.common.*
-import se.skoview.common.thousands
-import se.skoview.common.getVersion
-import se.skoview.app.formControlXs
 
 object StatPage : SimplePanel() {
 
@@ -53,6 +48,7 @@ object StatPage : SimplePanel() {
             div("Detaljerad statistik med diagram och möjlighet att ladda ner informationen för egna analyser.")
         }.apply {
             //width = 100.perc
+            id = "pageHeaderDiv"
             background = Background(Color.hex(0x113d3d))
             align = Align.CENTER
             color = Color.name(Col.WHITE)
@@ -63,6 +59,7 @@ object StatPage : SimplePanel() {
             FlexDirection.ROW, FlexWrap.WRAP, JustifyContent.SPACEBETWEEN, AlignItems.CENTER,
             spacing = 5
         ) {
+            id = "controlPanelFlex"
             clear = Clear.BOTH
             margin = 0.px
             background = Background(Color.hex(0xf6efe9))
@@ -131,6 +128,15 @@ object StatPage : SimplePanel() {
                                 store.dispatch(HippoAction.ShowTimeGraph(value))
                             }
                             +" Visa utveckling över tid"
+                        }
+                        // Use Advanced mode
+                        cell {
+                            checkBoxInput(
+                                value = state.statAdvancedMode
+                            ).onClick {
+                                store.dispatch(HippoAction.StatAdvancedMode(value))
+                            }
+                            +" Avancerat läge"
                         }
                     }
                     // End date
@@ -230,7 +236,10 @@ object StatPage : SimplePanel() {
 
             }
         }
-        add(AdvancedView)
+        div { }.bind(store) { state ->
+            if (state.statAdvancedMode) add(AdvancedView)
+            else add(SimpleView)
+        }
     }
 }
 

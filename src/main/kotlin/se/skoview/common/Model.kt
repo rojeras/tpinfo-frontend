@@ -107,6 +107,7 @@ data class HippoState(
 
     // View controllers
     val showTechnicalTerms: Boolean,
+    val statAdvancedMode: Boolean,
     val statPreSelect: String,
     val consumerLabel: String,
     val contractLabel: String,
@@ -179,6 +180,7 @@ fun getInitialState(): HippoState {
         mapOf(),
          */
         mapOf(),
+        false,
         false,
         false,
         "",

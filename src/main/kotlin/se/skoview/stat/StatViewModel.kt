@@ -150,7 +150,7 @@ object SInfo : BaseDataComponent() {
 }
 
 fun mkColorList(size: Int): List<Color> {
-   /* Google chart color scheme */
+    /* Google chart color scheme */
     val gColor: Array<Color> = arrayOf( //arrayOf<Color>()
         Color.hex("3366cc".toInt(radix = 16)),
         Color.hex("dc3912".toInt(radix = 16)),
@@ -188,7 +188,7 @@ fun mkColorList(size: Int): List<Color> {
     val colorList: MutableList<Color> = mutableListOf()
     var gColorIx = 0
 
-    repeat (size) {
+    repeat(size) {
         colorList.add(gColor[gColorIx])
         gColorIx += 1
         if (gColorIx > 30) gColorIx = 0

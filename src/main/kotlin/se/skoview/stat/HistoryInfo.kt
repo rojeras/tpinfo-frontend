@@ -73,7 +73,7 @@ fun loadHistory(state: HippoState) {
             val history = json.decodeFromString(HistoryInfo.serializer(), response)
             console.log(history.history)
             val historyMap = mutableMapOf<String, Int>()
-            for ((key, value ) in history.history) {
+            for ((key, value) in history.history) {
                 println("$key : $value")
             }
 

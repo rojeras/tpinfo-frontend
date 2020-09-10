@@ -38,8 +38,8 @@ import se.skoview.app.formControlXs
 import se.skoview.app.store
 import se.skoview.common.*
 import se.skoview.common.getVersion
-import kotlin.browser.document
-import kotlin.browser.window
+import kotlinx.browser.document
+import kotlinx.browser.window
 import kotlin.math.min
 
 class TextSearchInfo : BaseDataComponent() {

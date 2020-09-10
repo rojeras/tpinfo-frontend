@@ -26,8 +26,7 @@ import se.skoview.common.HippoAction
 import se.skoview.common.ItemType
 import se.skoview.common.isItemSelected
 
-
-fun getPieChartConfig(
+fun getSimplePieChartConfig(
     itemType: ItemType,
     itemSInfoList: SInfoList,
     animationTime: Int = 0
@@ -44,8 +43,53 @@ fun getPieChartConfig(
         options = ChartOptions(
             elements = ElementsOptions(arc = ArcOptions(borderWidth = 0)),
             animation = AnimationOptions(duration = animationTime),
-            responsive = false,
+            responsive = true,
             legend = LegendOptions(display = false),
+            maintainAspectRatio = false,
+            onClick = { _, activeElements ->
+                val sliceIx = activeElements[0]._get("_index") as Int
+                val itemId: Int = itemSInfoList.recordList[sliceIx].itemId
+                if (store.getState().isItemSelected(itemType, itemId)) {
+                    store.dispatch { _, getState ->
+                        store.dispatch(HippoAction.ItemIdDeselectedAll(itemType))
+                        loadStatistics(getState())
+                    }
+                } else {
+                    store.dispatch { _, getState ->
+                        store.dispatch(HippoAction.ItemIdSelected(itemType, itemId))
+                        loadStatistics(getState())
+                    }
+
+                }
+                "" // This lambda returns Any, which mean the last line must be an expression
+            }
+        )
+    )
+    return configuration
+}
+
+fun getPieChartConfig(
+    itemType: ItemType,
+    itemSInfoList: SInfoList,
+    animationTime: Int = 0,
+    responsive: Boolean = false,
+    maintainAspectRatio: Boolean = true
+): Configuration {
+    val configuration = Configuration(
+        ChartType.PIE,
+        listOf(
+            DataSets(
+                data = itemSInfoList.callList(),
+                backgroundColor = itemSInfoList.colorList()
+            )
+        ),
+        itemSInfoList.descList(),
+        options = ChartOptions(
+            elements = ElementsOptions(arc = ArcOptions(borderWidth = 0)),
+            animation = AnimationOptions(duration = animationTime),
+            responsive = responsive,
+            legend = LegendOptions(display = false),
+            maintainAspectRatio = maintainAspectRatio,
             onClick = { _, activeElements ->
                 val sliceIx = activeElements[0]._get("_index") as Int
                 val itemId: Int = itemSInfoList.recordList[sliceIx].itemId

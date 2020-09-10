@@ -1,9 +1,27 @@
+/**
+ * Copyright (C) 2013-2020 Lars Erik Röjerås
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package se.skoview.stat
 
 import pl.treksoft.kvision.chart.*
-import pl.treksoft.kvision.core.*
+import pl.treksoft.kvision.core.Overflow
 import pl.treksoft.kvision.html.div
-import pl.treksoft.kvision.panel.*
+import pl.treksoft.kvision.panel.SimplePanel
+import pl.treksoft.kvision.panel.VPanel
+import pl.treksoft.kvision.panel.hPanel
 import pl.treksoft.kvision.state.bind
 import pl.treksoft.kvision.utils.vh
 import pl.treksoft.kvision.utils.vw
