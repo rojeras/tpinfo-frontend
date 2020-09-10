@@ -17,9 +17,6 @@
 package se.skoview.stat
 
 import pl.treksoft.kvision.chart.Chart
-import pl.treksoft.kvision.core.Background
-import pl.treksoft.kvision.core.Col
-import pl.treksoft.kvision.core.Color
 import pl.treksoft.kvision.core.Overflow
 import pl.treksoft.kvision.panel.SimplePanel
 import pl.treksoft.kvision.panel.flexPanel
@@ -36,7 +33,7 @@ object SimpleView : SimplePanel(
 ) {
     init {
         id = "SimpleView"
-        background = Background(Color.name(Col.RED))
+        //background = Background(Color.name(Col.RED))
         // The whole item table
         flexPanel(
         ) {
@@ -44,7 +41,7 @@ object SimpleView : SimplePanel(
             overflow = Overflow.HIDDEN
             id = "SimpleViewInnerhPanel"
             width = 100.vw
-            background = Background(Color.name(Col.CHOCOLATE))
+            //background = Background(Color.name(Col.CHOCOLATE))
         }.bind(store) { state ->
             println("Time to update the simple view...")
             SInfo.createStatViewData(state)
@@ -64,7 +61,7 @@ object SimpleView : SimplePanel(
             val label: String = state.consumerLabel
 
             id = "SimpleStatPieTableView"
-            background = Background(Color.name(Col.GREEN))
+            //background = Background(Color.name(Col.GREEN))
             width = 100.vw
             val pieChart =
                 Chart(
@@ -78,10 +75,11 @@ object SimpleView : SimplePanel(
                 )
             add(
                 pieChart.apply {
-                    width = 50.vw
-                    height = 100.perc
+                    width = 40.vw
+                    height = 80.perc
                     id = "pieChart"
-                    background = Background(Color.name(Col.ALICEBLUE))
+                    margin = 5.vw
+                    //background = Background(Color.name(Col.ALICEBLUE))
                 }, grow = 1
             ).apply {
                 id = "The added pie container"
@@ -96,8 +94,9 @@ object SimpleView : SimplePanel(
                     label
                 ).apply {
                     id = "ChartLabelTable"
-                    width = 50.vw
-                    background = Background(Color.name(Col.LAWNGREEN))
+                    width = 40.vw
+                    margin = 5.vw
+                    //background = Background(Color.name(Col.LAWNGREEN))
                 }, grow = 1
             )
         }.apply { id = "postId" }

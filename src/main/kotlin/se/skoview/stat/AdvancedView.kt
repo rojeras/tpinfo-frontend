@@ -16,14 +16,12 @@
  */
 package se.skoview.stat
 
-import pl.treksoft.kvision.chart.*
+import pl.treksoft.kvision.chart.Chart
 import pl.treksoft.kvision.core.Overflow
-import pl.treksoft.kvision.html.div
 import pl.treksoft.kvision.panel.SimplePanel
 import pl.treksoft.kvision.panel.VPanel
 import pl.treksoft.kvision.panel.hPanel
 import pl.treksoft.kvision.state.bind
-import pl.treksoft.kvision.utils.vh
 import pl.treksoft.kvision.utils.vw
 import se.skoview.app.store
 import se.skoview.common.HippoAction
@@ -34,13 +32,14 @@ object AdvancedView : VPanel(
     //FlexDir.ROW, FlexWrap.WRAP, FlexJustify.SPACEBETWEEN, FlexAlignItems.CENTER,
 ) {
     init {
+        /*
         div { }.bind(store) { state ->
             if (state.showTimeGraph && state.historyMap.isNotEmpty()) {
                 val animateTime =
                     if (state.currentAction == HippoAction.DoneDownloadHistory::class) {
-                        1299
+                        1298
                     } else {
-                        -1
+                        -2
                     }
 
                 println("Will display time graph")
@@ -64,12 +63,13 @@ object AdvancedView : VPanel(
                         )
                     )
                 ).apply {
-                    height = 27.vh
-                    width = 96.vw
+                    height = 26.vh
+                    width = 95.vw
                     //background = Background(Color.name(Col.AZURE))
                 }
             }
         }
+         */
 
         // The whole item table
         hPanel(

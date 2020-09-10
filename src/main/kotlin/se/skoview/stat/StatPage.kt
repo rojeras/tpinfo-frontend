@@ -16,6 +16,7 @@
  */
 package se.skoview.stat
 
+import pl.treksoft.kvision.chart.*
 import pl.treksoft.kvision.core.*
 import pl.treksoft.kvision.form.check.checkBoxInput
 import pl.treksoft.kvision.form.select.simpleSelectInput
@@ -31,6 +32,8 @@ import pl.treksoft.kvision.table.cell
 import pl.treksoft.kvision.table.row
 import pl.treksoft.kvision.table.table
 import pl.treksoft.kvision.utils.px
+import pl.treksoft.kvision.utils.vh
+import pl.treksoft.kvision.utils.vw
 import se.skoview.app.formControlXs
 import se.skoview.app.store
 import se.skoview.common.*
@@ -94,15 +97,28 @@ object StatPage : SimplePanel() {
                                 if (state.selectedPlattformChains.size > 0)
                                     PlattformChain.map[state.selectedPlattformChains[0]]!!.last.toString()
                                 else ""
+
+                            val options =
+                                if (state.statAdvancedMode)
+                                    state.statisticsPlattforms.map { Pair(it.key.toString(), it.value.name) }
+                                else
+                                    listOf(Pair("3", "SLL-PROD"))
+
+                            println("Plattform select:")
+                            console.log(options)
                             simpleSelectInput(
-                                options = state.statisticsPlattforms.map { Pair(it.key.toString(), it.value.name) },
+                                //options = state.statisticsPlattforms.map { Pair(it.key.toString(), it.value.name) },
+                                options = options,
                                 value = selectedPlattformId
+
                             ) {
                                 addCssStyle(formControlXs)
                                 background = Background(Color.name(Col.WHITE))
                             }.onEvent {
                                 change = {
                                     val selectedTp = (self.value ?: "").toInt()
+                                    tpSelected(selectedTp)
+                                    /*
                                     val pChainId =
                                         PlattformChain.calculateId(first = selectedTp, middle = null, last = selectedTp)
                                     store.dispatch(HippoAction.ItemIdDeselectedAll(ItemType.PLATTFORM_CHAIN))
@@ -115,6 +131,7 @@ object StatPage : SimplePanel() {
                                         )
                                     )
                                     loadStatistics(store.getState())
+                                     */
                                 }
                             }
                         }
@@ -129,16 +146,21 @@ object StatPage : SimplePanel() {
                             }
                             +" Visa utveckling över tid"
                         }
+
                         // Use Advanced mode
                         cell {
                             checkBoxInput(
                                 value = state.statAdvancedMode
                             ).onClick {
                                 store.dispatch(HippoAction.StatAdvancedMode(value))
+                                if (!value)
+                                // todo: This hard coded plattform id must change to something more dynamic
+                                    tpSelected(3)
                             }
                             +" Avancerat läge"
                         }
                     }
+
                     // End date
                     row {
                         cell { +"Slutdatum:" }
@@ -236,10 +258,67 @@ object StatPage : SimplePanel() {
 
             }
         }
+
+        div { }.bind(store) { state ->
+            if (state.showTimeGraph && state.historyMap.isNotEmpty()) {
+                val animateTime =
+                    if (state.currentAction == HippoAction.DoneDownloadHistory::class) {
+                        1298
+                    } else {
+                        -2
+                    }
+
+                println("Will display time graph")
+                val xAxis = state.historyMap.keys.toList()
+                val yAxis = state.historyMap.values.toList()
+                chart(
+                    Configuration(
+                        ChartType.LINE,
+                        listOf(
+                            DataSets(
+                                label = "Antal anrop per dag",
+                                data = yAxis
+                            )
+                        ),
+                        xAxis,
+                        options = ChartOptions(
+                            animation = AnimationOptions(duration = animateTime),
+                            legend = LegendOptions(display = true),
+                            responsive = true,
+                            maintainAspectRatio = false
+                        )
+                    )
+                ).apply {
+                    height = 26.vh
+                    width = 95.vw
+                    //background = Background(Color.name(Col.AZURE))
+                }
+            }
+        }
+
         div { }.bind(store) { state ->
             if (state.statAdvancedMode) add(AdvancedView)
             else add(SimpleView)
         }
+    }
+
+    private fun tpSelected(selectedTp: Int) {
+        val pChainId =
+            PlattformChain.calculateId(first = selectedTp, middle = null, last = selectedTp)
+
+        // todo: Do not do anything if the function is called with the currently already selected TPId
+        //if (store.getState().selectedPlattformChains.contains(selectedTp)) return
+
+        store.dispatch(HippoAction.ItemIdDeselectedAll(ItemType.PLATTFORM_CHAIN))
+        store.dispatch(HippoAction.ItemDeselectedAllForAllTypes)
+        //store.dispatch { dispatch, getState ->
+        store.dispatch(
+            HippoAction.ItemIdSelected(
+                ItemType.PLATTFORM_CHAIN,
+                pChainId
+            )
+        )
+        loadStatistics(store.getState())
     }
 }
 
