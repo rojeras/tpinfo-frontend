@@ -184,8 +184,17 @@ object StatPage : SimplePanel() {
                         cell { +"Visa:" }
                         cell {
                             val selectedPreSelect = state.statPreSelect
+                            val options =
+                                if (state.statAdvancedMode)
+                                    StatPreSelect.selfStore
+                                        .filter { it.value.showInAdvancedView == true }
+                                        .map { Pair(it.key, it.value.getLabel(state.statAdvancedMode)) }
+                                    else
+                                    StatPreSelect.selfStore
+                                        .filter { it.value.showInSimpleView != null }
+                                        .map { Pair(it.key, it.value.getLabel(state.statAdvancedMode)) }
                             simpleSelectInput(
-                                options = StatPreSelect.selfStore.map { Pair(it.key, it.key) },
+                                options = options,
                                 value = selectedPreSelect
                             ) {
                                 addCssStyle(formControlXs)

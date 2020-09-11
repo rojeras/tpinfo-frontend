@@ -26,48 +26,6 @@ import se.skoview.common.HippoAction
 import se.skoview.common.ItemType
 import se.skoview.common.isItemSelected
 
-fun getSimplePieChartConfig(
-    itemType: ItemType,
-    itemSInfoList: SInfoList,
-    animationTime: Int = 0
-): Configuration {
-    val configuration = Configuration(
-        ChartType.PIE,
-        listOf(
-            DataSets(
-                data = itemSInfoList.callList(),
-                backgroundColor = itemSInfoList.colorList()
-            )
-        ),
-        itemSInfoList.descList(),
-        options = ChartOptions(
-            elements = ElementsOptions(arc = ArcOptions(borderWidth = 0)),
-            animation = AnimationOptions(duration = animationTime),
-            responsive = true,
-            legend = LegendOptions(display = false),
-            maintainAspectRatio = false,
-            onClick = { _, activeElements ->
-                val sliceIx = activeElements[0]._get("_index") as Int
-                val itemId: Int = itemSInfoList.recordList[sliceIx].itemId
-                if (store.getState().isItemSelected(itemType, itemId)) {
-                    store.dispatch { _, getState ->
-                        store.dispatch(HippoAction.ItemIdDeselectedAll(itemType))
-                        loadStatistics(getState())
-                    }
-                } else {
-                    store.dispatch { _, getState ->
-                        store.dispatch(HippoAction.ItemIdSelected(itemType, itemId))
-                        loadStatistics(getState())
-                    }
-
-                }
-                "" // This lambda returns Any, which mean the last line must be an expression
-            }
-        )
-    )
-    return configuration
-}
-
 fun getPieChartConfig(
     itemType: ItemType,
     itemSInfoList: SInfoList,
@@ -75,7 +33,7 @@ fun getPieChartConfig(
     responsive: Boolean = false,
     maintainAspectRatio: Boolean = true
 ): Configuration {
-    val configuration = Configuration(
+    return Configuration(
         ChartType.PIE,
         listOf(
             DataSets(
@@ -93,46 +51,13 @@ fun getPieChartConfig(
             onClick = { _, activeElements ->
                 val sliceIx = activeElements[0]._get("_index") as Int
                 val itemId: Int = itemSInfoList.recordList[sliceIx].itemId
-                if (store.getState().isItemSelected(itemType, itemId)) {
-                    store.dispatch { _, getState ->
-                        store.dispatch(HippoAction.ItemIdDeselectedAll(itemType))
-                        loadStatistics(getState())
-                    }
-                } else {
-                    store.dispatch { _, getState ->
-                        store.dispatch(HippoAction.ItemIdSelected(itemType, itemId))
-                        loadStatistics(getState())
-                    }
-
-                }
+                itemSelectDeselect(itemId, itemType)
                 "" // This lambda returns Any, which mean the last line must be an expression
             }
         )
     )
-    return configuration
 }
 
-fun getLineChartConfig(
-    historyMap: Map<String, Int>,
-    animationTime: Int = 0
-): Configuration {
-    val configuration = Configuration(
-        ChartType.LINE,
-        listOf(
-            DataSets(
-                label = "Antal anrop per dag",
-                data = historyMap.values.toList()
-            )
-        ),
-        historyMap.keys.toList(),
-        options = ChartOptions(
-            animation = AnimationOptions(duration = animationTime),
-            //responsive = false
-            maintainAspectRatio = false
-        )
-    )
-    return configuration
-}
 
 open class ChartLabelTable(
     itemType: ItemType,
@@ -173,7 +98,7 @@ open class ChartLabelTable(
                         headerSort = false,
                         title = heading,
                         field = dataField,
-                        topCalc = Calc.COUNT,
+                        //topCalc = Calc.COUNT,
                         topCalcFormatter = Formatter.COLOR,
                         headerFilter = Editor.INPUT,
                         //headerFilterPlaceholder = "Sök ${heading.toLowerCase()}",
@@ -182,16 +107,6 @@ open class ChartLabelTable(
                         //width = "20.vw",
                         widthGrow = 3,
                         formatter = Formatter.TEXTAREA
-                        /*
-                        formatterComponentFunction = { _, _, item ->
-                            Div(item.description) {
-                                if (store.getState().isItemSelected(item.itemType, item.itemId)) {
-                                    background = Background(Color.name(Col.LIGHTSTEELBLUE))
-                                }
-                            }
-                        }
-                         */
-                        //cellDblClick = { _, cell -> cell.edit(true) }
                     ),
                     ColumnDefinition(
                         widthGrow = 1,
@@ -208,23 +123,26 @@ open class ChartLabelTable(
                 selectable = true,
                 rowSelected = { row ->
                     val item = row.getData() as SInfoRecord
-                    if (item.calls > -1) {
-                        if (store.getState().isItemSelected(item.itemType, item.itemId)) {
-                            //store.dispatch { _, getState ->
-                            store.dispatch(HippoAction.ItemIdDeselectedAll(itemType))
-                            loadStatistics(store.getState())
-                            //}
-                        } else {
-                            //store.dispatch { _, getState ->
-                            store.dispatch(HippoAction.ItemIdSelected(itemType, item.itemId))
-                            loadStatistics(store.getState())
-                            //}
-                        }
-                    }
+
+                    if (item.calls > -1) itemSelectDeselect(item.itemId, item.itemType)
                 }
             ),
             types = setOf(TableType.BORDERED, TableType.STRIPED, TableType.HOVER)//,
             //background = Background(Col.BLUE)
         )
+    }
+}
+
+fun itemSelectDeselect(itemId: Int, itemType: ItemType) {
+    if (store.getState().isItemSelected(itemType, itemId)) {
+        // De-select of an item
+        store.dispatch(HippoAction.PreSelectedSelected("-"))
+        store.dispatch(HippoAction.ItemIdDeselectedAll(itemType))
+        loadStatistics(store.getState())
+    } else {
+        // Select an item
+        store.dispatch(HippoAction.StatAdvancedMode(true))
+        store.dispatch(HippoAction.ItemIdSelected(itemType, itemId))
+        loadStatistics(store.getState())
     }
 }

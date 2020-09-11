@@ -20,9 +20,20 @@ import se.skoview.common.ItemType
 
 data class StatPreSelect(
     val label: String,
+    val simpleLabel: String? = null,
     val selectedItemsMap: HashMap<ItemType, List<Int>>, // = hashMapOf<ItemType, List<Int>>()
-    val labelMap: HashMap<ItemType, String>
+    val labelMap: HashMap<ItemType, String>,
+    val showInSimpleView: ItemType? = null,
+    val showInAdvancedView: Boolean
+
 ) {
+    fun getLabel(advancedMode: Boolean) =
+        if ((!advancedMode) && simpleLabel != null)
+            simpleLabel
+        else
+            label
+
+
     init {
         selfStore[label] = this
     }
@@ -32,54 +43,78 @@ data class StatPreSelect(
 
         fun initialize() {
             StatPreSelect(
-                "-",
-                hashMapOf(),
-                hashMapOf(
+                label = "-",
+                simpleLabel = "Alla konsumerande tjänster",
+                selectedItemsMap = hashMapOf(),
+                labelMap = hashMapOf(
                     ItemType.CONSUMER to "Applikationer",
                     ItemType.CONTRACT to "Tjänster",
                     ItemType.PRODUCER to "Informationskällor",
                     ItemType.LOGICAL_ADDRESS to "Adresser"
-                )
+                ),
+                showInSimpleView = ItemType.CONSUMER,
+                showInAdvancedView = true
             )
             StatPreSelect(
-                "Bokade tider",
-                hashMapOf(ItemType.CONTRACT to listOf(117, 118, 114)),
-                hashMapOf(
+                label = "--",
+                simpleLabel = "Anropade producerande tjänster",
+                selectedItemsMap = hashMapOf(),
+                labelMap = hashMapOf(
+                    ItemType.CONSUMER to "Applikationer",
+                    ItemType.CONTRACT to "Tjänster",
+                    ItemType.PRODUCER to "Informationskällor",
+                    ItemType.LOGICAL_ADDRESS to "Adresser"
+                ),
+                showInSimpleView = ItemType.PRODUCER,
+                showInAdvancedView = false
+            )
+            StatPreSelect(
+                label = "Bokade tider",
+                selectedItemsMap = hashMapOf(ItemType.CONTRACT to listOf(117, 118, 114)),
+                labelMap = hashMapOf(
                     ItemType.CONSUMER to "Tidbokningsapplikation",
                     ItemType.CONTRACT to "Typ av bokning",
                     ItemType.PRODUCER to "Tidbokningsystem",
                     ItemType.LOGICAL_ADDRESS to "Enhet"
-                )
+                ),
+                showInSimpleView = ItemType.LOGICAL_ADDRESS,
+                showInAdvancedView = true
             )
             StatPreSelect(
-                "Skickade remisser",
-                hashMapOf(ItemType.CONTRACT to listOf(215)),
-                hashMapOf(
+                label = "Journalen",
+                selectedItemsMap = hashMapOf(ItemType.CONSUMER to listOf(865)),
+                labelMap = hashMapOf(
+                    ItemType.CONSUMER to "Applikation",
+                    ItemType.CONTRACT to "Information",
+                    ItemType.PRODUCER to "Journalsystem",
+                    ItemType.LOGICAL_ADDRESS to "Journalsystemets adress"
+                ),
+                showInSimpleView = ItemType.CONTRACT,
+                showInAdvancedView = true
+            )
+            StatPreSelect(
+                label = "Nationell patientöversikt (NPÖ)",
+                selectedItemsMap = hashMapOf(ItemType.CONSUMER to listOf(434, 693)),
+                labelMap = hashMapOf(
+                    ItemType.CONSUMER to "Applikation",
+                    ItemType.CONTRACT to "Information",
+                    ItemType.PRODUCER to "Journalsystem",
+                    ItemType.LOGICAL_ADDRESS to "Journalsystemets adress"
+                ),
+                showInSimpleView = ItemType.CONTRACT,
+                showInAdvancedView = true
+            )
+            StatPreSelect(
+                label = "Remisser",
+                selectedItemsMap = hashMapOf(ItemType.CONTRACT to listOf(215)),
+                labelMap = hashMapOf(
                     ItemType.CONSUMER to "Remitterande system",
                     ItemType.CONTRACT to "Remisstyp",
                     ItemType.PRODUCER to "Remissmottagande system",
                     ItemType.LOGICAL_ADDRESS to "Remitterad mottagning"
-                )
-            )
-            StatPreSelect(
-                "Journalen",
-                hashMapOf(ItemType.CONSUMER to listOf(865)),
-                hashMapOf(
-                    ItemType.CONSUMER to "Applikation",
-                    ItemType.CONTRACT to "Information",
-                    ItemType.PRODUCER to "Journalsystem",
-                    ItemType.LOGICAL_ADDRESS to "Journalsystemets adress"
-                )
-            )
-            StatPreSelect(
-                "Nationell patientöversikt (NPÖ)",
-                hashMapOf(ItemType.CONSUMER to listOf(434, 693)),
-                hashMapOf(
-                    ItemType.CONSUMER to "Applikation",
-                    ItemType.CONTRACT to "Information",
-                    ItemType.PRODUCER to "Journalsystem",
-                    ItemType.LOGICAL_ADDRESS to "Journalsystemets adress"
-                )
+                ),
+                showInSimpleView = ItemType.LOGICAL_ADDRESS,
+                showInAdvancedView = true
             )
         }
     }

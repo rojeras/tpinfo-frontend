@@ -157,7 +157,6 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
                     val newList = listOf(state.selectedPlattformChains, listOf(id)).flatten().distinct()
                     state.copy(
                         selectedPlattformChains = newList
-                        //selectedPlattformName = PlattformChain.map[newList[0]]!!.name
                     )
                 }
                 ItemType.LOGICAL_ADDRESS -> {

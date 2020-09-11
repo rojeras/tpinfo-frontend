@@ -92,14 +92,6 @@ data class HippoState(
 
     // Statistics information
     val statBlob: StatisticsBlob,
-    /*
-    val statisticsArrArr: Array<Array<Int>>,
-    val callsConsumer: Map<Int, Int>,
-    val callsProducer: Map<Int, Int>,
-    val callsLogicalAddress: Map<Int, Int>,
-    val callsDomain: Map<Int, Int>,
-    val callsContract: Map<Int, Int>,
-     */
 
     // History information
     val historyMap: Map<String, Int>,
@@ -171,14 +163,6 @@ fun getInitialState(): HippoState {
         100,
         500,
         StatisticsBlob(arrayOf(arrayOf())),
-        /*
-        arrayOf(arrayOf()),
-        mapOf(),
-        mapOf(),
-        mapOf(),
-        mapOf(),
-        mapOf(),
-         */
         mapOf(),
         false,
         false,

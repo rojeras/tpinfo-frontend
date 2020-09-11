@@ -56,9 +56,37 @@ object SimpleView : SimplePanel(
                     -1
                 }
 
-            val itemType: ItemType = ItemType.CONSUMER
-            val itemSInfoList: SInfoList = SInfo.consumerSInfoList
-            val label: String = state.consumerLabel
+            //val itemType: ItemType = ItemType.CONSUMER
+            // todo: Make the !! go away
+            val currentPreSelect: StatPreSelect = StatPreSelect.selfStore[state.statPreSelect]!!
+            val itemType: ItemType = currentPreSelect.showInSimpleView!!
+
+            var itemSInfoList: SInfoList
+            var label: String
+
+            when (itemType) {
+                ItemType.CONSUMER -> {
+                    itemSInfoList = SInfo.consumerSInfoList
+                    label = state.consumerLabel
+                }
+                ItemType.CONTRACT -> {
+                    itemSInfoList = SInfo.contractSInfoList
+                    label = state.contractLabel
+                }
+                ItemType.PRODUCER -> {
+                    itemSInfoList = SInfo.producerSInfoList
+                    label = state.producerLabel
+                }
+                ItemType.LOGICAL_ADDRESS -> {
+                    itemSInfoList = SInfo.logicalAddressSInfoList
+                    label = state.laLabel
+                }
+                else -> {
+                    println("ERROR in TheSimpleView, itemType = $itemType")
+                    itemSInfoList = SInfo.consumerSInfoList
+                    label = state.consumerLabel
+                }
+            }
 
             id = "SimpleStatPieTableView"
             //background = Background(Color.name(Col.GREEN))
