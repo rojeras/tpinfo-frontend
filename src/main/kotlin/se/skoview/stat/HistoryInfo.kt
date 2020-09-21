@@ -16,9 +16,7 @@
  */
 package se.skoview.stat
 
-import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.builtins.MapSerializer
 import kotlinx.serialization.json.Json
 import se.skoview.app.store
 import se.skoview.common.HippoAction

@@ -17,7 +17,7 @@
 package se.skoview.common
 
 import org.w3c.xhr.XMLHttpRequest
-import pl.treksoft.kvision.core.Color
+import pl.treksoft.kvision.core.Component
 import kotlin.browser.document
 import kotlin.browser.window
 import kotlin.js.Date
@@ -119,17 +119,6 @@ fun getVersion(versionName: String = "hippoVersion"): String {
     else "-2.-2.-2"
 }
 
-fun getColorForObject(obj: Any): Color {
-    /*
-    val cValue = obj.hashCode().absoluteValue
-    val fValue = cValue.toDouble() / Int.MAX_VALUE.toDouble()
-    val col = (fValue * 256 * 256 * 256 - 1).toInt()
-    return Color.hex(col)
-    */
-    val max = (256 * 256 * 256) - 1
-    return Color.hex((0..max).random())
-}
-
 fun String.thousands(): String {
     val s1 = this.reversed()
     val s2List = s1.chunked(3)
@@ -140,4 +129,14 @@ fun String.thousands(): String {
     }
 
     return s3.trim().reversed()
+}
+
+fun getHeightToRemainingViewPort(
+    topComponent: Component,
+    delta: Int = 48
+): String {
+    val occupiedViewPortArea = (topComponent.getElementJQuery()?.height() ?: 153).toInt()
+    println("++++++++++ Inner height: $occupiedViewPortArea")
+    val heightToRemove = occupiedViewPortArea + delta
+    return "calc(100vh - ${heightToRemove}px)"
 }

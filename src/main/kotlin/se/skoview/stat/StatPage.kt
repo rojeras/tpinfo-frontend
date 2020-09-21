@@ -38,44 +38,51 @@ import se.skoview.app.formControlXs
 import se.skoview.app.store
 import se.skoview.common.*
 
+var statPageTop: Div = Div()
+
 object StatPage : SimplePanel() {
 
     init {
+        id = "StatPage:SimplePanel()"
         println("In CharTab():init()")
-
         this.marginTop = 10.px
 
-        // Page header
-        div {
-            h2("Antal meddelanden genom SLL:s regionala tjänsteplattform")
-            div("Detaljerad statistik med diagram och möjlighet att ladda ner informationen för egna analyser.")
-        }.apply {
-            //width = 100.perc
-            id = "pageHeaderDiv"
-            background = Background(Color.hex(0x113d3d))
-            align = Align.CENTER
-            color = Color.name(Col.WHITE)
-            marginTop = 5.px
-        }
-
-        flexPanel(
-            FlexDirection.ROW, FlexWrap.WRAP, JustifyContent.SPACEBETWEEN, AlignItems.CENTER,
-            spacing = 5
-        ) {
-            id = "controlPanelFlex"
-            clear = Clear.BOTH
-            margin = 0.px
-            background = Background(Color.hex(0xf6efe9))
-            div {
-                align = Align.LEFT
+        statPageTop = div {
             }.bind(store) { state ->
+            id = "StatPageTop"
+
+            // Page header
+            div {
+                h2("Antal meddelanden genom SLL:s regionala tjänsteplattform")
+                div("Detaljerad statistik med diagram och möjlighet att ladda ner informationen för egna analyser.")
+            }.apply {
+                //width = 100.perc
+                id = "StatPage-HeadingArea:Div"
+                background = Background(Color.hex(0x113d3d))
+                align = Align.CENTER
+                color = Color.name(Col.WHITE)
+                marginTop = 5.px
+            }
+
+
+            flexPanel(
+                FlexDirection.ROW, FlexWrap.WRAP, JustifyContent.SPACEBETWEEN, AlignItems.CENTER,
+            ) {
+            //}.bind(store) { state ->
+                spacing = 5
+                clear = Clear.BOTH
+                margin = 0.px
+                background = Background(Color.hex(0xf6efe9))
+                id = "StatPage-ControlPanel:FlexPanel-Bind"
                 println("After bind in header")
                 table(
                     listOf(),
                     setOf(TableType.BORDERED, TableType.SMALL)
                 ) {
+                    id = "CpntrolPanel-Table"
                     // Star tdate
                     row {
+                        id = "First row"
                         cell { +"Startdatum:" }
                         cell {
                             simpleSelectInput(
@@ -118,20 +125,7 @@ object StatPage : SimplePanel() {
                                 change = {
                                     val selectedTp = (self.value ?: "").toInt()
                                     tpSelected(selectedTp)
-                                    /*
-                                    val pChainId =
-                                        PlattformChain.calculateId(first = selectedTp, middle = null, last = selectedTp)
-                                    store.dispatch(HippoAction.ItemIdDeselectedAll(ItemType.PLATTFORM_CHAIN))
-                                    store.dispatch(HippoAction.ItemDeselectedAllForAllTypes)
-                                    //store.dispatch { dispatch, getState ->
-                                    store.dispatch(
-                                        HippoAction.ItemIdSelected(
-                                            ItemType.PLATTFORM_CHAIN,
-                                            pChainId
-                                        )
-                                    )
-                                    loadStatistics(store.getState())
-                                     */
+
                                 }
                             }
                         }
@@ -163,6 +157,7 @@ object StatPage : SimplePanel() {
 
                     // End date
                     row {
+                        id = "Second row"
                         cell { +"Slutdatum:" }
                         cell {
                             simpleSelectInput(
@@ -186,11 +181,11 @@ object StatPage : SimplePanel() {
                             val selectedPreSelect = state.statPreSelect
                             val options =
                                 if (state.statAdvancedMode)
-                                    StatPreSelect.selfStore
+                                    StatPreSelect.mapp
                                         .filter { it.value.showInAdvancedView == true }
                                         .map { Pair(it.key, it.value.getLabel(state.statAdvancedMode)) }
-                                    else
-                                    StatPreSelect.selfStore
+                                else
+                                    StatPreSelect.mapp
                                         .filter { it.value.showInSimpleView != null }
                                         .map { Pair(it.key, it.value.getLabel(state.statAdvancedMode)) }
                             simpleSelectInput(
@@ -208,7 +203,7 @@ object StatPage : SimplePanel() {
                                         store.dispatch(HippoAction.ShowTechnicalTerms(state.showTechnicalTerms))
                                     }
                                     store.dispatch(HippoAction.ItemDeselectedAllForAllTypes)
-                                    val selectedItemsMap = StatPreSelect.selfStore[selectedPreSelect]!!.selectedItemsMap
+                                    val selectedItemsMap = StatPreSelect.mapp[selectedPreSelect]!!.selectedItemsMap
                                     for ((itemType, itemIdList) in selectedItemsMap) {
                                         itemIdList.forEach {
                                             store.dispatch(HippoAction.ItemIdSelected(itemType, it))
@@ -234,81 +229,87 @@ object StatPage : SimplePanel() {
 
                     }
                 }
-                val calls = state.statBlob.callsDomain.map { it.value }.sum()
-                val tCalls = calls.toString().thousands()
-                span { +"Totalt antal anrop för detta urval är: $tCalls" }.apply { align = Align.CENTER }
-            }
-
-            // About button
-            vPanel {
-                button("Exportera").onClick {
-                    exportStatData(store.getState())
-                }.apply {
-                    addBsBgColor(BsBgColor.LIGHT)
-                    addBsColor(BsColor.BLACK50)
-                    marginBottom = 5.px
-                }
-                //background = Background(Col.LIGHTSKYBLUE)
-                //align = Align.RIGHT
-                val modal = Modal("Om Statistikfunktionen")
-                modal.iframe(src = "about.html", iframeHeight = 400, iframeWidth = 700)
-                modal.size = ModalSize.LARGE
-                //modal.add(H(require("img/dog.jpg")))
-                modal.addButton(Button("Stäng").onClick {
-                    modal.hide()
-                })
-                button("Om Statistik ${getVersion("hippoVersion")}", style = ButtonStyle.INFO).onClick {
-                    size = ButtonSize.SMALL
-                    modal.show()
-                }.apply {
-                    addBsBgColor(BsBgColor.LIGHT)
-                    addBsColor(BsColor.BLACK50)
+                if (state.statAdvancedMode) {
+                    val tCalls = state.statBlob.callsDomain.map { it.value }.sum().toString().thousands()
+                    span {
+                        +"Totalt antal anrop för detta urval är: $tCalls"
+                        id = "Text number of calls:Span"
+                    }.apply { align = Align.CENTER }.apply { fontWeight = FontWeight.BOLD }
                 }
 
-            }
-        }
-
-        div { }.bind(store) { state ->
-            if (state.showTimeGraph && state.historyMap.isNotEmpty()) {
-                val animateTime =
-                    if (state.currentAction == HippoAction.DoneDownloadHistory::class) {
-                        1298
-                    } else {
-                        -2
+                // About button
+                vPanel {
+                    id = "Buttonpanel: vPanel"
+                    button("Exportera").onClick {
+                        exportStatData(store.getState())
+                    }.apply {
+                        addBsBgColor(BsBgColor.LIGHT)
+                        addBsColor(BsColor.BLACK50)
+                        marginBottom = 5.px
                     }
+                    //background = Background(Col.LIGHTSKYBLUE)
+                    //align = Align.RIGHT
+                    val modal = Modal("Om Statistikfunktionen")
+                    modal.iframe(src = "about.html", iframeHeight = 400, iframeWidth = 700)
+                    modal.size = ModalSize.LARGE
+                    //modal.add(H(require("img/dog.jpg")))
+                    modal.addButton(Button("Stäng").onClick {
+                        modal.hide()
+                    })
+                    button("Om Statistik ${getVersion("hippoVersion")}", style = ButtonStyle.INFO).onClick {
+                        size = ButtonSize.SMALL
+                        modal.show()
+                    }.apply {
+                        addBsBgColor(BsBgColor.LIGHT)
+                        addBsColor(BsColor.BLACK50)
+                    }
+                }
 
-                println("Will display time graph")
-                val xAxis = state.historyMap.keys.toList()
-                val yAxis = state.historyMap.values.toList()
-                chart(
-                    Configuration(
-                        ChartType.LINE,
-                        listOf(
-                            DataSets(
-                                label = "Antal anrop per dag",
-                                data = yAxis
+                id = "StatPage-Timegraph:Div.bind"
+                if (state.showTimeGraph && state.historyMap.isNotEmpty()) {
+                    val animateTime =
+                        if (state.currentAction == HippoAction.DoneDownloadHistory::class) {
+                            1298
+                        } else {
+                            -2
+                        }
+
+                    println("Will display time graph")
+                    val xAxis = state.historyMap.keys.toList()
+                    val yAxis = state.historyMap.values.toList()
+                    chart(
+                        Configuration(
+                            ChartType.LINE,
+                            listOf(
+                                DataSets(
+                                    label = "Antal anrop per dag",
+                                    data = yAxis
+                                )
+                            ),
+                            xAxis,
+                            options = ChartOptions(
+                                animation = AnimationOptions(duration = animateTime),
+                                legend = LegendOptions(display = true),
+                                responsive = true,
+                                maintainAspectRatio = false
                             )
-                        ),
-                        xAxis,
-                        options = ChartOptions(
-                            animation = AnimationOptions(duration = animateTime),
-                            legend = LegendOptions(display = true),
-                            responsive = true,
-                            maintainAspectRatio = false
                         )
-                    )
-                ).apply {
-                    height = 26.vh
-                    width = 95.vw
-                    //background = Background(Color.name(Col.AZURE))
+                    ).apply {
+                        height = 26.vh
+                        width = 95.vw
+                        //background = Background(Color.name(Col.AZURE))
+                    }
                 }
             }
+            println("=========== Inner height:")
+            console.log(statPageTop.getElementJQuery()?.innerHeight())
         }
 
         div { }.bind(store) { state ->
             if (state.statAdvancedMode) add(AdvancedView)
             else add(SimpleView)
         }
+
     }
 
     private fun tpSelected(selectedTp: Int) {

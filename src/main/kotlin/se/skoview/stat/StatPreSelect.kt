@@ -35,11 +35,11 @@ data class StatPreSelect(
 
 
     init {
-        selfStore[label] = this
+        mapp[label] = this
     }
 
     companion object {
-        val selfStore = mutableMapOf<String, StatPreSelect>()
+        val mapp = mutableMapOf<String, StatPreSelect>()
 
         fun initialize() {
             StatPreSelect(

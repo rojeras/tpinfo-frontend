@@ -16,6 +16,7 @@
  */
 package se.skoview.app
 
+import kotlinx.browser.window
 import pl.treksoft.kvision.Application
 import pl.treksoft.kvision.pace.Pace
 import pl.treksoft.kvision.panel.root
@@ -23,13 +24,13 @@ import pl.treksoft.kvision.panel.vPanel
 import pl.treksoft.kvision.redux.createReduxStore
 import pl.treksoft.kvision.require
 import pl.treksoft.kvision.startApplication
-import pl.treksoft.kvision.utils.*
+import pl.treksoft.kvision.utils.perc
 import se.skoview.common.*
-import se.skoview.hippo.*
+import se.skoview.hippo.HippoTablePage
+import se.skoview.hippo.setUrlFilter
 import se.skoview.stat.StatPage
 import se.skoview.stat.StatPreSelect
 import se.skoview.stat.loadStatistics
-import kotlin.browser.window
 
 /**
 Övergripande tankar inför sommaruppehållet 2020
@@ -68,9 +69,17 @@ import kotlin.browser.window
 
 // Statistik
 
-// todo: Den förenklade varianten skulle kunna se ut som idag med en paj. När användaren gör ett val av ett element i den första pajjen går man över till det avancerade läget.
+// todo: Testa med andra browsers, inte minst Edge (ML 2020-09-17)
+// todo: Flytta upp tabellen i simple view så att den linjerar med toppen av pajjen (ML 2020-09-17)
+// todo: Se till att pajjen får plats i browserförnstret (vikitigt i Edge) (ML 2020-09-17)
+// done: Lägg in en rubrik ovanför pajjen pss som i den gamla versionen (ML 2020-09-17)
+// todo: Skulle behöva får BACK-pil att fungera (ML 2020-09-17)
+// todo: Visa fler rader i simple-tabellen (ML 2020-09-17)
+// todo: Prestanda! (ML 2020-09-17)
+// todo: Förval blir fel när man går från advanced -> simple mode (ML 2020-09-17)
+// todo: Simple view blinks when selecting preSelects
+// todo: Select of a already preselected item de-selects all items of same type
 // todo: Knapp för att komma till hippo
-// todo: Flera förvalda vyer som i gamla statistiken. Journalen.
 // todo: Völjer man item som är del av en preselect så försvinner valet. Kolla Remissvyn.
 // todo: Fixa "about" för statistiken
 // todo: Se över synonymerna. Måste passa med de olika förvalen
@@ -79,7 +88,11 @@ import kotlin.browser.window
 // todo: Se över scrollbars och paging
 // todo: Se över prestanda, speciellt kring hantering av tidsgraf
 // todo: Begränsa datumlistorna så att man inte kan välja start/slutdatum "på vel sida" om varandra
+// todo: URL-hantering. Driftsättning och koppling till proxy
 // todo: Och så visa svarstider
+// todo: Dokumentation
+// done: Den förenklade varianten skulle kunna se ut som idag med en paj. När användaren gör ett val av ett element i den första pajjen går man över till det avancerade läget.
+// done: Flera förvalda vyer som i gamla statistiken. Journalen.
 // done: Export till CSV
 // done: Troligen bättre att vara mer konsekvent med färgerna. Kanske ha en lista för de första 100, och sedan slumpa.
 // done: Addera vy för "Över tid"
@@ -134,19 +147,90 @@ import kotlin.browser.window
 // Initialize the redux store
 val store = createReduxStore(
     ::hippoReducer,
-    getInitialState()
+    initialHippoState()
 )
 
 fun main() {
     startApplication(::App)
 }
 
+
+
 class App : Application() {
     init {
         require("css/hippo.css")
     }
 
+/*
+    data class Employee(
+        val name: String?,
+        val position: String?,
+        val office: String?,
+        val active: Boolean = false,
+        val startDate: Date?,
+        val salary: Int?,
+        @Suppress("ArrayInDataClass") val _children: Array<Employee>? = null,
+        val id: Int = counter++
+    ) {
+        companion object {
+            internal var counter = 0
+        }
+    }
+    override fun start() {
+        root("hippo") {
+            val data = observableListOf(
+                Employee(
+                    "Tiger Nixon",
+                    "System Architect",
+                    "Edinburgh",
+                    false,
+                    "2011-04-25".toDateF("YYYY-MM-DD"),
+                    320800,
+                    arrayOf(
+                        Employee("John Snow", "Programmer", "Edinburgh", true, "2012-04-23".toDateF("YYY-MM-DD"), 100000),
+                        Employee("Mark Lee", "Junior programmer", "Edinburgh", true, "2016-06-02".toDateF("YYY-MM-DD"), 80000)
+                    )
+                ),
+                Employee(
+                    "Garrett Winters",
+                    "Accountant",
+                    "Tokyo",
+                    true,
+                    "2011-07-25".toDateF("YYYY-MM-DD"),
+                    170750
+                ),
+                Employee(
+                    "Ashton Cox",
+                    "Junior Technical Author",
+                    "San Francisco",
+                    true,
+                    "2009-01-12".toDateF("YYYY-MM-DD"),
+                    86000
+                )
+            )
 
+            vPanel(alignItems = AlignItems.START, noWrappers = true) {
+                height = 100.vh
+                val ul = ul {
+                    li("test")
+                }
+                button("add").onClick {
+                    ul.add(Li("test"))
+                }
+                tabulator(data,
+                    options = TabulatorOptions(
+                        layout = Layout.FITCOLUMNS,
+                        columns = listOf(
+                            ColumnDefinition( "Name", "name")
+                        ), pagination = PaginationMode.LOCAL, paginationSize = 10, dataTree = true
+                    ), types = setOf(TableType.BORDERED, TableType.STRIPED, TableType.HOVER)
+                ) {
+                    height = 100.perc
+                }
+            }
+        }
+    }
+ */
     override fun start() {
 
         val startUrl = window.location.href
@@ -227,5 +311,4 @@ class App : Application() {
             }
         }
     }
-
 }

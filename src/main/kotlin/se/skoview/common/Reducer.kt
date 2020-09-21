@@ -277,7 +277,7 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
         }
         is HippoAction.PreSelectedSelected -> {
             val preName = action.label
-            val preObject = StatPreSelect.selfStore[preName]
+            val preObject = StatPreSelect.mapp[preName]
             val preLabelMap = preObject!!.labelMap
 
             state.copy(

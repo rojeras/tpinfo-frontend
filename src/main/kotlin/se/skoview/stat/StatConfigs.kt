@@ -21,6 +21,7 @@ import pl.treksoft.kvision.chart.*
 import pl.treksoft.kvision.panel.SimplePanel
 import pl.treksoft.kvision.table.TableType
 import pl.treksoft.kvision.tabulator.*
+import pl.treksoft.kvision.utils.perc
 import se.skoview.app.store
 import se.skoview.common.HippoAction
 import se.skoview.common.ItemType
@@ -68,6 +69,7 @@ open class ChartLabelTable(
     heading: String
 ) : SimplePanel() {
     init {
+        id = "ChartLabelTable: SimpleTable"
         // Color or red cross if item is selected
         val firstCol =
             if (
@@ -88,10 +90,19 @@ open class ChartLabelTable(
                     formatter = Formatter.COLOR
                 )
 
+        // Footer pagination buttons hidden through CSS
         tabulator(
-            itemSInfoList,
+            data = itemSInfoList,
+            types = setOf(TableType.BORDERED, TableType.STRIPED, TableType.HOVER),
             options = TabulatorOptions(
                 layout = Layout.FITCOLUMNS,
+                pagination = PaginationMode.LOCAL,
+                //height = "calc(100vh - 300px)",
+                //height = "100%",
+                //height = 100.vh,
+                paginationSize = 1000,
+                paginationButtonCount = 0,
+                selectable = true,
                 columns = listOf(
                     firstCol,
                     ColumnDefinition(
@@ -115,21 +126,18 @@ open class ChartLabelTable(
                         field = callsField
                     )
                 ),
-                //pagination = PaginationMode.LOCAL,
-                //height = "611px",
-                height = "50vh",
-                paginationSize = 1000,
-                //dataTree = true,
-                selectable = true,
                 rowSelected = { row ->
                     val item = row.getData() as SInfoRecord
-
                     if (item.calls > -1) itemSelectDeselect(item.itemId, item.itemType)
-                }
-            ),
-            types = setOf(TableType.BORDERED, TableType.STRIPED, TableType.HOVER)//,
-            //background = Background(Col.BLUE)
+                },
+                // todo: Hide the tabulator footer here
+                //dataLoaded = setStyle( ".tabulator-footer")
+            )
         )
+            .apply {
+            //height = 50.vh
+                height = 100.perc
+        }
     }
 }
 

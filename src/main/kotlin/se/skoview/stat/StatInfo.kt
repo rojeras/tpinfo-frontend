@@ -62,7 +62,7 @@ fun loadStatistics(state: HippoState) {
             HippoAction.DoneDownloadStatistics(statisticsArrArr)
         )
     } else {
-        println(">>> Statistics data NOT found in cache - will download")
+        println(">>> Statistics data NOT found in cache - will now download")
         console.log(parameters)
         getAsyncTpDb(parameters) { response ->
             println(">>> Size of fetched statistics data is: ${response.length}")

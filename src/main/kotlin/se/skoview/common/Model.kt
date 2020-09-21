@@ -120,7 +120,7 @@ fun HippoState.isItemSelected(itemType: ItemType, id: Int): Boolean {
 }
 
 // This function creates the initial state based on an option filter parameter in the URL
-fun getInitialState(): HippoState {
+fun initialHippoState(): HippoState {
 
     val bookmarkInformation = parseBookmark()
 
@@ -141,7 +141,8 @@ fun getInitialState(): HippoState {
         mapOf(),
         bookmarkInformation.dateEffective, // todo: Verify if this is a good default - really want empty value
         bookmarkInformation.dateEnd,
-        bookmarkInformation.selectedConsumers,
+        //bookmarkInformation.selectedConsumers,
+        listOf(304), // TEMP
         bookmarkInformation.selectedProducers,
         bookmarkInformation.selectedLogicalAddresses,
         bookmarkInformation.selectedContracts,
@@ -166,7 +167,7 @@ fun getInitialState(): HippoState {
         mapOf(),
         false,
         false,
-        false,
+        true, // TEMP
         "",
         "",
         "",

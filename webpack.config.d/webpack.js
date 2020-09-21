@@ -6,6 +6,7 @@ if (config.devServer) {
     };
     config.devServer.clientLogLevel = 'error';
     config.devtool = 'eval-cheap-source-map';
+    config.devServer.host = '0.0.0.0';
 }
 
 /* Changed migrating to KVision 3.13.1

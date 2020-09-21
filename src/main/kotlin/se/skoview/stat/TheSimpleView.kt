@@ -17,116 +17,144 @@
 package se.skoview.stat
 
 import pl.treksoft.kvision.chart.Chart
-import pl.treksoft.kvision.core.Overflow
+import pl.treksoft.kvision.core.*
+import pl.treksoft.kvision.html.div
+import pl.treksoft.kvision.html.span
 import pl.treksoft.kvision.panel.SimplePanel
 import pl.treksoft.kvision.panel.flexPanel
 import pl.treksoft.kvision.state.bind
 import pl.treksoft.kvision.utils.perc
+import pl.treksoft.kvision.utils.px
 import pl.treksoft.kvision.utils.vw
 import se.skoview.app.store
 import se.skoview.common.HippoAction
 import se.skoview.common.ItemType
+import se.skoview.common.getHeightToRemainingViewPort
+import se.skoview.common.thousands
 
 // Below is the code to show the different graphs for the simple version
 object SimpleView : SimplePanel(
-    //FlexDir.ROW, FlexWrap.WRAP, FlexJustify.SPACEBETWEEN, FlexAlignItems.CENTER,
 ) {
     init {
-        id = "SimpleView"
+        id = "TheSimpleView:SimplePanel"
         //background = Background(Color.name(Col.RED))
-        // The whole item table
-        flexPanel(
-        ) {
-            //spacing = 1
-            overflow = Overflow.HIDDEN
-            id = "SimpleViewInnerhPanel"
-            width = 100.vw
-            //background = Background(Color.name(Col.CHOCOLATE))
-        }.bind(store) { state ->
-            println("Time to update the simple view...")
-            SInfo.createStatViewData(state)
-
-            val animateTime =
-                if (state.currentAction == HippoAction.DoneDownloadStatistics::class) {
-                    //SInfo.createStatViewData(state)
-                    println("Chart will now change")
-                    1299
-                } else {
-                    println("Chart will NOT change")
-                    -1
-                }
-
-            //val itemType: ItemType = ItemType.CONSUMER
-            // todo: Make the !! go away
-            val currentPreSelect: StatPreSelect = StatPreSelect.selfStore[state.statPreSelect]!!
-            val itemType: ItemType = currentPreSelect.showInSimpleView!!
-
-            var itemSInfoList: SInfoList
-            var label: String
-
-            when (itemType) {
-                ItemType.CONSUMER -> {
-                    itemSInfoList = SInfo.consumerSInfoList
-                    label = state.consumerLabel
-                }
-                ItemType.CONTRACT -> {
-                    itemSInfoList = SInfo.contractSInfoList
-                    label = state.contractLabel
-                }
-                ItemType.PRODUCER -> {
-                    itemSInfoList = SInfo.producerSInfoList
-                    label = state.producerLabel
-                }
-                ItemType.LOGICAL_ADDRESS -> {
-                    itemSInfoList = SInfo.logicalAddressSInfoList
-                    label = state.laLabel
-                }
-                else -> {
-                    println("ERROR in TheSimpleView, itemType = $itemType")
-                    itemSInfoList = SInfo.consumerSInfoList
-                    label = state.consumerLabel
-                }
+        //height = 100.perc
+        div { }.bind(store) { state ->
+            id = "TheSimpleView:SimplePanel-Bind"
+            height = 100.perc
+            background = Background(Color.name(Col.LIGHTBLUE))
+            val tCalls = state.statBlob.callsDomain.map { it.value }.sum().toString().thousands()
+            span {
+                +"${StatPreSelect.mapp[state.statPreSelect]!!.getLabel(false)}: $tCalls"
+                fontWeight = FontWeight.BOLD
+                margin = 10.px
+                width = 100.vw
             }
 
-            id = "SimpleStatPieTableView"
-            //background = Background(Color.name(Col.GREEN))
-            width = 100.vw
-            val pieChart =
-                Chart(
-                    getPieChartConfig(
-                        itemType,
-                        itemSInfoList,
-                        animationTime = animateTime,
-                        responsive = true,
-                        maintainAspectRatio = false
+            flexPanel(
+            ) {
+                //spacing = 1
+                id = "TheSimpleViewBigPanel:FlexPanel"
+                overflow = Overflow.HIDDEN
+                width = 100.vw
+
+                //val occupiedViewPortArea = (statPageTop.getElementJQuery()?.innerHeight() ?: 153).toInt()
+                /*
+                val occupiedViewPortArea = (statPageTop.getElementJQuery()?.height() ?: 153).toInt()
+                println("++++++++++ Inner height: $occupiedViewPortArea")
+                val heightToRemove = occupiedViewPortArea + 40
+                setStyle("height", "calc(100vh - ${heightToRemove}px)")
+                 */
+                //setStyle("height", "calc(100vh - 200px)")
+
+                setStyle("height", getHeightToRemainingViewPort(statPageTop, 40))
+
+                height = 100.perc
+                background = Background(Color.name(Col.YELLOW))
+
+                println("Time to update the simple view...")
+                SInfo.createStatViewData(state)
+
+                val animateTime =
+                    if (state.currentAction == HippoAction.DoneDownloadStatistics::class) {
+                        println("Chart will now change")
+                        1299
+                    } else {
+                        println("Chart will NOT change")
+                        -1
+                    }
+
+                //val itemType: ItemType = ItemType.CONSUMER
+                // todo: Make the !! go away
+                val currentPreSelect: StatPreSelect = StatPreSelect.mapp[state.statPreSelect]!!
+                val itemType: ItemType = currentPreSelect.showInSimpleView!!
+
+                val itemSInfoList: SInfoList
+                val label: String
+
+                when (itemType) {
+                    ItemType.CONSUMER -> {
+                        itemSInfoList = SInfo.consumerSInfoList
+                        label = state.consumerLabel
+                    }
+                    ItemType.CONTRACT -> {
+                        itemSInfoList = SInfo.contractSInfoList
+                        label = state.contractLabel
+                    }
+                    ItemType.PRODUCER -> {
+                        itemSInfoList = SInfo.producerSInfoList
+                        label = state.producerLabel
+                    }
+                    ItemType.LOGICAL_ADDRESS -> {
+                        itemSInfoList = SInfo.logicalAddressSInfoList
+                        label = state.laLabel
+                    }
+                    else -> {
+                        println("ERROR in TheSimpleView, itemType = $itemType")
+                        itemSInfoList = SInfo.consumerSInfoList
+                        label = state.consumerLabel
+                    }
+                }
+
+                //width = 100.vw
+                val pieChart =
+                    Chart(
+                        getPieChartConfig(
+                            itemType,
+                            itemSInfoList,
+                            animationTime = animateTime,
+                            responsive = true,
+                            maintainAspectRatio = false
+                        )
                     )
+                add(
+                    pieChart.apply {
+                        id = "TheSimpleViewPieChart:Chart"
+                        width = 45.vw
+                        height = 80.perc
+                        marginTop = 6.vw
+                        marginLeft = 5.vw
+                        background = Background(Color.name(Col.ALICEBLUE))
+                    }, grow = 1
                 )
-            add(
-                pieChart.apply {
-                    width = 40.vw
-                    height = 80.perc
-                    id = "pieChart"
-                    margin = 5.vw
-                    //background = Background(Color.name(Col.ALICEBLUE))
-                }, grow = 1
-            ).apply {
-                id = "The added pie container"
+
+                add(
+                    ChartLabelTable(
+                        itemType,
+                        itemSInfoList.recordList,
+                        "description",
+                        "color",
+                        "calls",
+                        label
+                    ).apply {
+                        id = "TheSimpleViewChartLabelTable:ChartLabelTable"
+                        height = 97.perc
+                        width = 40.vw
+                        margin = 1.vw
+                        background = Background(Color.name(Col.LIGHTPINK))
+                    }, grow = 1
+                )
             }
-            add(
-                ChartLabelTable(
-                    itemType,
-                    itemSInfoList.recordList,
-                    "description",
-                    "color",
-                    "calls",
-                    label
-                ).apply {
-                    id = "ChartLabelTable"
-                    width = 40.vw
-                    margin = 5.vw
-                    //background = Background(Color.name(Col.LAWNGREEN))
-                }, grow = 1
-            )
-        }.apply { id = "postId" }
+        }
     }
 }

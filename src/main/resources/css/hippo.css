@@ -1,4 +1,9 @@
+/* Tabulator settings */
+.tabulator-footer {display: none } /* Hide tabulator footer */
+.tabulator {font-size: 12px}
+
 /* Try out the cursors at https://www.w3schools.com/cssref/tryit.asp?filename=trycss_cursor */
+/*
 .alias {cursor: alias;}
 .all-scroll {cursor: all-scroll;}
 .auto {cursor: auto;}
@@ -34,4 +39,6 @@
 .wait {cursor: wait;}
 .zoom-in {cursor: zoom-in;}
 .zoom-out {cursor: zoom-out;}
-.tabulator {font-size: 11px}
+*/
+
+

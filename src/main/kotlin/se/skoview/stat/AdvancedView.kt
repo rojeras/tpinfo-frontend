@@ -17,73 +17,39 @@
 package se.skoview.stat
 
 import pl.treksoft.kvision.chart.Chart
+import pl.treksoft.kvision.core.Background
+import pl.treksoft.kvision.core.Col
+import pl.treksoft.kvision.core.Color
 import pl.treksoft.kvision.core.Overflow
 import pl.treksoft.kvision.panel.SimplePanel
 import pl.treksoft.kvision.panel.VPanel
 import pl.treksoft.kvision.panel.hPanel
 import pl.treksoft.kvision.state.bind
+import pl.treksoft.kvision.utils.perc
 import pl.treksoft.kvision.utils.vw
 import se.skoview.app.store
 import se.skoview.common.HippoAction
 import se.skoview.common.ItemType
+import se.skoview.common.getHeightToRemainingViewPort
 
-// Below is the code to show the different graphs for the advanced version
 object AdvancedView : VPanel(
-    //FlexDir.ROW, FlexWrap.WRAP, FlexJustify.SPACEBETWEEN, FlexAlignItems.CENTER,
 ) {
     init {
-        /*
-        div { }.bind(store) { state ->
-            if (state.showTimeGraph && state.historyMap.isNotEmpty()) {
-                val animateTime =
-                    if (state.currentAction == HippoAction.DoneDownloadHistory::class) {
-                        1298
-                    } else {
-                        -2
-                    }
-
-                println("Will display time graph")
-                val xAxis = state.historyMap.keys.toList()
-                val yAxis = state.historyMap.values.toList()
-                chart(
-                    Configuration(
-                        ChartType.LINE,
-                        listOf(
-                            DataSets(
-                                label = "Antal anrop per dag",
-                                data = yAxis
-                            )
-                        ),
-                        xAxis,
-                        options = ChartOptions(
-                            animation = AnimationOptions(duration = animateTime),
-                            legend = LegendOptions(display = true),
-                            responsive = true,
-                            maintainAspectRatio = false
-                        )
-                    )
-                ).apply {
-                    height = 26.vh
-                    width = 95.vw
-                    //background = Background(Color.name(Col.AZURE))
-                }
-            }
-        }
-         */
 
         // The whole item table
         hPanel(
             spacing = 1
         ) {
-            overflow = Overflow.HIDDEN
         }.bind(store) { state ->
-
+            overflow = Overflow.HIDDEN
+            background = Background(Color.name(Col.YELLOW))
+            setStyle("height", getHeightToRemainingViewPort(statPageTop, 50))
+            //height = 100.perc
             println("Time to update the view...")
             SInfo.createStatViewData(state)
 
             val animateTime =
                 if (state.currentAction == HippoAction.DoneDownloadStatistics::class) {
-                    //SInfo.createStatViewData(state)
                     println("Chart will now change")
                     1299
                 } else {
@@ -100,7 +66,6 @@ object AdvancedView : VPanel(
                 )
             )
 
-
             add(
                 StatPieTableView(
                     itemType = ItemType.CONTRACT,
@@ -110,7 +75,6 @@ object AdvancedView : VPanel(
                 )
             )
 
-
             add(
                 StatPieTableView(
                     itemType = ItemType.PRODUCER,
@@ -119,7 +83,6 @@ object AdvancedView : VPanel(
                     label = state.producerLabel
                 )
             )
-
 
             add(
                 StatPieTableView(
@@ -140,17 +103,25 @@ class StatPieTableView(
     label: String
 ) : SimplePanel() {
     init {
-        //background = Background(Color.name(Col.GREEN))
+        background = Background(Color.name(Col.GREEN))
+        setStyle("height", getHeightToRemainingViewPort(statPageTop, 50))
+        //height = 100.perc
         width = 25.vw
         val pieChart =
             Chart(
                 getPieChartConfig(
                     itemType,
                     itemSInfoList,
-                    animationTime = animateTime
+                    animationTime = animateTime,
+                    responsive = true,
+                    maintainAspectRatio = false
                 )
             )
-        add(pieChart)
+        add(pieChart
+            .apply {
+                height = 30.perc
+                background = Background(Color.name(Col.ALICEBLUE))
+            })
         add(
             ChartLabelTable(
                 itemType,
@@ -159,7 +130,9 @@ class StatPieTableView(
                 "color",
                 "calls",
                 label
-            )
+            ).apply {
+                height = 70.perc
+            }
         )
     }
 }
