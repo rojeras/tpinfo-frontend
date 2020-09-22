@@ -70,27 +70,30 @@ import se.skoview.stat.loadStatistics
 // Statistik
 
 // todo: Testa med andra browsers, inte minst Edge (ML 2020-09-17)
-// todo: Flytta upp tabellen i simple view så att den linjerar med toppen av pajjen (ML 2020-09-17)
-// todo: Se till att pajjen får plats i browserförnstret (vikitigt i Edge) (ML 2020-09-17)
-// done: Lägg in en rubrik ovanför pajjen pss som i den gamla versionen (ML 2020-09-17)
-// todo: Skulle behöva får BACK-pil att fungera (ML 2020-09-17)
-// todo: Visa fler rader i simple-tabellen (ML 2020-09-17)
+// todo: Förtydliga vad som valt genom att även färga raden (i tillägg till det röda krysset)
+// todo: Måste få BACK-pil att fungera (ML 2020-09-17)
 // todo: Prestanda! (ML 2020-09-17)
-// todo: Förval blir fel när man går från advanced -> simple mode (ML 2020-09-17)
 // todo: Simple view blinks when selecting preSelects
 // todo: Select of a already preselected item de-selects all items of same type
+// todo: Förvalen måste återställas till default om användaren väljer bort något av de förvalda objekten
 // todo: Knapp för att komma till hippo
-// todo: Völjer man item som är del av en preselect så försvinner valet. Kolla Remissvyn.
+// todo: Väljer man item som är del av en preselect så försvinner valet. Kolla Remissvyn.
 // todo: Fixa "about" för statistiken
 // todo: Se över synonymerna. Måste passa med de olika förvalen
-// todo: Om förvalen baseras på konsumenter och producenter måste det anges separat för de olika plattformarna
-// todo: Förvalen måste återställas till default om användaren väljer bort något av de förvalda objekten
-// todo: Se över scrollbars och paging
-// todo: Se över prestanda, speciellt kring hantering av tidsgraf
 // todo: Begränsa datumlistorna så att man inte kan välja start/slutdatum "på vel sida" om varandra
 // todo: URL-hantering. Driftsättning och koppling till proxy
 // todo: Och så visa svarstider
 // todo: Dokumentation
+// done: Om förvalen baseras på konsumenter och producenter måste det anges separat för de olika plattformarna. Eller tas bort helt för QA.
+// done: Förval blir fel när man går från advanced -> simple mode (ML 2020-09-17)
+// done: Visa hur många rader det finns i varje tabulatortabell.
+// done: Se till att pajjen får plats i browserförnstret (vikitigt i Edge) (ML 2020-09-17)
+// done: Ändra till "Totalt antal anrrop för urval är: ..."
+// done: Ändra kolumnrubrik "Anrop" till "Antal anrop"
+// done: Flytta upp tabellen i simple view så att den linjerar med toppen av pajjen (ML 2020-09-17)
+// done: Lägg in en rubrik ovanför pajjen pss som i den gamla versionen (ML 2020-09-17)
+// done: Visa fler rader i simple-tabellen (ML 2020-09-17)
+// done: Se över scrollbars och paging
 // done: Den förenklade varianten skulle kunna se ut som idag med en paj. När användaren gör ett val av ett element i den första pajjen går man över till det avancerade läget.
 // done: Flera förvalda vyer som i gamla statistiken. Journalen.
 // done: Export till CSV
@@ -98,7 +101,7 @@ import se.skoview.stat.loadStatistics
 // done: Addera vy för "Över tid"
 // done: Inkludera synonymer. Överväg tr-funktionen för att även anpassa "Tjänstekonsument" -> "Anropande system" osv
 // done: Fixa till datahanteringen så att det blir en renare redux-koppling till vad som visas
-// done: Fixa skärmuppdateringen så att det inte blinkar och försvinner ibland
+// done: Fixa skärmuppdateringen så att det inte blinkar och försvinnerheight: ibland
 // done: Visa HSA-idn (sökbara)
 
 // TPDB
@@ -161,76 +164,7 @@ class App : Application() {
         require("css/hippo.css")
     }
 
-/*
-    data class Employee(
-        val name: String?,
-        val position: String?,
-        val office: String?,
-        val active: Boolean = false,
-        val startDate: Date?,
-        val salary: Int?,
-        @Suppress("ArrayInDataClass") val _children: Array<Employee>? = null,
-        val id: Int = counter++
-    ) {
-        companion object {
-            internal var counter = 0
-        }
-    }
-    override fun start() {
-        root("hippo") {
-            val data = observableListOf(
-                Employee(
-                    "Tiger Nixon",
-                    "System Architect",
-                    "Edinburgh",
-                    false,
-                    "2011-04-25".toDateF("YYYY-MM-DD"),
-                    320800,
-                    arrayOf(
-                        Employee("John Snow", "Programmer", "Edinburgh", true, "2012-04-23".toDateF("YYY-MM-DD"), 100000),
-                        Employee("Mark Lee", "Junior programmer", "Edinburgh", true, "2016-06-02".toDateF("YYY-MM-DD"), 80000)
-                    )
-                ),
-                Employee(
-                    "Garrett Winters",
-                    "Accountant",
-                    "Tokyo",
-                    true,
-                    "2011-07-25".toDateF("YYYY-MM-DD"),
-                    170750
-                ),
-                Employee(
-                    "Ashton Cox",
-                    "Junior Technical Author",
-                    "San Francisco",
-                    true,
-                    "2009-01-12".toDateF("YYYY-MM-DD"),
-                    86000
-                )
-            )
 
-            vPanel(alignItems = AlignItems.START, noWrappers = true) {
-                height = 100.vh
-                val ul = ul {
-                    li("test")
-                }
-                button("add").onClick {
-                    ul.add(Li("test"))
-                }
-                tabulator(data,
-                    options = TabulatorOptions(
-                        layout = Layout.FITCOLUMNS,
-                        columns = listOf(
-                            ColumnDefinition( "Name", "name")
-                        ), pagination = PaginationMode.LOCAL, paginationSize = 10, dataTree = true
-                    ), types = setOf(TableType.BORDERED, TableType.STRIPED, TableType.HOVER)
-                ) {
-                    height = 100.perc
-                }
-            }
-        }
-    }
- */
     override fun start() {
 
         val startUrl = window.location.href
@@ -261,37 +195,11 @@ class App : Application() {
 
         loadIntegrations(store.getState())
         root("hippo") {
-            /*
-            hPanel {
-                background = Background(Color.name(Col.BLUE))
-                width = 100.perc
-                height = 500.px
-                vPanel {
-                    background = Background(Color.name(Col.BEIGE))
-                    width = 20.perc
-                    height = 500.px
-                    span("Left")
-                }
-                vPanel {
-                    background = Background(Color.name(Col.GREEN))
-                    width = 80.perc
-                    height = 500.px
-                    span("Right")
-                }
-            }
-             */
             vPanel {
                 add(HippoTablePage)
             }.apply {
                 width = 100.perc
-                /*
-                width = 80.perc
-                margin = 20.px
-                marginLeft = auto
-                marginRight = auto
-                padding = 20.px
-                border = Border(2.px, BorderStyle.SOLID, Color.name(Col.SILVER))
-                 */
+
             }
 
         }
@@ -300,7 +208,7 @@ class App : Application() {
     fun startStat() {
         store.dispatch(HippoAction.ApplicationStarted(HippoApplication.STATISTIK))
         StatPreSelect.initialize()
-        store.dispatch(HippoAction.PreSelectedSelected("-"))
+        store.dispatch(HippoAction.PreSelectedSelected("Alla"))
         loadStatistics(store.getState())
         //loadHistory(store.getState())
         root("hippo") {

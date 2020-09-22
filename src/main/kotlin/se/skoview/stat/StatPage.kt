@@ -33,7 +33,6 @@ import pl.treksoft.kvision.table.row
 import pl.treksoft.kvision.table.table
 import pl.treksoft.kvision.utils.px
 import pl.treksoft.kvision.utils.vh
-import pl.treksoft.kvision.utils.vw
 import se.skoview.app.formControlXs
 import se.skoview.app.store
 import se.skoview.common.*
@@ -44,11 +43,12 @@ object StatPage : SimplePanel() {
 
     init {
         id = "StatPage:SimplePanel()"
+        background = Background(Color.name(Col.RED))
         println("In CharTab():init()")
         this.marginTop = 10.px
 
         statPageTop = div {
-            }.bind(store) { state ->
+        }.bind(store) { state ->
             id = "StatPageTop"
 
             // Page header
@@ -68,13 +68,12 @@ object StatPage : SimplePanel() {
             flexPanel(
                 FlexDirection.ROW, FlexWrap.WRAP, JustifyContent.SPACEBETWEEN, AlignItems.CENTER,
             ) {
-            //}.bind(store) { state ->
+                //}.bind(store) { state ->
                 spacing = 5
                 clear = Clear.BOTH
                 margin = 0.px
                 background = Background(Color.hex(0xf6efe9))
                 id = "StatPage-ControlPanel:FlexPanel-Bind"
-                println("After bind in header")
                 table(
                     listOf(),
                     setOf(TableType.BORDERED, TableType.SMALL)
@@ -110,9 +109,6 @@ object StatPage : SimplePanel() {
                                     state.statisticsPlattforms.map { Pair(it.key.toString(), it.value.name) }
                                 else
                                     listOf(Pair("3", "SLL-PROD"))
-
-                            println("Plattform select:")
-                            console.log(options)
                             simpleSelectInput(
                                 //options = state.statisticsPlattforms.map { Pair(it.key.toString(), it.value.name) },
                                 options = options,
@@ -125,7 +121,6 @@ object StatPage : SimplePanel() {
                                 change = {
                                     val selectedTp = (self.value ?: "").toInt()
                                     tpSelected(selectedTp)
-
                                 }
                             }
                         }
@@ -146,10 +141,7 @@ object StatPage : SimplePanel() {
                             checkBoxInput(
                                 value = state.statAdvancedMode
                             ).onClick {
-                                store.dispatch(HippoAction.StatAdvancedMode(value))
-                                if (!value)
-                                // todo: This hard coded plattform id must change to something more dynamic
-                                    tpSelected(3)
+                               selectMode(value)
                             }
                             +" Avancerat läge"
                         }
@@ -178,38 +170,29 @@ object StatPage : SimplePanel() {
 
                         cell { +"Visa:" }
                         cell {
-                            val selectedPreSelect = state.statPreSelect
+                            val selectedPreSelectLabel = state.statPreSelect
                             val options =
-                                if (state.statAdvancedMode)
-                                    StatPreSelect.mapp
-                                        .filter { it.value.showInAdvancedView == true }
-                                        .map { Pair(it.key, it.value.getLabel(state.statAdvancedMode)) }
-                                else
-                                    StatPreSelect.mapp
-                                        .filter { it.value.showInSimpleView != null }
-                                        .map { Pair(it.key, it.value.getLabel(state.statAdvancedMode)) }
+                                if (state.isPlattformSelected(3)) {
+                                    if (state.statAdvancedMode)
+                                    //    if ()
+                                        StatPreSelect.mapp
+                                            .filter { it.value.showInAdvancedView == true }
+                                            .map { Pair(it.key, it.value.getLabel(state.statAdvancedMode)) }
+                                    else
+                                        StatPreSelect.mapp
+                                            .filter { it.value.simpleViewDisplay != null }
+                                            .map { Pair(it.key, it.value.getLabel(state.statAdvancedMode)) }
+                                } else listOf(Pair("Alla", "Alla"))
                             simpleSelectInput(
                                 options = options,
-                                value = selectedPreSelect
+                                value = selectedPreSelectLabel
                             ) {
                                 addCssStyle(formControlXs)
                                 background = Background(Color.name(Col.WHITE))
                             }.onEvent {
                                 change = {
-                                    val selectedPreSelect: String = self.value ?: "-"
-                                    println("Selected pre-select: '$selectedPreSelect'")
-                                    store.dispatch(HippoAction.PreSelectedSelected(selectedPreSelect))
-                                    if (state.showTechnicalTerms) { // Restore technical labels
-                                        store.dispatch(HippoAction.ShowTechnicalTerms(state.showTechnicalTerms))
-                                    }
-                                    store.dispatch(HippoAction.ItemDeselectedAllForAllTypes)
-                                    val selectedItemsMap = StatPreSelect.mapp[selectedPreSelect]!!.selectedItemsMap
-                                    for ((itemType, itemIdList) in selectedItemsMap) {
-                                        itemIdList.forEach {
-                                            store.dispatch(HippoAction.ItemIdSelected(itemType, it))
-                                        }
-                                    }
-                                    loadStatistics(store.getState())
+                                    val selectedPreSelectLabel: String = self.value ?: "Alla"
+                                    selectPreSelect(selectedPreSelectLabel = selectedPreSelectLabel)
                                 }
                             }
                         }
@@ -228,13 +211,6 @@ object StatPage : SimplePanel() {
                         }
 
                     }
-                }
-                if (state.statAdvancedMode) {
-                    val tCalls = state.statBlob.callsDomain.map { it.value }.sum().toString().thousands()
-                    span {
-                        +"Totalt antal anrop för detta urval är: $tCalls"
-                        id = "Text number of calls:Span"
-                    }.apply { align = Align.CENTER }.apply { fontWeight = FontWeight.BOLD }
                 }
 
                 // About button
@@ -264,45 +240,57 @@ object StatPage : SimplePanel() {
                         addBsColor(BsColor.BLACK50)
                     }
                 }
+            }
 
-                id = "StatPage-Timegraph:Div.bind"
-                if (state.showTimeGraph && state.historyMap.isNotEmpty()) {
-                    val animateTime =
-                        if (state.currentAction == HippoAction.DoneDownloadHistory::class) {
-                            1298
-                        } else {
-                            -2
-                        }
+            // Heading
+            val tCalls: String = state.statBlob.callsDomain.map { it.value }.sum().toString().thousands()
 
-                    println("Will display time graph")
-                    val xAxis = state.historyMap.keys.toList()
-                    val yAxis = state.historyMap.values.toList()
-                    chart(
-                        Configuration(
-                            ChartType.LINE,
-                            listOf(
-                                DataSets(
-                                    label = "Antal anrop per dag",
-                                    data = yAxis
-                                )
-                            ),
-                            xAxis,
-                            options = ChartOptions(
-                                animation = AnimationOptions(duration = animateTime),
-                                legend = LegendOptions(display = true),
-                                responsive = true,
-                                maintainAspectRatio = false
-                            )
-                        )
-                    ).apply {
-                        height = 26.vh
-                        width = 95.vw
-                        //background = Background(Color.name(Col.AZURE))
+            val headingText: String =
+                if (state.statAdvancedMode) "Totalt antal anrop för detta urval är: $tCalls"
+                else "${StatPreSelect.mapp[state.statPreSelect]!!.getLabel(false)}: $tCalls anrop"
+
+            h4 {
+                content = headingText
+                align = Align.CENTER
+                fontWeight = FontWeight.BOLD
+            }
+
+            // Time graph
+            id = "StatPage-Timegraph:Div.bind"
+            if (state.showTimeGraph && state.historyMap.isNotEmpty()) {
+                val animateTime =
+                    if (state.currentAction == HippoAction.DoneDownloadHistory::class) {
+                        1298
+                    } else {
+                        -2
                     }
+
+                println("Will display time graph")
+                val xAxis = state.historyMap.keys.toList()
+                val yAxis = state.historyMap.values.toList()
+                chart(
+                    Configuration(
+                        ChartType.LINE,
+                        listOf(
+                            DataSets(
+                                label = "Antal anrop per dag",
+                                data = yAxis
+                            )
+                        ),
+                        xAxis,
+                        options = ChartOptions(
+                            animation = AnimationOptions(duration = animateTime),
+                            legend = LegendOptions(display = true),
+                            responsive = true,
+                            maintainAspectRatio = false
+                        )
+                    )
+                ).apply {
+                    height = 26.vh
+                    //width = 99.vw
+                    background = Background(Color.name(Col.AZURE))
                 }
             }
-            println("=========== Inner height:")
-            console.log(statPageTop.getElementJQuery()?.innerHeight())
         }
 
         div { }.bind(store) { state ->
@@ -313,12 +301,19 @@ object StatPage : SimplePanel() {
     }
 
     private fun tpSelected(selectedTp: Int) {
-        val pChainId =
-            PlattformChain.calculateId(first = selectedTp, middle = null, last = selectedTp)
+        println("In tpSelected($selectedTp)")
+        val state = store.getState()
+        val pChainId = PlattformChain.calculateId(first = selectedTp, middle = null, last = selectedTp)
+        /*
+        // Do not do anything if the function is called with the currently already selected TPId
+        //if (PlattformChain.map[store.getState().selectedPlattformChains[0]]!!.last == selectedTp) return
+        if (state.selectedPlattformChains.contains(pChainId)) return
+       */
+        if (state.isPlattformSelected(selectedTp)) return
 
-        // todo: Do not do anything if the function is called with the currently already selected TPId
-        //if (store.getState().selectedPlattformChains.contains(selectedTp)) return
+        println("Will change to plattformId = $selectedTp")
 
+        store.dispatch(HippoAction.PreSelectedSelected("Alla"))
         store.dispatch(HippoAction.ItemIdDeselectedAll(ItemType.PLATTFORM_CHAIN))
         store.dispatch(HippoAction.ItemDeselectedAllForAllTypes)
         //store.dispatch { dispatch, getState ->
@@ -328,7 +323,49 @@ object StatPage : SimplePanel() {
                 pChainId
             )
         )
+        println("Will now call loadStatistics()")
         loadStatistics(store.getState())
+    }
+
+    private fun selectPreSelect(selectedPreSelectLabel: String) {
+        println("Selected pre-select: '$selectedPreSelectLabel'")
+        store.dispatch(HippoAction.PreSelectedSelected(selectedPreSelectLabel))
+        if (store.getState().showTechnicalTerms) { // Restore technical labels
+            store.dispatch(HippoAction.ShowTechnicalTerms(store.getState().showTechnicalTerms))
+        }
+        store.dispatch(HippoAction.ItemDeselectedAllForAllTypes)
+        val selectedItemsMap = StatPreSelect.mapp[selectedPreSelectLabel]!!.selectedItemsMap
+        for ((itemType, itemIdList) in selectedItemsMap) {
+            itemIdList.forEach {
+                store.dispatch(HippoAction.ItemIdSelected(itemType, it))
+            }
+        }
+        loadStatistics(store.getState())
+    }
+
+    private fun selectMode(setAdvancedMode: Boolean) {
+        val state = store.getState()
+
+        // If mode already set - do nothing
+        if (state.statAdvancedMode == setAdvancedMode) return
+
+        // todo: This hard coded plattform id must change to something more dynamic
+        if (!setAdvancedMode) tpSelected(3)
+
+        // Change the mode
+        store.dispatch(HippoAction.StatAdvancedMode(setAdvancedMode))
+
+        // Evalutate which pre-select should be used
+        val currentPreSelectLabel = state.statPreSelect
+        var newPreSelectLabel: String = currentPreSelectLabel
+        val currentPreSelect = StatPreSelect.mapp[currentPreSelectLabel]!!
+
+        if (setAdvancedMode && (!currentPreSelect.showInAdvancedView)) newPreSelectLabel = "Alla"
+        if ((!setAdvancedMode) && (!currentPreSelect.showInSimpleView)) newPreSelectLabel = "Alla"
+
+        println("Current preSelect=$currentPreSelectLabel, newPreselect=$newPreSelectLabel")
+        if (newPreSelectLabel != currentPreSelectLabel) selectPreSelect(newPreSelectLabel)
+
     }
 }
 

@@ -17,20 +17,20 @@
 package se.skoview.stat
 
 import pl.treksoft.kvision.chart.Chart
-import pl.treksoft.kvision.core.*
+import pl.treksoft.kvision.core.Background
+import pl.treksoft.kvision.core.Col
+import pl.treksoft.kvision.core.Color
+import pl.treksoft.kvision.core.Overflow
 import pl.treksoft.kvision.html.div
-import pl.treksoft.kvision.html.span
 import pl.treksoft.kvision.panel.SimplePanel
 import pl.treksoft.kvision.panel.flexPanel
 import pl.treksoft.kvision.state.bind
 import pl.treksoft.kvision.utils.perc
-import pl.treksoft.kvision.utils.px
 import pl.treksoft.kvision.utils.vw
 import se.skoview.app.store
 import se.skoview.common.HippoAction
 import se.skoview.common.ItemType
 import se.skoview.common.getHeightToRemainingViewPort
-import se.skoview.common.thousands
 
 // Below is the code to show the different graphs for the simple version
 object SimpleView : SimplePanel(
@@ -43,13 +43,7 @@ object SimpleView : SimplePanel(
             id = "TheSimpleView:SimplePanel-Bind"
             height = 100.perc
             background = Background(Color.name(Col.LIGHTBLUE))
-            val tCalls = state.statBlob.callsDomain.map { it.value }.sum().toString().thousands()
-            span {
-                +"${StatPreSelect.mapp[state.statPreSelect]!!.getLabel(false)}: $tCalls"
-                fontWeight = FontWeight.BOLD
-                margin = 10.px
-                width = 100.vw
-            }
+
 
             flexPanel(
             ) {
@@ -61,7 +55,7 @@ object SimpleView : SimplePanel(
                 //val occupiedViewPortArea = (statPageTop.getElementJQuery()?.innerHeight() ?: 153).toInt()
                 /*
                 val occupiedViewPortArea = (statPageTop.getElementJQuery()?.height() ?: 153).toInt()
-                println("++++++++++ Inner height: $occupiedViewPortArea")
+                println("+++++++++- Inner height: $occupiedViewPortArea")
                 val heightToRemove = occupiedViewPortArea + 40
                 setStyle("height", "calc(100vh - ${heightToRemove}px)")
                  */
@@ -72,22 +66,19 @@ object SimpleView : SimplePanel(
                 height = 100.perc
                 background = Background(Color.name(Col.YELLOW))
 
-                println("Time to update the simple view...")
                 SInfo.createStatViewData(state)
 
                 val animateTime =
                     if (state.currentAction == HippoAction.DoneDownloadStatistics::class) {
-                        println("Chart will now change")
                         1299
                     } else {
-                        println("Chart will NOT change")
                         -1
                     }
 
                 //val itemType: ItemType = ItemType.CONSUMER
                 // todo: Make the !! go away
                 val currentPreSelect: StatPreSelect = StatPreSelect.mapp[state.statPreSelect]!!
-                val itemType: ItemType = currentPreSelect.showInSimpleView!!
+                val itemType: ItemType = currentPreSelect.simpleViewDisplay!!
 
                 val itemSInfoList: SInfoList
                 val label: String

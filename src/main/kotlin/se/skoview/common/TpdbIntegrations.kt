@@ -17,8 +17,6 @@
 package se.skoview.common
 
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonConfiguration
 import se.skoview.app.store
 import se.skoview.hippo.createHippoViewData
 
@@ -125,44 +123,5 @@ fun loadIntegrations(state: HippoState) {
     }
 }
 
-// The extension function create the part of the URL to fetch integrations
-fun HippoState.getParams(): String {
 
-    //var params = "?dummy&contractId=379"
-    var params = "?dummy"
-
-    params += "&dateEffective=" + this.dateEffective
-    params += "&dateEnd=" + this.dateEnd
-
-    params += if (this.selectedConsumers.isNotEmpty()) this.selectedConsumers.joinToString(
-        prefix = "&consumerId=",
-        separator = ","
-    ) else ""
-    params += if (this.selectedDomains.isNotEmpty()) this.selectedDomains.joinToString(
-        prefix = "&domainId=",
-        separator = ","
-    ) else ""
-    params += if (this.selectedContracts.isNotEmpty()) this.selectedContracts.joinToString(
-        prefix = "&contractId=",
-        separator = ","
-    ) else ""
-    params += if (this.selectedLogicalAddresses.isNotEmpty()) this.selectedLogicalAddresses.joinToString(
-        prefix = "&logicalAddressId=",
-        separator = ","
-    ) else ""
-    params += if (this.selectedProducers.isNotEmpty()) this.selectedProducers.joinToString(
-        prefix = "&producerId=",
-        separator = ","
-    ) else ""
-
-    // Separate plattforms now stored in filter, not the chain
-    for (pcId in this.selectedPlattformChains) {
-        val firstId = PlattformChain.map[pcId]?.first
-        val lastId = PlattformChain.map[pcId]?.last
-        params += "&firstPlattformId=$firstId"
-        params += "&lastPlattformId=$lastId"
-    }
-
-    return params
-}
 

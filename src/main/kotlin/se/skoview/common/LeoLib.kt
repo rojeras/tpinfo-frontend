@@ -136,7 +136,7 @@ fun getHeightToRemainingViewPort(
     delta: Int = 48
 ): String {
     val occupiedViewPortArea = (topComponent.getElementJQuery()?.height() ?: 153).toInt()
-    println("++++++++++ Inner height: $occupiedViewPortArea")
+    //println("++++++++++ Inner height: $occupiedViewPortArea")
     val heightToRemove = occupiedViewPortArea + delta
     return "calc(100vh - ${heightToRemove}px)"
 }

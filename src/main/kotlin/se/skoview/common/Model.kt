@@ -108,17 +108,6 @@ data class HippoState(
 
 )
 
-fun HippoState.isItemSelected(itemType: ItemType, id: Int): Boolean {
-    return when (itemType) {
-        ItemType.CONSUMER -> this.selectedConsumers.contains(id)
-        ItemType.DOMAIN -> this.selectedDomains.contains(id)
-        ItemType.CONTRACT -> this.selectedContracts.contains(id)
-        ItemType.PLATTFORM_CHAIN -> this.selectedPlattformChains.contains(id)
-        ItemType.LOGICAL_ADDRESS -> this.selectedLogicalAddresses.contains(id)
-        ItemType.PRODUCER -> this.selectedProducers.contains(id)
-    }
-}
-
 // This function creates the initial state based on an option filter parameter in the URL
 fun initialHippoState(): HippoState {
 
@@ -175,5 +164,66 @@ fun initialHippoState(): HippoState {
         ""
     )
 }
+
+
+fun HippoState.isItemSelected(itemType: ItemType, id: Int): Boolean {
+    return when (itemType) {
+        ItemType.CONSUMER -> this.selectedConsumers.contains(id)
+        ItemType.DOMAIN -> this.selectedDomains.contains(id)
+        ItemType.CONTRACT -> this.selectedContracts.contains(id)
+        ItemType.PLATTFORM_CHAIN -> this.selectedPlattformChains.contains(id)
+        ItemType.LOGICAL_ADDRESS -> this.selectedLogicalAddresses.contains(id)
+        ItemType.PRODUCER -> this.selectedProducers.contains(id)
+    }
+}
+
+fun HippoState.isPlattformSelected(id: Int): Boolean {
+    val pChainId = PlattformChain.calculateId(first = id, middle = null, last = id)
+
+    return this.selectedPlattformChains.contains(pChainId)
+}
+
+
+// The extension function create the part of the URL to fetch integrations
+fun HippoState.getParams(): String {
+
+    //var params = "?dummy&contractId=379"
+    var params = "?dummy"
+
+    params += "&dateEffective=" + this.dateEffective
+    params += "&dateEnd=" + this.dateEnd
+
+    params += if (this.selectedConsumers.isNotEmpty()) this.selectedConsumers.joinToString(
+        prefix = "&consumerId=",
+        separator = ","
+    ) else ""
+    params += if (this.selectedDomains.isNotEmpty()) this.selectedDomains.joinToString(
+        prefix = "&domainId=",
+        separator = ","
+    ) else ""
+    params += if (this.selectedContracts.isNotEmpty()) this.selectedContracts.joinToString(
+        prefix = "&contractId=",
+        separator = ","
+    ) else ""
+    params += if (this.selectedLogicalAddresses.isNotEmpty()) this.selectedLogicalAddresses.joinToString(
+        prefix = "&logicalAddressId=",
+        separator = ","
+    ) else ""
+    params += if (this.selectedProducers.isNotEmpty()) this.selectedProducers.joinToString(
+        prefix = "&producerId=",
+        separator = ","
+    ) else ""
+
+    // Separate plattforms now stored in filter, not the chain
+    for (pcId in this.selectedPlattformChains) {
+        val firstId = PlattformChain.map[pcId]?.first
+        val lastId = PlattformChain.map[pcId]?.last
+        params += "&firstPlattformId=$firstId"
+        params += "&lastPlattformId=$lastId"
+    }
+
+    return params
+}
+
 
 

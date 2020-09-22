@@ -264,7 +264,9 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
             state.copy(showTimeGraph = action.isShown)
         }
         is HippoAction.StatAdvancedMode -> {
-            state.copy(statAdvancedMode = action.isAdvanced)
+            state.copy(
+                statAdvancedMode = action.isAdvanced
+            )
         }
         is HippoAction.ShowTechnicalTerms -> {
             state.copy(

@@ -23,13 +23,13 @@ data class StatPreSelect(
     val simpleLabel: String? = null,
     val selectedItemsMap: HashMap<ItemType, List<Int>>, // = hashMapOf<ItemType, List<Int>>()
     val labelMap: HashMap<ItemType, String>,
-    val showInSimpleView: ItemType? = null,
+    val simpleViewDisplay: ItemType? = null, // todo: Modify to array if we need tp extend the simple view
+    val showInSimpleView: Boolean,
     val showInAdvancedView: Boolean
 
 ) {
     fun getLabel(advancedMode: Boolean) =
-        if ((!advancedMode) && simpleLabel != null)
-            simpleLabel
+        if ((!advancedMode) && simpleLabel != null)            simpleLabel
         else
             label
 
@@ -43,7 +43,7 @@ data class StatPreSelect(
 
         fun initialize() {
             StatPreSelect(
-                label = "-",
+                label = "Alla",
                 simpleLabel = "Alla konsumerande tjänster",
                 selectedItemsMap = hashMapOf(),
                 labelMap = hashMapOf(
@@ -52,7 +52,8 @@ data class StatPreSelect(
                     ItemType.PRODUCER to "Informationskällor",
                     ItemType.LOGICAL_ADDRESS to "Adresser"
                 ),
-                showInSimpleView = ItemType.CONSUMER,
+                simpleViewDisplay = ItemType.CONSUMER,
+                showInSimpleView = true,
                 showInAdvancedView = true
             )
             StatPreSelect(
@@ -65,7 +66,8 @@ data class StatPreSelect(
                     ItemType.PRODUCER to "Informationskällor",
                     ItemType.LOGICAL_ADDRESS to "Adresser"
                 ),
-                showInSimpleView = ItemType.PRODUCER,
+                simpleViewDisplay = ItemType.PRODUCER,
+                showInSimpleView = true,
                 showInAdvancedView = false
             )
             StatPreSelect(
@@ -77,7 +79,8 @@ data class StatPreSelect(
                     ItemType.PRODUCER to "Tidbokningsystem",
                     ItemType.LOGICAL_ADDRESS to "Enhet"
                 ),
-                showInSimpleView = ItemType.LOGICAL_ADDRESS,
+                simpleViewDisplay = ItemType.LOGICAL_ADDRESS,
+                showInSimpleView = true,
                 showInAdvancedView = true
             )
             StatPreSelect(
@@ -89,7 +92,8 @@ data class StatPreSelect(
                     ItemType.PRODUCER to "Journalsystem",
                     ItemType.LOGICAL_ADDRESS to "Journalsystemets adress"
                 ),
-                showInSimpleView = ItemType.CONTRACT,
+                simpleViewDisplay = ItemType.CONTRACT,
+                showInSimpleView = true,
                 showInAdvancedView = true
             )
             StatPreSelect(
@@ -101,7 +105,8 @@ data class StatPreSelect(
                     ItemType.PRODUCER to "Journalsystem",
                     ItemType.LOGICAL_ADDRESS to "Journalsystemets adress"
                 ),
-                showInSimpleView = ItemType.CONTRACT,
+                simpleViewDisplay = ItemType.CONTRACT,
+                showInSimpleView = true,
                 showInAdvancedView = true
             )
             StatPreSelect(
@@ -113,7 +118,8 @@ data class StatPreSelect(
                     ItemType.PRODUCER to "Remissmottagande system",
                     ItemType.LOGICAL_ADDRESS to "Remitterad mottagning"
                 ),
-                showInSimpleView = ItemType.LOGICAL_ADDRESS,
+                simpleViewDisplay = ItemType.LOGICAL_ADDRESS,
+                showInSimpleView = true,
                 showInAdvancedView = true
             )
         }

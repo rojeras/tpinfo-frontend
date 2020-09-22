@@ -45,15 +45,12 @@ object AdvancedView : VPanel(
             background = Background(Color.name(Col.YELLOW))
             setStyle("height", getHeightToRemainingViewPort(statPageTop, 50))
             //height = 100.perc
-            println("Time to update the view...")
             SInfo.createStatViewData(state)
 
             val animateTime =
                 if (state.currentAction == HippoAction.DoneDownloadStatistics::class) {
-                    println("Chart will now change")
                     1299
                 } else {
-                    println("Chart will NOT change")
                     -1
                 }
 

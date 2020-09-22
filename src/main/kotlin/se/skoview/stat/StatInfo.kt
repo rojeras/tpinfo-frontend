@@ -55,14 +55,14 @@ fun loadStatistics(state: HippoState) {
 
     // Check if the statistics info is available in the cache
     if (statArrArrCache.containsKey(parameters)) {
-        println("Statistics found in cache")
+        println(">>> Statistics found in cache, parameters: $parameters")
         val statisticsArrArr = statArrArrCache[parameters]!!
 
         store.dispatch(
             HippoAction.DoneDownloadStatistics(statisticsArrArr)
         )
     } else {
-        println(">>> Statistics data NOT found in cache - will now download")
+        println(">>> Statistics data NOT found in cache - will now download, parameters: $parameters")
         console.log(parameters)
         getAsyncTpDb(parameters) { response ->
             println(">>> Size of fetched statistics data is: ${response.length}")

@@ -79,6 +79,7 @@ open class ChartLabelTable(
                 ColumnDefinition(
                     headerSort = false,
                     title = "",
+                    width = "(0.3).px",
                     formatter = Formatter.BUTTONCROSS
                 )
             else
@@ -107,7 +108,7 @@ open class ChartLabelTable(
                     firstCol,
                     ColumnDefinition(
                         headerSort = false,
-                        title = heading,
+                        title = "$heading (${itemSInfoList.size})",
                         field = dataField,
                         //topCalc = Calc.COUNT,
                         topCalcFormatter = Formatter.COLOR,
@@ -121,7 +122,7 @@ open class ChartLabelTable(
                     ),
                     ColumnDefinition(
                         widthGrow = 1,
-                        title = "Antal",
+                        title = "Antal anrop",
                         hozAlign = Align.RIGHT,
                         field = callsField
                     )
@@ -144,7 +145,7 @@ open class ChartLabelTable(
 fun itemSelectDeselect(itemId: Int, itemType: ItemType) {
     if (store.getState().isItemSelected(itemType, itemId)) {
         // De-select of an item
-        store.dispatch(HippoAction.PreSelectedSelected("-"))
+        store.dispatch(HippoAction.PreSelectedSelected("Alla"))
         store.dispatch(HippoAction.ItemIdDeselectedAll(itemType))
         loadStatistics(store.getState())
     } else {
