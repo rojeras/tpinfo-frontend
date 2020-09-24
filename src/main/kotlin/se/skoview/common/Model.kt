@@ -17,6 +17,7 @@
 package se.skoview.common
 
 import se.skoview.hippo.parseBookmark
+import se.skoview.stat.StatPreSelect
 import se.skoview.stat.StatisticsBlob
 import kotlin.reflect.KClass
 
@@ -100,7 +101,8 @@ data class HippoState(
     // View controllers
     val showTechnicalTerms: Boolean,
     val statAdvancedMode: Boolean,
-    val statPreSelect: String,
+    val statPreSelectLabel: String,
+    val statPreSelect: StatPreSelect?,
     val consumerLabel: String,
     val contractLabel: String,
     val producerLabel: String,
@@ -157,7 +159,8 @@ fun initialHippoState(): HippoState {
         false,
         false,
         true, // TEMP
-        "",
+        "Allt",
+        null,
         "",
         "",
         "",

@@ -64,7 +64,6 @@ object StatPage : SimplePanel() {
                 marginTop = 5.px
             }
 
-
             flexPanel(
                 FlexDirection.ROW, FlexWrap.WRAP, JustifyContent.SPACEBETWEEN, AlignItems.CENTER,
             ) {
@@ -78,7 +77,7 @@ object StatPage : SimplePanel() {
                     listOf(),
                     setOf(TableType.BORDERED, TableType.SMALL)
                 ) {
-                    id = "CpntrolPanel-Table"
+                    id = "ControlPanel-Table"
                     // Star tdate
                     row {
                         id = "First row"
@@ -170,7 +169,7 @@ object StatPage : SimplePanel() {
 
                         cell { +"Visa:" }
                         cell {
-                            val selectedPreSelectLabel = state.statPreSelect
+                            val selectedPreSelectLabel = state.statPreSelectLabel
                             val options =
                                 if (state.isPlattformSelected(3)) {
                                     if (state.statAdvancedMode)
@@ -182,7 +181,7 @@ object StatPage : SimplePanel() {
                                         StatPreSelect.mapp
                                             .filter { it.value.simpleViewDisplay != null }
                                             .map { Pair(it.key, it.value.getLabel(state.statAdvancedMode)) }
-                                } else listOf(Pair("Alla", "Alla"))
+                                } else listOf(Pair("-", "-"))
                             simpleSelectInput(
                                 options = options,
                                 value = selectedPreSelectLabel
@@ -191,7 +190,7 @@ object StatPage : SimplePanel() {
                                 background = Background(Color.name(Col.WHITE))
                             }.onEvent {
                                 change = {
-                                    val selectedPreSelectLabel: String = self.value ?: "Alla"
+                                    val selectedPreSelectLabel: String = self.value ?: "default"
                                     selectPreSelect(selectedPreSelectLabel = selectedPreSelectLabel)
                                 }
                             }
@@ -204,12 +203,11 @@ object StatPage : SimplePanel() {
                                 println("In showTechnicalTerms, value = $value")
                                 store.dispatch(HippoAction.ShowTechnicalTerms(value))
                                 if (!value) { // Restore labels for current preselect
-                                    store.dispatch(HippoAction.PreSelectedSelected(state.statPreSelect))
+                                    store.dispatch(HippoAction.PreSelectedSet(state.statPreSelect!!))
                                 }
                             }
                             +" Tekniska termer"
                         }
-
                     }
                 }
 
@@ -247,7 +245,7 @@ object StatPage : SimplePanel() {
 
             val headingText: String =
                 if (state.statAdvancedMode) "Totalt antal anrop för detta urval är: $tCalls"
-                else "${StatPreSelect.mapp[state.statPreSelect]!!.getLabel(false)}: $tCalls anrop"
+                else "${StatPreSelect.mapp[state.statPreSelectLabel]!!.getLabel(false)}: $tCalls anrop"
 
             h4 {
                 content = headingText
@@ -313,7 +311,7 @@ object StatPage : SimplePanel() {
 
         println("Will change to plattformId = $selectedTp")
 
-        store.dispatch(HippoAction.PreSelectedSelected("Alla"))
+        store.dispatch(HippoAction.PreSelectedLabelSet("default"))
         store.dispatch(HippoAction.ItemIdDeselectedAll(ItemType.PLATTFORM_CHAIN))
         store.dispatch(HippoAction.ItemDeselectedAllForAllTypes)
         //store.dispatch { dispatch, getState ->
@@ -327,21 +325,7 @@ object StatPage : SimplePanel() {
         loadStatistics(store.getState())
     }
 
-    private fun selectPreSelect(selectedPreSelectLabel: String) {
-        println("Selected pre-select: '$selectedPreSelectLabel'")
-        store.dispatch(HippoAction.PreSelectedSelected(selectedPreSelectLabel))
-        if (store.getState().showTechnicalTerms) { // Restore technical labels
-            store.dispatch(HippoAction.ShowTechnicalTerms(store.getState().showTechnicalTerms))
-        }
-        store.dispatch(HippoAction.ItemDeselectedAllForAllTypes)
-        val selectedItemsMap = StatPreSelect.mapp[selectedPreSelectLabel]!!.selectedItemsMap
-        for ((itemType, itemIdList) in selectedItemsMap) {
-            itemIdList.forEach {
-                store.dispatch(HippoAction.ItemIdSelected(itemType, it))
-            }
-        }
-        loadStatistics(store.getState())
-    }
+
 
     private fun selectMode(setAdvancedMode: Boolean) {
         val state = store.getState()
@@ -356,12 +340,12 @@ object StatPage : SimplePanel() {
         store.dispatch(HippoAction.StatAdvancedMode(setAdvancedMode))
 
         // Evalutate which pre-select should be used
-        val currentPreSelectLabel = state.statPreSelect
+        val currentPreSelectLabel = state.statPreSelectLabel
         var newPreSelectLabel: String = currentPreSelectLabel
         val currentPreSelect = StatPreSelect.mapp[currentPreSelectLabel]!!
 
-        if (setAdvancedMode && (!currentPreSelect.showInAdvancedView)) newPreSelectLabel = "Alla"
-        if ((!setAdvancedMode) && (!currentPreSelect.showInSimpleView)) newPreSelectLabel = "Alla"
+        if (setAdvancedMode && (!currentPreSelect.showInAdvancedView)) newPreSelectLabel = "default"
+        if ((!setAdvancedMode) && (!currentPreSelect.showInSimpleView)) newPreSelectLabel = "default"
 
         println("Current preSelect=$currentPreSelectLabel, newPreselect=$newPreSelectLabel")
         if (newPreSelectLabel != currentPreSelectLabel) selectPreSelect(newPreSelectLabel)

@@ -77,7 +77,7 @@ object SimpleView : SimplePanel(
 
                 //val itemType: ItemType = ItemType.CONSUMER
                 // todo: Make the !! go away
-                val currentPreSelect: StatPreSelect = StatPreSelect.mapp[state.statPreSelect]!!
+                val currentPreSelect: StatPreSelect = StatPreSelect.mapp[state.statPreSelectLabel]!!
                 val itemType: ItemType = currentPreSelect.simpleViewDisplay!!
 
                 val itemSInfoList: SInfoList

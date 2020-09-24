@@ -18,6 +18,7 @@ package se.skoview.common
 
 import pl.treksoft.kvision.redux.RAction
 import se.skoview.hippo.IntegrationLists
+import se.skoview.stat.StatPreSelect
 
 /** According to: https://github.com/redux-utilities/flux-standard-action
  * An action object should have a type and contain:
@@ -67,6 +68,7 @@ sealed class HippoAction : RAction {
     data class SetVMax(val type: ItemType, val size: Int): HippoAction()
     data class ShowTimeGraph(val isShown: Boolean): HippoAction()
     data class ShowTechnicalTerms(val isShown: Boolean): HippoAction()
-    data class PreSelectedSelected(val label: String): HippoAction()
+    //data class PreSelectedLabelSet(val label: String): HippoAction()
+    data class PreSelectedSet(val preSelect: StatPreSelect): HippoAction()
     data class StatAdvancedMode(val isAdvanced: Boolean): HippoAction()
 }

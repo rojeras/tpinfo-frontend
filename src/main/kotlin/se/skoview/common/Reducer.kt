@@ -17,7 +17,6 @@
 package se.skoview.common
 
 import se.skoview.common.PlattformChain.Companion.calculateId
-import se.skoview.stat.StatPreSelect
 import se.skoview.stat.StatisticsBlob
 
 fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
@@ -277,13 +276,19 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
                 laLabel = "Logiska adresser"
             )
         }
-        is HippoAction.PreSelectedSelected -> {
-            val preName = action.label
-            val preObject = StatPreSelect.mapp[preName]
-            val preLabelMap = preObject!!.labelMap
+        /*
+        is HippoAction.PreSelectedLabelSet -> {
+           state.copy(
+                statPreSelectLabel = action.label,
+            )
+        }
+         */
+        is HippoAction.PreSelectedSet -> {
+            val preObject = action.preSelect
+            val preLabelMap = preObject.labelMap
 
             state.copy(
-                statPreSelect = action.label,
+                statPreSelectLabel = preObject.getLabel(state.statAdvancedMode),
                 consumerLabel = preLabelMap[ItemType.CONSUMER]!!,
                 contractLabel = preLabelMap[ItemType.CONTRACT]!!,
                 producerLabel = preLabelMap[ItemType.PRODUCER]!!,

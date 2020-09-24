@@ -30,7 +30,7 @@ import se.skoview.hippo.HippoTablePage
 import se.skoview.hippo.setUrlFilter
 import se.skoview.stat.StatPage
 import se.skoview.stat.StatPreSelect
-import se.skoview.stat.loadStatistics
+import se.skoview.stat.selectPreSelect
 
 /**
 Övergripande tankar inför sommaruppehållet 2020
@@ -208,8 +208,9 @@ class App : Application() {
     fun startStat() {
         store.dispatch(HippoAction.ApplicationStarted(HippoApplication.STATISTIK))
         StatPreSelect.initialize()
-        store.dispatch(HippoAction.PreSelectedSelected("Alla"))
-        loadStatistics(store.getState())
+        //store.dispatch(HippoAction.PreSelectedLabelSet("Alla"))
+        //loadStatistics(store.getState())
+        selectPreSelect("default")
         //loadHistory(store.getState())
         root("hippo") {
             vPanel {

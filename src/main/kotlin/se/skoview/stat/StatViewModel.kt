@@ -21,7 +21,6 @@ import pl.treksoft.kvision.core.Color
 import pl.treksoft.kvision.data.BaseDataComponent
 import se.skoview.common.*
 
-
 class SInfoRecord(
     val itemType: ItemType,
     val itemId: Int,
@@ -31,19 +30,6 @@ class SInfoRecord(
 ) {
     var color: Color = Color.name(Col.BLACK)
 
-    /*
-    val color: Color =
-        when (itemType) {
-            ItemType.CONSUMER -> Color.hex(ServiceComponent.map[itemId]!!.colorValue)
-            ItemType.CONTRACT -> Color.hex(ServiceContract.map[itemId]!!.colorValue)
-            ItemType.PRODUCER -> Color.hex(ServiceComponent.map[itemId]!!.colorValue)
-            ItemType.LOGICAL_ADDRESS -> Color.hex(LogicalAddress.map[itemId]!!.colorValue)
-            else -> {
-                println("Error in SInfoRecord, ItemType = $itemType")
-                Color.name(Col.BLACK)
-            }
-        }
-    */
 }
 
 class SInfoList(private val itemType: ItemType) {
@@ -53,6 +39,7 @@ class SInfoList(private val itemType: ItemType) {
     fun callList(): List<Int> {
         return recordList.map { it.calls }
     }
+
 
     // todo: Maybe this is the correct place to return the Google chart colors in the right order
     fun colorList(): List<Color> {
@@ -64,7 +51,7 @@ class SInfoList(private val itemType: ItemType) {
         return recordList.map { it.description }
     }
 
-    fun populate(ackMap: Map<Int, Int>, showSynonyms: Boolean) {
+    fun populate(state: HippoState, ackMap: Map<Int, Int>, showSynonyms: Boolean) {
         // Will go via a temp collection
         val ackMapTmp = ackMap.toList().sortedBy { (_, value) -> value }.reversed().toMap()
         val callsTmp = mutableListOf<SInfoRecord>()
@@ -99,6 +86,7 @@ class SInfoList(private val itemType: ItemType) {
                 else -> error("Unknown itemType in populate()!")
             }
             //println("${item!!.description} has calls: ${ackMapTmp[entry.key]}")
+
             callsTmp.add(
                 SInfoRecord(
                     this.itemType,
@@ -141,10 +129,10 @@ object SInfo : BaseDataComponent() {
     var contractSInfoList = SInfoList(ItemType.CONTRACT)
 
     fun createStatViewData(state: HippoState) {
-        consumerSInfoList.populate(state.statBlob.callsConsumer, !state.showTechnicalTerms)
-        producerSInfoList.populate(state.statBlob.callsProducer, !state.showTechnicalTerms)
-        logicalAddressSInfoList.populate(state.statBlob.callsLogicalAddress, !state.showTechnicalTerms)
-        contractSInfoList.populate(state.statBlob.callsContract, !state.showTechnicalTerms)
+        consumerSInfoList.populate(state, state.statBlob.callsConsumer, !state.showTechnicalTerms)
+        producerSInfoList.populate(state, state.statBlob.callsProducer, !state.showTechnicalTerms)
+        logicalAddressSInfoList.populate(state, state.statBlob.callsLogicalAddress, !state.showTechnicalTerms)
+        contractSInfoList.populate(state, state.statBlob.callsContract, !state.showTechnicalTerms)
 
     }
 }

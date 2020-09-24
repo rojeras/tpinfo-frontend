@@ -18,6 +18,8 @@ package se.skoview.stat
 
 import com.github.snabbdom._get
 import pl.treksoft.kvision.chart.*
+import pl.treksoft.kvision.core.*
+import pl.treksoft.kvision.html.Div
 import pl.treksoft.kvision.panel.SimplePanel
 import pl.treksoft.kvision.table.TableType
 import pl.treksoft.kvision.tabulator.*
@@ -66,30 +68,11 @@ open class ChartLabelTable(
     dataField: String = "description",
     colorField: String = "color",
     callsField: String = "calls",
+    //formatterField: String = "formatter",
     heading: String
 ) : SimplePanel() {
     init {
         id = "ChartLabelTable: SimpleTable"
-        // Color or red cross if item is selected
-        val firstCol =
-            if (
-                itemSInfoList.size == 1 &&
-                store.getState().isItemSelected(itemType, itemSInfoList[0].itemId)
-            )
-                ColumnDefinition(
-                    headerSort = false,
-                    title = "",
-                    width = "(0.3).px",
-                    formatter = Formatter.BUTTONCROSS
-                )
-            else
-                ColumnDefinition<Any>(
-                    headerSort = false,
-                    title = "",
-                    field = colorField,
-                    width = "(0.3).px",
-                    formatter = Formatter.COLOR
-                )
 
         // Footer pagination buttons hidden through CSS
         tabulator(
@@ -105,7 +88,14 @@ open class ChartLabelTable(
                 paginationButtonCount = 0,
                 selectable = true,
                 columns = listOf(
-                    firstCol,
+                    //firstCol,
+                    ColumnDefinition<Any>(
+                        headerSort = false,
+                        title = "",
+                        field = colorField,
+                        width = "(0.3).px",
+                        formatter = Formatter.COLOR
+                    ),
                     ColumnDefinition(
                         headerSort = false,
                         title = "$heading (${itemSInfoList.size})",
@@ -113,12 +103,25 @@ open class ChartLabelTable(
                         //topCalc = Calc.COUNT,
                         topCalcFormatter = Formatter.COLOR,
                         headerFilter = Editor.INPUT,
-                        //headerFilterPlaceholder = "Sök ${heading.toLowerCase()}",
-                        headerFilterPlaceholder = "Sök...",
+                        headerFilterPlaceholder = "Sök ${heading.toLowerCase()}",
+                        //headerFilterPlaceholder = "Sök...",
                         editable = { false },
                         //width = "20.vw",
                         widthGrow = 3,
-                        formatter = Formatter.TEXTAREA
+                        //formatter = Formatter.TEXTAREA,
+                        formatterComponentFunction = { _, _, item ->
+                            val itemRecord = item as SInfoRecord
+                            Div {
+                                if (store.getState().isItemSelected(itemRecord.itemType, itemRecord.itemId)) {
+                                    background = Background(Color.name(Col.LIGHTPINK))
+                                    fontWeight = FontWeight.BOLD
+                                }
+                                whiteSpace = WhiteSpace.PREWRAP
+                                wordBreak = WordBreak.BREAKALL
+                                +itemRecord.description
+                            }
+                        }
+
                     ),
                     ColumnDefinition(
                         widthGrow = 1,
@@ -136,18 +139,25 @@ open class ChartLabelTable(
             )
         )
             .apply {
-            //height = 50.vh
+                //height = 50.vh
                 height = 100.perc
-        }
+            }
     }
 }
 
 fun itemSelectDeselect(itemId: Int, itemType: ItemType) {
+    println("In itemSelectDeselect()")
+    //store.dispatch(HippoAction.PreSelectedLabelSet("default"))
     if (store.getState().isItemSelected(itemType, itemId)) {
         // De-select of an item
-        store.dispatch(HippoAction.PreSelectedSelected("Alla"))
-        store.dispatch(HippoAction.ItemIdDeselectedAll(itemType))
-        loadStatistics(store.getState())
+        // If we deselect an item which is part of the current PreSelect, then restore the default view
+        if (store.getState().statPreSelect!!.selectedItemsMap[itemType]!!.contains(itemId))
+            selectPreSelect("default")
+        else {
+            store.dispatch(HippoAction.ItemIdDeselected(itemType, itemId))
+            loadStatistics(store.getState())
+        }
+//        store.dispatch(HippoAction.ItemIdDeselectedAll(itemType))
     } else {
         // Select an item
         store.dispatch(HippoAction.StatAdvancedMode(true))

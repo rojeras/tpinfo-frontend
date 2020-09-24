@@ -16,6 +16,8 @@
  */
 package se.skoview.stat
 
+import se.skoview.app.store
+import se.skoview.common.HippoAction
 import se.skoview.common.ItemType
 
 data class StatPreSelect(
@@ -29,7 +31,7 @@ data class StatPreSelect(
 
 ) {
     fun getLabel(advancedMode: Boolean) =
-        if ((!advancedMode) && simpleLabel != null)            simpleLabel
+        if ((!advancedMode) && simpleLabel != null) simpleLabel
         else
             label
 
@@ -43,7 +45,7 @@ data class StatPreSelect(
 
         fun initialize() {
             StatPreSelect(
-                label = "Alla",
+                label = "Allt",
                 simpleLabel = "Alla konsumerande tjänster",
                 selectedItemsMap = hashMapOf(),
                 labelMap = hashMapOf(
@@ -124,6 +126,31 @@ data class StatPreSelect(
             )
         }
     }
+}
+
+fun selectPreSelect(selectedPreSelectLabel: String) {
+    println("Selected pre-select: '$selectedPreSelectLabel'")
+
+    val preLabel =
+        if (selectedPreSelectLabel.equals("default")) "Allt"
+        else selectedPreSelectLabel
+
+    val preSelect = StatPreSelect.mapp[preLabel]!!
+    store.dispatch(HippoAction.PreSelectedSet(preSelect))
+
+    if (store.getState().showTechnicalTerms) { // Restore technical labels
+        store.dispatch(HippoAction.ShowTechnicalTerms(store.getState().showTechnicalTerms))
+    }
+
+    store.dispatch(HippoAction.ItemDeselectedAllForAllTypes)
+
+    val selectedItemsMap = preSelect.selectedItemsMap
+    for ((itemType, itemIdList) in selectedItemsMap) {
+        itemIdList.forEach {
+            store.dispatch(HippoAction.ItemIdSelected(itemType, it))
+        }
+    }
+    loadStatistics(store.getState())
 }
 
 
