@@ -20,7 +20,7 @@ import se.skoview.app.store
 import se.skoview.common.HippoAction
 import se.skoview.common.ItemType
 
-data class StatPreSelect(
+data class AdvancedPreSelect(
     val label: String,
     val simpleLabel: String? = null,
     val selectedItemsMap: HashMap<ItemType, List<Int>>, // = hashMapOf<ItemType, List<Int>>()
@@ -41,10 +41,10 @@ data class StatPreSelect(
     }
 
     companion object {
-        val mapp = mutableMapOf<String, StatPreSelect>()
+        val mapp = mutableMapOf<String, AdvancedPreSelect>()
 
         fun initialize() {
-            StatPreSelect(
+            AdvancedPreSelect(
                 label = "Allt",
                 simpleLabel = "Alla konsumerande tjänster",
                 selectedItemsMap = hashMapOf(),
@@ -58,7 +58,7 @@ data class StatPreSelect(
                 showInSimpleView = true,
                 showInAdvancedView = true
             )
-            StatPreSelect(
+            AdvancedPreSelect(
                 label = "--",
                 simpleLabel = "Anropade producerande tjänster",
                 selectedItemsMap = hashMapOf(),
@@ -72,7 +72,7 @@ data class StatPreSelect(
                 showInSimpleView = true,
                 showInAdvancedView = false
             )
-            StatPreSelect(
+            AdvancedPreSelect(
                 label = "Bokade tider",
                 selectedItemsMap = hashMapOf(ItemType.CONTRACT to listOf(117, 118, 114)),
                 labelMap = hashMapOf(
@@ -85,7 +85,7 @@ data class StatPreSelect(
                 showInSimpleView = true,
                 showInAdvancedView = true
             )
-            StatPreSelect(
+            AdvancedPreSelect(
                 label = "Journalen",
                 selectedItemsMap = hashMapOf(ItemType.CONSUMER to listOf(865)),
                 labelMap = hashMapOf(
@@ -98,7 +98,7 @@ data class StatPreSelect(
                 showInSimpleView = true,
                 showInAdvancedView = true
             )
-            StatPreSelect(
+            AdvancedPreSelect(
                 label = "Nationell patientöversikt (NPÖ)",
                 selectedItemsMap = hashMapOf(ItemType.CONSUMER to listOf(434, 693)),
                 labelMap = hashMapOf(
@@ -111,7 +111,7 @@ data class StatPreSelect(
                 showInSimpleView = true,
                 showInAdvancedView = true
             )
-            StatPreSelect(
+            AdvancedPreSelect(
                 label = "Remisser",
                 selectedItemsMap = hashMapOf(ItemType.CONTRACT to listOf(215)),
                 labelMap = hashMapOf(
@@ -135,7 +135,7 @@ fun selectPreSelect(selectedPreSelectLabel: String) {
         if (selectedPreSelectLabel.equals("default")) "Allt"
         else selectedPreSelectLabel
 
-    val preSelect = StatPreSelect.mapp[preLabel]!!
+    val preSelect = AdvancedPreSelect.mapp[preLabel]!!
     store.dispatch(HippoAction.PreSelectedSet(preSelect))
 
     if (store.getState().showTechnicalTerms) { // Restore technical labels
