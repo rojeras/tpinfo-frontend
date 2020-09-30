@@ -21,6 +21,11 @@ import pl.treksoft.kvision.core.Color
 import pl.treksoft.kvision.data.BaseDataComponent
 import se.skoview.common.*
 
+object STAT_CONSTANTS {
+    val TP_ID = hashMapOf<String, Int>("SLL-PROD" to 3, "SLL-QA" to 4)
+}
+
+
 class SInfoRecord(
     val itemType: ItemType,
     val itemId: Int,

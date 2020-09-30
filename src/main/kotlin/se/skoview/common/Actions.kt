@@ -18,7 +18,8 @@ package se.skoview.common
 
 import pl.treksoft.kvision.redux.RAction
 import se.skoview.hippo.IntegrationLists
-import se.skoview.stat.StatPreSelect
+import se.skoview.stat.AdvancedViewPreSelect
+import se.skoview.stat.SimpleViewPreSelect
 
 /** According to: https://github.com/redux-utilities/flux-standard-action
  * An action object should have a type and contain:
@@ -39,36 +40,25 @@ sealed class HippoAction : RAction {
     ) : HippoAction()
     data class DoneDownloadStatistics(
         val statisticsArrArr: Array<Array<Int>>
-        /*
-        val callsConsumer: Map<Int, Int>,
-        val callsProducer: Map<Int, Int>,
-        val callsLogicalAddress: Map<Int, Int>,
-        val callsDomain: Map<Int, Int>,
-        val callsContract: Map<Int, Int>
-         */
     ) : HippoAction()
     data class DoneDownloadHistory(
         val historyMap: Map<String, Int>
     ): HippoAction()
     data class ErrorDownloadIntegrations(val errorMessage: String) : HippoAction()
     data class DateSelected(val dateType: DateType, val selectedDate: String) : HippoAction()
+    data class StatTpSelected(val tpId: Int) : HippoAction()
     data class ItemIdSelected(
         val viewType: ItemType,
         val id: Int
     ) : HippoAction()
-    data class ItemIdDeselected(
-        val viewType: ItemType,
-        val id: Int
-    ): HippoAction()
-    data class ItemIdDeselectedAll(
-        val viewType: ItemType
-    ): HippoAction()
-    object ItemDeselectedAllForAllTypes: HippoAction()
+    data class ItemIdDeselected( val viewType: ItemType, val id: Int ): HippoAction()
+    //data class ItemIdDeselectedAll( val viewType: ItemType ): HippoAction()
+    //object ItemDeselectedAllForAllTypes: HippoAction()
     data class ViewUpdated(val integrationLists: IntegrationLists) : HippoAction()
     data class SetVMax(val type: ItemType, val size: Int): HippoAction()
     data class ShowTimeGraph(val isShown: Boolean): HippoAction()
     data class ShowTechnicalTerms(val isShown: Boolean): HippoAction()
-    //data class PreSelectedLabelSet(val label: String): HippoAction()
-    data class PreSelectedSet(val preSelect: StatPreSelect): HippoAction()
-    data class StatAdvancedMode(val isAdvanced: Boolean): HippoAction()
+    data class SetViewMode(val viewMode: ViewMode): HippoAction()
+    data class SetSimpleViewPreselect(val preSelect: SimpleViewPreSelect): HippoAction()
+    data class SetAdvancedViewPreselect(val preSelect: AdvancedViewPreSelect): HippoAction()
 }

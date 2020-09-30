@@ -17,7 +17,8 @@
 package se.skoview.common
 
 import se.skoview.hippo.parseBookmark
-import se.skoview.stat.StatPreSelect
+import se.skoview.stat.AdvancedViewPreSelect
+import se.skoview.stat.SimpleViewPreSelect
 import se.skoview.stat.StatisticsBlob
 import kotlin.reflect.KClass
 
@@ -39,6 +40,11 @@ enum class HippoApplication {
     STATISTIK
 }
 
+enum class ViewMode {
+    SIMPLE,
+    ADVANCED
+}
+
 //@Serializable
 data class HippoState(
     // Status information
@@ -49,6 +55,7 @@ data class HippoState(
     val errorMessage: String?,
 
     // Base Items
+    // todo: Why are the base items stored via the state? Ought to be enough to register when they are loaded.
     val integrationDates: List<String>,
     val statisticsDates: List<String>,
     val serviceComponents: Map<Int, ServiceComponent>,
@@ -100,14 +107,9 @@ data class HippoState(
 
     // View controllers
     val showTechnicalTerms: Boolean,
-    val statAdvancedMode: Boolean,
-    val statPreSelectLabel: String,
-    val statPreSelect: StatPreSelect?,
-    val consumerLabel: String,
-    val contractLabel: String,
-    val producerLabel: String,
-    val laLabel: String
-
+    val viewMode: ViewMode,
+    val simpleViewPreSelect: SimpleViewPreSelect,
+    val advancedViewPreSelect: AdvancedViewPreSelect?
 )
 
 // This function creates the initial state based on an option filter parameter in the URL
@@ -158,13 +160,9 @@ fun initialHippoState(): HippoState {
         mapOf(),
         false,
         false,
-        true, // TEMP
-        "Allt",
-        null,
-        "",
-        "",
-        "",
-        ""
+        ViewMode.ADVANCED, // TEMP
+        SimpleViewPreSelect.getDefault(),
+        null
     )
 }
 

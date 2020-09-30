@@ -17,10 +17,10 @@
 package se.skoview.common
 
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonConfiguration
 import pl.treksoft.kvision.redux.ReduxStore
-import kotlinx.serialization.builtins.*
+import kotlin.collections.component1
+import kotlin.collections.component2
+import kotlin.collections.set
 
 fun loadBaseItems(store: ReduxStore<HippoState, HippoAction>) {
     println("Will now load BaseItems")
@@ -427,23 +427,22 @@ data class StatisticsPlattform(
     val platform: String,
     val environment: String,
     override val synonym: String? = null
-) :
-    BaseItem() {
-    var colorValue: Int = (0..(256*256*256)-1).random()
+): BaseItem() {
+   //var colorValue: Int = (0..(256*256*256)-1).random()
     override val name: String = "$platform-$environment"
     override val description = ""
     override val searchField: String = name
     override fun toString(): String = name
 
     init {
-        map[id] = this
+        mapp[id] = this
 
-        if (id > StatisticsPlattform.maxId) StatisticsPlattform.maxId = id
+        //if (id > StatisticsPlattform.maxId) StatisticsPlattform.maxId = id
     }
 
     companion object {
-        val map = hashMapOf<Int, StatisticsPlattform>()
-        var maxId = 0
+        val mapp = hashMapOf<Int, StatisticsPlattform>()
+        //var maxId = 0
         var isLoaded = false
 
         fun load(callback: () -> Unit) {
@@ -452,15 +451,15 @@ data class StatisticsPlattform(
                 val id: Int,
                 val platform: String,
                 val environment: String,
-                val snapshotTime: String,
-                val synonym: String
+                //val snapshotTime: String,
+                //val synonym: String
             )
 
             val type = "statPlattforms"
             getAsyncTpDb(type) { response ->
                 val items = JSON.parse<Array<StatisticsPlattformJsonParse>>(response)
                 items.forEach { item ->
-                    StatisticsPlattform(item.id, item.platform, item.environment, item.synonym)
+                    StatisticsPlattform(item.id, item.platform, item.environment/*, item.synonym*/)
                 }
                 isLoaded = true
                 callback()

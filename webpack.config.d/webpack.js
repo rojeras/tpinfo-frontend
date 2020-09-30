@@ -5,7 +5,7 @@ if (config.devServer) {
         warnings: false
     };
     config.devServer.clientLogLevel = 'error';
-    config.devtool = 'eval-cheap-source-map';
+    //config.devtool = 'eval-cheap-source-map';
     config.devServer.host = '0.0.0.0';
 }
 

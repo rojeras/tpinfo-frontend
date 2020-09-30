@@ -17,9 +17,6 @@
 package se.skoview.stat
 
 import pl.treksoft.kvision.chart.Chart
-import pl.treksoft.kvision.core.Background
-import pl.treksoft.kvision.core.Col
-import pl.treksoft.kvision.core.Color
 import pl.treksoft.kvision.core.Overflow
 import pl.treksoft.kvision.html.div
 import pl.treksoft.kvision.panel.SimplePanel
@@ -36,14 +33,14 @@ import se.skoview.common.getHeightToRemainingViewPort
 object SimpleView : SimplePanel(
 ) {
     init {
+        println("In the simple view")
         id = "TheSimpleView:SimplePanel"
         //background = Background(Color.name(Col.RED))
         //height = 100.perc
         div { }.bind(store) { state ->
             id = "TheSimpleView:SimplePanel-Bind"
             height = 100.perc
-            background = Background(Color.name(Col.LIGHTBLUE))
-
+            //background = Background(Color.name(Col.LIGHTBLUE))
 
             flexPanel(
             ) {
@@ -64,7 +61,7 @@ object SimpleView : SimplePanel(
                 setStyle("height", getHeightToRemainingViewPort(statPageTop, 40))
 
                 height = 100.perc
-                background = Background(Color.name(Col.YELLOW))
+                //background = Background(Color.name(Col.YELLOW))
 
                 SInfo.createStatViewData(state)
 
@@ -74,36 +71,38 @@ object SimpleView : SimplePanel(
                     } else {
                         -1
                     }
-
+                println("Time to check preselect")
                 //val itemType: ItemType = ItemType.CONSUMER
                 // todo: Make the !! go away
-                val currentPreSelect: StatPreSelect = StatPreSelect.mapp[state.statPreSelectLabel]!!
-                val itemType: ItemType = currentPreSelect.simpleViewDisplay!!
+                //val currentPreSelect: StatPreSelect = StatPreSelect.mapp[state.statPreSelectLabel]!!
+                println("A")
+                val preSelect: SimpleViewPreSelect = store.getState().simpleViewPreSelect
+                //val preSelect: PreSelect = PreSelect.getDefault(VIEW_MODE.SIMPLE)
+                println("B")
+                console.log(preSelect)
+                println("C")
+                val showItemType: ItemType = preSelect.simpleModeViewOrder[0]
 
                 val itemSInfoList: SInfoList
-                val label: String
+                val label: String = state.simpleViewPreSelect.label
 
-                when (itemType) {
+                println("Before when")
+                when (showItemType) {
                     ItemType.CONSUMER -> {
                         itemSInfoList = SInfo.consumerSInfoList
-                        label = state.consumerLabel
                     }
                     ItemType.CONTRACT -> {
                         itemSInfoList = SInfo.contractSInfoList
-                        label = state.contractLabel
                     }
                     ItemType.PRODUCER -> {
                         itemSInfoList = SInfo.producerSInfoList
-                        label = state.producerLabel
                     }
                     ItemType.LOGICAL_ADDRESS -> {
                         itemSInfoList = SInfo.logicalAddressSInfoList
-                        label = state.laLabel
                     }
                     else -> {
-                        println("ERROR in TheSimpleView, itemType = $itemType")
+                        println("ERROR in TheSimpleView, itemType = $showItemType")
                         itemSInfoList = SInfo.consumerSInfoList
-                        label = state.consumerLabel
                     }
                 }
 
@@ -111,7 +110,7 @@ object SimpleView : SimplePanel(
                 val pieChart =
                     Chart(
                         getPieChartConfig(
-                            itemType,
+                            showItemType,
                             itemSInfoList,
                             animationTime = animateTime,
                             responsive = true,
@@ -125,24 +124,24 @@ object SimpleView : SimplePanel(
                         height = 80.perc
                         marginTop = 6.vw
                         marginLeft = 5.vw
-                        background = Background(Color.name(Col.ALICEBLUE))
+                        //background = Background(Color.name(Col.ALICEBLUE))
                     }, grow = 1
                 )
 
                 add(
                     ChartLabelTable(
-                        itemType,
+                        showItemType,
                         itemSInfoList.recordList,
                         "description",
                         "color",
                         "calls",
-                        label
+                       label
                     ).apply {
                         id = "TheSimpleViewChartLabelTable:ChartLabelTable"
                         height = 97.perc
                         width = 40.vw
                         margin = 1.vw
-                        background = Background(Color.name(Col.LIGHTPINK))
+                        //background = Background(Color.name(Col.LIGHTPINK))
                     }, grow = 1
                 )
             }

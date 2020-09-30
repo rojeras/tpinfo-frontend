@@ -29,19 +29,12 @@ import se.skoview.common.*
 import se.skoview.hippo.HippoTablePage
 import se.skoview.hippo.setUrlFilter
 import se.skoview.stat.StatPage
-import se.skoview.stat.StatPreSelect
-import se.skoview.stat.selectPreSelect
+import se.skoview.stat.loadStatistics
 
 /**
 Övergripande tankar inför sommaruppehållet 2020
  v Red ut redux-thunk. Bör kunna göra mycket av dispatchandet enklare och centrerat. Nu sker för mycket ute lokalt i komponenterna.
  v https://daveceddia.com/what-is-a-thunk/ - Behövs troligen inte nu när vi jobbar i Kotlin. Ropa på funktionen direkt
- - Måste reda ut trigger för när tidsgrafen ska visas. Ska det vara checkboxen självt eller det faktum att det finns historiskt data tillgängligt
- - Linejegrafen måste animeras när nytt data blir tillgängligt, se https://www.chartjs.org/samples/latest/scales/logarithmic/line.html
- - Radio buttons för att styra om synonymer ska visas
- - Förval - jobb påbörjat i StatPreSelect.kt
- - Sedan saknas bara knappen för "ladda ner fil"
-
 */
 
 
@@ -69,21 +62,23 @@ import se.skoview.stat.selectPreSelect
 
 // Statistik
 
+// todo: Kolla varför pekaren försvunnit i hippo
 // todo: Testa med andra browsers, inte minst Edge (ML 2020-09-17)
-// todo: Förtydliga vad som valt genom att även färga raden (i tillägg till det röda krysset)
 // todo: Måste få BACK-pil att fungera (ML 2020-09-17)
 // todo: Prestanda! (ML 2020-09-17)
 // todo: Simple view blinks when selecting preSelects
-// todo: Select of a already preselected item de-selects all items of same type
-// todo: Förvalen måste återställas till default om användaren väljer bort något av de förvalda objekten
 // todo: Knapp för att komma till hippo
-// todo: Väljer man item som är del av en preselect så försvinner valet. Kolla Remissvyn.
 // todo: Fixa "about" för statistiken
 // todo: Se över synonymerna. Måste passa med de olika förvalen
 // todo: Begränsa datumlistorna så att man inte kan välja start/slutdatum "på vel sida" om varandra
 // todo: URL-hantering. Driftsättning och koppling till proxy
+// todo: A more intelligent way to decide when to do a loadStatistics()
 // todo: Och så visa svarstider
 // todo: Dokumentation
+// done: Väljer man item som är del av en preselect så försvinner valet. Kolla Remissvyn.
+// done: Select of a already preselected item de-selects all items of same type
+// done: Förvalen måste återställas till default om användaren väljer bort något av de förvalda objekten
+// done: Förtydliga vad som valt genom att även färga raden (i tillägg till det röda krysset)
 // done: Om förvalen baseras på konsumenter och producenter måste det anges separat för de olika plattformarna. Eller tas bort helt för QA.
 // done: Förval blir fel när man går från advanced -> simple mode (ML 2020-09-17)
 // done: Visa hur många rader det finns i varje tabulatortabell.
@@ -161,7 +156,9 @@ fun main() {
 
 class App : Application() {
     init {
+        println("1")
         require("css/hippo.css")
+        println("2")
     }
 
 
@@ -207,10 +204,8 @@ class App : Application() {
 
     fun startStat() {
         store.dispatch(HippoAction.ApplicationStarted(HippoApplication.STATISTIK))
-        StatPreSelect.initialize()
         //store.dispatch(HippoAction.PreSelectedLabelSet("Alla"))
-        //loadStatistics(store.getState())
-        selectPreSelect("default")
+        loadStatistics(store.getState())
         //loadHistory(store.getState())
         root("hippo") {
             vPanel {

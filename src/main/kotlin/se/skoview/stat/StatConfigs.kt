@@ -27,6 +27,7 @@ import pl.treksoft.kvision.utils.perc
 import se.skoview.app.store
 import se.skoview.common.HippoAction
 import se.skoview.common.ItemType
+import se.skoview.common.ViewMode
 import se.skoview.common.isItemSelected
 
 fun getPieChartConfig(
@@ -109,12 +110,13 @@ open class ChartLabelTable(
                         //width = "20.vw",
                         widthGrow = 3,
                         //formatter = Formatter.TEXTAREA,
-                        formatterComponentFunction = { _, _, item ->
+                        formatterComponentFunction = { cell, _, item ->
                             val itemRecord = item as SInfoRecord
                             Div {
                                 if (store.getState().isItemSelected(itemRecord.itemType, itemRecord.itemId)) {
-                                    background = Background(Color.name(Col.LIGHTPINK))
+                                    //background = Background(Color.name(Col.LIGHTPINK))
                                     fontWeight = FontWeight.BOLD
+                                    cell.apply { background = Background(Color.name(Col.YELLOW)) }
                                 }
                                 whiteSpace = WhiteSpace.PREWRAP
                                 wordBreak = WordBreak.BREAKALL
@@ -145,23 +147,27 @@ open class ChartLabelTable(
     }
 }
 
-fun itemSelectDeselect(itemId: Int, itemType: ItemType) {
+private fun itemSelectDeselect(itemId: Int, itemType: ItemType) {
     println("In itemSelectDeselect()")
     //store.dispatch(HippoAction.PreSelectedLabelSet("default"))
     if (store.getState().isItemSelected(itemType, itemId)) {
         // De-select of an item
         // If we deselect an item which is part of the current PreSelect, then restore the default view
-        if (store.getState().statPreSelect!!.selectedItemsMap[itemType]!!.contains(itemId))
-            selectPreSelect("default")
-        else {
+        //if (store.getState().preSelect!!.selectedItemsMap[itemType]!!.contains(itemId))
+        //selectPreSelect("default")
+        //else {
             store.dispatch(HippoAction.ItemIdDeselected(itemType, itemId))
             loadStatistics(store.getState())
-        }
+        //}
 //        store.dispatch(HippoAction.ItemIdDeselectedAll(itemType))
     } else {
         // Select an item
-        store.dispatch(HippoAction.StatAdvancedMode(true))
+        if (store.getState().viewMode == ViewMode.SIMPLE) store.dispatch(HippoAction.SetViewMode(ViewMode.ADVANCED))
         store.dispatch(HippoAction.ItemIdSelected(itemType, itemId))
         loadStatistics(store.getState())
     }
 }
+
+
+
+

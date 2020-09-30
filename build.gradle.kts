@@ -1,8 +1,8 @@
+
 import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootPlugin
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 import org.jetbrains.kotlin.gradle.tasks.KotlinJsDce
-import  org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType.js
 
 /**  Removed when migrating to KVision 3.12.0
 buildscript {
@@ -42,7 +42,7 @@ kotlin {
         browser {
             runTask {
                 outputFileName = "main.bundle.js"
-                sourceMaps = false
+                //sourceMaps = false
                 devServer = KotlinWebpackConfig.DevServer(
                     open = false,
                     port = 2000,

@@ -102,3 +102,9 @@ In this case, the merge requires manual input.
     ```
    git br -d hotfix_7.0.8
    ```
+   
+##Debug
+When starting from the template project you need to remove line 
+```sourceMaps = false``` from build.gradle.kts and remove line ```config.devtool = 'eval-cheap-source-map'``` from webpack.config.d/webpack.js. 
+After this you should see all kotlin sources in the Sources panel of Chrome dev tools.
+And also you will see correct file name and line number in the console panel when you do console.log() in your code.

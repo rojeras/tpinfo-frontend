@@ -17,9 +17,6 @@
 package se.skoview.stat
 
 import pl.treksoft.kvision.chart.Chart
-import pl.treksoft.kvision.core.Background
-import pl.treksoft.kvision.core.Col
-import pl.treksoft.kvision.core.Color
 import pl.treksoft.kvision.core.Overflow
 import pl.treksoft.kvision.panel.SimplePanel
 import pl.treksoft.kvision.panel.VPanel
@@ -29,6 +26,7 @@ import pl.treksoft.kvision.utils.perc
 import pl.treksoft.kvision.utils.vw
 import se.skoview.app.store
 import se.skoview.common.HippoAction
+import se.skoview.common.HippoState
 import se.skoview.common.ItemType
 import se.skoview.common.getHeightToRemainingViewPort
 
@@ -42,7 +40,7 @@ object AdvancedView : VPanel(
         ) {
         }.bind(store) { state ->
             overflow = Overflow.HIDDEN
-            background = Background(Color.name(Col.YELLOW))
+            //background = Background(Color.name(Col.YELLOW))
             setStyle("height", getHeightToRemainingViewPort(statPageTop, 50))
             //height = 100.perc
             SInfo.createStatViewData(state)
@@ -59,7 +57,7 @@ object AdvancedView : VPanel(
                     itemType = ItemType.CONSUMER,
                     itemSInfoList = SInfo.consumerSInfoList,
                     animateTime = animateTime,
-                    label = state.consumerLabel
+                    label = getHeading(state, ItemType.CONSUMER)
                 )
             )
 
@@ -68,7 +66,7 @@ object AdvancedView : VPanel(
                     itemType = ItemType.CONTRACT,
                     itemSInfoList = SInfo.contractSInfoList,
                     animateTime = animateTime,
-                    label = state.contractLabel
+                    label = getHeading(state, ItemType.CONTRACT)
                 )
             )
 
@@ -77,7 +75,7 @@ object AdvancedView : VPanel(
                     itemType = ItemType.PRODUCER,
                     itemSInfoList = SInfo.producerSInfoList,
                     animateTime = animateTime,
-                    label = state.producerLabel
+                    label = getHeading(state, ItemType.PRODUCER)
                 )
             )
 
@@ -86,12 +84,37 @@ object AdvancedView : VPanel(
                     itemType = ItemType.LOGICAL_ADDRESS,
                     itemSInfoList = SInfo.logicalAddressSInfoList,
                     animateTime = animateTime,
-                    label = state.laLabel
+                    label = getHeading(state, ItemType.LOGICAL_ADDRESS)
                 )
             )
         }
     }
+
+    private fun getHeading(state: HippoState, itemType: ItemType): String {
+        if (state.showTechnicalTerms)
+            return when (itemType) {
+                ItemType.CONSUMER -> "Tjänstekonsumenter"
+                ItemType.PRODUCER -> "Tjänsteproducenter"
+                ItemType.CONTRACT -> "Tjänstekontrakt"
+                ItemType.LOGICAL_ADDRESS -> "Logiska adresser"
+                else -> "Internt fel i getHeading() - 1"
+            }
+        else { // ! state.showTechnicalTerms
+            if (state.advancedViewPreSelect != null) {
+                return state.advancedViewPreSelect.headingsMap[itemType]!!
+            } else { // state.preSelect == null, specify defaults
+                return when (itemType) {
+                    ItemType.CONSUMER -> "Applikationer"
+                    ItemType.PRODUCER -> "Informationskällor"
+                    ItemType.CONTRACT -> "Tjänster"
+                    ItemType.LOGICAL_ADDRESS -> "Adresser"
+                    else -> "Internt fel i getHeading() - 2"
+                }
+            }
+        }
+    }
 }
+
 
 class StatPieTableView(
     itemType: ItemType,
@@ -100,7 +123,7 @@ class StatPieTableView(
     label: String
 ) : SimplePanel() {
     init {
-        background = Background(Color.name(Col.GREEN))
+        //background = Background(Color.name(Col.GREEN))
         setStyle("height", getHeightToRemainingViewPort(statPageTop, 50))
         //height = 100.perc
         width = 25.vw
@@ -117,7 +140,7 @@ class StatPieTableView(
         add(pieChart
             .apply {
                 height = 30.perc
-                background = Background(Color.name(Col.ALICEBLUE))
+                //background = Background(Color.name(Col.ALICEBLUE))
             })
         add(
             ChartLabelTable(
@@ -133,3 +156,4 @@ class StatPieTableView(
         )
     }
 }
+

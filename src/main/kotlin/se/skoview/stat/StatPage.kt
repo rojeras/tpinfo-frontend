@@ -43,7 +43,7 @@ object StatPage : SimplePanel() {
 
     init {
         id = "StatPage:SimplePanel()"
-        background = Background(Color.name(Col.RED))
+        //background = Background(Color.name(Col.RED))
         println("In CharTab():init()")
         this.marginTop = 10.px
 
@@ -104,22 +104,24 @@ object StatPage : SimplePanel() {
                                 else ""
 
                             val options =
-                                if (state.statAdvancedMode)
-                                    state.statisticsPlattforms.map { Pair(it.key.toString(), it.value.name) }
+                                if (state.viewMode == ViewMode.ADVANCED)
+                                    StatisticsPlattform.mapp.map { Pair(it.key.toString(), it.value.name) }
                                 else
-                                    listOf(Pair("3", "SLL-PROD"))
+                                    StatisticsPlattform.mapp
+                                        .filter { it.value.name == "SLL-PROD" }
+                                        .map { Pair(it.key.toString(), it.value.name) }
                             simpleSelectInput(
-                                //options = state.statisticsPlattforms.map { Pair(it.key.toString(), it.value.name) },
                                 options = options,
                                 value = selectedPlattformId
-
                             ) {
                                 addCssStyle(formControlXs)
                                 background = Background(Color.name(Col.WHITE))
                             }.onEvent {
                                 change = {
                                     val selectedTp = (self.value ?: "").toInt()
-                                    tpSelected(selectedTp)
+                                    store.dispatch(HippoAction.StatTpSelected(selectedTp))
+                                    loadStatistics(store.getState())
+                                    //selectTp(state, selectedTp)
                                 }
                             }
                         }
@@ -138,9 +140,11 @@ object StatPage : SimplePanel() {
                         // Use Advanced mode
                         cell {
                             checkBoxInput(
-                                value = state.statAdvancedMode
+                                value = state.viewMode == ViewMode.ADVANCED
                             ).onClick {
-                               selectMode(value)
+                                if (value) store.dispatch(HippoAction.SetViewMode(ViewMode.ADVANCED)) //setViewMode(state, viewMode = VIEW_MODE.ADVANCED)
+                                else store.dispatch(HippoAction.SetViewMode(ViewMode.SIMPLE)) //setViewMode(state, viewMode = VIEW_MODE.SIMPLE)
+                                loadStatistics(store.getState())
                             }
                             +" Avancerat läge"
                         }
@@ -169,19 +173,28 @@ object StatPage : SimplePanel() {
 
                         cell { +"Visa:" }
                         cell {
-                            val selectedPreSelectLabel = state.statPreSelectLabel
-                            val options =
-                                if (state.isPlattformSelected(3)) {
-                                    if (state.statAdvancedMode)
-                                    //    if ()
-                                        StatPreSelect.mapp
-                                            .filter { it.value.showInAdvancedView == true }
-                                            .map { Pair(it.key, it.value.getLabel(state.statAdvancedMode)) }
-                                    else
-                                        StatPreSelect.mapp
-                                            .filter { it.value.simpleViewDisplay != null }
-                                            .map { Pair(it.key, it.value.getLabel(state.statAdvancedMode)) }
-                                } else listOf(Pair("-", "-"))
+                            val selectedPreSelectLabel: String
+                            val options: List<Pair<String, String>>
+                            when (state.viewMode) {
+                                ViewMode.SIMPLE -> {
+                                    selectedPreSelectLabel = state.simpleViewPreSelect.label
+                                    options = SimpleViewPreSelect.mapp
+                                        .toList()
+                                        .sortedBy { it.first }
+                                        .map { Pair(it.first, it.first) }
+                                    //.map { Pair(it.value.label, it.value.label) }
+                                }
+                                ViewMode.ADVANCED -> {
+                                    selectedPreSelectLabel =
+                                        if (state.advancedViewPreSelect != null) state.advancedViewPreSelect.label
+                                        else ""
+                                    options = AdvancedViewPreSelect.mapp
+                                        .toList()
+                                        .sortedBy { it.first }
+                                        .map { Pair(it.first, it.first) }
+                                        //.map { Pair(it.value.label, it.value.label) }
+                                }
+                            }
                             simpleSelectInput(
                                 options = options,
                                 value = selectedPreSelectLabel
@@ -190,8 +203,21 @@ object StatPage : SimplePanel() {
                                 background = Background(Color.name(Col.WHITE))
                             }.onEvent {
                                 change = {
-                                    val selectedPreSelectLabel: String = self.value ?: "default"
-                                    selectPreSelect(selectedPreSelectLabel = selectedPreSelectLabel)
+                                    val preSelectLabel: String = self.value ?: "dummy"
+                                    when (state.viewMode) {
+                                        ViewMode.SIMPLE -> {
+                                            val preSelect = SimpleViewPreSelect.mapp[preSelectLabel]
+                                                ?: throw NullPointerException("Internal error in Select View")
+                                            store.dispatch(HippoAction.SetSimpleViewPreselect(preSelect))
+                                        }
+                                        ViewMode.ADVANCED -> {
+                                            val preSelect = AdvancedViewPreSelect.mapp[preSelectLabel]
+                                                ?: throw NullPointerException("Internal error in Select View")
+                                            store.dispatch(HippoAction.SetAdvancedViewPreselect(preSelect))
+                                        }
+                                    }
+                                    loadStatistics(store.getState())
+                                    //}
                                 }
                             }
                         }
@@ -203,7 +229,7 @@ object StatPage : SimplePanel() {
                                 println("In showTechnicalTerms, value = $value")
                                 store.dispatch(HippoAction.ShowTechnicalTerms(value))
                                 if (!value) { // Restore labels for current preselect
-                                    store.dispatch(HippoAction.PreSelectedSet(state.statPreSelect!!))
+                                    //store.dispatch(HippoAction.PreSelectedSet(state.statPreSelect!!))
                                 }
                             }
                             +" Tekniska termer"
@@ -244,8 +270,8 @@ object StatPage : SimplePanel() {
             val tCalls: String = state.statBlob.callsDomain.map { it.value }.sum().toString().thousands()
 
             val headingText: String =
-                if (state.statAdvancedMode) "Totalt antal anrop för detta urval är: $tCalls"
-                else "${StatPreSelect.mapp[state.statPreSelectLabel]!!.getLabel(false)}: $tCalls anrop"
+                if (state.viewMode == ViewMode.ADVANCED) "Totalt antal anrop för detta urval är: $tCalls"
+                else "${state.simpleViewPreSelect!!.label}: $tCalls anrop"
 
             h4 {
                 content = headingText
@@ -286,72 +312,17 @@ object StatPage : SimplePanel() {
                 ).apply {
                     height = 26.vh
                     //width = 99.vw
-                    background = Background(Color.name(Col.AZURE))
+                    //background = Background(Color.name(Col.LIGHTCORAL))
                 }
             }
         }
 
-        div { }.bind(store) { state ->
-            if (state.statAdvancedMode) add(AdvancedView)
-            else add(SimpleView)
+        div {}.bind(store) { state ->
+            println("Time to select the view: ${state.viewMode}")
+            when (state.viewMode) {
+                ViewMode.ADVANCED -> add(AdvancedView)
+                ViewMode.SIMPLE -> add(SimpleView)
+            }
         }
-
-    }
-
-    private fun tpSelected(selectedTp: Int) {
-        println("In tpSelected($selectedTp)")
-        val state = store.getState()
-        val pChainId = PlattformChain.calculateId(first = selectedTp, middle = null, last = selectedTp)
-        /*
-        // Do not do anything if the function is called with the currently already selected TPId
-        //if (PlattformChain.map[store.getState().selectedPlattformChains[0]]!!.last == selectedTp) return
-        if (state.selectedPlattformChains.contains(pChainId)) return
-       */
-        if (state.isPlattformSelected(selectedTp)) return
-
-        println("Will change to plattformId = $selectedTp")
-
-        store.dispatch(HippoAction.PreSelectedLabelSet("default"))
-        store.dispatch(HippoAction.ItemIdDeselectedAll(ItemType.PLATTFORM_CHAIN))
-        store.dispatch(HippoAction.ItemDeselectedAllForAllTypes)
-        //store.dispatch { dispatch, getState ->
-        store.dispatch(
-            HippoAction.ItemIdSelected(
-                ItemType.PLATTFORM_CHAIN,
-                pChainId
-            )
-        )
-        println("Will now call loadStatistics()")
-        loadStatistics(store.getState())
-    }
-
-
-
-    private fun selectMode(setAdvancedMode: Boolean) {
-        val state = store.getState()
-
-        // If mode already set - do nothing
-        if (state.statAdvancedMode == setAdvancedMode) return
-
-        // todo: This hard coded plattform id must change to something more dynamic
-        if (!setAdvancedMode) tpSelected(3)
-
-        // Change the mode
-        store.dispatch(HippoAction.StatAdvancedMode(setAdvancedMode))
-
-        // Evalutate which pre-select should be used
-        val currentPreSelectLabel = state.statPreSelectLabel
-        var newPreSelectLabel: String = currentPreSelectLabel
-        val currentPreSelect = StatPreSelect.mapp[currentPreSelectLabel]!!
-
-        if (setAdvancedMode && (!currentPreSelect.showInAdvancedView)) newPreSelectLabel = "default"
-        if ((!setAdvancedMode) && (!currentPreSelect.showInSimpleView)) newPreSelectLabel = "default"
-
-        println("Current preSelect=$currentPreSelectLabel, newPreselect=$newPreSelectLabel")
-        if (newPreSelectLabel != currentPreSelectLabel) selectPreSelect(newPreSelectLabel)
-
     }
 }
-
-
-
