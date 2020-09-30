@@ -28,6 +28,7 @@ import pl.treksoft.kvision.utils.perc
 import se.skoview.common.*
 import se.skoview.hippo.HippoTablePage
 import se.skoview.hippo.setUrlFilter
+import se.skoview.stat.SimpleViewPreSelect
 import se.skoview.stat.StatPage
 import se.skoview.stat.loadStatistics
 
@@ -62,7 +63,6 @@ import se.skoview.stat.loadStatistics
 
 // Statistik
 
-// todo: Kolla varför pekaren försvunnit i hippo
 // todo: Testa med andra browsers, inte minst Edge (ML 2020-09-17)
 // todo: Måste få BACK-pil att fungera (ML 2020-09-17)
 // todo: Prestanda! (ML 2020-09-17)
@@ -75,6 +75,7 @@ import se.skoview.stat.loadStatistics
 // todo: A more intelligent way to decide when to do a loadStatistics()
 // todo: Och så visa svarstider
 // todo: Dokumentation
+// done: Kolla varför pekaren försvunnit i hippo
 // done: Väljer man item som är del av en preselect så försvinner valet. Kolla Remissvyn.
 // done: Select of a already preselected item de-selects all items of same type
 // done: Förvalen måste återställas till default om användaren väljer bort något av de förvalda objekten
@@ -204,6 +205,7 @@ class App : Application() {
 
     fun startStat() {
         store.dispatch(HippoAction.ApplicationStarted(HippoApplication.STATISTIK))
+        store.dispatch(HippoAction.SetSimpleViewPreselect(SimpleViewPreSelect.getDefault()))
         //store.dispatch(HippoAction.PreSelectedLabelSet("Alla"))
         loadStatistics(store.getState())
         //loadHistory(store.getState())

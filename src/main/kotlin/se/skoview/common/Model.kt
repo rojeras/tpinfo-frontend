@@ -20,6 +20,7 @@ import se.skoview.hippo.parseBookmark
 import se.skoview.stat.AdvancedViewPreSelect
 import se.skoview.stat.SimpleViewPreSelect
 import se.skoview.stat.StatisticsBlob
+import se.skoview.stat.simpleViewPreSelectDefault
 import kotlin.reflect.KClass
 
 enum class AsyncActionStatus {
@@ -134,8 +135,8 @@ fun initialHippoState(): HippoState {
         mapOf(),
         bookmarkInformation.dateEffective, // todo: Verify if this is a good default - really want empty value
         bookmarkInformation.dateEnd,
-        //bookmarkInformation.selectedConsumers,
-        listOf(304), // TEMP
+        bookmarkInformation.selectedConsumers,
+        //listOf(304), // TEMP
         bookmarkInformation.selectedProducers,
         bookmarkInformation.selectedLogicalAddresses,
         bookmarkInformation.selectedContracts,
@@ -160,8 +161,8 @@ fun initialHippoState(): HippoState {
         mapOf(),
         false,
         false,
-        ViewMode.ADVANCED, // TEMP
-        SimpleViewPreSelect.getDefault(),
+        ViewMode.SIMPLE, // TEMP
+        simpleViewPreSelectDefault,
         null
     )
 }

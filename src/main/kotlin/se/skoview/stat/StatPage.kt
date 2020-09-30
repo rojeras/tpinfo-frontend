@@ -177,6 +177,13 @@ object StatPage : SimplePanel() {
                             val options: List<Pair<String, String>>
                             when (state.viewMode) {
                                 ViewMode.SIMPLE -> {
+                                    console.log(state.simpleViewPreSelect)
+                                    /*
+                                    val preSelect =
+                                        if (state.simpleViewPreSelect == undefined) SimpleViewPreSelect.getDefault()
+                                        else state.simpleViewPreSelect
+                                    selectedPreSelectLabel = preSelect.label
+                                     */
                                     selectedPreSelectLabel = state.simpleViewPreSelect.label
                                     options = SimpleViewPreSelect.mapp
                                         .toList()
@@ -192,7 +199,7 @@ object StatPage : SimplePanel() {
                                         .toList()
                                         .sortedBy { it.first }
                                         .map { Pair(it.first, it.first) }
-                                        //.map { Pair(it.value.label, it.value.label) }
+                                    //.map { Pair(it.value.label, it.value.label) }
                                 }
                             }
                             simpleSelectInput(

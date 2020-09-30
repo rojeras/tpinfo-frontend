@@ -8,6 +8,8 @@
     text-overflow: clip;
 }
 
+.pointer {cursor: pointer;}
+
 /* Try out the cursors at https://www.w3schools.com/cssref/tryit.asp?filename=trycss_cursor */
 /*
 .alias {cursor: alias;}
