@@ -63,6 +63,8 @@ object SimpleView : SimplePanel(
                 height = 100.perc
                 //background = Background(Color.name(Col.YELLOW))
 
+
+
                 SInfo.createStatViewData(state)
 
                 val animateTime =

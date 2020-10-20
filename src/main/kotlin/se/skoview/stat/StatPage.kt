@@ -42,6 +42,7 @@ var statPageTop: Div = Div()
 object StatPage : SimplePanel() {
 
     init {
+        fontFamily = "Times New Roman"
         id = "StatPage:SimplePanel()"
         //background = Background(Color.name(Col.RED))
         println("In CharTab():init()")
@@ -53,7 +54,7 @@ object StatPage : SimplePanel() {
 
             // Page header
             div {
-                h2("Antal meddelanden genom SLL:s regionala tjänsteplattform")
+                h2("Antal meddelanden genom Region Stockholms tjänsteplattform")
                 div("Detaljerad statistik med diagram och möjlighet att ladda ner informationen för egna analyser.")
             }.apply {
                 //width = 100.perc
@@ -305,7 +306,8 @@ object StatPage : SimplePanel() {
                         listOf(
                             DataSets(
                                 label = "Antal anrop per dag",
-                                data = yAxis
+                                data = yAxis,
+                                lineTension = 0
                             )
                         ),
                         xAxis,

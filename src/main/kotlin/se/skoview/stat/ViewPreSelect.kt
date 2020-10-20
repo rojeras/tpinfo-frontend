@@ -90,7 +90,7 @@ val simplePreSelects = listOf<SimpleViewPreSelect>(
         simpleModeViewOrder = listOf(ItemType.PRODUCER)
     ),
     SimpleViewPreSelect(
-        label = "Bokade tider",
+        label = "Tidbokningar",
         filteredItems = TIMEBOOKING_ITEMS_FILTER,
         simpleModeViewOrder = listOf(ItemType.LOGICAL_ADDRESS),
     ),
@@ -125,7 +125,7 @@ val advancedViewPreSelectDefault =
 val advancedViewPreSelects = listOf<AdvancedViewPreSelect>(
     advancedViewPreSelectDefault,
     AdvancedViewPreSelect(
-        label = "Bokade tider",
+        label = "Tidbokningar",
         filteredItems = FilteredItems(contracts = listOf(117, 118, 114)),
         headingsMap = hashMapOf(
             ItemType.CONSUMER to "Tidbokningsapplikation",

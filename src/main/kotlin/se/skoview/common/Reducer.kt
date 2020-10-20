@@ -317,6 +317,8 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
     console.log(finalState)
     println("<<<===== ${action::class}")
 
+    HippoStateArr.states.add(finalState)
+
     return finalState
 }
 

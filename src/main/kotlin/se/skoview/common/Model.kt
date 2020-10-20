@@ -167,6 +167,23 @@ fun initialHippoState(): HippoState {
     )
 }
 
+object HippoStateArr {
+    val states: MutableList<HippoState> = mutableListOf()
+    var currentIndex = -1
+
+    fun size() = states.size
+
+    fun add(newState: HippoState) {
+        states.add(newState)
+        currentIndex += 1
+    }
+
+    fun back(): HippoState {
+        currentIndex -= 1
+        return states[currentIndex]
+    }
+
+}
 
 fun HippoState.isItemSelected(itemType: ItemType, id: Int): Boolean {
     return when (itemType) {

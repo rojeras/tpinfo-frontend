@@ -42,6 +42,7 @@ import se.skoview.stat.loadStatistics
 
 // Common
 
+// todo: Lägg med Visa-menyn i hippo. Ett snabbt sätt för vyer för olika domäner/tjänster
 // todo: Show messages to user
 // todo: Make it possible to participate in discussion, maybe through slack channel
 // todo: Verifiera att zip bygger en produktionsversion
@@ -62,6 +63,13 @@ import se.skoview.stat.loadStatistics
 // todo: Hippo kanske skulle uppdateras varje dygn om browsern skulle vara öppen över natten
 
 // Statistik
+
+// done: Byt ut "SLL" mot "Region Stockholm" i texterna.
+// todo: Byt ut "SLL" i plattformsnamnen. Stäm av lösning med MLA. Bör också ske i hippo och i BS.
+// done: Döp om förvalet "Bokade tider" till "Tidbokningar"
+// todo: Tydliggör vad som är valt (dvs vad som kan väljas bort)
+// todo: Fixa Back-knappen i webbläsaren så att den backar i applikationen.
+// done: Använda samma typsnitt i statistiken som i hippo
 
 // todo: Testa med andra browsers, inte minst Edge (ML 2020-09-17)
 // todo: Måste få BACK-pil att fungera (ML 2020-09-17)
@@ -209,7 +217,9 @@ class App : Application() {
         //store.dispatch(HippoAction.PreSelectedLabelSet("Alla"))
         loadStatistics(store.getState())
         //loadHistory(store.getState())
+
         root("hippo") {
+
             vPanel {
                 add(StatPage)
             }.apply {

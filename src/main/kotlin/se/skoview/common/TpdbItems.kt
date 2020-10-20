@@ -92,17 +92,17 @@ data class ServiceComponent(
     override val synonym: String? = null
 ) : BaseItem() {
 
-    var colorValue: Int = (0..(256*256*256)-1).random()
+    var colorValue: Int = (0..(256 * 256 * 256) - 1).random()
 
     init {
         map[id] = this
-        //colorValue = (0..(256*256*256)-1).random()
+        // colorValue = (0..(256*256*256)-1).random()
         if (id > maxId) maxId = id
     }
 
     override val name: String = hsaId
 
-    //override val itemType = ItemType.COMPONENT
+    // override val itemType = ItemType.COMPONENT
     override val searchField = "$name $description"
 
     override fun equals(other: Any?): Boolean {
@@ -117,7 +117,7 @@ data class ServiceComponent(
     override fun hashCode(): Int {
         return id
     }
-    //fun color() = Color.hex(colorValue)
+    // fun color() = Color.hex(colorValue)
     companion object {
         val map = hashMapOf<Int, ServiceComponent>()
         var maxId = 0
@@ -129,7 +129,7 @@ data class ServiceComponent(
 
             getAsyncTpDb(type) { response ->
                 println("Size of response is: ${response.length}")
-                //val json = Json(JsonConfiguration.Stable)
+                // val json = Json(JsonConfiguration.Stable)
                 val items = JSON.parse<Array<ServiceComponent>>(response)
                 items.forEach { item ->
                     ServiceComponent(item.id, item.hsaId, item.description, item.synonym)
@@ -149,7 +149,7 @@ data class LogicalAddress constructor(
     override val synonym: String? = null
 ) : BaseItem() {
 
-    var colorValue: Int = (0..(256*256*256)-1).random()
+    var colorValue: Int = (0..(256 * 256 * 256) - 1).random()
     init {
         map[id] = this
 
@@ -197,7 +197,7 @@ data class ServiceContract(
 ) : BaseItem() {
     private val domain: ServiceDomain?
 
-    var colorValue: Int = (0..(256*256*256)-1).random()
+    var colorValue: Int = (0..(256 * 256 * 256) - 1).random()
     init {
         map[id] = this
         domain = ServiceDomain.map[serviceDomainId]
@@ -207,7 +207,7 @@ data class ServiceContract(
 
     override var searchField: String = namespace
 
-    //override val itemType = ItemType.CONTRACT
+    // override val itemType = ItemType.CONTRACT
     override val description = "$name v$major"
 
     override fun toString(): String = namespace
@@ -252,10 +252,10 @@ data class ServiceDomain(
     override val name: String,
     override val synonym: String? = null
 ) : BaseItem() {
-    //override val itemType = ItemType.DOMAIN
+    // override val itemType = ItemType.DOMAIN
     var contracts: MutableSet<ServiceContract> = mutableSetOf()
 
-    var colorValue: Int = (0..(256*256*256)-1).random()
+    var colorValue: Int = (0..(256 * 256 * 256) - 1).random()
     override val description = name
 
     init {
@@ -314,12 +314,12 @@ data class Plattform(
     override val synonym: String? = null
 ) :
     BaseItem() {
-    //override val itemType = ItemType.PLATTFORM
+    // override val itemType = ItemType.PLATTFORM
     override val name: String = "$platform-$environment"
     override val description = ""
     override val searchField: String = name
     override fun toString(): String = name
-    var colorValue: Int = (0..(256*256*256)-1).random()
+    var colorValue: Int = (0..(256 * 256 * 256) - 1).random()
 
     init {
         map[id] = this
@@ -352,7 +352,6 @@ data class Plattform(
             }
         }
     }
-
 }
 
 data class PlattformChain(
@@ -362,10 +361,10 @@ data class PlattformChain(
     override val synonym: String? = null
 ) : BaseItem() {
 
-    var colorValue: Int = (0..(256*256*256)-1).random()
+    var colorValue: Int = (0..(256 * 256 * 256) - 1).random()
     private val firstPlattform = Plattform.map[first]
 
-    //private val middlePlattform = Plattform.map[middle]
+    // private val middlePlattform = Plattform.map[middle]
     private val lastPlattform = Plattform.map[last]
 
     override val id = calculateId(first, middle, last)
@@ -374,7 +373,7 @@ data class PlattformChain(
     override val searchField: String = calculateName()
 
     init {
-        //name = calculateName()
+        // name = calculateName()
         map[id] = this
 
         if (id > PlattformChain.maxId) PlattformChain.maxId = id
@@ -427,8 +426,8 @@ data class StatisticsPlattform(
     val platform: String,
     val environment: String,
     override val synonym: String? = null
-): BaseItem() {
-   //var colorValue: Int = (0..(256*256*256)-1).random()
+) : BaseItem() {
+    // var colorValue: Int = (0..(256*256*256)-1).random()
     override val name: String = "$platform-$environment"
     override val description = ""
     override val searchField: String = name
@@ -437,12 +436,12 @@ data class StatisticsPlattform(
     init {
         mapp[id] = this
 
-        //if (id > StatisticsPlattform.maxId) StatisticsPlattform.maxId = id
+        // if (id > StatisticsPlattform.maxId) StatisticsPlattform.maxId = id
     }
 
     companion object {
         val mapp = hashMapOf<Int, StatisticsPlattform>()
-        //var maxId = 0
+        // var maxId = 0
         var isLoaded = false
 
         fun load(callback: () -> Unit) {
@@ -451,8 +450,8 @@ data class StatisticsPlattform(
                 val id: Int,
                 val platform: String,
                 val environment: String,
-                //val snapshotTime: String,
-                //val synonym: String
+                // val snapshotTime: String,
+                // val synonym: String
             )
 
             val type = "statPlattforms"
@@ -467,5 +466,3 @@ data class StatisticsPlattform(
         }
     }
 }
-
-
