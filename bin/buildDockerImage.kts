@@ -101,7 +101,7 @@ val versionInfo = """
     <!--
     Build information
     -----------------
-    Build:      $gitDescribe
+    Version:    $gitDescribe
     Build time: $dateTime
     Git branch: $gitBranch
     Git hash:   $gitHash
@@ -110,7 +110,8 @@ val versionInfo = """
 
 File("versionInfo.txt").writeText(versionInfo)
 // -------------------------------------------------------------------------------------------
-if (Largument.isSet("clean")) lExec("./gradlew clean")
+// If the image is to be pushed (QA/Production) then we should always do a "git clean"
+if (Largument.isSet("clean") || Largument.isSet("push")) lExec("./gradlew clean")
 
 lExec("./gradlew zip")
 File(zipDirName).walkBottomUp().forEach {
@@ -120,7 +121,25 @@ File(zipDirName).walkBottomUp().forEach {
 println("Unzip")
 lExec("unzip -d $zipDirName $buildZipFile", quiet = true)
 
-File(indexHtmlFile).appendText(versionInfo)
+// Append version info as comment at end of index.html
+//File(indexHtmlFile).appendText(versionInfo)
+
+// Edit index.html and include correct version info (stored in gitDescribe variable)
+val file = File(indexHtmlFile)
+val tempFile = createTempFile()
+val regex = Regex("""<meta id="hippoVersion" content="0.0.0">""")
+tempFile.printWriter().use { writer ->
+    file.forEachLine { line ->
+        println(line)
+        writer.println(when {
+            regex.matches(line.trim()) -> """<meta id="hippoVersion" content="$gitDescribe">"""
+            else -> line
+        })
+    }
+    writer.print(versionInfo)
+}
+check(file.delete() && tempFile.renameTo(file)) { "failed to replace file" }
+// ------------------------------------------------------------------------------
 
 lExec("docker build --rm -t $localImageTag .", quiet = false)
 

@@ -14,10 +14,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package se.skoview.view
+package se.skoview.hippo
 
-import se.skoview.data.HippoState
-import se.skoview.data.PlattformChain
+import se.skoview.common.HippoState
+import se.skoview.common.PlattformChain
 import kotlin.browser.document
 import kotlin.browser.window
 import kotlin.js.Date
@@ -35,7 +35,6 @@ data class BookmarkInformation(
 
 // Let the URL mirror the current state
 fun setUrlFilter(state: HippoState) {
-    val bookmark = state.getBookmark()
     val hostname = window.location.hostname
     val protocol = window.location.protocol
     val port = window.location.port
@@ -44,15 +43,29 @@ fun setUrlFilter(state: HippoState) {
     val portSpec = if (port.isNotEmpty()) ":$port" else ""
     var newUrl = "$protocol//$hostname$portSpec$pathname"
 
-    if (bookmark.length > 1) {
-        newUrl += "?filter=$bookmark"
+
+    val bookmark = state.getBookmark()
+    val filterString =
+        if (bookmark.length > 1) "?filter=$bookmark"
+        else ""
+
+    // And if the current URL contains "app=statistik" then it should be kept (once)
+    val href = window.location.href
+
+    var statString = ""
+    if (href.contains("app=statistik")) {
+        statString =
+            if (filterString.isEmpty()) "?app=statistik"
+            else "&app=statistik"
     }
-    window.history.pushState(newUrl, "hippo-utforska integrationer", newUrl)
+
+    window.history.pushState(newUrl, "hippo-utforska integrationer", newUrl + filterString + statString)
 }
 
 fun HippoState.getBookmark(): String {
+    println("getBookmars(), updateDates:")
+    println("Length ${this.updateDates.size}")
     if (this.updateDates.isEmpty() || this.dateEffective == "") return ""
-
     var bookmark = ""
 
     bookmark += if (this.selectedConsumers.isNotEmpty()) this.selectedConsumers.joinToString(
@@ -77,12 +90,10 @@ fun HippoState.getBookmark(): String {
     ) else ""
 
     // Exclude dates if dateEnd == current date (first in updateDates list)
-
     if (this.dateEnd != this.updateDates[0]) {
         bookmark += "S" + date2DaysSinceEpoch(this.dateEffective)
         bookmark += "E" + date2DaysSinceEpoch(this.dateEnd)
     }
-
     // Separate plattforms now stored in filter, not the chain
     for (pcId in this.selectedPlattformChains) {
         val firstId = PlattformChain.map[pcId]?.first
@@ -90,9 +101,7 @@ fun HippoState.getBookmark(): String {
         bookmark += "F$firstId"
         bookmark += "L$lastId"
     }
-
     return bookmark
-
 }
 
 fun parseBookmark(): BookmarkInformation {

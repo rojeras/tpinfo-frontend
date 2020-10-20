@@ -1,4 +1,17 @@
+/* Tabulator settings */
+.tabulator-footer {display: none } /* Hide tabulator footer */
+.tabulator {font-size: 12px}
+
+/* Wrap column title */
+.tabulator .tabulator-header .tabulator-col .tabulator-col-content .tabulator-col-title{
+    white-space: normal;
+    text-overflow: clip;
+}
+
+.pointer {cursor: pointer;}
+
 /* Try out the cursors at https://www.w3schools.com/cssref/tryit.asp?filename=trycss_cursor */
+/*
 .alias {cursor: alias;}
 .all-scroll {cursor: all-scroll;}
 .auto {cursor: auto;}
@@ -34,3 +47,6 @@
 .wait {cursor: wait;}
 .zoom-in {cursor: zoom-in;}
 .zoom-out {cursor: zoom-out;}
+*/
+
+

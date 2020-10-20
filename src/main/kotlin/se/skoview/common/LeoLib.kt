@@ -14,20 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package se.skoview.lib
+package se.skoview.common
 
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
 import org.w3c.xhr.XMLHttpRequest
-import pl.treksoft.kvision.core.Color
-import pl.treksoft.kvision.rest.RestClient
-import se.skoview.data.BaseItem
+import pl.treksoft.kvision.core.Component
+import kotlin.browser.document
 import kotlin.browser.window
 import kotlin.js.Date
-import kotlin.math.absoluteValue
-
 
 fun getAsync(url: String, callback: (String) -> Unit) {
     console.log("getAsync(): URL: $url")
@@ -47,22 +40,22 @@ fun getAsyncTpDb(url: String, callback: (String) -> Unit) {
     val currentProtocol = window.location.protocol
     val currentHost = window.location.host
     // tpdb is assumed to be on the 'qa.integrationer.tjansteplattform.se' server if we run in development or test environment
-    val baseUrl = if (currentHost.contains("localhost") || currentHost.contains("www.hippokrates.se")) {
+    val baseUrl = if (currentHost.contains("localhost") || currentHost.contains("192.168.0.") || currentHost.contains("www.hippokrates.se")) {
         "https://qa.integrationer.tjansteplattform.se/tpdb/tpdbapi.php/api/v1/"
-    }
-    else {
+    } else {
         "$currentProtocol//$currentHost/../tpdb/tpdbapi.php/api/v1/"
     }
     val fullUrl = baseUrl + url
     console.log("URL: $fullUrl")
 
     val xmlHttp = XMLHttpRequest()
-    xmlHttp.open("GET", fullUrl)
-    xmlHttp.onload = {
+    //xmlHttp.onload = {
+    xmlHttp.onreadystatechange = {
         if (xmlHttp.readyState == 4.toShort() && xmlHttp.status == 200.toShort()) {
             callback.invoke(xmlHttp.responseText)
         }
     }
+    xmlHttp.open("GET", fullUrl, true)
     xmlHttp.send()
 }
 
@@ -112,20 +105,38 @@ fun getDatesLastMonth(): Pair<Date, Date> {
     }
 
     val firstDay = Date("${yyyy}-${month}-01")
-    println("firstDay: $firstDay")
-    println("firstDay.toISOString(): ${firstDay.toISOString()}")
 
     val lastDate = Date(yyyy, mm, 0)
     val lastDay = "$yyyy-$month-${lastDate.getDate()}"
 
     return Pair(firstDay, Date(lastDay))
 }
-/*
-fun getColorForObject(obj: Any): Color {
-    val cValue = obj.hashCode().absoluteValue
-    val fValue = cValue.toDouble() / Int.MAX_VALUE.toDouble()
-    val col = (fValue * 256 * 256 * 256 - 1).toInt()
-    //return Color(col)
-    return Color(col)
+
+fun getVersion(versionName: String = "hippoVersion"): String {
+    val versionElement = document.getElementById(versionName)
+
+    return if (versionElement != null) versionElement.getAttribute("content") ?: "-1.-1.-1"
+    else "-2.-2.-2"
 }
-*/
+
+fun String.thousands(): String {
+    val s1 = this.reversed()
+    val s2List = s1.chunked(3)
+    var s3 = ""
+
+    for (item in s2List) {
+        s3 += "$item "
+    }
+
+    return s3.trim().reversed()
+}
+
+fun getHeightToRemainingViewPort(
+    topComponent: Component,
+    delta: Int = 48
+): String {
+    val occupiedViewPortArea = (topComponent.getElementJQuery()?.height() ?: 153).toInt()
+    //println("++++++++++ Inner height: $occupiedViewPortArea")
+    val heightToRemove = occupiedViewPortArea + delta
+    return "calc(100vh - ${heightToRemove}px)"
+}

@@ -14,10 +14,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package se.skoview.data
+package se.skoview.common
 
 import pl.treksoft.kvision.redux.RAction
-import se.skoview.view.IntegrationLists
+import se.skoview.hippo.IntegrationLists
+import se.skoview.stat.AdvancedViewPreSelect
+import se.skoview.stat.SimpleViewPreSelect
 
 /** According to: https://github.com/redux-utilities/flux-standard-action
  * An action object should have a type and contain:
@@ -27,23 +29,36 @@ import se.skoview.view.IntegrationLists
  */
 
 sealed class HippoAction : RAction {
-    object ApplicationStarted : HippoAction()
+    data class ApplicationStarted(val App: HippoApplication) : HippoAction()
     object StartDownloadBaseItems : HippoAction()
     object DoneDownloadBaseItems : HippoAction()
     data class ErrorDownloadBaseItems(val errorMessage: String) : HippoAction()
-    //object StartDownloadIntegrations : HippoAction()
     data class DoneDownloadIntegrations(
         val integrationArrs: List<Integration>,
         val maxCounters: MaxCounter,
-        val updateDates: List<String>
+        val updateDates: Array<String>
     ) : HippoAction()
+    data class DoneDownloadStatistics(
+        val statisticsArrArr: Array<Array<Int>>
+    ) : HippoAction()
+    data class DoneDownloadHistory(
+        val historyMap: Map<String, Int>
+    ): HippoAction()
     data class ErrorDownloadIntegrations(val errorMessage: String) : HippoAction()
-    data class DateSelected(val selectedDate: String) : HippoAction()
-    data class ItemSelected(
+    data class DateSelected(val dateType: DateType, val selectedDate: String) : HippoAction()
+    data class StatTpSelected(val tpId: Int) : HippoAction()
+    data class ItemIdSelected(
         val viewType: ItemType,
-        val baseItem: BaseItem
+        val id: Int
     ) : HippoAction()
+    data class ItemIdDeselected( val viewType: ItemType, val id: Int ): HippoAction()
+    //data class ItemIdDeselectedAll( val viewType: ItemType ): HippoAction()
+    //object ItemDeselectedAllForAllTypes: HippoAction()
     data class ViewUpdated(val integrationLists: IntegrationLists) : HippoAction()
-    data class FilterItems(val type: ItemType, val filterString: String) : HippoAction()
     data class SetVMax(val type: ItemType, val size: Int): HippoAction()
+    data class ShowTimeGraph(val isShown: Boolean): HippoAction()
+    data class ShowTechnicalTerms(val isShown: Boolean): HippoAction()
+    data class SetViewMode(val viewMode: ViewMode): HippoAction()
+    data class SetSimpleViewPreselect(val preSelect: SimpleViewPreSelect): HippoAction()
+    data class SetAdvancedViewPreselect(val preSelect: AdvancedViewPreSelect): HippoAction()
 }
