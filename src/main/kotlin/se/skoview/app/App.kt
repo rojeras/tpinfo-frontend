@@ -17,6 +17,8 @@
 package se.skoview.app
 
 import kotlinx.browser.window
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
 import pl.treksoft.kvision.Application
 import pl.treksoft.kvision.pace.Pace
 import pl.treksoft.kvision.panel.root
@@ -37,8 +39,6 @@ import se.skoview.stat.loadStatistics
  v Red ut redux-thunk. Bör kunna göra mycket av dispatchandet enklare och centrerat. Nu sker för mycket ute lokalt i komponenterna.
  v https://daveceddia.com/what-is-a-thunk/ - Behövs troligen inte nu när vi jobbar i Kotlin. Ropa på funktionen direkt
 */
-
-
 
 // Common
 
@@ -161,15 +161,12 @@ fun main() {
     startApplication(::App)
 }
 
-
-
 class App : Application() {
     init {
         println("1")
         require("css/hippo.css")
         println("2")
     }
-
 
     override fun start() {
 
@@ -186,7 +183,9 @@ class App : Application() {
         }
 
         Pace.init()
-        loadBaseItems(store)
+        GlobalScope.async {
+            loadBaseItems(store)
+        }
 
         store.subscribe { state ->
             if (state.currentAction == HippoAction.DoneDownloadBaseItems::class) {
@@ -205,18 +204,16 @@ class App : Application() {
                 add(HippoTablePage)
             }.apply {
                 width = 100.perc
-
             }
-
         }
     }
 
     fun startStat() {
         store.dispatch(HippoAction.ApplicationStarted(HippoApplication.STATISTIK))
         store.dispatch(HippoAction.SetSimpleViewPreselect(SimpleViewPreSelect.getDefault()))
-        //store.dispatch(HippoAction.PreSelectedLabelSet("Alla"))
+        // store.dispatch(HippoAction.PreSelectedLabelSet("Alla"))
         loadStatistics(store.getState())
-        //loadHistory(store.getState())
+        // loadHistory(store.getState())
 
         root("hippo") {
 

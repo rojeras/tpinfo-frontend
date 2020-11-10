@@ -52,7 +52,7 @@ fun createHippoViewData(state: HippoState) {
         filteredIntegrations.asSequence()
             .map { integration: Integration -> integration.logicalAddressId } //iarr: Array<Int> -> iarr[4] }
             .distinct()
-            .map { LogicalAddress.map[it] ?: LogicalAddress(-1, "", "") }
+            .map { LogicalAddress.map[it] ?: LogicalAddress(-1, "", "", "") }
             .sortedWith(compareBy(LogicalAddress::description))
             .toList()
 
@@ -62,7 +62,7 @@ fun createHippoViewData(state: HippoState) {
             .map { integration: Integration -> integration.serviceDomainId }
             .distinct()
             .map {
-                ServiceDomain.map[it] ?: ServiceDomain(id = -1, name = "")
+                ServiceDomain.map[it] ?: ServiceDomain(id = -1, domainName = "")
             }
             .sortedWith(compareBy(ServiceDomain::name))
             .toList()

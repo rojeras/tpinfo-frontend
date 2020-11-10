@@ -81,13 +81,11 @@ fun loadHistory(state: HippoState) {
                 history.history
             )
 
-
             println("Time to Dispatch")
 
             store.dispatch(
                 HippoAction.DoneDownloadHistory(HistoryCache.map[parameters]!!.historyMap)
             )
-
         }
     }
 }

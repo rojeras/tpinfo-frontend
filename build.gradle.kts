@@ -6,7 +6,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinJsDce
 
 /**  Removed when migrating to KVision 3.12.0
 buildscript {
-    extra.set("production", (findProperty("prod") ?: findProperty("production") ?: "false") == "true")
+ extra.set("production", (findProperty("prod") ?: findProperty("production") ?: "false") == "true")
 }
 */
 
@@ -32,17 +32,18 @@ repositories {
 // Versions
 val kotlinVersion: String by System.getProperties()
 val kvisionVersion: String by System.getProperties()
+val coroutinesVersion: String by project
 
 // Custom Properties
 val webDir = file("src/main/web")
-//val isProductionBuild = project.extra.get("production") as Boolean
+// val isProductionBuild = project.extra.get("production") as Boolean
 
 kotlin {
     js {
         browser {
             runTask {
                 outputFileName = "main.bundle.js"
-                //sourceMaps = false
+                // sourceMaps = false
                 devServer = KotlinWebpackConfig.DevServer(
                     open = false,
                     port = 2000,
@@ -86,6 +87,7 @@ kotlin {
         implementation("pl.treksoft:kvision-tabulator:$kvisionVersion")
         implementation("pl.treksoft:kvision-pace:$kvisionVersion")
     	implementation("pl.treksoft:kvision-redux-kotlin:$kvisionVersion")
+        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-js:$coroutinesVersion")
     }
     sourceSets["test"].dependencies {
         implementation(kotlin("test-js"))
@@ -95,7 +97,7 @@ kotlin {
 }
 
 fun getNodeJsBinaryExecutable(): String {
-    //val nodeDir = NodeJsRootPlugin.apply(project).nodeJsSetupTask.destination
+    // val nodeDir = NodeJsRootPlugin.apply(project).nodeJsSetupTask.destination
     val nodeDir = NodeJsRootPlugin.apply(project).nodeJsSetupTaskProvider.get().destination
     val isWindows = System.getProperty("os.name").toLowerCase().contains("windows")
     val nodeBinDir = if (isWindows) nodeDir else nodeDir.resolve("bin")

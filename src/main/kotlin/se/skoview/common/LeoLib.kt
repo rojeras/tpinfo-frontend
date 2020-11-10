@@ -16,11 +16,23 @@
  */
 package se.skoview.common
 
+import kotlinx.browser.document
+import kotlinx.browser.window
 import org.w3c.xhr.XMLHttpRequest
 import pl.treksoft.kvision.core.Component
-import kotlin.browser.document
-import kotlin.browser.window
 import kotlin.js.Date
+
+fun tpdbBaseUrl(): String {
+    val currentProtocol = window.location.protocol
+    val currentHost = window.location.host
+    // tpdb is assumed to be on the 'qa.integrationer.tjansteplattform.se' server if we run in development or test environment
+    return if (currentHost.contains("localhost") || currentHost.contains("192.168.0.") || currentHost.contains("www.hippokrates.se")) {
+        "http://localhost:5555/tpdb/tpdbapi.php/api/v1/"
+        // "https://qa.integrationer.tjansteplattform.se/tpdb/tpdbapi.php/api/v1/"
+    } else {
+        "$currentProtocol//$currentHost/../tpdb/tpdbapi.php/api/v1/"
+    }
+}
 
 fun getAsync(url: String, callback: (String) -> Unit) {
     console.log("getAsync(): URL: $url")
@@ -34,22 +46,14 @@ fun getAsync(url: String, callback: (String) -> Unit) {
     xmlHttp.send()
 }
 
-
 // todo: Evaluate the use of the KVision client CallAgent. See CallAgentExample.kt
 fun getAsyncTpDb(url: String, callback: (String) -> Unit) {
-    val currentProtocol = window.location.protocol
-    val currentHost = window.location.host
-    // tpdb is assumed to be on the 'qa.integrationer.tjansteplattform.se' server if we run in development or test environment
-    val baseUrl = if (currentHost.contains("localhost") || currentHost.contains("192.168.0.") || currentHost.contains("www.hippokrates.se")) {
-        "https://qa.integrationer.tjansteplattform.se/tpdb/tpdbapi.php/api/v1/"
-    } else {
-        "$currentProtocol//$currentHost/../tpdb/tpdbapi.php/api/v1/"
-    }
-    val fullUrl = baseUrl + url
+
+    val fullUrl = tpdbBaseUrl() + url
     console.log("URL: $fullUrl")
 
     val xmlHttp = XMLHttpRequest()
-    //xmlHttp.onload = {
+    // xmlHttp.onload = {
     xmlHttp.onreadystatechange = {
         if (xmlHttp.readyState == 4.toShort() && xmlHttp.status == 200.toShort()) {
             callback.invoke(xmlHttp.responseText)
@@ -62,7 +66,7 @@ fun getAsyncTpDb(url: String, callback: (String) -> Unit) {
 fun getSyncTpDb(url: String): String? {
     val baseUrl = "https://qa.integrationer.tjansteplattform.se/tpdb/tpdbapi.php/api/v1/"
     val fullUrl = baseUrl + url
-    //console.log("URL: $fullUrl")
+    // console.log("URL: $fullUrl")
     val xmlHttp = XMLHttpRequest()
     xmlHttp.open("GET", fullUrl, false)
     xmlHttp.send(null)
@@ -78,7 +82,7 @@ fun getSyncTpDb(url: String): String? {
 fun Date.toSwedishDate(): String {
 
     val dd = this.getDate()
-    val mm = this.getMonth() + 1 //January is 0!
+    val mm = this.getMonth() + 1 // January is 0!
     val yyyy = this.getFullYear()
 
     val sDD = if (dd > 9) dd.toString() else "0$dd"
@@ -87,15 +91,15 @@ fun Date.toSwedishDate(): String {
 
     return "$sYYYY-$sMM-$sDD"
 
-    //return this.toISOString().substring(0, 10)
-    //return this.toLocaleDateString().substring(0, 10)
+    // return this.toISOString().substring(0, 10)
+    // return this.toLocaleDateString().substring(0, 10)
 }
 
 fun getDatesLastMonth(): Pair<Date, Date> {
 
     val today = Date()
     println("Today: $today")
-    val mm = today.getMonth() //January is 0!
+    val mm = today.getMonth() // January is 0!
     var yyyy = today.getFullYear()
 
     var month = mm
@@ -104,7 +108,7 @@ fun getDatesLastMonth(): Pair<Date, Date> {
         yyyy -= 1
     }
 
-    val firstDay = Date("${yyyy}-${month}-01")
+    val firstDay = Date("$yyyy-$month-01")
 
     val lastDate = Date(yyyy, mm, 0)
     val lastDay = "$yyyy-$month-${lastDate.getDate()}"
@@ -136,7 +140,7 @@ fun getHeightToRemainingViewPort(
     delta: Int = 48
 ): String {
     val occupiedViewPortArea = (topComponent.getElementJQuery()?.height() ?: 153).toInt()
-    //println("++++++++++ Inner height: $occupiedViewPortArea")
+    // println("++++++++++ Inner height: $occupiedViewPortArea")
     val heightToRemove = occupiedViewPortArea + delta
     return "calc(100vh - ${heightToRemove}px)"
 }
