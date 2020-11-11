@@ -70,7 +70,7 @@ import se.skoview.stat.loadStatistics
 // todo: Tydliggör vad som är valt (dvs vad som kan väljas bort)
 // todo: Fixa Back-knappen i webbläsaren så att den backar i applikationen.
 // done: Använda samma typsnitt i statistiken som i hippo
-
+// todo: Inför RestClient() och (därmed) kotlinx.serialization
 // todo: Testa med andra browsers, inte minst Edge (ML 2020-09-17)
 // todo: Måste få BACK-pil att fungera (ML 2020-09-17)
 // todo: Prestanda! (ML 2020-09-17)
@@ -110,7 +110,7 @@ import se.skoview.stat.loadStatistics
 
 // TPDB
 // todo: domainId not supported in stat call: https://qa.integrationer.tjansteplattform.se/tpdb/tpdbapi.php/api/v1/statistics?dummy&dateEffective=2020-07-01&dateEnd=2020-07-31&domainId=11
-
+// todo: Add header header("Content-type:application/json"); to tpdbapi.php
 // Done
 
 // done: Skriv ut versionsnummer på sidan

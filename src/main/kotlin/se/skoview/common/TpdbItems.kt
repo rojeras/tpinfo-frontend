@@ -34,61 +34,36 @@ suspend fun loadBaseItems(store: ReduxStore<HippoState, HippoAction>) {
     println("Will now load BaseItems")
     store.dispatch(HippoAction.StartDownloadBaseItems)
 
-    // BaseDates.load { areAllBaseItemsLoaded(store) }
     val baseDatesJob = GlobalScope.launch {
         loadBaseItem("dates", Dates.serializer())
-        BaseDates.isLoaded = true
-        // areAllBaseItemsLoaded(store)
     }
 
-    // ServiceDomain.load { areAllBaseItemsLoaded(store) }
     val domainsJob = GlobalScope.launch {
         loadBaseItem("domains", ListSerializer(ServiceDomain.serializer()))
-        ServiceDomain.isLoaded = true
-        // areAllBaseItemsLoaded(store)
     }
 
-    // ServiceContract.load { areAllBaseItemsLoaded(store) }
     val contractsJob = GlobalScope.launch {
         loadBaseItem("contracts", ListSerializer(ServiceContract.serializer()))
-        ServiceContract.isLoaded = true
-        // areAllBaseItemsLoaded(store)
     }
 
-    // ServiceComponent.load { areAllBaseItemsLoaded(store) }
     val componentJob = GlobalScope.launch {
         loadBaseItem("components", ListSerializer(ServiceComponent.serializer()))
-        ServiceComponent.isLoaded = true
-        // areAllBaseItemsLoaded(store)
     }
 
-    // LogicalAddress.load { areAllBaseItemsLoaded(store) }
     val laJob = GlobalScope.launch {
         loadBaseItem("logicalAddress", ListSerializer(LogicalAddress.serializer()))
-        LogicalAddress.isLoaded = true
-        // areAllBaseItemsLoaded(store)
     }
 
-
-    // Plattform.load { areAllBaseItemsLoaded(store) }
     val plattformJob = GlobalScope.launch {
         loadBaseItem("plattforms", ListSerializer(Plattform.serializer()))
-        Plattform.isLoaded = true
-        // areAllBaseItemsLoaded(store)
     }
 
-    // PlattformChain.load { areAllBaseItemsLoaded(store) }
     val plattformChainJob = GlobalScope.launch {
         loadBaseItem("plattformChains", ListSerializer(PlattformChainJson.serializer()))
-        PlattformChain.isLoaded = true
-        // areAllBaseItemsLoaded(store)
     }
 
-    // StatisticsPlattform.load { areAllBaseItemsLoaded(store) }
     val statPlattformJob = GlobalScope.launch {
         loadBaseItem("statPlattforms", ListSerializer(StatisticsPlattform.serializer()))
-        StatisticsPlattform.isLoaded = true
-        // areAllBaseItemsLoaded(store)
     }
 
     println("Before Joinall")
@@ -103,8 +78,8 @@ suspend fun loadBaseItems(store: ReduxStore<HippoState, HippoAction>) {
 suspend fun <T : Any> loadBaseItem(type: String, deserializer: DeserializationStrategy<T>) {
     val restClient = RestClient()
     val url = "${tpdbBaseUrl()}$type"
-    println(url)
     println("*** In load $type")
+    println(url)
 
     val componentList =
         restClient.remoteCall(
@@ -114,25 +89,8 @@ suspend fun <T : Any> loadBaseItem(type: String, deserializer: DeserializationSt
             contentType = ""
         )
 
-    println("*** In load $type - after restClient() call")
-    console.log(componentList)
-    val sss = componentList.await()
-    println("*** In load $type - after await()")
-    console.log(sss)
-    // callback()
-}
-
-fun areAllBaseItemsLoaded(store: ReduxStore<HippoState, HippoAction>) {
-    if (LogicalAddress.isLoaded &&
-        PlattformChain.isLoaded &&
-        Plattform.isLoaded &&
-        ServiceComponent.isLoaded &&
-        ServiceContract.isLoaded &&
-        ServiceDomain.isLoaded &&
-        // BaseDates.isLoaded &&
-        StatisticsPlattform.isLoaded
-    )
-        store.dispatch(HippoAction.DoneDownloadBaseItems)
+    componentList.await()
+    println("*** Leaving load $type")
 }
 
 abstract class BaseItem {
@@ -160,39 +118,10 @@ data class BaseDates(
     }
 
     companion object {
-        var isLoaded = false
         var integrationDates = listOf<String>()
         var statisticsDates = listOf<String>()
     }
 }
-
-/*
-object BaseDates {
-    val integrationDates = mutableListOf<String>()
-    val statisticsDates = mutableListOf<String>()
-    var isLoaded = false
-
-    fun load(callback: () -> Unit) {
-        @Serializable
-        data class BaseDatesJsonParseContent(val integrations: Array<String>, val statistics: Array<String>)
-
-        data class BaseDatesJsonParse(val dates: BaseDatesJsonParseContent)
-
-        val type = "dates"
-        getAsyncTpDb(type) { response ->
-            val items = JSON.parse<BaseDatesJsonParse>(response)
-            for (integration in items.dates.integrations) {
-                integrationDates.add(integration)
-            }
-            for (statistics in items.dates.statistics) {
-                statisticsDates.add(statistics)
-            }
-            isLoaded = true
-            callback()
-        }
-    }
-}
- */
 
 @Serializable
 data class ServiceComponent(
@@ -202,11 +131,9 @@ data class ServiceComponent(
     override val synonym: String? = null
 ) : BaseItem() {
 
-    var colorValue: Int = (0..(256 * 256 * 256) - 1).random()
-
     init {
         map[id] = this
-        if (id > maxId) maxId = id
+        // if (id > maxId) maxId = id
     }
 
     override val name: String = hsaId
@@ -228,70 +155,13 @@ data class ServiceComponent(
 
     companion object {
         val map = hashMapOf<Int, ServiceComponent>()
-        var maxId = 0
-        var isLoaded = false
-/*
-        suspend fun load(callback: () -> Unit) {
-            val type = "components"
-            val restClient = RestClient()
-            val url = "${tpdbBaseUrl()}/$type"
-            println(url)
-            println("*** In load $type")
-
-            val componentList =
-                restClient.remoteCall(
-                    url = url,
-                    method = HttpMethod.GET,
-                    deserializer = ListSerializer(ServiceComponent.serializer()),
-                    contentType = ""
-                )
-
-            println("*** In load $type - after restClient() call")
-            console.log(componentList)
-            val sss = componentList.await()
-            println("*** In load $type - after await()")
-            console.log(sss)
-            isLoaded = true
-            callback()
-        }
- */
-
-        /*
-        fun abc() {
-            @Serializable
-            data class Repository(val id: Int, val full_name: String?, val description: String?, val fork: Boolean)
-
-            val restClient = RestClient()
-            val items: Promise<List<Repository>> = restClient.remoteCall(
-                "https://api.github.com/search/repositories",
-                obj { q = "kvision" },
-                deserializer = Repository.serializer().list
-            ) {
-                it.items
-            }
-        }
-
-        fun load2(callback: () -> Unit) {
-
-            getAsyncTpDb("components") { response ->
-                println("Size of response for ServiceComponents are: ${response.length}")
-                println(response.substring(0, 200))
-
-                val json = Json {}
-                json.decodeFromString(ListSerializer(ServiceComponent.serializer()), response)
-
-                isLoaded = true
-                callback()
-            }
-        }
-        */
+        // var maxId = 0
     }
 }
 
 @Serializable
 data class LogicalAddress constructor(
     override val id: Int,
-    // override val name: String? = null,
     override val description: String,
     override val synonym: String? = null,
     val logicalAddress: String
@@ -302,7 +172,7 @@ data class LogicalAddress constructor(
     init {
         map[id] = this
 
-        if (id > LogicalAddress.maxId) LogicalAddress.maxId = id
+      //  if (id > LogicalAddress.maxId) LogicalAddress.maxId = id
     }
 
     override val searchField = "$name $description"
@@ -311,30 +181,7 @@ data class LogicalAddress constructor(
 
     companion object {
         val map = hashMapOf<Int, LogicalAddress>()
-        var maxId = 0
-        var isLoaded = false
-
-        /*
-        fun load(callback: () -> Unit) {
-            @Serializable
-            data class LogicalAddressJsonParse constructor(
-                val id: Int,
-                val logicalAddress: String,
-                val description: String,
-                val synonym: String
-            )
-
-            val type = "logicalAddress"
-            getAsyncTpDb(type) { response ->
-                val items = JSON.parse<Array<LogicalAddressJsonParse>>(response)
-                items.forEach { item ->
-                    LogicalAddress(item.id, item.logicalAddress, item.description, item.synonym)
-                }
-                isLoaded = true
-                callback()
-            }
-        }
-         */
+        // var maxId = 0
     }
 }
 
@@ -347,18 +194,14 @@ data class ServiceContract(
     val major: Int,
     override val synonym: String? = null
 ) : BaseItem() {
-    // private val domain: ServiceDomain?
 
     init {
         map[id] = this
-        // domain = ServiceDomain.map[serviceDomainId]
-
-        if (id > ServiceContract.maxId) ServiceContract.maxId = id
+        // if (id > ServiceContract.maxId) ServiceContract.maxId = id
     }
 
     override var searchField: String = namespace
 
-    // override val itemType = ItemType.CONTRACT
     override val description = "$name v$major"
 
     override fun toString(): String = namespace
@@ -366,36 +209,7 @@ data class ServiceContract(
     companion object {
         val map = hashMapOf<Int, ServiceContract>()
 
-        var maxId = 0
-
-        var isLoaded = false
-/*
-        fun load(callback: () -> Unit) {
-            @Serializable
-            data class ServiceContractJsonParse(
-                val id: Int,
-                val serviceDomainId: Int,
-                val name: String,
-                val namespace: String,
-                val major: Int,
-                val synonym: String
-            )
-
-            val type = "contracts"
-            getAsyncTpDb(type) { response ->
-                val items = JSON.parse<Array<ServiceContractJsonParse>>(response)
-                items.forEach { item ->
-                    ServiceContract(item.id, item.serviceDomainId, item.name, item.namespace, item.major, item.synonym)
-                }
-                isLoaded = true
-
-                if (ServiceDomain.isLoaded) {
-                    ServiceDomain.attachContractsToDomains()
-                }
-                callback()
-            }
-        }
-        */
+        // var maxId = 0
     }
 }
 
@@ -407,7 +221,6 @@ data class ServiceDomain(
 ) : BaseItem() {
     override val name = domainName
 
-    // override val itemType = ItemType.DOMAIN
     var contracts: MutableSet<ServiceContract> = mutableSetOf()
 
     override val description = name
@@ -415,8 +228,7 @@ data class ServiceDomain(
     init {
         // todo: Add logic to populate contracts
         map[id] = this
-
-        if (id > ServiceDomain.maxId) ServiceDomain.maxId = id
+        // if (id > ServiceDomain.maxId) ServiceDomain.maxId = id
     }
 
     override val searchField: String = name
@@ -425,28 +237,7 @@ data class ServiceDomain(
 
     companion object {
         val map = hashMapOf<Int, ServiceDomain>()
-        var maxId = 0
-        var isLoaded = false
-
-        /*
-        fun load(callback: () -> Unit) {
-            @Serializable
-            data class ServiceDomainJsonParse(val id: Int, val domainName: String, val synonym: String)
-
-            val type = "domains"
-            getAsyncTpDb(type) { response ->
-                val items = JSON.parse<Array<ServiceDomainJsonParse>>(response)
-                items.forEach { item ->
-                    ServiceDomain(item.id, item.domainName, item.synonym)
-                }
-                isLoaded = true
-                if (ServiceContract.isLoaded) {
-                    attachContractsToDomains()
-                }
-                callback()
-            }
-        }
-        */
+        // var maxId = 0
 
         fun attachContractsToDomains() {
             // Connect the contracts to its domain
@@ -479,36 +270,12 @@ data class Plattform(
 
     init {
         map[id] = this
-        if (id > Plattform.maxId) Plattform.maxId = id
+        // if (id > Plattform.maxId) Plattform.maxId = id
     }
 
     companion object {
         val map = hashMapOf<Int, Plattform>()
-        var maxId = 0
-        var isLoaded = false
-
-        /*
-        fun load(callback: () -> Unit) {
-            @Serializable
-            data class PlattformJsonParse(
-                val id: Int,
-                val platform: String,
-                val environment: String,
-                val snapshotTime: String,
-                val synonym: String
-            )
-
-            val type = "plattforms"
-            getAsyncTpDb(type) { response ->
-                val items = JSON.parse<Array<PlattformJsonParse>>(response)
-                items.forEach { item ->
-                    Plattform(item.id, item.platform, item.environment, item.snapshotTime, item.synonym)
-                }
-                isLoaded = true
-                callback()
-            }
-        }
-        */
+        // var maxId = 0
     }
 }
 
@@ -534,7 +301,6 @@ data class PlattformChain(
     var colorValue: Int = (0..(256 * 256 * 256) - 1).random()
     private val firstPlattform = Plattform.map[first]
 
-    // private val middlePlattform = Plattform.map[middle]
     private val lastPlattform = Plattform.map[last]
 
     override val id = calculateId(first, middle, last)
@@ -543,10 +309,9 @@ data class PlattformChain(
     override val searchField: String = calculateName()
 
     init {
-        // name = calculateName()
         map[id] = this
 
-        if (id > PlattformChain.maxId) PlattformChain.maxId = id
+      //  if (id > PlattformChain.maxId) PlattformChain.maxId = id
     }
 
     override fun toString(): String = firstPlattform!!.name + "->" + lastPlattform!!.name
@@ -562,27 +327,8 @@ data class PlattformChain(
 
     companion object {
         val map = hashMapOf<Int, PlattformChain>()
-        var maxId = 0
-        var isLoaded = false
+        // var maxId = 0
 
-        /*
-        fun load(callback: () -> Unit) {
-            @Serializable
-            data class PlattformChainJsonParse(val id: Int, val plattforms: Array<Int?>)
-
-            val type = "plattformChains"
-            getAsyncTpDb(type) { response ->
-                val items = JSON.parse<Array<PlattformChainJsonParse>>(response)
-                items.forEach { item ->
-                    val f = item.plattforms[0] ?: 0
-                    val l = item.plattforms[2] ?: 0
-                    PlattformChain(f, item.plattforms[1], l)
-                }
-                isLoaded = true
-                callback()
-            }
-        }
-        */
         // Calculte a plattformChainId based on ids of three separate plattforms
         fun calculateId(first: Int, middle: Int?, last: Int): Int {
             val saveM: Int = middle ?: 0
@@ -599,7 +345,6 @@ data class StatisticsPlattform(
     val environment: String,
     override val synonym: String? = null
 ) : BaseItem() {
-    // var colorValue: Int = (0..(256*256*256)-1).random()
     override val name: String = "$platform-$environment"
     override val description = ""
     override val searchField: String = name
@@ -607,37 +352,9 @@ data class StatisticsPlattform(
 
     init {
         mapp[id] = this
-
-        // if (id > StatisticsPlattform.maxId) StatisticsPlattform.maxId = id
     }
 
     companion object {
         val mapp = hashMapOf<Int, StatisticsPlattform>()
-
-        // var maxId = 0
-        var isLoaded = false
-
-        /*
-        fun load(callback: () -> Unit) {
-            @Serializable
-            data class StatisticsPlattformJsonParse(
-                val id: Int,
-                val platform: String,
-                val environment: String,
-                // val snapshotTime: String,
-                // val synonym: String
-            )
-
-            val type = "statPlattforms"
-            getAsyncTpDb(type) { response ->
-                val items = JSON.parse<Array<StatisticsPlattformJsonParse>>(response)
-                items.forEach { item ->
-                    StatisticsPlattform(item.id, item.platform, item.environment/*, item.synonym*/)
-                }
-                isLoaded = true
-                callback()
-            }
-        }
-         */
     }
 }
