@@ -16,7 +16,12 @@
  */
 package se.skoview.common
 
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.await
+import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
+import pl.treksoft.kvision.rest.HttpMethod
+import pl.treksoft.kvision.rest.RestClient
 import se.skoview.app.store
 import se.skoview.hippo.createHippoViewData
 
@@ -91,9 +96,21 @@ fun loadIntegrations(state: HippoState) {
         createHippoViewData(store.getState())
     } else {
         println(">>> Integrations NOT found in cache - will download")
-        getAsyncTpDb(parameters) { response ->
-            println(">>> Size of fetched integrations is: ${response.length}")
-            val integrationInfo: IntegrationInfo = JSON.parse<IntegrationInfo>(response)
+
+        val restClient = RestClient()
+
+        val url = "${tpdbBaseUrl()}$parameters"
+
+        val job = GlobalScope.launch {
+            val integrationInfoPromise =
+                restClient.remoteCall(
+                    url = url,
+                    method = HttpMethod.GET,
+                    deserializer = IntegrationInfo.serializer(),
+                    contentType = ""
+                )
+            val integrationInfo = integrationInfoPromise.await()
+
             val integrationArrs: MutableList<Integration> = mutableListOf()
             for (arr: Array<Int?> in integrationInfo.integrations) {
                 val one: Int = arr[1] ?: -1

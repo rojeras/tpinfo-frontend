@@ -16,11 +16,13 @@
  */
 package se.skoview.stat
 
+import kotlinx.serialization.Serializable
 import org.w3c.files.Blob
 import org.w3c.files.BlobPropertyBag
 import se.skoview.app.store
 import se.skoview.common.*
 
+@Serializable
 val statArrArrCache: HashMap<String, Array<Array<Int>>> = hashMapOf<String, Array<Array<Int>>>()
 
 data class StatisticsBlob(
@@ -48,7 +50,6 @@ data class StatisticsBlob(
     }
 }
 
-
 fun loadStatistics(state: HippoState) {
     val urlParameters = state.getParams()
     val parameters = "statistics$urlParameters"
@@ -64,16 +65,16 @@ fun loadStatistics(state: HippoState) {
     } else {
         println(">>> Statistics data NOT found in cache - will now download, parameters: $parameters")
         console.log(parameters)
+
         getAsyncTpDb(parameters) { response ->
             println(">>> Size of fetched statistics data is: ${response.length}")
-
             val statisticsArrArr: Array<Array<Int>> = JSON.parse(response)
+
             statArrArrCache[parameters] = statisticsArrArr
             store.dispatch(HippoAction.DoneDownloadStatistics(statisticsArrArr))
         }
     }
     if (state.showTimeGraph) loadHistory(state)
-
 }
 
 private fun updateCallsArr(callsArr: MutableMap<Int, Int>, itemId: Int, calls: Int) {
@@ -100,23 +101,23 @@ fun exportStatData(state: HippoState) {
 
     if (state.selectedConsumers.size > 0)
         csvData += "Tjänstekonsumenter: ${
-            state.selectedConsumers.map { ServiceComponent.map[it]!!.name }.joinToString()
+        state.selectedConsumers.map { ServiceComponent.map[it]!!.name }.joinToString()
         }\n"
 
     if (state.selectedContracts.size > 0)
         csvData += "Tjänstekontrakt: ${
-            state.selectedContracts.map { ServiceContract.map[it]!!.name }.joinToString()
+        state.selectedContracts.map { ServiceContract.map[it]!!.name }.joinToString()
         } \n"
 
     if (state.selectedLogicalAddresses.size > 0)
         csvData +=
             "Logiska adresser : ${
-                state.selectedLogicalAddresses.map { LogicalAddress.map[it]!!.name }.joinToString()
+            state.selectedLogicalAddresses.map { LogicalAddress.map[it]!!.name }.joinToString()
             }\n"
 
     if (state.selectedProducers.size > 0)
         csvData += "Tjänsteproducenter: ${
-            state.selectedProducers.map { ServiceComponent.map[it]!!.name }.joinToString()
+        state.selectedProducers.map { ServiceComponent.map[it]!!.name }.joinToString()
         }\n"
 
     csvData += "\n"
@@ -133,7 +134,7 @@ fun exportStatData(state: HippoState) {
 
         csvData += "${consumer.hsaId}; ${consumer.description};"
         csvData += "$calls;"
-        csvData += "${selectedTpName};"
+        csvData += "$selectedTpName;"
         csvData += "${domain.name};"
         csvData += "${contract.name} ${contract.major};"
         csvData += "${logicalAddress.name}; ${logicalAddress.description};"
