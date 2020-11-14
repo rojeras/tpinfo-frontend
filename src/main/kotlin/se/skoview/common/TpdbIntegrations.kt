@@ -100,6 +100,7 @@ fun loadIntegrations(state: HippoState) {
         val restClient = RestClient()
 
         val url = "${tpdbBaseUrl()}$parameters"
+        println(url)
 
         val job = GlobalScope.launch {
             val integrationInfoPromise =

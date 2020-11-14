@@ -16,6 +16,7 @@
  */
 package se.skoview.common
 
+import se.skoview.hippo.BookmarkInformation
 import se.skoview.hippo.parseBookmark
 import se.skoview.stat.AdvancedViewPreSelect
 import se.skoview.stat.SimpleViewPreSelect
@@ -46,143 +47,88 @@ enum class ViewMode {
     ADVANCED
 }
 
-//@Serializable
 data class HippoState(
     // Status information
-    val currentAction: KClass<out HippoAction>,
-    val applicationStarted: HippoApplication?,
-    val downloadBaseItemStatus: AsyncActionStatus,
-    val downloadIntegrationStatus: AsyncActionStatus,
-    val errorMessage: String?,
+    val currentAction: KClass<out HippoAction> = HippoAction.ApplicationStarted::class,
+    val view: View = View.HOME,
+    val applicationStarted: HippoApplication? = null,
+    val downloadBaseItemStatus: AsyncActionStatus = AsyncActionStatus.NOT_INITIALIZED,
+    val downloadIntegrationStatus: AsyncActionStatus = AsyncActionStatus.NOT_INITIALIZED,
+    val errorMessage: String? = null,
 
     // Base Items
     // todo: Why are the base items stored via the state? Ought to be enough to register when they are loaded.
-    val integrationDates: List<String>,
-    val statisticsDates: List<String>,
-    val serviceComponents: Map<Int, ServiceComponent>,
-    val logicalAddresses: Map<Int, LogicalAddress>,
-    val serviceContracts: Map<Int, ServiceContract>,
-    val serviceDomains: Map<Int, ServiceDomain>,
-    val plattforms: Map<Int, Plattform>,
-    val plattformChains: Map<Int, PlattformChain>,
-    val statisticsPlattforms: Map<Int, StatisticsPlattform>,
+    val integrationDates: List<String> = listOf(),
+    val statisticsDates: List<String> = listOf(),
+    val serviceComponents: Map<Int, ServiceComponent> = mapOf(),
+    val logicalAddresses: Map<Int, LogicalAddress> = mapOf(),
+    val serviceContracts: Map<Int, ServiceContract> = mapOf(),
+    val serviceDomains: Map<Int, ServiceDomain> = mapOf(),
+    val plattforms: Map<Int, Plattform> = mapOf(),
+    val plattformChains: Map<Int, PlattformChain> = mapOf(),
+    val statisticsPlattforms: Map<Int, StatisticsPlattform> = mapOf(),
 
     // Filter parameters
-    val dateEffective: String,
-    val dateEnd: String,
 
-    val selectedConsumers: List<Int>,
-    val selectedProducers: List<Int>,
-    val selectedLogicalAddresses: List<Int>,
-    val selectedContracts: List<Int>,
-    val selectedDomains: List<Int>,
-    val selectedPlattformChains: List<Int>,
-    val selectedPlattformName: String,
+    val dateEffective: String? = null,
+    val dateEnd: String? = null,
+
+    val selectedConsumers: List<Int> = listOf(),
+    val selectedProducers: List<Int> = listOf(),
+    val selectedLogicalAddresses: List<Int> = listOf(),
+    val selectedContracts: List<Int> = listOf(),
+    val selectedDomains: List<Int> = listOf(),
+    val selectedPlattformChains: List<Int> = listOf(),
 
     // Integrations data
-    val integrationArrs: List<Integration>,
-    val maxCounters: MaxCounter,
-    val updateDates: List<String>,
+    val selectedPlattformName: String = "",
+    val integrationArrs: List<Integration> = listOf(),
+    val maxCounters: MaxCounter = MaxCounter(0, 0, 0, 0, 0, 0),
+    val updateDates: List<String> = listOf(),
 
     // View data
-    val vServiceConsumers: List<ServiceComponent>,
-    val vServiceProducers: List<ServiceComponent>,
-    val vServiceDomains: List<ServiceDomain>,
-    val vServiceContracts: List<ServiceContract>,
-    val vDomainsAndContracts: List<BaseItem>,
-    val vPlattformChains: List<PlattformChain>,
-    val vLogicalAddresses: List<LogicalAddress>,
+    val vServiceConsumers: List<ServiceComponent> = listOf(),
+    val vServiceProducers: List<ServiceComponent> = listOf(),
+    val vServiceDomains: List<ServiceDomain> = listOf(),
+    val vServiceContracts: List<ServiceContract> = listOf(),
+    val vDomainsAndContracts: List<BaseItem> = listOf(),
+    val vPlattformChains: List<PlattformChain> = listOf(),
+    val vLogicalAddresses: List<LogicalAddress> = listOf(),
 
     // Max number of items to display
-    val vServiceConsumersMax: Int,
-    val vServiceProducersMax: Int,
-    val vLogicalAddressesMax: Int,
-    val vServiceContractsMax: Int,
+    val vServiceConsumersMax: Int = 100,
+    val vServiceProducersMax: Int = 100,
+    val vLogicalAddressesMax: Int = 100,
+    val vServiceContractsMax: Int = 500,
 
     // Statistics information
-    val statBlob: StatisticsBlob,
+    val statBlob: StatisticsBlob = StatisticsBlob(arrayOf(arrayOf())),
 
     // History information
-    val historyMap: Map<String, Int>,
-    val showTimeGraph: Boolean,
+    val historyMap: Map<String, Int> = mapOf(),
+    val showTimeGraph: Boolean = false,
 
     // View controllers
-    val showTechnicalTerms: Boolean,
-    val viewMode: ViewMode,
-    val simpleViewPreSelect: SimpleViewPreSelect,
-    val advancedViewPreSelect: AdvancedViewPreSelect?
+    val showTechnicalTerms: Boolean = false,
+    val viewMode: ViewMode = ViewMode.SIMPLE,
+    val simpleViewPreSelect: SimpleViewPreSelect = simpleViewPreSelectDefault,
+    val advancedViewPreSelect: AdvancedViewPreSelect? = null
 )
 
-// This function creates the initial state based on an option filter parameter in the URL
-fun initialHippoState(): HippoState {
+fun initializeHippoState(): HippoState {
+    val bookmarkInformation: BookmarkInformation = parseBookmark()
 
-    val bookmarkInformation = parseBookmark()
-
-    return HippoState(
-        HippoAction.ApplicationStarted::class,
-        null,
-        AsyncActionStatus.NOT_INITIALIZED,
-        AsyncActionStatus.NOT_INITIALIZED,
-        null,
-        listOf(),
-        listOf(),
-        mapOf(),
-        mapOf(),
-        mapOf(),
-        mapOf(),
-        mapOf(),
-        mapOf(),
-        mapOf(),
-        bookmarkInformation.dateEffective, // todo: Verify if this is a good default - really want empty value
-        bookmarkInformation.dateEnd,
-        bookmarkInformation.selectedConsumers,
-        //listOf(304), // TEMP
-        bookmarkInformation.selectedProducers,
-        bookmarkInformation.selectedLogicalAddresses,
-        bookmarkInformation.selectedContracts,
-        bookmarkInformation.selectedDomains,
-        bookmarkInformation.selectedPlattformChains,
-        "",
-        listOf(),
-        MaxCounter(0, 0, 0, 0, 0, 0),
-        listOf(),
-        listOf(),
-        listOf(),
-        listOf(),
-        listOf(),
-        listOf(),
-        listOf(),
-        listOf(),
-        100,
-        100,
-        100,
-        500,
-        StatisticsBlob(arrayOf(arrayOf())),
-        mapOf(),
-        false,
-        false,
-        ViewMode.SIMPLE, // TEMP
-        simpleViewPreSelectDefault,
-        null
+    val state = HippoState()
+    return state.copy(
+        dateEffective = bookmarkInformation.dateEffective,
+        dateEnd = bookmarkInformation.dateEnd,
+        selectedConsumers = bookmarkInformation.selectedConsumers,
+        selectedProducers = bookmarkInformation.selectedProducers,
+        selectedLogicalAddresses = bookmarkInformation.selectedLogicalAddresses,
+        selectedContracts = bookmarkInformation.selectedContracts,
+        selectedDomains = bookmarkInformation.selectedDomains,
+        selectedPlattformChains = bookmarkInformation.selectedPlattformChains
     )
-}
-
-object HippoStateArr {
-    val states: MutableList<HippoState> = mutableListOf()
-    var currentIndex = -1
-
-    fun size() = states.size
-
-    fun add(newState: HippoState) {
-        states.add(newState)
-        currentIndex += 1
-    }
-
-    fun back(): HippoState {
-        currentIndex -= 1
-        return states[currentIndex]
-    }
-
 }
 
 fun HippoState.isItemSelected(itemType: ItemType, id: Int): Boolean {
@@ -202,11 +148,10 @@ fun HippoState.isPlattformSelected(id: Int): Boolean {
     return this.selectedPlattformChains.contains(pChainId)
 }
 
-
 // The extension function create the part of the URL to fetch integrations
 fun HippoState.getParams(): String {
 
-    //var params = "?dummy&contractId=379"
+    // var params = "?dummy&contractId=379"
     var params = "?dummy"
 
     params += "&dateEffective=" + this.dateEffective
@@ -243,6 +188,3 @@ fun HippoState.getParams(): String {
 
     return params
 }
-
-
-

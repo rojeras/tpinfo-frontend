@@ -17,9 +17,8 @@
 package se.skoview.common
 
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
 import kotlinx.coroutines.await
-import kotlinx.coroutines.joinAll
-import kotlinx.coroutines.launch
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.ListSerializer
@@ -29,59 +28,78 @@ import pl.treksoft.kvision.rest.RestClient
 import kotlin.collections.component1
 import kotlin.collections.component2
 import kotlin.collections.set
+import kotlin.js.Promise
 
-suspend fun loadBaseItems(store: ReduxStore<HippoState, HippoAction>) {
+fun loadBaseItems(store: ReduxStore<HippoState, HippoAction>) { // : Deferred<Unit> {
     println("Will now load BaseItems")
+    // We must ensure the dates are loaded synchronisly - integration and statistics fetch are dependent
+
     store.dispatch(HippoAction.StartDownloadBaseItems)
+    GlobalScope.async {
 
-    val baseDatesJob = GlobalScope.launch {
-        loadBaseItem("dates", Dates.serializer())
-    }
+        // val baseDatesJob = GlobalScope.launch {
+        val p1 = loadBaseItem("dates", Dates.serializer())
+        // }
 
-    val domainsJob = GlobalScope.launch {
-        loadBaseItem("domains", ListSerializer(ServiceDomain.serializer()))
-    }
+        // val domainsJob = GlobalScope.launch {
+        val p2 = loadBaseItem("domains", ListSerializer(ServiceDomain.serializer()))
+        // }
 
-    val contractsJob = GlobalScope.launch {
-        loadBaseItem("contracts", ListSerializer(ServiceContract.serializer()))
-    }
+        // val contractsJob = GlobalScope.launch {
+        val p3 = loadBaseItem("contracts", ListSerializer(ServiceContract.serializer()))
+        // }
 
-    val componentJob = GlobalScope.launch {
-        loadBaseItem("components", ListSerializer(ServiceComponent.serializer()))
-    }
-
-    val laJob = GlobalScope.launch {
+        // val componentJob = GlobalScope.launch {
+        val p4 = loadBaseItem("components", ListSerializer(ServiceComponent.serializer()))
+        // }
+/*
+        // val laJob = GlobalScope.launch {
         loadBaseItem("logicalAddress", ListSerializer(LogicalAddress.serializer()))
-    }
+        // }
 
-    val plattformJob = GlobalScope.launch {
+        // val plattformJob = GlobalScope.launch {
         loadBaseItem("plattforms", ListSerializer(Plattform.serializer()))
-    }
+        // }
 
-    val plattformChainJob = GlobalScope.launch {
+        // val plattformChainJob = GlobalScope.launch {
         loadBaseItem("plattformChains", ListSerializer(PlattformChainJson.serializer()))
-    }
+        // }
 
-    val statPlattformJob = GlobalScope.launch {
+        // val statPlattformJob = GlobalScope.launch {
         loadBaseItem("statPlattforms", ListSerializer(StatisticsPlattform.serializer()))
+        // }
+*/
+        p1.await()
+        p2.await()
+        p3.await()
+        p4.await()
+
+        /*
+        joinAll(
+            baseDatesJob,
+            domainsJob,
+            contractsJob,
+            componentJob,
+            laJob,
+            plattformJob,
+            plattformChainJob,
+            statPlattformJob
+        )
+         */
+        println("After join")
+        ServiceDomain.attachContractsToDomains()
+        println("Will now dispatch DoneDownloadBaseItems")
+        store.dispatch(HippoAction.DoneDownloadBaseItems)
     }
-
-    println("Before Joinall")
-    joinAll(baseDatesJob, domainsJob, contractsJob, componentJob, laJob, plattformJob, plattformChainJob, statPlattformJob)
-    println("After Joinall")
-
-    ServiceDomain.attachContractsToDomains()
-
-    store.dispatch(HippoAction.DoneDownloadBaseItems)
 }
 
-suspend fun <T : Any> loadBaseItem(type: String, deserializer: DeserializationStrategy<T>) {
+suspend fun <T : Any> loadBaseItem(type: String, deserializer: DeserializationStrategy<T>): Promise<T> {
     val restClient = RestClient()
     val url = "${tpdbBaseUrl()}$type"
     println("*** In load $type")
     println(url)
 
-    val componentList =
+    val answerPromise =
         restClient.remoteCall(
             url = url,
             method = HttpMethod.GET,
@@ -89,8 +107,9 @@ suspend fun <T : Any> loadBaseItem(type: String, deserializer: DeserializationSt
             contentType = ""
         )
 
-    componentList.await()
+    // answerPromise.await()
     println("*** Leaving load $type")
+    return answerPromise
 }
 
 abstract class BaseItem {
@@ -172,7 +191,7 @@ data class LogicalAddress constructor(
     init {
         map[id] = this
 
-      //  if (id > LogicalAddress.maxId) LogicalAddress.maxId = id
+        //  if (id > LogicalAddress.maxId) LogicalAddress.maxId = id
     }
 
     override val searchField = "$name $description"
@@ -311,7 +330,7 @@ data class PlattformChain(
     init {
         map[id] = this
 
-      //  if (id > PlattformChain.maxId) PlattformChain.maxId = id
+        //  if (id > PlattformChain.maxId) PlattformChain.maxId = id
     }
 
     override fun toString(): String = firstPlattform!!.name + "->" + lastPlattform!!.name

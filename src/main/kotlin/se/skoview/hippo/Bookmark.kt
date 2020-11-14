@@ -43,7 +43,6 @@ fun setUrlFilter(state: HippoState) {
     val portSpec = if (port.isNotEmpty()) ":$port" else ""
     var newUrl = "$protocol//$hostname$portSpec$pathname"
 
-
     val bookmark = state.getBookmark()
     val filterString =
         if (bookmark.length > 1) "?filter=$bookmark"
@@ -91,8 +90,8 @@ fun HippoState.getBookmark(): String {
 
     // Exclude dates if dateEnd == current date (first in updateDates list)
     if (this.dateEnd != this.updateDates[0]) {
-        bookmark += "S" + date2DaysSinceEpoch(this.dateEffective)
-        bookmark += "E" + date2DaysSinceEpoch(this.dateEnd)
+        bookmark += "S" + date2DaysSinceEpoch(this.dateEffective!!)
+        bookmark += "E" + date2DaysSinceEpoch(this.dateEnd!!)
     }
     // Separate plattforms now stored in filter, not the chain
     for (pcId in this.selectedPlattformChains) {
@@ -107,7 +106,7 @@ fun HippoState.getBookmark(): String {
 fun parseBookmark(): BookmarkInformation {
     // ---------------------------------------------------------------------
     fun parseBookmarkType(typeChar: String, filterValue: String): List<Int> {
-        //val regex = Regex("""c\d*""")
+        // val regex = Regex("""c\d*""")
         val regexPattern = """\d*"""
         val regex = Regex(typeChar + regexPattern)
 
@@ -136,10 +135,14 @@ fun parseBookmark(): BookmarkInformation {
 
     // Extract and calculate the date values
     val dateEffectiveCodeList = parseBookmarkType("S", filterValue)
-    val dateEffective = if (dateEffectiveCodeList.isNotEmpty()) daysSinceEpoch2date(dateEffectiveCodeList[0]) else ""
+    val dateEffective = if (dateEffectiveCodeList.isNotEmpty())
+        daysSinceEpoch2date(dateEffectiveCodeList[0])
+    else ""
 
     val dateEndCodeList = parseBookmarkType("E", filterValue)
-    val dateEnd = if (dateEndCodeList.isNotEmpty()) daysSinceEpoch2date(dateEffectiveCodeList[0].toInt()) else ""
+    val dateEnd = if (dateEndCodeList.isNotEmpty())
+        daysSinceEpoch2date(dateEffectiveCodeList[0].toInt())
+    else ""
 
     // Extract and calculate the plattforms values
     val firstPlattformCodeList = parseBookmarkType("F", filterValue)
@@ -165,14 +168,14 @@ fun parseBookmark(): BookmarkInformation {
         parseBookmarkType("d", filterValue),
         plattformChainList
     )
-    //val cList = parseBookmarkType("c", filterValue)
+    // val cList = parseBookmarkType("c", filterValue)
 
     return bookmarkInformation
 }
 
 fun date2DaysSinceEpoch(dateString: String): Double {
     val day = Date(dateString)
-    return (day.getTime() / 8.64e7) - 16874  // Dived by number of millisecs since epoch (1/1 1970)
+    return (day.getTime() / 8.64e7) - 16874 // Dived by number of millisecs since epoch (1/1 1970)
 }
 
 fun daysSinceEpoch2date(daysSinceEpoch: Int): String {

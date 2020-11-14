@@ -33,12 +33,14 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
             val dEnd: String
             val pChainId: List<Int>
             val app: HippoApplication
+            val view: View
             when (action.App) {
                 HippoApplication.HIPPO -> {
-                    dEffective = if (state.dateEffective == "") BaseDates.integrationDates[0] else state.dateEffective
+                    dEffective = if (state.dateEffective == null) BaseDates.integrationDates[0] else state.dateEffective
                     dEnd = dEffective
                     pChainId = state.selectedPlattformChains
                     app = HippoApplication.HIPPO
+                    view = View.HIPPO
                 }
                 HippoApplication.STATISTIK -> {
                     app = HippoApplication.STATISTIK
@@ -47,13 +49,15 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
                     // todo: Following should not be hard coded like this
                     pChainId = listOf(calculateId(first = 3, middle = null, last = 3))
                     dEnd = datePair.second.toSwedishDate()
+                    view = View.STAT_SIMPLE
                 }
             }
             state.copy(
                 applicationStarted = app,
                 dateEffective = dEffective,
                 selectedPlattformChains = pChainId,
-                dateEnd = dEnd
+                dateEnd = dEnd,
+                view = view
             )
         }
         is HippoAction.StartDownloadBaseItems -> state.copy(
@@ -71,9 +75,10 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
                 serviceDomains = ServiceDomain.map,
                 plattforms = Plattform.map,
                 plattformChains = PlattformChain.map,
-                statisticsPlattforms = StatisticsPlattform.mapp
-                //dateEffective = newDate,
-                //dateEnd = newDate
+                statisticsPlattforms = StatisticsPlattform.mapp,
+                // Try this
+                dateEffective = BaseDates.integrationDates[0],
+                dateEnd = BaseDates.integrationDates[0]
             )
         }
         is HippoAction.ErrorDownloadBaseItems -> state.copy(
@@ -146,7 +151,7 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
                 advancedViewPreSelect = preSelect
             )
 
-            state1 //itemDeselectAllForAllTypes(state1)
+            state1 // itemDeselectAllForAllTypes(state1)
         }
         is HippoAction.ItemIdSelected -> {
 
@@ -309,7 +314,6 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
             val preSelect = action.preSelect
             applyFilteredItemsSelection(state, preSelect.filteredItems).copy(advancedViewPreSelect = preSelect)
         }
-
     }
 
     val finalState = newState.copy(currentAction = action::class)
@@ -317,11 +321,8 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
     console.log(finalState)
     println("<<<===== ${action::class}")
 
-    HippoStateArr.states.add(finalState)
-
     return finalState
 }
-
 
 private fun itemIdListSelected(inState: HippoState, itemType: ItemType, selectedList: List<Int>): HippoState {
     return when (itemType) {
@@ -338,7 +339,7 @@ private fun itemDeselectAllForAllTypes(inState: HippoState): HippoState {
         selectedConsumers = listOf(),
         selectedDomains = listOf(),
         selectedContracts = listOf(),
-        //selectedPlattformChains = listOf(),
+        // selectedPlattformChains = listOf(),
         selectedLogicalAddresses = listOf(),
         selectedProducers = listOf()
     )
@@ -346,7 +347,7 @@ private fun itemDeselectAllForAllTypes(inState: HippoState): HippoState {
 
 private fun applyFilteredItemsSelection(inState: HippoState, filteredItems: FilteredItems): HippoState {
 
-    println("In applyFilteredItemsSelection(): ${filteredItems}")
+    println("In applyFilteredItemsSelection(): $filteredItems")
 
     var state2 = itemDeselectAllForAllTypes(inState)
 
