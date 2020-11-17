@@ -14,17 +14,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package se.skoview.hippo
+package se.skoview.common
 
-import se.skoview.common.HippoState
-import se.skoview.common.PlattformChain
-import kotlin.browser.document
-import kotlin.browser.window
+import kotlinx.browser.document
+import kotlinx.browser.window
 import kotlin.js.Date
 
 data class BookmarkInformation(
-    var dateEffective: String = "",
-    var dateEnd: String = "",
+    var dateEffective: String? = null,
+    var dateEnd: String? = null,
     var selectedConsumers: List<Int> = listOf(),
     var selectedProducers: List<Int> = listOf(),
     var selectedLogicalAddresses: List<Int> = listOf(),
@@ -95,6 +93,7 @@ fun HippoState.getBookmark(): String {
     }
     // Separate plattforms now stored in filter, not the chain
     for (pcId in this.selectedPlattformChains) {
+        println("In getBookmark()")
         val firstId = PlattformChain.map[pcId]?.first
         val lastId = PlattformChain.map[pcId]?.last
         bookmark += "F$firstId"
@@ -103,7 +102,7 @@ fun HippoState.getBookmark(): String {
     return bookmark
 }
 
-fun parseBookmark(): BookmarkInformation {
+fun parseBookmark(fullUrl: String = document.baseURI): BookmarkInformation {
     // ---------------------------------------------------------------------
     fun parseBookmarkType(typeChar: String, filterValue: String): List<Int> {
         // val regex = Regex("""c\d*""")
@@ -121,7 +120,9 @@ fun parseBookmark(): BookmarkInformation {
     }
     // ---------------------------------------------------------------------
 
-    val fullUrl = document.baseURI
+    // val fullUrl = document.baseURI
+
+    println("In parseBookmark, url=$fullUrl")
 
     val filterParam = "filter"
     var ix = fullUrl.indexOf(filterParam)
@@ -137,12 +138,12 @@ fun parseBookmark(): BookmarkInformation {
     val dateEffectiveCodeList = parseBookmarkType("S", filterValue)
     val dateEffective = if (dateEffectiveCodeList.isNotEmpty())
         daysSinceEpoch2date(dateEffectiveCodeList[0])
-    else ""
+    else null
 
     val dateEndCodeList = parseBookmarkType("E", filterValue)
     val dateEnd = if (dateEndCodeList.isNotEmpty())
         daysSinceEpoch2date(dateEffectiveCodeList[0].toInt())
-    else ""
+    else null
 
     // Extract and calculate the plattforms values
     val firstPlattformCodeList = parseBookmarkType("F", filterValue)

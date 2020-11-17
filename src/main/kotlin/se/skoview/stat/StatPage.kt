@@ -34,7 +34,6 @@ import pl.treksoft.kvision.table.table
 import pl.treksoft.kvision.utils.px
 import pl.treksoft.kvision.utils.vh
 import se.skoview.app.formControlXs
-import se.skoview.app.store
 import se.skoview.common.*
 
 var statPageTop: Div = Div()
@@ -42,6 +41,7 @@ var statPageTop: Div = Div()
 object StatPage : SimplePanel() {
 
     init {
+        val store = HippoManager.hippoStore
         fontFamily = "Times New Roman"
         id = "StatPage:SimplePanel()"
         //background = Background(Color.name(Col.RED))

@@ -24,16 +24,12 @@ import pl.treksoft.kvision.panel.hPanel
 import pl.treksoft.kvision.state.bind
 import pl.treksoft.kvision.utils.perc
 import pl.treksoft.kvision.utils.vw
-import se.skoview.app.store
-import se.skoview.common.HippoAction
-import se.skoview.common.HippoState
-import se.skoview.common.ItemType
-import se.skoview.common.getHeightToRemainingViewPort
+import se.skoview.common.*
 
 object AdvancedView : VPanel(
 ) {
     init {
-
+        val store = HippoManager.hippoStore
         // The whole item table
         hPanel(
             spacing = 1

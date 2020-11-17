@@ -17,8 +17,9 @@
 package se.skoview.common
 
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
 import kotlinx.coroutines.await
+import kotlinx.coroutines.joinAll
+import kotlinx.coroutines.launch
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.ListSerializer
@@ -30,67 +31,62 @@ import kotlin.collections.component2
 import kotlin.collections.set
 import kotlin.js.Promise
 
-fun loadBaseItems(store: ReduxStore<HippoState, HippoAction>) { // : Deferred<Unit> {
+suspend fun loadBaseItems(store: ReduxStore<HippoState, HippoAction>) { // : Deferred<Unit> {
     println("Will now load BaseItems")
     // We must ensure the dates are loaded synchronisly - integration and statistics fetch are dependent
 
-    store.dispatch(HippoAction.StartDownloadBaseItems)
-    GlobalScope.async {
+    // store.dispatch(HippoAction.StartDownloadBaseItems)
 
-        // val baseDatesJob = GlobalScope.launch {
-        val p1 = loadBaseItem("dates", Dates.serializer())
-        // }
-
-        // val domainsJob = GlobalScope.launch {
-        val p2 = loadBaseItem("domains", ListSerializer(ServiceDomain.serializer()))
-        // }
-
-        // val contractsJob = GlobalScope.launch {
-        val p3 = loadBaseItem("contracts", ListSerializer(ServiceContract.serializer()))
-        // }
-
-        // val componentJob = GlobalScope.launch {
-        val p4 = loadBaseItem("components", ListSerializer(ServiceComponent.serializer()))
-        // }
-/*
-        // val laJob = GlobalScope.launch {
-        loadBaseItem("logicalAddress", ListSerializer(LogicalAddress.serializer()))
-        // }
-
-        // val plattformJob = GlobalScope.launch {
-        loadBaseItem("plattforms", ListSerializer(Plattform.serializer()))
-        // }
-
-        // val plattformChainJob = GlobalScope.launch {
-        loadBaseItem("plattformChains", ListSerializer(PlattformChainJson.serializer()))
-        // }
-
-        // val statPlattformJob = GlobalScope.launch {
-        loadBaseItem("statPlattforms", ListSerializer(StatisticsPlattform.serializer()))
-        // }
-*/
-        p1.await()
-        p2.await()
-        p3.await()
-        p4.await()
-
+    // GlobalScope.async {
         /*
-        joinAll(
-            baseDatesJob,
-            domainsJob,
-            contractsJob,
-            componentJob,
-            laJob,
-            plattformJob,
-            plattformChainJob,
-            statPlattformJob
-        )
+        val baseDatesJob = GlobalScope.launch {
+            val p1 = loadBaseItem("dates", Dates.serializer())
+            println("Dates loaded")
+        }
          */
-        println("After join")
-        ServiceDomain.attachContractsToDomains()
-        println("Will now dispatch DoneDownloadBaseItems")
-        store.dispatch(HippoAction.DoneDownloadBaseItems)
+
+    val domainsJob = GlobalScope.launch {
+        loadBaseItem("domains", ListSerializer(ServiceDomain.serializer()))
     }
+
+    val contractsJob = GlobalScope.launch {
+        loadBaseItem("contracts", ListSerializer(ServiceContract.serializer()))
+    }
+
+    val componentJob = GlobalScope.launch {
+        loadBaseItem("components", ListSerializer(ServiceComponent.serializer()))
+    }
+
+    val laJob = GlobalScope.launch {
+        loadBaseItem("logicalAddress", ListSerializer(LogicalAddress.serializer()))
+    }
+
+    val plattformJob = GlobalScope.launch {
+        loadBaseItem("plattforms", ListSerializer(Plattform.serializer()))
+    }
+
+    val plattformChainJob = GlobalScope.launch {
+        loadBaseItem("plattformChains", ListSerializer(PlattformChainJson.serializer()))
+    }
+
+    val statPlattformJob = GlobalScope.launch {
+        loadBaseItem("statPlattforms", ListSerializer(StatisticsPlattform.serializer()))
+    }
+
+    joinAll(
+        // baseDatesJob,
+        domainsJob,
+        contractsJob,
+        componentJob,
+        laJob,
+        plattformJob,
+        plattformChainJob,
+        statPlattformJob
+    )
+
+    println("After join")
+    ServiceDomain.attachContractsToDomains()
+    // }
 }
 
 suspend fun <T : Any> loadBaseItem(type: String, deserializer: DeserializationStrategy<T>): Promise<T> {
@@ -107,7 +103,7 @@ suspend fun <T : Any> loadBaseItem(type: String, deserializer: DeserializationSt
             contentType = ""
         )
 
-    // answerPromise.await()
+    answerPromise.await()
     println("*** Leaving load $type")
     return answerPromise
 }
@@ -317,7 +313,6 @@ data class PlattformChain(
     override val synonym: String? = null
 ) : BaseItem() {
 
-    var colorValue: Int = (0..(256 * 256 * 256) - 1).random()
     private val firstPlattform = Plattform.map[first]
 
     private val lastPlattform = Plattform.map[last]
@@ -329,8 +324,6 @@ data class PlattformChain(
 
     init {
         map[id] = this
-
-        //  if (id > PlattformChain.maxId) PlattformChain.maxId = id
     }
 
     override fun toString(): String = firstPlattform!!.name + "->" + lastPlattform!!.name
@@ -346,9 +339,8 @@ data class PlattformChain(
 
     companion object {
         val map = hashMapOf<Int, PlattformChain>()
-        // var maxId = 0
 
-        // Calculte a plattformChainId based on ids of three separate plattforms
+        // Calculate a plattformChainId based on ids of three separate plattforms
         fun calculateId(first: Int, middle: Int?, last: Int): Int {
             val saveM: Int = middle ?: 0
             return (first * 10000) + saveM * 100 + last

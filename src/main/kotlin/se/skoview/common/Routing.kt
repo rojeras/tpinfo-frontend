@@ -28,16 +28,28 @@ enum class View(val url: String) {
 fun Navigo.initialize(): Navigo {
     return on(
         View.HOME.url,
-        { _ -> HippoManager.fromUrl(View.HOME) }
+        { _ -> HippoManager.newOrUpdatedUrlFromBrowser(View.HOME) }
+    ) /* .on(
+        "${View.HOME.url}/:slug",
+        { params -> HippoManager.newOrUpdatedUrlFromBrowser(View.HOME, stringParameter(params, "slug")) }
+    ) */.on(
+        View.HIPPO.url,
+        { _ -> HippoManager.newOrUpdatedUrlFromBrowser(View.HIPPO) }
     ).on(
         "${View.HIPPO.url}/:slug",
-        { params -> HippoManager.fromUrl(View.HIPPO, stringParameter(params, "slug")) }
+        { params -> HippoManager.newOrUpdatedUrlFromBrowser(View.HIPPO, stringParameter(params, "slug")) }
+    ).on(
+        View.STAT_SIMPLE.url,
+        { _ -> HippoManager.newOrUpdatedUrlFromBrowser(View.STAT_SIMPLE) }
     ).on(
         "${View.STAT_SIMPLE.url}/:slug",
-        { params -> HippoManager.fromUrl(View.STAT_SIMPLE, stringParameter(params, "slug")) }
+        { params -> HippoManager.newOrUpdatedUrlFromBrowser(View.STAT_SIMPLE, stringParameter(params, "slug")) }
+    ).on(
+        View.STAT_ADVANCED.url,
+        { _ -> HippoManager.newOrUpdatedUrlFromBrowser(View.STAT_ADVANCED) }
     ).on(
         "${View.STAT_ADVANCED.url}/:slug",
-        { params -> HippoManager.fromUrl(View.STAT_ADVANCED, stringParameter(params, "slug")) }
+        { params -> HippoManager.newOrUpdatedUrlFromBrowser(View.STAT_ADVANCED, stringParameter(params, "slug")) }
     )
 }
 /*
@@ -63,7 +75,6 @@ fun Navigo.initialize(): Navigo {
     })
 }
  */
-
 
 fun stringParameter(params: dynamic, parameterName: String): String {
     return (params[parameterName]).toString()

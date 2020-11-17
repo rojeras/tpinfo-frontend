@@ -24,46 +24,43 @@ import pl.treksoft.kvision.panel.flexPanel
 import pl.treksoft.kvision.state.bind
 import pl.treksoft.kvision.utils.perc
 import pl.treksoft.kvision.utils.vw
-import se.skoview.app.store
 import se.skoview.common.HippoAction
+import se.skoview.common.HippoManager
 import se.skoview.common.ItemType
 import se.skoview.common.getHeightToRemainingViewPort
 
 // Below is the code to show the different graphs for the simple version
-object SimpleView : SimplePanel(
-) {
+object SimpleView : SimplePanel() {
     init {
+        val store = HippoManager.hippoStore
         println("In the simple view")
         id = "TheSimpleView:SimplePanel"
-        //background = Background(Color.name(Col.RED))
-        //height = 100.perc
+        // background = Background(Color.name(Col.RED))
+        // height = 100.perc
         div { }.bind(store) { state ->
             id = "TheSimpleView:SimplePanel-Bind"
             height = 100.perc
-            //background = Background(Color.name(Col.LIGHTBLUE))
+            // background = Background(Color.name(Col.LIGHTBLUE))
 
-            flexPanel(
-            ) {
-                //spacing = 1
+            flexPanel() {
+                // spacing = 1
                 id = "TheSimpleViewBigPanel:FlexPanel"
                 overflow = Overflow.HIDDEN
                 width = 100.vw
 
-                //val occupiedViewPortArea = (statPageTop.getElementJQuery()?.innerHeight() ?: 153).toInt()
+                // val occupiedViewPortArea = (statPageTop.getElementJQuery()?.innerHeight() ?: 153).toInt()
                 /*
                 val occupiedViewPortArea = (statPageTop.getElementJQuery()?.height() ?: 153).toInt()
                 println("+++++++++- Inner height: $occupiedViewPortArea")
                 val heightToRemove = occupiedViewPortArea + 40
                 setStyle("height", "calc(100vh - ${heightToRemove}px)")
                  */
-                //setStyle("height", "calc(100vh - 200px)")
+                // setStyle("height", "calc(100vh - 200px)")
 
                 setStyle("height", getHeightToRemainingViewPort(statPageTop, 40))
 
                 height = 100.perc
-                //background = Background(Color.name(Col.YELLOW))
-
-
+                // background = Background(Color.name(Col.YELLOW))
 
                 SInfo.createStatViewData(state)
 
@@ -74,12 +71,12 @@ object SimpleView : SimplePanel(
                         -1
                     }
                 println("Time to check preselect")
-                //val itemType: ItemType = ItemType.CONSUMER
+                // val itemType: ItemType = ItemType.CONSUMER
                 // todo: Make the !! go away
-                //val currentPreSelect: StatPreSelect = StatPreSelect.mapp[state.statPreSelectLabel]!!
+                // val currentPreSelect: StatPreSelect = StatPreSelect.mapp[state.statPreSelectLabel]!!
                 println("A")
                 val preSelect: SimpleViewPreSelect = store.getState().simpleViewPreSelect
-                //val preSelect: PreSelect = PreSelect.getDefault(VIEW_MODE.SIMPLE)
+                // val preSelect: PreSelect = PreSelect.getDefault(VIEW_MODE.SIMPLE)
                 println("B")
                 console.log(preSelect)
                 println("C")
@@ -108,7 +105,7 @@ object SimpleView : SimplePanel(
                     }
                 }
 
-                //width = 100.vw
+                // width = 100.vw
                 val pieChart =
                     Chart(
                         getPieChartConfig(
@@ -126,8 +123,9 @@ object SimpleView : SimplePanel(
                         height = 80.perc
                         marginTop = 6.vw
                         marginLeft = 5.vw
-                        //background = Background(Color.name(Col.ALICEBLUE))
-                    }, grow = 1
+                        // background = Background(Color.name(Col.ALICEBLUE))
+                    },
+                    grow = 1
                 )
 
                 add(
@@ -137,14 +135,15 @@ object SimpleView : SimplePanel(
                         "description",
                         "color",
                         "calls",
-                       label
+                        label
                     ).apply {
                         id = "TheSimpleViewChartLabelTable:ChartLabelTable"
                         height = 97.perc
                         width = 40.vw
                         margin = 1.vw
-                        //background = Background(Color.name(Col.LIGHTPINK))
-                    }, grow = 1
+                        // background = Background(Color.name(Col.LIGHTPINK))
+                    },
+                    grow = 1
                 )
             }
         }

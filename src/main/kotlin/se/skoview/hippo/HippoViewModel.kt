@@ -16,7 +16,6 @@
  */
 package se.skoview.hippo
 
-import se.skoview.app.store
 import se.skoview.common.*
 
 // todo: Speed up and simplify
@@ -31,9 +30,10 @@ data class IntegrationLists(
 )
 
 fun createHippoViewData(state: HippoState) {
-    //val filteredIntegrations = filterViewData(state)
+    val store = HippoManager.hippoStore
+    // val filteredIntegrations = filterViewData(state)
     val filteredIntegrations = state.integrationArrs
-
+    println("In createHippoViewData()")
     val plattformChains =
         filteredIntegrations.asSequence()
             .map { integration: Integration ->

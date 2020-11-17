@@ -60,6 +60,16 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
                 view = view
             )
         }
+        is HippoAction.SetView -> state.copy(view = action.view)
+        is HippoAction.SetDownloadBaseDatesStatus -> {
+            if (action.status == AsyncActionStatus.COMPLETED)
+                state.copy(
+                    dateEffective = BaseDates.integrationDates[0],
+                    dateEnd = BaseDates.integrationDates[0],
+                    downloadBaseDatesStatus = action.status
+                )
+            else state.copy(downloadBaseDatesStatus = AsyncActionStatus.COMPLETED)
+        }
         is HippoAction.StartDownloadBaseItems -> state.copy(
             downloadBaseItemStatus = AsyncActionStatus.INITIALIZED
         )
@@ -77,8 +87,6 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
                 plattformChains = PlattformChain.map,
                 statisticsPlattforms = StatisticsPlattform.mapp,
                 // Try this
-                dateEffective = BaseDates.integrationDates[0],
-                dateEnd = BaseDates.integrationDates[0]
             )
         }
         is HippoAction.ErrorDownloadBaseItems -> state.copy(
@@ -92,6 +100,11 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
             )
         }
          */
+
+        is HippoAction.StartDownloadIntegrations -> state.copy(
+            downloadIntegrationStatus = AsyncActionStatus.INITIALIZED
+        )
+
         is HippoAction.DoneDownloadIntegrations -> {
             // Must ensure the selected date is part of the list of all dates
             // Otherwise the date selector might be empty
@@ -103,6 +116,26 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
                 vServiceConsumersMax = 100,
                 vServiceProducersMax = 100,
                 vLogicalAddressesMax = 100
+            )
+        }
+        is HippoAction.ApplyBookmark -> {
+            val newDateEffective: String? =
+                if (action.bookmark.dateEffective != null) action.bookmark.dateEffective
+                else state.dateEffective
+            val newDateEnd: String? =
+                if (action.bookmark.dateEnd != null) action.bookmark.dateEnd
+                else state.dateEnd
+
+            state.copy(
+                view = action.view,
+                dateEffective = newDateEffective,
+                dateEnd = newDateEnd,
+                selectedConsumers = action.bookmark.selectedConsumers,
+                selectedProducers = action.bookmark.selectedProducers,
+                selectedLogicalAddresses = action.bookmark.selectedLogicalAddresses,
+                selectedContracts = action.bookmark.selectedContracts,
+                selectedDomains = action.bookmark.selectedDomains,
+                selectedPlattformChains = action.bookmark.selectedPlattformChains
             )
         }
         is HippoAction.DoneDownloadStatistics -> {
@@ -286,13 +319,21 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
                 ViewMode.SIMPLE -> {
                     val currentAdvancedPreSelect = state.advancedViewPreSelect ?: AdvancedViewPreSelect.getDefault()
                     val currentAdvancedPreSelectLabel = currentAdvancedPreSelect.label
-                    val newSimpleViewPreSelect = SimpleViewPreSelect.mapp[currentAdvancedPreSelectLabel] ?: SimpleViewPreSelect.getDefault()
-                    applyFilteredItemsSelection(state, newSimpleViewPreSelect.filteredItems).copy(simpleViewPreSelect = newSimpleViewPreSelect, viewMode = ViewMode.SIMPLE)
+                    val newSimpleViewPreSelect =
+                        SimpleViewPreSelect.mapp[currentAdvancedPreSelectLabel] ?: SimpleViewPreSelect.getDefault()
+                    applyFilteredItemsSelection(
+                        state,
+                        newSimpleViewPreSelect.filteredItems
+                    ).copy(simpleViewPreSelect = newSimpleViewPreSelect, viewMode = ViewMode.SIMPLE)
                 }
                 ViewMode.ADVANCED -> {
                     val currentSimplePreSelectLabel = state.simpleViewPreSelect.label
-                    val newAdvancedViewPreSelect = AdvancedViewPreSelect.mapp[currentSimplePreSelectLabel] ?: AdvancedViewPreSelect.getDefault()
-                    applyFilteredItemsSelection(state, newAdvancedViewPreSelect.filteredItems).copy(advancedViewPreSelect = newAdvancedViewPreSelect, viewMode = ViewMode.ADVANCED)
+                    val newAdvancedViewPreSelect =
+                        AdvancedViewPreSelect.mapp[currentSimplePreSelectLabel] ?: AdvancedViewPreSelect.getDefault()
+                    applyFilteredItemsSelection(state, newAdvancedViewPreSelect.filteredItems).copy(
+                        advancedViewPreSelect = newAdvancedViewPreSelect,
+                        viewMode = ViewMode.ADVANCED
+                    )
                 }
             }
         }

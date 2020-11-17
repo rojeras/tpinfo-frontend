@@ -18,11 +18,7 @@ package se.skoview.stat
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import se.skoview.app.store
-import se.skoview.common.HippoAction
-import se.skoview.common.HippoState
-import se.skoview.common.getAsyncTpDb
-import se.skoview.common.getParams
+import se.skoview.common.*
 
 @Serializable
 data class HistoryEntry(
@@ -49,6 +45,7 @@ data class HistoryCache(
 }
 
 fun loadHistory(state: HippoState) {
+    val store = HippoManager.hippoStore
     val urlParameters = state.getParams()
     val parameters = "history$urlParameters"
 

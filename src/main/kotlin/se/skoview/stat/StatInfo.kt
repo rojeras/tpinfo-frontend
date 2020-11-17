@@ -19,7 +19,6 @@ package se.skoview.stat
 import kotlinx.serialization.Serializable
 import org.w3c.files.Blob
 import org.w3c.files.BlobPropertyBag
-import se.skoview.app.store
 import se.skoview.common.*
 
 @Serializable
@@ -51,6 +50,7 @@ data class StatisticsBlob(
 }
 
 fun loadStatistics(state: HippoState) {
+    val store = HippoManager.hippoStore
     val urlParameters = state.getParams()
     val parameters = "statistics$urlParameters"
 

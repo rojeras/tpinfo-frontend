@@ -16,18 +16,18 @@
  */
 package se.skoview.app
 
-import kotlinx.browser.window
 import pl.treksoft.kvision.Application
 import pl.treksoft.kvision.html.main
+import pl.treksoft.kvision.module
 import pl.treksoft.kvision.pace.Pace
 import pl.treksoft.kvision.panel.root
-import pl.treksoft.kvision.panel.vPanel
-import pl.treksoft.kvision.redux.createReduxStore
 import pl.treksoft.kvision.startApplication
-import pl.treksoft.kvision.utils.perc
-import se.skoview.common.*
-import se.skoview.hippo.HippoTablePage
-import se.skoview.stat.*
+import se.skoview.common.AsyncActionStatus
+import se.skoview.common.HippoManager
+import se.skoview.common.View
+import se.skoview.hippo.hippoView
+import se.skoview.stat.AdvancedView
+import se.skoview.stat.SimpleView
 
 /**
 Övergripande tankar inför sommaruppehållet 2020
@@ -106,7 +106,10 @@ import se.skoview.stat.*
 // TPDB
 // todo: domainId not supported in stat call: https://qa.integrationer.tjansteplattform.se/tpdb/tpdbapi.php/api/v1/statistics?dummy&dateEffective=2020-07-01&dateEnd=2020-07-31&domainId=11
 // todo: Add header header("Content-type:application/json"); to tpdbapi.php
-// Done
+// todo: Let TPDB-api add the default dates for integrations and statistics. Maybe extend the answers to contain date information
+// todo: Create v2 of the API
+// todo: Add cache
+// todo: Rewrite in Kotlin
 
 // done: Skriv ut versionsnummer på sidan
 // done: Add the initial loading of integrations and stat data to be on demand from the respective view - not from areAllBaseItemsLoaded()
@@ -147,42 +150,23 @@ import se.skoview.stat.*
 // done: ”Återställ tjänsteplattform(ar)” bör flyttas ned någon centimeter.
 
 // Initialize the redux store
+/*
 val store = createReduxStore(
     ::hippoReducer,
     // initialHippoState()
     initializeHippoState()
 )
+ */
 
 class App : Application() {
 
     override fun start() {
 
-        val startUrl = window.location.href
-        println("window.location.href: $startUrl")
-
-        // A listener that sets the URL after each state change
-        /*
-        store.subscribe { state ->
-            setUrlFilter(state)
-        }
-         */
+        // val startUrl = window.location.href
+        // println("window.location.href: $startUrl")
 
         Pace.init()
         HippoManager.initialize()
-        /*
-        GlobalScope.async {
-            loadBaseItems(store)
-        }
-         */
-
-        // If hostname or path contains "statistik" then we start the statistik app, else hippo
-        /*
-        val isStatApp = startUrl.contains("statistik")
-        if (isStatApp)
-            HippoManager.hippoStore.dispatch(HippoAction.ApplicationStarted(HippoApplication.STATISTIK))
-        else
-            HippoManager.hippoStore.dispatch(HippoAction.ApplicationStarted(HippoApplication.HIPPO))
-         */
 
         root("hippo") {
             // place for common header
@@ -195,10 +179,13 @@ class App : Application() {
                 // setUrlFilter(state)
                 if (state.downloadBaseItemStatus == AsyncActionStatus.COMPLETED) {
                     when (state.view) {
-                        View.HOME -> add(HippoTablePage)
+                        View.HOME -> println("View.HOME found in main")
                         View.HIPPO -> {
-                            if (state.downloadIntegrationStatus == AsyncActionStatus.COMPLETED) {
-                                add(HippoTablePage)
+                            if (
+                                state.downloadBaseItemStatus == AsyncActionStatus.COMPLETED &&
+                                state.downloadIntegrationStatus == AsyncActionStatus.COMPLETED
+                            ) {
+                                hippoView(state)
                             }
                         }
                         View.STAT_SIMPLE -> add(SimpleView)
@@ -208,17 +195,9 @@ class App : Application() {
             }
             // footer()
         }
-
-        /*
-        store.subscribe { state ->
-            if (state.currentAction == HippoAction.DoneDownloadBaseItems::class) {
-                if (isStatApp) startStat()
-                else startHippo()
-            }
-        }
-         */
     }
 
+    /*
     fun startHippo() {
         store.dispatch(HippoAction.ApplicationStarted(HippoApplication.HIPPO))
 
@@ -248,8 +227,9 @@ class App : Application() {
             }
         }
     }
+    */
 }
 
 fun main() {
-    startApplication(::App) // startApplication(::App, module.hot)
+    startApplication(::App, module.hot) // startApplication(::App, module.hot)
 }

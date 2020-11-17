@@ -16,8 +16,6 @@
  */
 package se.skoview.common
 
-import se.skoview.hippo.BookmarkInformation
-import se.skoview.hippo.parseBookmark
 import se.skoview.stat.AdvancedViewPreSelect
 import se.skoview.stat.SimpleViewPreSelect
 import se.skoview.stat.StatisticsBlob
@@ -52,6 +50,7 @@ data class HippoState(
     val currentAction: KClass<out HippoAction> = HippoAction.ApplicationStarted::class,
     val view: View = View.HOME,
     val applicationStarted: HippoApplication? = null,
+    val downloadBaseDatesStatus: AsyncActionStatus = AsyncActionStatus.NOT_INITIALIZED,
     val downloadBaseItemStatus: AsyncActionStatus = AsyncActionStatus.NOT_INITIALIZED,
     val downloadIntegrationStatus: AsyncActionStatus = AsyncActionStatus.NOT_INITIALIZED,
     val errorMessage: String? = null,
@@ -180,6 +179,7 @@ fun HippoState.getParams(): String {
 
     // Separate plattforms now stored in filter, not the chain
     for (pcId in this.selectedPlattformChains) {
+        print("In getParams()")
         val firstId = PlattformChain.map[pcId]?.first
         val lastId = PlattformChain.map[pcId]?.last
         params += "&firstPlattformId=$firstId"

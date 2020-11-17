@@ -22,7 +22,6 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import pl.treksoft.kvision.rest.HttpMethod
 import pl.treksoft.kvision.rest.RestClient
-import se.skoview.app.store
 import se.skoview.hippo.createHippoViewData
 
 enum class ItemType {
@@ -79,8 +78,11 @@ data class IntegrationCache(
 }
 
 fun loadIntegrations(state: HippoState) {
+    val store = HippoManager.hippoStore
     val urlParameters = state.getParams()
     val parameters = "integrations$urlParameters"
+
+    store.dispatch(HippoAction.StartDownloadIntegrations)
 
     if (IntegrationCache.map.containsKey(parameters)) {
         println(">>> Integrations found in cache")
@@ -102,7 +104,7 @@ fun loadIntegrations(state: HippoState) {
         val url = "${tpdbBaseUrl()}$parameters"
         println(url)
 
-        val job = GlobalScope.launch {
+        GlobalScope.launch {
             val integrationInfoPromise =
                 restClient.remoteCall(
                     url = url,

@@ -30,6 +30,8 @@ import se.skoview.stat.SimpleViewPreSelect
 
 sealed class HippoAction : RAction {
     data class ApplicationStarted(val App: HippoApplication) : HippoAction()
+    data class SetView(val view: View) : HippoAction()
+    data class SetDownloadBaseDatesStatus(val status: AsyncActionStatus) : HippoAction()
     object StartDownloadBaseItems : HippoAction()
     object DoneDownloadBaseItems : HippoAction()
     data class ErrorDownloadBaseItems(val errorMessage: String) : HippoAction()
@@ -38,12 +40,17 @@ sealed class HippoAction : RAction {
         val maxCounters: MaxCounter,
         val updateDates: Array<String>
     ) : HippoAction()
+    data class ApplyBookmark(
+        val view: View,
+        val bookmark: BookmarkInformation
+    ) : HippoAction()
+    object StartDownloadIntegrations : HippoAction()
     data class DoneDownloadStatistics(
         val statisticsArrArr: Array<Array<Int>>
     ) : HippoAction()
     data class DoneDownloadHistory(
         val historyMap: Map<String, Int>
-    ): HippoAction()
+    ) : HippoAction()
     data class ErrorDownloadIntegrations(val errorMessage: String) : HippoAction()
     data class DateSelected(val dateType: DateType, val selectedDate: String) : HippoAction()
     data class StatTpSelected(val tpId: Int) : HippoAction()
@@ -51,14 +58,14 @@ sealed class HippoAction : RAction {
         val viewType: ItemType,
         val id: Int
     ) : HippoAction()
-    data class ItemIdDeselected( val viewType: ItemType, val id: Int ): HippoAction()
-    //data class ItemIdDeselectedAll( val viewType: ItemType ): HippoAction()
-    //object ItemDeselectedAllForAllTypes: HippoAction()
+    data class ItemIdDeselected(val viewType: ItemType, val id: Int) : HippoAction()
+    // data class ItemIdDeselectedAll( val viewType: ItemType ): HippoAction()
+    // object ItemDeselectedAllForAllTypes: HippoAction()
     data class ViewUpdated(val integrationLists: IntegrationLists) : HippoAction()
-    data class SetVMax(val type: ItemType, val size: Int): HippoAction()
-    data class ShowTimeGraph(val isShown: Boolean): HippoAction()
-    data class ShowTechnicalTerms(val isShown: Boolean): HippoAction()
-    data class SetViewMode(val viewMode: ViewMode): HippoAction()
-    data class SetSimpleViewPreselect(val preSelect: SimpleViewPreSelect): HippoAction()
-    data class SetAdvancedViewPreselect(val preSelect: AdvancedViewPreSelect): HippoAction()
+    data class SetVMax(val type: ItemType, val size: Int) : HippoAction()
+    data class ShowTimeGraph(val isShown: Boolean) : HippoAction()
+    data class ShowTechnicalTerms(val isShown: Boolean) : HippoAction()
+    data class SetViewMode(val viewMode: ViewMode) : HippoAction()
+    data class SetSimpleViewPreselect(val preSelect: SimpleViewPreSelect) : HippoAction()
+    data class SetAdvancedViewPreselect(val preSelect: AdvancedViewPreSelect) : HippoAction()
 }

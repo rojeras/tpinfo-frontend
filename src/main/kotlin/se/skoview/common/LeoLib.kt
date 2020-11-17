@@ -144,3 +144,5 @@ fun getHeightToRemainingViewPort(
     val heightToRemove = occupiedViewPortArea + delta
     return "calc(100vh - ${heightToRemove}px)"
 }
+
+// fun <T> jsRunBlocking(block: suspend () -> T): dynamic = promise { block() }

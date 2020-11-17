@@ -24,11 +24,7 @@ import pl.treksoft.kvision.panel.SimplePanel
 import pl.treksoft.kvision.table.TableType
 import pl.treksoft.kvision.tabulator.*
 import pl.treksoft.kvision.utils.perc
-import se.skoview.app.store
-import se.skoview.common.HippoAction
-import se.skoview.common.ItemType
-import se.skoview.common.ViewMode
-import se.skoview.common.isItemSelected
+import se.skoview.common.*
 
 fun getPieChartConfig(
     itemType: ItemType,
@@ -73,6 +69,7 @@ open class ChartLabelTable(
     heading: String
 ) : SimplePanel() {
     init {
+        val store = HippoManager.hippoStore
         id = "ChartLabelTable: SimpleTable"
 
         // Footer pagination buttons hidden through CSS
@@ -148,6 +145,7 @@ open class ChartLabelTable(
 }
 
 private fun itemSelectDeselect(itemId: Int, itemType: ItemType) {
+    val store = HippoManager.hippoStore
     println("In itemSelectDeselect()")
     //store.dispatch(HippoAction.PreSelectedLabelSet("default"))
     if (store.getState().isItemSelected(itemType, itemId)) {
