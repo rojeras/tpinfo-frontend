@@ -17,28 +17,31 @@
 package se.skoview.stat
 
 import pl.treksoft.kvision.chart.Chart
+import pl.treksoft.kvision.core.Container
 import pl.treksoft.kvision.core.Overflow
+import pl.treksoft.kvision.html.div
 import pl.treksoft.kvision.panel.SimplePanel
-import pl.treksoft.kvision.panel.VPanel
 import pl.treksoft.kvision.panel.hPanel
-import pl.treksoft.kvision.state.bind
 import pl.treksoft.kvision.utils.perc
 import pl.treksoft.kvision.utils.vw
-import se.skoview.common.*
+import se.skoview.common.HippoAction
+import se.skoview.common.HippoState
+import se.skoview.common.ItemType
+import se.skoview.common.getHeightToRemainingViewPort
 
-object AdvancedView : VPanel(
-) {
-    init {
-        val store = HippoManager.hippoStore
+// object AdvancedView : VPanel() {
+fun Container.statAdvancedView(state: HippoState) {
+    div {
+        // val store = HippoManager.hippoStore
         // The whole item table
         hPanel(
             spacing = 1
         ) {
-        }.bind(store) { state ->
+            // }.bind(store) { state ->
             overflow = Overflow.HIDDEN
-            //background = Background(Color.name(Col.YELLOW))
+            // background = Background(Color.name(Col.YELLOW))
             setStyle("height", getHeightToRemainingViewPort(statPageTop, 50))
-            //height = 100.perc
+            // height = 100.perc
             SInfo.createStatViewData(state)
 
             val animateTime =
@@ -85,32 +88,31 @@ object AdvancedView : VPanel(
             )
         }
     }
+}
 
-    private fun getHeading(state: HippoState, itemType: ItemType): String {
-        if (state.showTechnicalTerms)
+private fun getHeading(state: HippoState, itemType: ItemType): String {
+    if (state.showTechnicalTerms)
+        return when (itemType) {
+            ItemType.CONSUMER -> "Tjänstekonsumenter"
+            ItemType.PRODUCER -> "Tjänsteproducenter"
+            ItemType.CONTRACT -> "Tjänstekontrakt"
+            ItemType.LOGICAL_ADDRESS -> "Logiska adresser"
+            else -> "Internt fel i getHeading() - 1"
+        }
+    else { // ! state.showTechnicalTerms
+        if (state.advancedViewPreSelect != null) {
+            return state.advancedViewPreSelect.headingsMap[itemType]!!
+        } else { // state.preSelect == null, specify defaults
             return when (itemType) {
-                ItemType.CONSUMER -> "Tjänstekonsumenter"
-                ItemType.PRODUCER -> "Tjänsteproducenter"
-                ItemType.CONTRACT -> "Tjänstekontrakt"
-                ItemType.LOGICAL_ADDRESS -> "Logiska adresser"
-                else -> "Internt fel i getHeading() - 1"
-            }
-        else { // ! state.showTechnicalTerms
-            if (state.advancedViewPreSelect != null) {
-                return state.advancedViewPreSelect.headingsMap[itemType]!!
-            } else { // state.preSelect == null, specify defaults
-                return when (itemType) {
-                    ItemType.CONSUMER -> "Applikationer"
-                    ItemType.PRODUCER -> "Informationskällor"
-                    ItemType.CONTRACT -> "Tjänster"
-                    ItemType.LOGICAL_ADDRESS -> "Adresser"
-                    else -> "Internt fel i getHeading() - 2"
-                }
+                ItemType.CONSUMER -> "Applikationer"
+                ItemType.PRODUCER -> "Informationskällor"
+                ItemType.CONTRACT -> "Tjänster"
+                ItemType.LOGICAL_ADDRESS -> "Adresser"
+                else -> "Internt fel i getHeading() - 2"
             }
         }
     }
 }
-
 
 class StatPieTableView(
     itemType: ItemType,
@@ -119,9 +121,9 @@ class StatPieTableView(
     label: String
 ) : SimplePanel() {
     init {
-        //background = Background(Color.name(Col.GREEN))
+        // background = Background(Color.name(Col.GREEN))
         setStyle("height", getHeightToRemainingViewPort(statPageTop, 50))
-        //height = 100.perc
+        // height = 100.perc
         width = 25.vw
         val pieChart =
             Chart(
@@ -133,11 +135,13 @@ class StatPieTableView(
                     maintainAspectRatio = false
                 )
             )
-        add(pieChart
-            .apply {
-                height = 30.perc
-                //background = Background(Color.name(Col.ALICEBLUE))
-            })
+        add(
+            pieChart
+                .apply {
+                    height = 30.perc
+                    // background = Background(Color.name(Col.ALICEBLUE))
+                }
+        )
         add(
             ChartLabelTable(
                 itemType,
@@ -152,4 +156,3 @@ class StatPieTableView(
         )
     }
 }
-

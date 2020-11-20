@@ -22,7 +22,6 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import pl.treksoft.kvision.rest.HttpMethod
 import pl.treksoft.kvision.rest.RestClient
-import se.skoview.hippo.createHippoViewData
 
 enum class ItemType {
     CONSUMER,
@@ -79,7 +78,7 @@ data class IntegrationCache(
 
 fun loadIntegrations(state: HippoState) {
     val store = HippoManager.hippoStore
-    val urlParameters = state.getParams()
+    val urlParameters = state.getParams(state.view)
     val parameters = "integrations$urlParameters"
 
     store.dispatch(HippoAction.StartDownloadIntegrations)
@@ -95,7 +94,6 @@ fun loadIntegrations(state: HippoState) {
                 integrationsCache.updateDates
             )
         )
-        createHippoViewData(store.getState())
     } else {
         println(">>> Integrations NOT found in cache - will download")
 
@@ -138,7 +136,6 @@ fun loadIntegrations(state: HippoState) {
                     integrationInfo.updateDates
                 )
             )
-            createHippoViewData(store.getState())
         }
     }
 }

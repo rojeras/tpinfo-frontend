@@ -16,8 +16,6 @@
  */
 package se.skoview.common
 
-import kotlinx.browser.document
-import kotlinx.browser.window
 import kotlin.js.Date
 
 data class BookmarkInformation(
@@ -32,6 +30,7 @@ data class BookmarkInformation(
 )
 
 // Let the URL mirror the current state
+/*
 fun setUrlFilter(state: HippoState) {
     val hostname = window.location.hostname
     val protocol = window.location.protocol
@@ -41,7 +40,7 @@ fun setUrlFilter(state: HippoState) {
     val portSpec = if (port.isNotEmpty()) ":$port" else ""
     var newUrl = "$protocol//$hostname$portSpec$pathname"
 
-    val bookmark = state.getBookmark()
+    val bookmark = state.createBookmarkString()
     val filterString =
         if (bookmark.length > 1) "?filter=$bookmark"
         else ""
@@ -58,12 +57,26 @@ fun setUrlFilter(state: HippoState) {
 
     window.history.pushState(newUrl, "hippo-utforska integrationer", newUrl + filterString + statString)
 }
+*/
 
-fun HippoState.getBookmark(): String {
+fun HippoState.createBookmarkString(): String {
     println("getBookmars(), updateDates:")
     println("Length ${this.updateDates.size}")
-    if (this.updateDates.isEmpty() || this.dateEffective == "") return ""
-    var bookmark = ""
+
+    var bookmark: String = ""
+
+    if (this.view == View.HIPPO) {
+        if (this.updateDates.isNullOrEmpty() || this.dateEffective.isNullOrEmpty()) return ""
+
+        // Exclude dates if dateEnd == current date (first in updateDates list)
+        if (this.dateEnd != this.updateDates[0]) {
+            bookmark += "S" + date2DaysSinceEpoch(this.dateEffective!!)
+            bookmark += "E" + date2DaysSinceEpoch(this.dateEnd!!)
+        }
+    } else {
+        bookmark += "S" + date2DaysSinceEpoch(this.statDateEffective)
+        bookmark += "E" + date2DaysSinceEpoch(this.statDateEnd)
+    }
 
     bookmark += if (this.selectedConsumers.isNotEmpty()) this.selectedConsumers.joinToString(
         prefix = "c",
@@ -86,11 +99,6 @@ fun HippoState.getBookmark(): String {
         separator = "p"
     ) else ""
 
-    // Exclude dates if dateEnd == current date (first in updateDates list)
-    if (this.dateEnd != this.updateDates[0]) {
-        bookmark += "S" + date2DaysSinceEpoch(this.dateEffective!!)
-        bookmark += "E" + date2DaysSinceEpoch(this.dateEnd!!)
-    }
     // Separate plattforms now stored in filter, not the chain
     for (pcId in this.selectedPlattformChains) {
         println("In getBookmark()")
@@ -99,10 +107,12 @@ fun HippoState.getBookmark(): String {
         bookmark += "F$firstId"
         bookmark += "L$lastId"
     }
+
     return bookmark
 }
 
-fun parseBookmark(fullUrl: String = document.baseURI): BookmarkInformation {
+// fun parseBookmarkString(fullUrl: String = document.baseURI): BookmarkInformation {
+fun parseBookmarkString(fullUrl: String): BookmarkInformation {
     // ---------------------------------------------------------------------
     fun parseBookmarkType(typeChar: String, filterValue: String): List<Int> {
         // val regex = Regex("""c\d*""")
@@ -122,7 +132,7 @@ fun parseBookmark(fullUrl: String = document.baseURI): BookmarkInformation {
 
     // val fullUrl = document.baseURI
 
-    println("In parseBookmark, url=$fullUrl")
+    println("In parseBookmarkString, string=$fullUrl")
 
     val filterParam = "filter"
     var ix = fullUrl.indexOf(filterParam)
@@ -134,7 +144,7 @@ fun parseBookmark(fullUrl: String = document.baseURI): BookmarkInformation {
     val parts = filterValueStart.split('&')
     val filterValue = parts[0]
 
-    // Extract and calculate the date values
+    // Extract and calculate the date values for hippo
     val dateEffectiveCodeList = parseBookmarkType("S", filterValue)
     val dateEffective = if (dateEffectiveCodeList.isNotEmpty())
         daysSinceEpoch2date(dateEffectiveCodeList[0])
@@ -174,12 +184,12 @@ fun parseBookmark(fullUrl: String = document.baseURI): BookmarkInformation {
     return bookmarkInformation
 }
 
-fun date2DaysSinceEpoch(dateString: String): Double {
+private fun date2DaysSinceEpoch(dateString: String): Double {
     val day = Date(dateString)
     return (day.getTime() / 8.64e7) - 16874 // Dived by number of millisecs since epoch (1/1 1970)
 }
 
-fun daysSinceEpoch2date(daysSinceEpoch: Int): String {
+private fun daysSinceEpoch2date(daysSinceEpoch: Int): String {
     val date = Date((daysSinceEpoch + 16874) * 8.64e7)
     return date.toISOString().substring(0, 10)
 }

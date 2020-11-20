@@ -38,12 +38,12 @@ suspend fun loadBaseItems(store: ReduxStore<HippoState, HippoAction>) { // : Def
     // store.dispatch(HippoAction.StartDownloadBaseItems)
 
     // GlobalScope.async {
-        /*
-        val baseDatesJob = GlobalScope.launch {
-            val p1 = loadBaseItem("dates", Dates.serializer())
-            println("Dates loaded")
-        }
-         */
+    /*
+    val baseDatesJob = GlobalScope.launch {
+        val p1 = loadBaseItem("dates", Dates.serializer())
+        println("Dates loaded")
+    }
+     */
 
     val domainsJob = GlobalScope.launch {
         loadBaseItem("domains", ListSerializer(ServiceDomain.serializer()))
@@ -92,7 +92,6 @@ suspend fun loadBaseItems(store: ReduxStore<HippoState, HippoAction>) { // : Def
 suspend fun <T : Any> loadBaseItem(type: String, deserializer: DeserializationStrategy<T>): Promise<T> {
     val restClient = RestClient()
     val url = "${tpdbBaseUrl()}$type"
-    println("*** In load $type")
     println(url)
 
     val answerPromise =
@@ -102,9 +101,7 @@ suspend fun <T : Any> loadBaseItem(type: String, deserializer: DeserializationSt
             deserializer = deserializer, // ListSerializer(ServiceComponent.serializer()),
             contentType = ""
         )
-
     answerPromise.await()
-    println("*** Leaving load $type")
     return answerPromise
 }
 

@@ -16,17 +16,15 @@
  */
 package se.skoview.stat
 
-import pl.treksoft.kvision.chart.*
-import pl.treksoft.kvision.core.*
+import pl.treksoft.kvision.chart.* // ktlint-disable no-wildcard-imports
+import pl.treksoft.kvision.core.* // ktlint-disable no-wildcard-imports
 import pl.treksoft.kvision.form.check.checkBoxInput
 import pl.treksoft.kvision.form.select.simpleSelectInput
-import pl.treksoft.kvision.html.*
+import pl.treksoft.kvision.html.* // ktlint-disable no-wildcard-imports
 import pl.treksoft.kvision.modal.Modal
 import pl.treksoft.kvision.modal.ModalSize
-import pl.treksoft.kvision.panel.SimplePanel
 import pl.treksoft.kvision.panel.flexPanel
 import pl.treksoft.kvision.panel.vPanel
-import pl.treksoft.kvision.state.bind
 import pl.treksoft.kvision.table.TableType
 import pl.treksoft.kvision.table.cell
 import pl.treksoft.kvision.table.row
@@ -34,22 +32,26 @@ import pl.treksoft.kvision.table.table
 import pl.treksoft.kvision.utils.px
 import pl.treksoft.kvision.utils.vh
 import se.skoview.app.formControlXs
-import se.skoview.common.*
+import se.skoview.common.* // ktlint-disable no-wildcard-imports
+
+// ktlint-disable no-wildcard-imports
+
+// ktlint-disable no-wildcard-imports
 
 var statPageTop: Div = Div()
 
-object StatPage : SimplePanel() {
-
-    init {
-        val store = HippoManager.hippoStore
+// object StatPage : SimplePanel() {
+fun Container.statView(state: HippoState, view: View) {
+    div {
+        // val store = HippoManager.hippoStore
         fontFamily = "Times New Roman"
         id = "StatPage:SimplePanel()"
-        //background = Background(Color.name(Col.RED))
+        // background = Background(Color.name(Col.RED))
         println("In CharTab():init()")
         this.marginTop = 10.px
 
         statPageTop = div {
-        }.bind(store) { state ->
+            // }.bind(store) { state ->
             id = "StatPageTop"
 
             // Page header
@@ -57,7 +59,7 @@ object StatPage : SimplePanel() {
                 h2("Antal meddelanden genom Region Stockholms tjänsteplattform")
                 div("Detaljerad statistik med diagram och möjlighet att ladda ner informationen för egna analyser.")
             }.apply {
-                //width = 100.perc
+                // width = 100.perc
                 id = "StatPage-HeadingArea:Div"
                 background = Background(Color.hex(0x113d3d))
                 align = Align.CENTER
@@ -68,7 +70,7 @@ object StatPage : SimplePanel() {
             flexPanel(
                 FlexDirection.ROW, FlexWrap.WRAP, JustifyContent.SPACEBETWEEN, AlignItems.CENTER,
             ) {
-                //}.bind(store) { state ->
+                // }.bind(store) { state ->
                 spacing = 5
                 clear = Clear.BOTH
                 margin = 0.px
@@ -79,21 +81,22 @@ object StatPage : SimplePanel() {
                     setOf(TableType.BORDERED, TableType.SMALL)
                 ) {
                     id = "ControlPanel-Table"
-                    // Star tdate
+                    // Start date
                     row {
                         id = "First row"
                         cell { +"Startdatum:" }
                         cell {
                             simpleSelectInput(
                                 options = state.statisticsDates.sortedByDescending { it }.map { Pair(it, it) },
-                                value = state.dateEffective
+                                value = state.statDateEffective
                             ) {
                                 addCssStyle(formControlXs)
                                 background = Background(Color.name(Col.WHITE))
                             }.onEvent {
                                 change = {
-                                    store.dispatch(HippoAction.DateSelected(DateType.EFFECTIVE, self.value ?: ""))
-                                    loadStatistics(store.getState())
+                                    // store.dispatch(HippoAction.DateSelected(DateType.EFFECTIVE, self.value ?: ""))
+                                    // loadStatistics(store.getState())
+                                    HippoManager.dateSelected(DateType.EFFECTIVE, self.value ?: "")
                                 }
                             }
                         }
@@ -105,7 +108,7 @@ object StatPage : SimplePanel() {
                                 else ""
 
                             val options =
-                                if (state.viewMode == ViewMode.ADVANCED)
+                                if (state.view == View.STAT_ADVANCED)
                                     StatisticsPlattform.mapp.map { Pair(it.key.toString(), it.value.name) }
                                 else
                                     StatisticsPlattform.mapp
@@ -120,9 +123,10 @@ object StatPage : SimplePanel() {
                             }.onEvent {
                                 change = {
                                     val selectedTp = (self.value ?: "").toInt()
-                                    store.dispatch(HippoAction.StatTpSelected(selectedTp))
-                                    loadStatistics(store.getState())
-                                    //selectTp(state, selectedTp)
+                                    HippoManager.statTpSelected(selectedTp)
+                                    // store.dispatch(HippoAction.StatTpSelected(selectedTp))
+                                    // loadStatistics(store.getState())
+                                    // selectTp(state, selectedTp)
                                 }
                             }
                         }
@@ -132,8 +136,9 @@ object StatPage : SimplePanel() {
                             checkBoxInput(
                                 value = state.showTimeGraph
                             ).onClick {
-                                if (value) loadHistory(state)
-                                store.dispatch(HippoAction.ShowTimeGraph(value))
+                                // if (value) loadHistory(state)
+                                // store.dispatch(HippoAction.ShowTimeGraph(value))
+                                HippoManager.statHistorySelected(value)
                             }
                             +" Visa utveckling över tid"
                         }
@@ -141,11 +146,14 @@ object StatPage : SimplePanel() {
                         // Use Advanced mode
                         cell {
                             checkBoxInput(
-                                value = state.viewMode == ViewMode.ADVANCED
+                                value = state.view == View.STAT_ADVANCED
                             ).onClick {
-                                if (value) store.dispatch(HippoAction.SetViewMode(ViewMode.ADVANCED)) //setViewMode(state, viewMode = VIEW_MODE.ADVANCED)
-                                else store.dispatch(HippoAction.SetViewMode(ViewMode.SIMPLE)) //setViewMode(state, viewMode = VIEW_MODE.SIMPLE)
-                                loadStatistics(store.getState())
+                                // todo: Remove viewMode from state and use view instead
+                                val mode =
+                                    if (value) View.STAT_ADVANCED
+                                    else View.STAT_SIMPLE
+                                HippoManager.setView(mode)
+                                // loadStatistics(store.getState())
                             }
                             +" Avancerat läge"
                         }
@@ -164,20 +172,21 @@ object StatPage : SimplePanel() {
                                 background = Background(Color.name(Col.WHITE))
                             }.onEvent {
                                 change = {
-                                    //store.dispatch { dispatch, getState ->
-                                    store.dispatch(HippoAction.DateSelected(DateType.END, self.value ?: ""))
-                                    loadStatistics(store.getState())
-                                    //}
+                                    // store.dispatch { dispatch, getState ->
+                                    // store.dispatch(HippoAction.DateSelected(DateType.END, self.value ?: ""))
+                                    // loadStatistics(store.getState())
+                                    HippoManager.dateSelected(DateType.END, self.value ?: "")
+                                    // }
                                 }
                             }
                         }
 
                         cell { +"Visa:" }
                         cell {
-                            val selectedPreSelectLabel: String
-                            val options: List<Pair<String, String>>
-                            when (state.viewMode) {
-                                ViewMode.SIMPLE -> {
+                            var options: List<Pair<String, String>> = listOf()
+                            var selectedPreSelectLabel: String = ""
+                            when (state.view) {
+                                View.STAT_SIMPLE -> {
                                     console.log(state.simpleViewPreSelect)
                                     /*
                                     val preSelect =
@@ -190,9 +199,9 @@ object StatPage : SimplePanel() {
                                         .toList()
                                         .sortedBy { it.first }
                                         .map { Pair(it.first, it.first) }
-                                    //.map { Pair(it.value.label, it.value.label) }
+                                    // .map { Pair(it.value.label, it.value.label) }
                                 }
-                                ViewMode.ADVANCED -> {
+                                View.STAT_ADVANCED -> {
                                     selectedPreSelectLabel =
                                         if (state.advancedViewPreSelect != null) state.advancedViewPreSelect.label
                                         else ""
@@ -200,8 +209,9 @@ object StatPage : SimplePanel() {
                                         .toList()
                                         .sortedBy { it.first }
                                         .map { Pair(it.first, it.first) }
-                                    //.map { Pair(it.value.label, it.value.label) }
+                                    // .map { Pair(it.value.label, it.value.label) }
                                 }
+                                else -> println("Error in StatPage, view = ${state.view}")
                             }
                             simpleSelectInput(
                                 options = options,
@@ -212,6 +222,8 @@ object StatPage : SimplePanel() {
                             }.onEvent {
                                 change = {
                                     val preSelectLabel: String = self.value ?: "dummy"
+                                    HippoManager.statSetViewModePreselect(preSelectLabel)
+                                    /*
                                     when (state.viewMode) {
                                         ViewMode.SIMPLE -> {
                                             val preSelect = SimpleViewPreSelect.mapp[preSelectLabel]
@@ -225,7 +237,8 @@ object StatPage : SimplePanel() {
                                         }
                                     }
                                     loadStatistics(store.getState())
-                                    //}
+                                    */
+                                    // }
                                 }
                             }
                         }
@@ -233,11 +246,12 @@ object StatPage : SimplePanel() {
                             checkBoxInput(
                                 value = state.showTechnicalTerms
                             ).onClick {
-                                //if (value) loadHistory(state)
+                                // if (value) loadHistory(state)
                                 println("In showTechnicalTerms, value = $value")
-                                store.dispatch(HippoAction.ShowTechnicalTerms(value))
+                                HippoManager.statTechnialTermsSelected(value)
+                                // store.dispatch(HippoAction.ShowTechnicalTerms(value))
                                 if (!value) { // Restore labels for current preselect
-                                    //store.dispatch(HippoAction.PreSelectedSet(state.statPreSelect!!))
+                                    // store.dispatch(HippoAction.PreSelectedSet(state.statPreSelect!!))
                                 }
                             }
                             +" Tekniska termer"
@@ -249,21 +263,23 @@ object StatPage : SimplePanel() {
                 vPanel {
                     id = "Buttonpanel: vPanel"
                     button("Exportera").onClick {
-                        exportStatData(store.getState())
+                        exportStatData(state)
                     }.apply {
                         addBsBgColor(BsBgColor.LIGHT)
                         addBsColor(BsColor.BLACK50)
                         marginBottom = 5.px
                     }
-                    //background = Background(Col.LIGHTSKYBLUE)
-                    //align = Align.RIGHT
+                    // background = Background(Col.LIGHTSKYBLUE)
+                    // align = Align.RIGHT
                     val modal = Modal("Om Statistikfunktionen")
                     modal.iframe(src = "about.html", iframeHeight = 400, iframeWidth = 700)
                     modal.size = ModalSize.LARGE
-                    //modal.add(H(require("img/dog.jpg")))
-                    modal.addButton(Button("Stäng").onClick {
-                        modal.hide()
-                    })
+                    // modal.add(H(require("img/dog.jpg")))
+                    modal.addButton(
+                        Button("Stäng").onClick {
+                            modal.hide()
+                        }
+                    )
                     button("Om Statistik ${getVersion("hippoVersion")}", style = ButtonStyle.INFO).onClick {
                         size = ButtonSize.SMALL
                         modal.show()
@@ -278,8 +294,8 @@ object StatPage : SimplePanel() {
             val tCalls: String = state.statBlob.callsDomain.map { it.value }.sum().toString().thousands()
 
             val headingText: String =
-                if (state.viewMode == ViewMode.ADVANCED) "Totalt antal anrop för detta urval är: $tCalls"
-                else "${state.simpleViewPreSelect!!.label}: $tCalls anrop"
+                if (state.view == View.STAT_ADVANCED) "Totalt antal anrop för detta urval är: $tCalls"
+                else "${state.simpleViewPreSelect.label}: $tCalls anrop"
 
             h4 {
                 content = headingText
@@ -320,18 +336,19 @@ object StatPage : SimplePanel() {
                     )
                 ).apply {
                     height = 26.vh
-                    //width = 99.vw
-                    //background = Background(Color.name(Col.LIGHTCORAL))
+                    // width = 99.vw
+                    // background = Background(Color.name(Col.LIGHTCORAL))
                 }
             }
         }
 
-        div {}.bind(store) { state ->
-            println("Time to select the view: ${state.viewMode}")
-            when (state.viewMode) {
-                ViewMode.ADVANCED -> add(AdvancedView)
-                ViewMode.SIMPLE -> add(SimpleView)
-            }
+        // div {}.bind(store) { state ->
+        println("Time to select the view: ${state.view}")
+        when (state.view) {
+            View.STAT_ADVANCED -> statAdvancedView(state)
+            View.STAT_SIMPLE -> statSimpleView(state)
+            else -> println("Error in StatPage bottom, view = ${state.view}")
         }
+        // }
     }
 }

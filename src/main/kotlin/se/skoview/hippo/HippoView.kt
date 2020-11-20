@@ -62,6 +62,7 @@ class TextSearchInfo : BaseDataComponent() {
 // object HippoTablePage : SimplePanel() {
 fun Container.hippoView(state: HippoState) {
     println("In hippoView()")
+    val integrationLists = createHippoViewData(state)
     div {
         // font-family: Georgia,Times New Roman,Times,serif;
         fontFamily = "Times New Roman"
@@ -106,7 +107,8 @@ fun Container.hippoView(state: HippoState) {
                     change = {
                         // store.dispatch { dispatch, getState ->
                         val date = self.value ?: ""
-                        HippoManager.bothDatesSelected(date)
+                        // HippoManager.bothDatesSelected(date)
+                        HippoManager.dateSelected(DateType.EFFECTIVE_AND_END, date)
                         // }
                     }
                 }
@@ -117,7 +119,7 @@ fun Container.hippoView(state: HippoState) {
                 align = Align.CENTER
                 //       }.bind(HippoManager.hippoStore) { state ->
                 val sllRtpProdId = 3
-                val chainId = if (state.vPlattformChains.size == 1) state.vPlattformChains[0].id else -1
+                val chainId = if (integrationLists.plattformChains.size == 1) integrationLists.plattformChains[0].id else -1
                 if (chainId > 0) {
                     println("Show statistics button")
                     val chain = PlattformChain.map[chainId]
@@ -156,34 +158,25 @@ fun Container.hippoView(state: HippoState) {
 
         // The whole item table
         hPanel {
-            // flexPanel {
-            // margin = 5.px
 
-            // position = Position.ABSOLUTE
-            // width = 95.vw
             overflow = Overflow.HIDDEN
 
-            // marginRight = 24.px
-
-            // background = Background(hex(0xff0000))
-
-            /*
-            add(HippoItemsView(ItemType.CONSUMER, "Tjänstekonsumenter", 21)) // , grow = 1)
-            add(HippoItemsView(ItemType.CONTRACT, "Tjänstekontrakt", 21)) // , grow = 1)
-            add(HippoItemsView(ItemType.PLATTFORM_CHAIN, "Tjänsteplattformar", 16)) // , grow = 1)
-            add(HippoItemsView(ItemType.PRODUCER, "Tjänsteproducenter", 21)) // , grow = 1)
-            add(HippoItemsView(ItemType.LOGICAL_ADDRESS, "Logiska adresser", 21)) // , grow = 1)
-             */
-            hippoItemsView(state, ItemType.CONSUMER, "Tjänstekonsumenter", 21) // , grow = 1)
-            hippoItemsView(state, ItemType.CONTRACT, "Tjänstekontrakt", 21) // , grow = 1)
-            hippoItemsView(state, ItemType.PLATTFORM_CHAIN, "Tjänsteplattformar", 16) // , grow = 1)
-            hippoItemsView(state, ItemType.PRODUCER, "Tjänsteproducenter", 21) // , grow = 1)
-            hippoItemsView(state, ItemType.LOGICAL_ADDRESS, "Logiska adresser", 21) // , grow = 1)
+            hippoItemsView(state, ItemType.CONSUMER, integrationLists, "Tjänstekonsumenter", 21) // , grow = 1)
+            hippoItemsView(state, ItemType.CONTRACT, integrationLists, "Tjänstekontrakt", 21) // , grow = 1)
+            hippoItemsView(state, ItemType.PLATTFORM_CHAIN, integrationLists, "Tjänsteplattformar", 16) // , grow = 1)
+            hippoItemsView(state, ItemType.PRODUCER, integrationLists, "Tjänsteproducenter", 21) // , grow = 1)
+            hippoItemsView(state, ItemType.LOGICAL_ADDRESS, integrationLists, "Logiska adresser", 21) // , grow = 1)
         }
     }
 }
 
-private fun Container.hippoItemsView(state: HippoState, type: ItemType, heading: String, bredd: Int = 20) {
+private fun Container.hippoItemsView(
+    state: HippoState,
+    type: ItemType,
+    integrationLists: IntegrationLists,
+    heading: String,
+    bredd: Int = 20
+) {
     div {
         // val store = HippoManager.hippoStore
         // background = Background((hex(0x0fffff)))
@@ -209,31 +202,37 @@ private fun Container.hippoItemsView(state: HippoState, type: ItemType, heading:
         var maxCounter = -1
         var maxNoItems = -1
 
+        // val integrationLists = createHippoViewData(state)
         // background = Background(Col.LIGHTSTEELBLUE)
         when (type) {
             ItemType.CONSUMER -> {
-                vList = state.vServiceConsumers
+                // vList = state.vServiceConsumers
+                vList = integrationLists.serviceConsumers
                 maxCounter = state.maxCounters.consumers
                 maxNoItems = state.vServiceConsumersMax
             }
             ItemType.PRODUCER -> {
-                vList = state.vServiceProducers
+                // vList = state.vServiceProducers
+                vList = integrationLists.serviceProducers
                 maxCounter = state.maxCounters.producers
                 maxNoItems = state.vServiceProducersMax
             }
             ItemType.PLATTFORM_CHAIN -> {
-                vList = state.vPlattformChains
+                // vList = state.vPlattformChains
+                vList = integrationLists.plattformChains
                 maxCounter = state.maxCounters.plattformChains
                 maxNoItems = 100
             }
             ItemType.LOGICAL_ADDRESS -> {
-                vList = state.vLogicalAddresses
+                // vList = state.vLogicalAddresses
+                vList = integrationLists.logicalAddresses
                 maxCounter = state.maxCounters.logicalAddress
                 maxNoItems = state.vLogicalAddressesMax
                 marginRight = 10.px
             }
             ItemType.CONTRACT -> {
-                vList = state.vDomainsAndContracts
+                // vList = state.vDomainsAndContracts
+                vList = integrationLists.domainsAndContracts
                 maxCounter = state.maxCounters.contracts
                 maxNoItems = state.vServiceContractsMax
             }
@@ -287,7 +286,7 @@ private fun Container.hippoItemsView(state: HippoState, type: ItemType, heading:
                                         +item.description
                                         if (
                                             state.isItemSelected(ItemType.CONTRACT, item.id) &&
-                                            state.vServiceContracts.size == 1
+                                            integrationLists.serviceContracts.size == 1
                                         ) {
                                             insertResetButton(item, ItemType.CONTRACT)
                                         } else itemSelect(item, ItemType.CONTRACT, textSearchInfo)
@@ -297,7 +296,7 @@ private fun Container.hippoItemsView(state: HippoState, type: ItemType, heading:
 
                                         if (
                                             state.isItemSelected(ItemType.DOMAIN, item.id) &&
-                                            state.vServiceDomains.size == 1
+                                            integrationLists.serviceDomains.size == 1
                                         ) {
                                             insertResetButton(item, ItemType.DOMAIN)
                                         } else itemSelect(item, ItemType.DOMAIN, textSearchInfo)
@@ -357,7 +356,6 @@ private fun Container.searchField(type: ItemType, textSearchInfo: TextSearchInfo
 }
 
 private fun Div.itemSelect(item: BaseItem, type: ItemType, textSearchInfo: TextSearchInfo) {
-    val store = HippoManager.hippoStore
     onEvent {
         click = {
             textSearchInfo.clear()
@@ -367,7 +365,6 @@ private fun Div.itemSelect(item: BaseItem, type: ItemType, textSearchInfo: TextS
 }
 
 private fun Div.insertResetButton(item: BaseItem, type: ItemType) {
-    val store = HippoManager.hippoStore
     val buttonText = when (type) {
         ItemType.CONSUMER -> "Återställ tjänstekonsument"
         ItemType.CONTRACT -> "Återställ tjänstekontrakt"
@@ -389,7 +386,6 @@ private fun Div.insertResetButton(item: BaseItem, type: ItemType) {
 }
 
 private fun Container.showMoreItemsButton(type: ItemType, size: Int, maxItemsToShow: Int) {
-    val store = HippoManager.hippoStore
     if (size > maxItemsToShow) {
         div {
             val linesLeft = size - maxItemsToShow

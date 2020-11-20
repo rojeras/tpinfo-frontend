@@ -51,7 +51,7 @@ data class StatisticsBlob(
 
 fun loadStatistics(state: HippoState) {
     val store = HippoManager.hippoStore
-    val urlParameters = state.getParams()
+    val urlParameters = state.getParams(state.view)
     val parameters = "statistics$urlParameters"
 
     // Check if the statistics info is available in the cache

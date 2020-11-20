@@ -46,7 +46,7 @@ data class HistoryCache(
 
 fun loadHistory(state: HippoState) {
     val store = HippoManager.hippoStore
-    val urlParameters = state.getParams()
+    val urlParameters = state.getParams(state.view)
     val parameters = "history$urlParameters"
 
     // Check if the statistics info is available in the cache

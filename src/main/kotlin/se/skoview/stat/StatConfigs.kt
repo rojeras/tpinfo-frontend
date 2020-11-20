@@ -160,7 +160,7 @@ private fun itemSelectDeselect(itemId: Int, itemType: ItemType) {
 //        store.dispatch(HippoAction.ItemIdDeselectedAll(itemType))
     } else {
         // Select an item
-        if (store.getState().viewMode == ViewMode.SIMPLE) store.dispatch(HippoAction.SetViewMode(ViewMode.ADVANCED))
+        if (store.getState().view == View.STAT_SIMPLE) store.dispatch(HippoAction.SetView(View.STAT_ADVANCED))
         store.dispatch(HippoAction.ItemIdSelected(itemType, itemId))
         loadStatistics(store.getState())
     }

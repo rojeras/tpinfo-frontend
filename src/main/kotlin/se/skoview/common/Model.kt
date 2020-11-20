@@ -47,12 +47,14 @@ enum class ViewMode {
 
 data class HippoState(
     // Status information
-    val currentAction: KClass<out HippoAction> = HippoAction.ApplicationStarted::class,
+    val currentAction: KClass<out HippoAction> = HippoAction.SetView::class,
     val view: View = View.HOME,
     val applicationStarted: HippoApplication? = null,
     val downloadBaseDatesStatus: AsyncActionStatus = AsyncActionStatus.NOT_INITIALIZED,
     val downloadBaseItemStatus: AsyncActionStatus = AsyncActionStatus.NOT_INITIALIZED,
     val downloadIntegrationStatus: AsyncActionStatus = AsyncActionStatus.NOT_INITIALIZED,
+    val downloadStatisticsStatus: AsyncActionStatus = AsyncActionStatus.NOT_INITIALIZED,
+    val downloadHistoryStatus: AsyncActionStatus = AsyncActionStatus.NOT_INITIALIZED,
     val errorMessage: String? = null,
 
     // Base Items
@@ -68,9 +70,10 @@ data class HippoState(
     val statisticsPlattforms: Map<Int, StatisticsPlattform> = mapOf(),
 
     // Filter parameters
-
     val dateEffective: String? = null,
     val dateEnd: String? = null,
+    val statDateEffective: String = "",
+    val statDateEnd: String = "",
 
     val selectedConsumers: List<Int> = listOf(),
     val selectedProducers: List<Int> = listOf(),
@@ -84,15 +87,6 @@ data class HippoState(
     val integrationArrs: List<Integration> = listOf(),
     val maxCounters: MaxCounter = MaxCounter(0, 0, 0, 0, 0, 0),
     val updateDates: List<String> = listOf(),
-
-    // View data
-    val vServiceConsumers: List<ServiceComponent> = listOf(),
-    val vServiceProducers: List<ServiceComponent> = listOf(),
-    val vServiceDomains: List<ServiceDomain> = listOf(),
-    val vServiceContracts: List<ServiceContract> = listOf(),
-    val vDomainsAndContracts: List<BaseItem> = listOf(),
-    val vPlattformChains: List<PlattformChain> = listOf(),
-    val vLogicalAddresses: List<LogicalAddress> = listOf(),
 
     // Max number of items to display
     val vServiceConsumersMax: Int = 100,
@@ -109,24 +103,19 @@ data class HippoState(
 
     // View controllers
     val showTechnicalTerms: Boolean = false,
-    val viewMode: ViewMode = ViewMode.SIMPLE,
+    // val viewMode: ViewMode = ViewMode.SIMPLE,
     val simpleViewPreSelect: SimpleViewPreSelect = simpleViewPreSelectDefault,
     val advancedViewPreSelect: AdvancedViewPreSelect? = null
 )
 
 fun initializeHippoState(): HippoState {
-    val bookmarkInformation: BookmarkInformation = parseBookmark()
+    val datesPair = getDatesLastMonth()
+    val statDateEffective = datesPair.first.toSwedishDate()
+    val statDdateEnd = datesPair.second.toSwedishDate()
 
-    val state = HippoState()
-    return state.copy(
-        dateEffective = bookmarkInformation.dateEffective,
-        dateEnd = bookmarkInformation.dateEnd,
-        selectedConsumers = bookmarkInformation.selectedConsumers,
-        selectedProducers = bookmarkInformation.selectedProducers,
-        selectedLogicalAddresses = bookmarkInformation.selectedLogicalAddresses,
-        selectedContracts = bookmarkInformation.selectedContracts,
-        selectedDomains = bookmarkInformation.selectedDomains,
-        selectedPlattformChains = bookmarkInformation.selectedPlattformChains
+    return HippoState(
+        statDateEffective = statDateEffective,
+        statDateEnd = statDdateEnd,
     )
 }
 
@@ -148,13 +137,18 @@ fun HippoState.isPlattformSelected(id: Int): Boolean {
 }
 
 // The extension function create the part of the URL to fetch integrations
-fun HippoState.getParams(): String {
+fun HippoState.getParams(view: View): String {
 
     // var params = "?dummy&contractId=379"
     var params = "?dummy"
 
-    params += "&dateEffective=" + this.dateEffective
-    params += "&dateEnd=" + this.dateEnd
+    if (view == View.HIPPO) {
+        params += "&dateEffective=" + this.dateEffective
+        params += "&dateEnd=" + this.dateEnd
+    } else {
+        params += "&dateEffective=" + this.statDateEffective
+        params += "&dateEnd=" + this.statDateEnd
+    }
 
     params += if (this.selectedConsumers.isNotEmpty()) this.selectedConsumers.joinToString(
         prefix = "&consumerId=",
@@ -187,4 +181,147 @@ fun HippoState.getParams(): String {
     }
 
     return params
+}
+
+// is HippoAction.ItemIdSelected -> {
+fun HippoState.itemIdSeclected(id: Int, viewType: ItemType): HippoState {
+
+    return when (viewType) {
+        ItemType.CONSUMER -> {
+            val newList = listOf(this.selectedConsumers, listOf(id)).flatten().distinct()
+            this.copy(
+                selectedConsumers = newList
+            )
+        }
+        ItemType.DOMAIN -> {
+            val newList = listOf(this.selectedDomains, listOf(id)).flatten().distinct()
+            this.copy(
+                selectedDomains = newList
+            )
+        }
+        ItemType.CONTRACT -> {
+            val newList = listOf(this.selectedContracts, listOf(id)).flatten().distinct()
+            this.copy(
+                selectedContracts = newList
+            )
+        }
+        ItemType.PLATTFORM_CHAIN -> {
+            val newList = listOf(this.selectedPlattformChains, listOf(id)).flatten().distinct()
+            this.copy(
+                selectedPlattformChains = newList
+            )
+        }
+        ItemType.LOGICAL_ADDRESS -> {
+            val newList = listOf(this.selectedLogicalAddresses, listOf(id)).flatten().distinct()
+            this.copy(
+                selectedLogicalAddresses = newList
+            )
+        }
+        ItemType.PRODUCER -> {
+            val newList = listOf(this.selectedProducers, listOf(id)).flatten().distinct()
+            this.copy(
+                selectedProducers = newList
+            )
+        }
+    }
+}
+
+// is HippoAction.ItemIdDeselected -> {
+fun HippoState.itemIdDeseclected(id: Int, viewType: ItemType): HippoState {
+    return when (viewType) {
+        ItemType.CONSUMER -> {
+            val newList = this.selectedConsumers as MutableList<Int>
+            newList.remove(id)
+            this.copy(
+                selectedConsumers = newList,
+                advancedViewPreSelect = null
+            )
+        }
+        ItemType.DOMAIN -> {
+            val newList = this.selectedDomains as MutableList<Int>
+            newList.remove(id)
+            this.copy(
+                selectedDomains = newList,
+                advancedViewPreSelect = null
+            )
+        }
+        ItemType.CONTRACT -> {
+            val newList = this.selectedContracts as MutableList<Int>
+            newList.remove(id)
+            this.copy(
+                selectedContracts = newList,
+                advancedViewPreSelect = null
+            )
+        }
+        ItemType.PLATTFORM_CHAIN -> {
+            val newList = this.selectedPlattformChains as MutableList<Int>
+            newList.remove(id)
+            this.copy(
+                selectedPlattformChains = newList,
+                advancedViewPreSelect = null
+            )
+        }
+        ItemType.LOGICAL_ADDRESS -> {
+            val newList = this.selectedLogicalAddresses as MutableList<Int>
+            newList.remove(id)
+            this.copy(
+                selectedLogicalAddresses = newList,
+                advancedViewPreSelect = null
+            )
+        }
+        ItemType.PRODUCER -> {
+            val newList = this.selectedProducers as MutableList<Int>
+            newList.remove(id)
+            this.copy(
+                selectedProducers = newList,
+                advancedViewPreSelect = null
+            )
+        }
+    }
+}
+
+// is HippoAction.StatTpSelected -> {
+fun HippoState.statTpSelected(tpId: Int): HippoState {
+    // TP can only be selected in advanced mode
+
+    val preSelect: AdvancedViewPreSelect = AdvancedViewPreSelect.getDefault()
+    val pChainId = PlattformChain.calculateId(first = tpId, middle = null, last = tpId)
+
+    return this.copy(
+        selectedPlattformChains = listOf(pChainId),
+        advancedViewPreSelect = preSelect
+    )
+}
+
+// is HippoAction.SetView -> {
+fun HippoState.setView(newView: View): HippoState {
+
+    if (this.view == newView) throw RuntimeException("Current view  == new  in reducer SetViewMode")
+
+    // If the new mode have a preselect with the same label as the current, apply it. Otherwise use its default.
+    return when (newView) {
+        View.STAT_SIMPLE -> {
+            val currentAdvancedPreSelect = this.advancedViewPreSelect ?: AdvancedViewPreSelect.getDefault()
+            val currentAdvancedPreSelectLabel = currentAdvancedPreSelect.label
+            val newSimpleViewPreSelect =
+                SimpleViewPreSelect.mapp[currentAdvancedPreSelectLabel] ?: SimpleViewPreSelect.getDefault()
+            applyFilteredItemsSelection(
+                this,
+                newSimpleViewPreSelect.filteredItems
+            ).copy(
+                simpleViewPreSelect = newSimpleViewPreSelect,
+                view = View.STAT_SIMPLE
+            )
+        }
+        View.STAT_ADVANCED -> {
+            val currentSimplePreSelectLabel = this.simpleViewPreSelect.label
+            val newAdvancedViewPreSelect =
+                AdvancedViewPreSelect.mapp[currentSimplePreSelectLabel] ?: AdvancedViewPreSelect.getDefault()
+            applyFilteredItemsSelection(this, newAdvancedViewPreSelect.filteredItems).copy(
+                advancedViewPreSelect = newAdvancedViewPreSelect,
+                view = View.STAT_ADVANCED
+            )
+        }
+        else -> this.copy(view = View.HIPPO)
+    }
 }

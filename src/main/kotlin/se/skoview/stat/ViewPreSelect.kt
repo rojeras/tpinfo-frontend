@@ -43,11 +43,13 @@ val JOURNAL_ITEMS_FILTER = FilteredItems(consumers = listOf(865))
 val NPO_ITEMS_FILTER = FilteredItems(consumers = listOf(434, 693))
 val REQUEST_ITEMS_FILTER = FilteredItems(contracts = listOf(215))
 
-data class SimpleViewPreSelect(
+interface ViewPreSelect
+
+data class SimpleViewPreSelect (
     val label: String,
     val filteredItems: FilteredItems,
     val simpleModeViewOrder: List<ItemType>
-) {
+) : ViewPreSelect {
     init {
         mapp[label] = this
     }
@@ -63,7 +65,7 @@ data class AdvancedViewPreSelect(
     val label: String,
     val filteredItems: FilteredItems,
     val headingsMap: HashMap<ItemType, String>,
-) {
+) : ViewPreSelect {
     init {
         mapp[label] = this
     }

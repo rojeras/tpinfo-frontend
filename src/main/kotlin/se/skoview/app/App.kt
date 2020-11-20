@@ -17,17 +17,11 @@
 package se.skoview.app
 
 import pl.treksoft.kvision.Application
-import pl.treksoft.kvision.html.main
 import pl.treksoft.kvision.module
-import pl.treksoft.kvision.pace.Pace
 import pl.treksoft.kvision.panel.root
 import pl.treksoft.kvision.startApplication
-import se.skoview.common.AsyncActionStatus
 import se.skoview.common.HippoManager
-import se.skoview.common.View
-import se.skoview.hippo.hippoView
-import se.skoview.stat.AdvancedView
-import se.skoview.stat.SimpleView
+import se.skoview.common.HippoManager.mainLoop
 
 /**
 Övergripande tankar inför sommaruppehållet 2020
@@ -44,6 +38,7 @@ import se.skoview.stat.SimpleView
 // todo: Visa antal användare senaste 24 timmarna
 // todo: Lägg in stöd för Navigo routing
 // todo: Börja använda Karma och enhetstester
+// todo: Investigate Kotlin JS blocking: runBlocking workaround https://youtrack.jetbrains.com/issue/KT-22228
 
 // Hippo
 
@@ -61,6 +56,7 @@ import se.skoview.stat.SimpleView
 
 // done: Byt ut "SLL" mot "Region Stockholm" i texterna.
 // todo: Byt ut "SLL" i plattformsnamnen. Stäm av lösning med MLA. Bör också ske i hippo och i BS.
+// todo: Addera förval för; Infektionsverktyget, Listning
 // done: Döp om förvalet "Bokade tider" till "Tidbokningar"
 // todo: Tydliggör vad som är valt (dvs vad som kan väljas bort)
 // todo: Fixa Back-knappen i webbläsaren så att den backar i applikationen.
@@ -149,15 +145,6 @@ import se.skoview.stat.SimpleView
 // done: Varför poppar rutan ”SLL statistiktjänst” upp – finns väl ingen anledning till det.
 // done: ”Återställ tjänsteplattform(ar)” bör flyttas ned någon centimeter.
 
-// Initialize the redux store
-/*
-val store = createReduxStore(
-    ::hippoReducer,
-    // initialHippoState()
-    initializeHippoState()
-)
- */
-
 class App : Application() {
 
     override fun start() {
@@ -165,16 +152,17 @@ class App : Application() {
         // val startUrl = window.location.href
         // println("window.location.href: $startUrl")
 
-        Pace.init()
+        // Pace.init()
         HippoManager.initialize()
 
         root("hippo") {
+            mainLoop() // In HippoManager
             // place for common header
             /*
             header(HippoManager.hippoStore) { state ->
                 headerNav(state)
             }
-             */
+
             main(HippoManager.hippoStore) { state ->
                 // setUrlFilter(state)
                 if (state.downloadBaseItemStatus == AsyncActionStatus.COMPLETED) {
@@ -188,28 +176,17 @@ class App : Application() {
                                 hippoView(state)
                             }
                         }
-                        View.STAT_SIMPLE -> add(SimpleView)
-                        View.STAT_ADVANCED -> add(AdvancedView)
+                        View.STAT_SIMPLE -> statView(state, View.STAT_SIMPLE)
+                        View.STAT_ADVANCED -> statView(state, View.STAT_ADVANCED)
                     }
                 }
             }
             // footer()
+            */
         }
     }
 
     /*
-    fun startHippo() {
-        store.dispatch(HippoAction.ApplicationStarted(HippoApplication.HIPPO))
-
-        loadIntegrations(store.getState())
-        root("hippo") {
-            vPanel {
-                add(HippoTablePage)
-            }.apply {
-                width = 100.perc
-            }
-        }
-    }
 
     fun startStat() {
         store.dispatch(HippoAction.ApplicationStarted(HippoApplication.STATISTIK))

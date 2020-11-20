@@ -17,7 +17,6 @@
 package se.skoview.common
 
 import pl.treksoft.kvision.redux.RAction
-import se.skoview.hippo.IntegrationLists
 import se.skoview.stat.AdvancedViewPreSelect
 import se.skoview.stat.SimpleViewPreSelect
 
@@ -35,6 +34,7 @@ sealed class HippoAction : RAction {
     object StartDownloadBaseItems : HippoAction()
     object DoneDownloadBaseItems : HippoAction()
     data class ErrorDownloadBaseItems(val errorMessage: String) : HippoAction()
+    object StartDownloadIntegrations : HippoAction()
     data class DoneDownloadIntegrations(
         val integrationArrs: List<Integration>,
         val maxCounters: MaxCounter,
@@ -44,10 +44,11 @@ sealed class HippoAction : RAction {
         val view: View,
         val bookmark: BookmarkInformation
     ) : HippoAction()
-    object StartDownloadIntegrations : HippoAction()
+    object StartDownloadStatistics : HippoAction()
     data class DoneDownloadStatistics(
         val statisticsArrArr: Array<Array<Int>>
     ) : HippoAction()
+    object StartDownloadHistory : HippoAction()
     data class DoneDownloadHistory(
         val historyMap: Map<String, Int>
     ) : HippoAction()
@@ -59,13 +60,10 @@ sealed class HippoAction : RAction {
         val id: Int
     ) : HippoAction()
     data class ItemIdDeselected(val viewType: ItemType, val id: Int) : HippoAction()
-    // data class ItemIdDeselectedAll( val viewType: ItemType ): HippoAction()
-    // object ItemDeselectedAllForAllTypes: HippoAction()
-    data class ViewUpdated(val integrationLists: IntegrationLists) : HippoAction()
     data class SetVMax(val type: ItemType, val size: Int) : HippoAction()
     data class ShowTimeGraph(val isShown: Boolean) : HippoAction()
     data class ShowTechnicalTerms(val isShown: Boolean) : HippoAction()
-    data class SetViewMode(val viewMode: ViewMode) : HippoAction()
+    // data class SetViewMode(val viewMode: ViewMode) : HippoAction()
     data class SetSimpleViewPreselect(val preSelect: SimpleViewPreSelect) : HippoAction()
     data class SetAdvancedViewPreselect(val preSelect: AdvancedViewPreSelect) : HippoAction()
 }

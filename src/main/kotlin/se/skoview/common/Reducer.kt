@@ -17,9 +17,7 @@
 package se.skoview.common
 
 import se.skoview.common.PlattformChain.Companion.calculateId
-import se.skoview.stat.AdvancedViewPreSelect
 import se.skoview.stat.FilteredItems
-import se.skoview.stat.SimpleViewPreSelect
 import se.skoview.stat.StatisticsBlob
 
 fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
@@ -60,7 +58,7 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
                 view = view
             )
         }
-        is HippoAction.SetView -> state.copy(view = action.view)
+        // is HippoAction.SetView -> state.copy(view = action.view)
         is HippoAction.SetDownloadBaseDatesStatus -> {
             if (action.status == AsyncActionStatus.COMPLETED)
                 state.copy(
@@ -93,13 +91,6 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
             downloadBaseItemStatus = AsyncActionStatus.ERROR,
             errorMessage = action.errorMessage
         )
-        /*
-        is HippoAction.StartDownloadIntegrations -> {
-            state.copy(
-                downloadIntegrationStatus = AsyncActionStatus.INITIALIZED
-            )
-        }
-         */
 
         is HippoAction.StartDownloadIntegrations -> state.copy(
             downloadIntegrationStatus = AsyncActionStatus.INITIALIZED
@@ -138,12 +129,21 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
                 selectedPlattformChains = action.bookmark.selectedPlattformChains
             )
         }
+        is HippoAction.StartDownloadStatistics ->
+            state.copy(
+                downloadStatisticsStatus = AsyncActionStatus.INITIALIZED
+            )
         is HippoAction.DoneDownloadStatistics -> {
             val statBlob = StatisticsBlob(action.statisticsArrArr)
             state.copy(
+                downloadStatisticsStatus = AsyncActionStatus.COMPLETED,
                 statBlob = statBlob
             )
         }
+        is HippoAction.StartDownloadHistory ->
+            state.copy(
+                downloadHistoryStatus = AsyncActionStatus.INITIALIZED
+            )
         is HippoAction.DoneDownloadHistory -> {
             println("In reducer DonwDownloadHistory")
             state.copy(historyMap = action.historyMap)
@@ -162,129 +162,14 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
                 )
             }
         }
-        is HippoAction.ViewUpdated -> state.copy(
-            vServiceConsumers = action.integrationLists.serviceConsumers,
-            vServiceDomains = action.integrationLists.serviceDomains,
-            vServiceContracts = action.integrationLists.serviceContracts,
-            vDomainsAndContracts = action.integrationLists.domainsAndContracts,
-            vPlattformChains = action.integrationLists.plattformChains,
-            vLogicalAddresses = action.integrationLists.logicalAddresses,
-            vServiceProducers = action.integrationLists.serviceProducers
-        )
-
         is HippoAction.StatTpSelected -> {
-            // TP can only be selected in advanced mode
-
-            val preSelect: AdvancedViewPreSelect = AdvancedViewPreSelect.getDefault()
-
-            val pChainId = PlattformChain.calculateId(first = action.tpId, middle = null, last = action.tpId)
-
-            val state1: HippoState = state.copy(
-                selectedPlattformChains = listOf(pChainId),
-                advancedViewPreSelect = preSelect
-            )
-
-            state1 // itemDeselectAllForAllTypes(state1)
+            state.statTpSelected(action.tpId)
         }
         is HippoAction.ItemIdSelected -> {
-
-            // We will also clear the PreSelect label when an item is deselected
-            val id = action.id
-
-            when (action.viewType) {
-                ItemType.CONSUMER -> {
-                    val newList = listOf(state.selectedConsumers, listOf(id)).flatten().distinct()
-                    state.copy(
-                        selectedConsumers = newList
-
-                    )
-                }
-                ItemType.DOMAIN -> {
-                    val newList = listOf(state.selectedDomains, listOf(id)).flatten().distinct()
-                    state.copy(
-                        selectedDomains = newList
-                    )
-                }
-                ItemType.CONTRACT -> {
-                    val newList = listOf(state.selectedContracts, listOf(id)).flatten().distinct()
-                    state.copy(
-                        selectedContracts = newList
-                    )
-                }
-                ItemType.PLATTFORM_CHAIN -> {
-                    val newList = listOf(state.selectedPlattformChains, listOf(id)).flatten().distinct()
-                    state.copy(
-                        selectedPlattformChains = newList
-                    )
-                }
-                ItemType.LOGICAL_ADDRESS -> {
-                    val newList = listOf(state.selectedLogicalAddresses, listOf(id)).flatten().distinct()
-                    state.copy(
-                        selectedLogicalAddresses = newList
-                    )
-                }
-                ItemType.PRODUCER -> {
-                    val newList = listOf(state.selectedProducers, listOf(id)).flatten().distinct()
-                    state.copy(
-                        selectedProducers = newList
-                    )
-                }
-            }
+            state.itemIdSeclected(action.id, action.viewType)
         }
         is HippoAction.ItemIdDeselected -> {
-
-            val id = action.id
-
-            when (action.viewType) {
-                ItemType.CONSUMER -> {
-                    val newList = state.selectedConsumers as MutableList<Int>
-                    newList.remove(id)
-                    state.copy(
-                        selectedConsumers = newList,
-                        advancedViewPreSelect = null
-                    )
-                }
-                ItemType.DOMAIN -> {
-                    val newList = state.selectedDomains as MutableList<Int>
-                    newList.remove(id)
-                    state.copy(
-                        selectedDomains = newList,
-                        advancedViewPreSelect = null
-                    )
-                }
-                ItemType.CONTRACT -> {
-                    val newList = state.selectedContracts as MutableList<Int>
-                    newList.remove(id)
-                    state.copy(
-                        selectedContracts = newList,
-                        advancedViewPreSelect = null
-                    )
-                }
-                ItemType.PLATTFORM_CHAIN -> {
-                    val newList = state.selectedPlattformChains as MutableList<Int>
-                    newList.remove(id)
-                    state.copy(
-                        selectedPlattformChains = newList,
-                        advancedViewPreSelect = null
-                    )
-                }
-                ItemType.LOGICAL_ADDRESS -> {
-                    val newList = state.selectedLogicalAddresses as MutableList<Int>
-                    newList.remove(id)
-                    state.copy(
-                        selectedLogicalAddresses = newList,
-                        advancedViewPreSelect = null
-                    )
-                }
-                ItemType.PRODUCER -> {
-                    val newList = state.selectedProducers as MutableList<Int>
-                    newList.remove(id)
-                    state.copy(
-                        selectedProducers = newList,
-                        advancedViewPreSelect = null
-                    )
-                }
-            }
+            state.itemIdSeclected(action.id, action.viewType)
         }
 
         is HippoAction.SetVMax -> {
@@ -309,14 +194,16 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
             state.copy(showTimeGraph = action.isShown)
         }
 
-        is HippoAction.SetViewMode -> {
-            val newViewMode: ViewMode = action.viewMode
+        is HippoAction.SetView -> {
+            state.setView(action.view)
+            /*
+            val newView: View = action.view
 
-            if (state.viewMode == newViewMode) throw RuntimeException("Current view mode == new mode in reducer SetViewMode")
+            if (state.view == newView) throw RuntimeException("Current view  == new  in reducer SetViewMode")
 
             // If the new mode have a preselect with the same label as the current, apply it. Otherwise use its default.
-            when (newViewMode) {
-                ViewMode.SIMPLE -> {
+            when (newView) {
+                View.STAT_SIMPLE -> {
                     val currentAdvancedPreSelect = state.advancedViewPreSelect ?: AdvancedViewPreSelect.getDefault()
                     val currentAdvancedPreSelectLabel = currentAdvancedPreSelect.label
                     val newSimpleViewPreSelect =
@@ -324,18 +211,23 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
                     applyFilteredItemsSelection(
                         state,
                         newSimpleViewPreSelect.filteredItems
-                    ).copy(simpleViewPreSelect = newSimpleViewPreSelect, viewMode = ViewMode.SIMPLE)
+                    ).copy(
+                        simpleViewPreSelect = newSimpleViewPreSelect,
+                        view = View.STAT_SIMPLE
+                    )
                 }
-                ViewMode.ADVANCED -> {
+                View.STAT_ADVANCED -> {
                     val currentSimplePreSelectLabel = state.simpleViewPreSelect.label
                     val newAdvancedViewPreSelect =
                         AdvancedViewPreSelect.mapp[currentSimplePreSelectLabel] ?: AdvancedViewPreSelect.getDefault()
                     applyFilteredItemsSelection(state, newAdvancedViewPreSelect.filteredItems).copy(
                         advancedViewPreSelect = newAdvancedViewPreSelect,
-                        viewMode = ViewMode.ADVANCED
+                        view = View.STAT_ADVANCED
                     )
                 }
+                else -> state.copy(view = View.HIPPO)
             }
+             */
         }
 
         is HippoAction.ShowTechnicalTerms -> {
@@ -386,7 +278,7 @@ private fun itemDeselectAllForAllTypes(inState: HippoState): HippoState {
     )
 }
 
-private fun applyFilteredItemsSelection(inState: HippoState, filteredItems: FilteredItems): HippoState {
+fun applyFilteredItemsSelection(inState: HippoState, filteredItems: FilteredItems): HippoState {
 
     println("In applyFilteredItemsSelection(): $filteredItems")
 
