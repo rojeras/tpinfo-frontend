@@ -32,7 +32,9 @@ enum class AsyncActionStatus {
 enum class DateType {
     EFFECTIVE,
     END,
-    EFFECTIVE_AND_END
+    EFFECTIVE_AND_END,
+    STAT_EFFECTIVE,
+    STAT_END
 }
 
 enum class HippoApplication {
@@ -323,5 +325,19 @@ fun HippoState.setView(newView: View): HippoState {
             )
         }
         else -> this.copy(view = View.HIPPO)
+    }
+}
+
+fun HippoState.dateSelected(selectedDate: String, dateType: DateType): HippoState {
+      //  is HippoAction.DateSelected -> {
+    return when (dateType) {
+        DateType.EFFECTIVE -> this.copy(dateEffective = selectedDate)
+        DateType.END -> this.copy(dateEnd = selectedDate)
+        DateType.EFFECTIVE_AND_END -> this.copy(
+            dateEffective = selectedDate,
+            dateEnd = selectedDate
+        )
+        DateType.STAT_EFFECTIVE -> this.copy(statDateEffective = selectedDate)
+        DateType.STAT_END -> this.copy(statDateEnd = selectedDate)
     }
 }

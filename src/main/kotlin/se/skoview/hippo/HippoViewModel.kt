@@ -30,7 +30,7 @@ data class IntegrationLists(
 )
 
 fun createHippoViewData(state: HippoState): IntegrationLists {
-    val store = HippoManager.hippoStore
+    // val store = HippoManager.hippoStore
     // val filteredIntegrations = filterViewData(state)
     val filteredIntegrations = state.integrationArrs
     println("In createHippoViewData()")

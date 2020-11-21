@@ -70,22 +70,12 @@ fun Container.statSimpleView(state: HippoState) {
                 } else {
                     -1
                 }
-            println("Time to check preselect")
-            // val itemType: ItemType = ItemType.CONSUMER
-            // todo: Make the !! go away
-            // val currentPreSelect: StatPreSelect = StatPreSelect.mapp[state.statPreSelectLabel]!!
-            println("A")
             val preSelect: SimpleViewPreSelect = state.simpleViewPreSelect
-            // val preSelect: PreSelect = PreSelect.getDefault(VIEW_MODE.SIMPLE)
-            println("B")
-            console.log(preSelect)
-            println("C")
             val showItemType: ItemType = preSelect.simpleModeViewOrder[0]
 
             val itemSInfoList: SInfoList
             val label: String = state.simpleViewPreSelect.label
 
-            println("Before when")
             when (showItemType) {
                 ItemType.CONSUMER -> {
                     itemSInfoList = SInfo.consumerSInfoList
@@ -109,6 +99,7 @@ fun Container.statSimpleView(state: HippoState) {
             val pieChart =
                 Chart(
                     getPieChartConfig(
+                        state,
                         showItemType,
                         itemSInfoList,
                         animationTime = animateTime,
@@ -130,6 +121,7 @@ fun Container.statSimpleView(state: HippoState) {
 
             add(
                 ChartLabelTable(
+                    state,
                     showItemType,
                     itemSInfoList.recordList,
                     "description",

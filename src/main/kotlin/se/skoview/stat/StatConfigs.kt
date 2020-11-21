@@ -27,6 +27,7 @@ import pl.treksoft.kvision.utils.perc
 import se.skoview.common.*
 
 fun getPieChartConfig(
+    state: HippoState,
     itemType: ItemType,
     itemSInfoList: SInfoList,
     animationTime: Int = 0,
@@ -51,7 +52,7 @@ fun getPieChartConfig(
             onClick = { _, activeElements ->
                 val sliceIx = activeElements[0]._get("_index") as Int
                 val itemId: Int = itemSInfoList.recordList[sliceIx].itemId
-                itemSelectDeselect(itemId, itemType)
+                itemSelectDeselect(state, itemId, itemType)
                 "" // This lambda returns Any, which mean the last line must be an expression
             }
         )
@@ -60,6 +61,7 @@ fun getPieChartConfig(
 
 
 open class ChartLabelTable(
+    state: HippoState,
     itemType: ItemType,
     itemSInfoList: List<SInfoRecord>,
     dataField: String = "description",
@@ -69,7 +71,7 @@ open class ChartLabelTable(
     heading: String
 ) : SimplePanel() {
     init {
-        val store = HippoManager.hippoStore
+        // val store = HippoManager.hippoStore
         id = "ChartLabelTable: SimpleTable"
 
         // Footer pagination buttons hidden through CSS
@@ -110,7 +112,7 @@ open class ChartLabelTable(
                         formatterComponentFunction = { cell, _, item ->
                             val itemRecord = item as SInfoRecord
                             Div {
-                                if (store.getState().isItemSelected(itemRecord.itemType, itemRecord.itemId)) {
+                                if (state.isItemSelected(itemRecord.itemType, itemRecord.itemId)) {
                                     //background = Background(Color.name(Col.LIGHTPINK))
                                     fontWeight = FontWeight.BOLD
                                     cell.apply { background = Background(Color.name(Col.YELLOW)) }
@@ -131,7 +133,7 @@ open class ChartLabelTable(
                 ),
                 rowSelected = { row ->
                     val item = row.getData() as SInfoRecord
-                    if (item.calls > -1) itemSelectDeselect(item.itemId, item.itemType)
+                    if (item.calls > -1) itemSelectDeselect(state, item.itemId, item.itemType)
                 },
                 // todo: Hide the tabulator footer here
                 //dataLoaded = setStyle( ".tabulator-footer")
@@ -144,25 +146,29 @@ open class ChartLabelTable(
     }
 }
 
-private fun itemSelectDeselect(itemId: Int, itemType: ItemType) {
-    val store = HippoManager.hippoStore
+private fun itemSelectDeselect(state: HippoState, itemId: Int, itemType: ItemType) {
+    // val store = HippoManager.hippoStore
     println("In itemSelectDeselect()")
     //store.dispatch(HippoAction.PreSelectedLabelSet("default"))
-    if (store.getState().isItemSelected(itemType, itemId)) {
+    if (state.isItemSelected(itemType, itemId)) {
         // De-select of an item
         // If we deselect an item which is part of the current PreSelect, then restore the default view
         //if (store.getState().preSelect!!.selectedItemsMap[itemType]!!.contains(itemId))
         //selectPreSelect("default")
         //else {
-            store.dispatch(HippoAction.ItemIdDeselected(itemType, itemId))
-            loadStatistics(store.getState())
+            HippoManager.itemDeselected(itemId, itemType)
+            // store.dispatch(HippoAction.ItemIdDeselected(itemType, itemId))
+            /// loadStatistics(store.getState())
         //}
 //        store.dispatch(HippoAction.ItemIdDeselectedAll(itemType))
     } else {
         // Select an item
-        if (store.getState().view == View.STAT_SIMPLE) store.dispatch(HippoAction.SetView(View.STAT_ADVANCED))
-        store.dispatch(HippoAction.ItemIdSelected(itemType, itemId))
-        loadStatistics(store.getState())
+        if (state.view == View.STAT_SIMPLE)
+            HippoManager.setView(View.STAT_ADVANCED)
+            // store.dispatch(HippoAction.SetView(View.STAT_ADVANCED))
+        HippoManager.itemSelected(itemId, itemType)
+        // store.dispatch(HippoAction.ItemIdSelected(itemType, itemId))
+        // loadStatistics(store.getState())
     }
 }
 

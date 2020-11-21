@@ -359,7 +359,7 @@ private fun Div.itemSelect(item: BaseItem, type: ItemType, textSearchInfo: TextS
     onEvent {
         click = {
             textSearchInfo.clear()
-            HippoManager.itemSelected(item, type)
+            HippoManager.itemSelected(item.id, type)
         }
     }
 }
@@ -379,7 +379,7 @@ private fun Div.insertResetButton(item: BaseItem, type: ItemType) {
             width = 100.perc
             background = Background(Color.name(Col.GRAY))
             onClick {
-                HippoManager.itemDeselected(item, type)
+                HippoManager.itemDeselected(item.id, type)
             }
         }
     }

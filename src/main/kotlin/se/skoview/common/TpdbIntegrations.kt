@@ -77,17 +77,17 @@ data class IntegrationCache(
 }
 
 fun loadIntegrations(state: HippoState) {
-    val store = HippoManager.hippoStore
+    // val store = HippoManager.hippoStore
     val urlParameters = state.getParams(state.view)
     val parameters = "integrations$urlParameters"
 
-    store.dispatch(HippoAction.StartDownloadIntegrations)
+    HippoManager.dispatchProxy(HippoAction.StartDownloadIntegrations)
 
     if (IntegrationCache.map.containsKey(parameters)) {
         println(">>> Integrations found in cache")
         val integrationsCache = IntegrationCache.map[parameters]
         // todo: Make sure to remove the !! below
-        store.dispatch(
+        HippoManager.dispatchProxy(
             HippoAction.DoneDownloadIntegrations(
                 integrationsCache!!.integrationArr,
                 integrationsCache.maxCounters,
@@ -129,7 +129,7 @@ fun loadIntegrations(state: HippoState) {
             IntegrationCache(parameters, integrationArrs, integrationInfo.maxCounters, integrationInfo.updateDates)
 
             println("Number of integrations: ${integrationArrs.size}")
-            store.dispatch(
+            HippoManager.dispatchProxy(
                 HippoAction.DoneDownloadIntegrations(
                     integrationArrs,
                     integrationInfo.maxCounters,

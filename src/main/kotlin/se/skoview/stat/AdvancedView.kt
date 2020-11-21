@@ -53,6 +53,7 @@ fun Container.statAdvancedView(state: HippoState) {
 
             add(
                 StatPieTableView(
+                    state,
                     itemType = ItemType.CONSUMER,
                     itemSInfoList = SInfo.consumerSInfoList,
                     animateTime = animateTime,
@@ -62,6 +63,7 @@ fun Container.statAdvancedView(state: HippoState) {
 
             add(
                 StatPieTableView(
+                    state,
                     itemType = ItemType.CONTRACT,
                     itemSInfoList = SInfo.contractSInfoList,
                     animateTime = animateTime,
@@ -71,6 +73,7 @@ fun Container.statAdvancedView(state: HippoState) {
 
             add(
                 StatPieTableView(
+                    state,
                     itemType = ItemType.PRODUCER,
                     itemSInfoList = SInfo.producerSInfoList,
                     animateTime = animateTime,
@@ -80,6 +83,7 @@ fun Container.statAdvancedView(state: HippoState) {
 
             add(
                 StatPieTableView(
+                    state,
                     itemType = ItemType.LOGICAL_ADDRESS,
                     itemSInfoList = SInfo.logicalAddressSInfoList,
                     animateTime = animateTime,
@@ -115,6 +119,7 @@ private fun getHeading(state: HippoState, itemType: ItemType): String {
 }
 
 class StatPieTableView(
+    state: HippoState,
     itemType: ItemType,
     itemSInfoList: SInfoList,
     animateTime: Int,
@@ -128,6 +133,7 @@ class StatPieTableView(
         val pieChart =
             Chart(
                 getPieChartConfig(
+                    state,
                     itemType,
                     itemSInfoList,
                     animationTime = animateTime,
@@ -144,6 +150,7 @@ class StatPieTableView(
         )
         add(
             ChartLabelTable(
+                state,
                 itemType,
                 itemSInfoList.recordList,
                 "description",

@@ -45,14 +45,14 @@ data class HistoryCache(
 }
 
 fun loadHistory(state: HippoState) {
-    val store = HippoManager.hippoStore
+    // val store = HippoManager.hippoStore
     val urlParameters = state.getParams(state.view)
     val parameters = "history$urlParameters"
 
     // Check if the statistics info is available in the cache
     if (HistoryCache.map.containsKey(parameters)) {
         println(">>> History data found in cache")
-        store.dispatch(
+        HippoManager.dispatchProxy(
             HippoAction.DoneDownloadHistory(HistoryCache.map[parameters]!!.historyMap)
         )
     } else {
@@ -80,7 +80,7 @@ fun loadHistory(state: HippoState) {
 
             println("Time to Dispatch")
 
-            store.dispatch(
+            HippoManager.dispatchProxy(
                 HippoAction.DoneDownloadHistory(HistoryCache.map[parameters]!!.historyMap)
             )
         }

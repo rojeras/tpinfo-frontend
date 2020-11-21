@@ -32,7 +32,7 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
     private val routing = Navigo(null, true, "#")
 
     // todo: Move remaining dispatch to HippoManager and make the hippoStore private
-    val hippoStore = createReduxStore(
+    private val hippoStore = createReduxStore(
         ::hippoReducer,
         initializeHippoState()
     )
@@ -128,7 +128,7 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
     fun newOrUpdatedUrlFromBrowser(view: View, params: String? = null) {
         println("¤¤¤¤¤¤¤¤¤¤¤¤ In fromUrl(), view=$view, params=$params")
         val filterVals = if (params != null) params else ""
-        val bookmark = parseBookmarkString(filterVals)
+        val bookmark = parseBookmarkString(view, filterVals)
         println("bookmark from filter:")
         console.log(bookmark)
         hippoStore.dispatch(HippoAction.ApplyBookmark(view, bookmark))
@@ -145,19 +145,23 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
         }
     }
 
+    fun dispatchProxy(action: HippoAction) {
+        hippoStore.dispatch(action)
+    }
+
     fun dateSelected(type: DateType, date: String) {
-        hippoStore.dispatch(HippoAction.DateSelected(type, date))
-        // navigateWithBookmark()
+        val nextState = hippoStore.getState().dateSelected(date, type)
+        navigateWithBookmark(nextState)
     }
 
-    fun itemSelected(item: BaseItem, type: ItemType) {
-        val preState = hippoStore.getState().itemIdSeclected(item.id, type)
-        navigateWithBookmark(preState)
+    fun itemSelected(itemId: Int, type: ItemType) {
+        val nextState = hippoStore.getState().itemIdSeclected(itemId, type)
+        navigateWithBookmark(nextState)
     }
 
-    fun itemDeselected(item: BaseItem, type: ItemType) {
-        val preState = hippoStore.getState().itemIdDeseclected(item.id, type)
-        navigateWithBookmark(preState)
+    fun itemDeselected(itemId: Int, type: ItemType) {
+        val nextState = hippoStore.getState().itemIdDeseclected(itemId, type)
+        navigateWithBookmark(nextState)
     }
 
     fun setViewMax(type: ItemType, lines: Int) {
@@ -165,8 +169,8 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
     }
 
     fun statTpSelected(tpId: Int) {
-        val preState = hippoStore.getState().statTpSelected(tpId)
-        navigateWithBookmark(preState)
+        val nextState = hippoStore.getState().statTpSelected(tpId)
+        navigateWithBookmark(nextState)
     }
 
     fun statHistorySelected(flag: Boolean) {
@@ -179,10 +183,9 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
     }
 
     fun setView(view: View) {
-        val preState = hippoStore.getState().setView(view)
-        navigateWithBookmark(preState)
-        // hippoStore.dispatch(HippoAction.SetView(mode)) // todo: Change to navigate call
-        // loadStatistics(hippoStore.getState())
+        println("In setView, view=$view")
+        val nextState = hippoStore.getState().setView(view)
+        navigateWithBookmark(nextState)
     }
 
     fun statSetViewModePreselect(preSelectLabel: String) {
@@ -202,13 +205,15 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
         loadStatistics(hippoStore.getState())
     }
 
-    private fun navigateWithBookmark(preState: HippoState) {
-        val bookmarkString = preState.createBookmarkString()
+    private fun navigateWithBookmark(nextState: HippoState) {
+        val bookmarkString = nextState.createBookmarkString()
+        println("In navigateWithBookmark, bookmarkString = '$bookmarkString', preState:")
+        console.log(nextState)
         val route: String =
             if (bookmarkString.isNotEmpty()) "/filter=$bookmarkString"
             else ""
-        val currentView = hippoStore.getState().view
-        routing.navigate(currentView.url + route)
+        val newView = nextState.view
+        routing.navigate(newView.url + route)
     }
 
     private fun parseUrlForView(url: String): View {

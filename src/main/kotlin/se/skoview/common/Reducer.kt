@@ -153,6 +153,8 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
             errorMessage = action.errorMessage
         )
         is HippoAction.DateSelected -> {
+            state.dateSelected(action.selectedDate, action.dateType)
+            /*
             when (action.dateType) {
                 DateType.EFFECTIVE -> state.copy(dateEffective = action.selectedDate)
                 DateType.END -> state.copy(dateEnd = action.selectedDate)
@@ -160,7 +162,10 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
                     dateEffective = action.selectedDate,
                     dateEnd = action.selectedDate
                 )
+                DateType.STAT_EFFECTIVE -> state.copy(statDateEffective = action.selectedDate)
+                DateType.STAT_END -> state.copy(statDateEnd = action.selectedDate)
             }
+            */
         }
         is HippoAction.StatTpSelected -> {
             state.statTpSelected(action.tpId)
@@ -196,38 +201,6 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
 
         is HippoAction.SetView -> {
             state.setView(action.view)
-            /*
-            val newView: View = action.view
-
-            if (state.view == newView) throw RuntimeException("Current view  == new  in reducer SetViewMode")
-
-            // If the new mode have a preselect with the same label as the current, apply it. Otherwise use its default.
-            when (newView) {
-                View.STAT_SIMPLE -> {
-                    val currentAdvancedPreSelect = state.advancedViewPreSelect ?: AdvancedViewPreSelect.getDefault()
-                    val currentAdvancedPreSelectLabel = currentAdvancedPreSelect.label
-                    val newSimpleViewPreSelect =
-                        SimpleViewPreSelect.mapp[currentAdvancedPreSelectLabel] ?: SimpleViewPreSelect.getDefault()
-                    applyFilteredItemsSelection(
-                        state,
-                        newSimpleViewPreSelect.filteredItems
-                    ).copy(
-                        simpleViewPreSelect = newSimpleViewPreSelect,
-                        view = View.STAT_SIMPLE
-                    )
-                }
-                View.STAT_ADVANCED -> {
-                    val currentSimplePreSelectLabel = state.simpleViewPreSelect.label
-                    val newAdvancedViewPreSelect =
-                        AdvancedViewPreSelect.mapp[currentSimplePreSelectLabel] ?: AdvancedViewPreSelect.getDefault()
-                    applyFilteredItemsSelection(state, newAdvancedViewPreSelect.filteredItems).copy(
-                        advancedViewPreSelect = newAdvancedViewPreSelect,
-                        view = View.STAT_ADVANCED
-                    )
-                }
-                else -> state.copy(view = View.HIPPO)
-            }
-             */
         }
 
         is HippoAction.ShowTechnicalTerms -> {

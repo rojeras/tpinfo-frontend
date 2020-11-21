@@ -94,9 +94,7 @@ fun Container.statView(state: HippoState, view: View) {
                                 background = Background(Color.name(Col.WHITE))
                             }.onEvent {
                                 change = {
-                                    // store.dispatch(HippoAction.DateSelected(DateType.EFFECTIVE, self.value ?: ""))
-                                    // loadStatistics(store.getState())
-                                    HippoManager.dateSelected(DateType.EFFECTIVE, self.value ?: "")
+                                    HippoManager.dateSelected(DateType.STAT_EFFECTIVE, self.value ?: "")
                                 }
                             }
                         }
@@ -124,9 +122,6 @@ fun Container.statView(state: HippoState, view: View) {
                                 change = {
                                     val selectedTp = (self.value ?: "").toInt()
                                     HippoManager.statTpSelected(selectedTp)
-                                    // store.dispatch(HippoAction.StatTpSelected(selectedTp))
-                                    // loadStatistics(store.getState())
-                                    // selectTp(state, selectedTp)
                                 }
                             }
                         }
@@ -166,16 +161,16 @@ fun Container.statView(state: HippoState, view: View) {
                         cell {
                             simpleSelectInput(
                                 options = state.statisticsDates.sortedByDescending { it }.map { Pair(it, it) },
-                                value = state.dateEnd
+                                value = state.statDateEnd
                             ) {
                                 addCssStyle(formControlXs)
                                 background = Background(Color.name(Col.WHITE))
+                                println("Time to show end date, vale=$value")
+                                console.log(options)
+
                             }.onEvent {
                                 change = {
-                                    // store.dispatch { dispatch, getState ->
-                                    // store.dispatch(HippoAction.DateSelected(DateType.END, self.value ?: ""))
-                                    // loadStatistics(store.getState())
-                                    HippoManager.dateSelected(DateType.END, self.value ?: "")
+                                    HippoManager.dateSelected(DateType.STAT_END, self.value ?: "")
                                     // }
                                 }
                             }

@@ -112,7 +112,7 @@ fun HippoState.createBookmarkString(): String {
 }
 
 // fun parseBookmarkString(fullUrl: String = document.baseURI): BookmarkInformation {
-fun parseBookmarkString(fullUrl: String): BookmarkInformation {
+fun parseBookmarkString(view: View, fullUrl: String): BookmarkInformation {
     // ---------------------------------------------------------------------
     fun parseBookmarkType(typeChar: String, filterValue: String): List<Int> {
         // val regex = Regex("""c\d*""")

@@ -50,7 +50,7 @@ data class StatisticsBlob(
 }
 
 fun loadStatistics(state: HippoState) {
-    val store = HippoManager.hippoStore
+    // val store = HippoManager.hippoStore
     val urlParameters = state.getParams(state.view)
     val parameters = "statistics$urlParameters"
 
@@ -59,7 +59,7 @@ fun loadStatistics(state: HippoState) {
         println(">>> Statistics found in cache, parameters: $parameters")
         val statisticsArrArr = statArrArrCache[parameters]!!
 
-        store.dispatch(
+        HippoManager.dispatchProxy(
             HippoAction.DoneDownloadStatistics(statisticsArrArr)
         )
     } else {
@@ -71,7 +71,7 @@ fun loadStatistics(state: HippoState) {
             val statisticsArrArr: Array<Array<Int>> = JSON.parse(response)
 
             statArrArrCache[parameters] = statisticsArrArr
-            store.dispatch(HippoAction.DoneDownloadStatistics(statisticsArrArr))
+            HippoManager.dispatchProxy(HippoAction.DoneDownloadStatistics(statisticsArrArr))
         }
     }
     if (state.showTimeGraph) loadHistory(state)
