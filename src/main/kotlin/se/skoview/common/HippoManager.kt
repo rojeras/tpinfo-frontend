@@ -46,6 +46,7 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
         println("window.location.href: $startUrl")
 
         val view = parseUrlForView(startUrl)
+
         val bookmark = parseBookmarkString(startUrl)
         hippoStore.dispatch(HippoAction.ApplyBookmark(view, bookmark))
 
@@ -69,6 +70,8 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
     /**
      * This function is part of the manager. It listen to state changes, evaluates them and,
      * in some cases, act.
+     * It ensures integrations and/or statistics load is initialized at program start when
+     * necessary base data is available.
      */
     private fun actUponStateChangeInitialize() {
         hippoStore.subscribe { state ->
@@ -86,10 +89,28 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
                 state.view == View.STAT_SIMPLE ||
                 state.view == View.STAT_ADVANCED
             ) {
-                // Load statistics data if not loaded and dates are available
+                // Load statistics data if not loaded and plattform are available
                 if (
-                    state.downloadStatisticsStatus == AsyncActionStatus.NOT_INITIALIZED
+                    state.statDateEnd.isNotBlank() &&
+                    state.statisticsDates.isNotEmpty() &&
+                    state.statisticsDates.reversed()[0] < state.statDateEnd
+                )
+                    hippoStore.dispatch(
+                        HippoAction.DateSelected(
+                            DateType.STAT_END,
+                            state.statisticsDates.reversed()[0]
+                        )
+                    )
+                else if (
+                    state.downloadStatisticsStatus == AsyncActionStatus.NOT_INITIALIZED &&
+                    state.downloadBaseItemStatus == AsyncActionStatus.COMPLETED
                 ) {
+                    if (state.selectedPlattformChains.isEmpty()) {
+                        val tpId: Int? = Plattform.nameToId("SLL-PROD")
+                        if (tpId != null) {
+                            hippoStore.dispatch(HippoAction.StatTpSelected(tpId))
+                        }
+                    }
                     println("Will now loadStatistics()")
                     loadStatistics(hippoStore.getState())
                 }
@@ -117,7 +138,23 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
                             hippoView(state)
                         }
                     }
-                    View.STAT_SIMPLE -> statView(state, View.STAT_SIMPLE)
+                    View.STAT_SIMPLE -> {
+                        // todo: Refactor and clean up code below
+                        if (state.selectedPlattformChains.isNotEmpty()) {
+                            val pcId = state.selectedPlattformChains[0]
+                            val pc = PlattformChain.map[pcId]!!
+                            val tp = Plattform.mapp[pc.last]!!
+                            if (tp.name != "SLL-PROD") {
+                                val tpId: Int? = Plattform.nameToId("SLL-PROD")
+                                if (tpId != null) {
+                                    hippoStore.dispatch(HippoAction.StatTpSelected(tpId))
+                                }
+                                println("Will now load statistics from main loop")
+                                loadStatistics(hippoStore.getState())
+                            }
+                        }
+                        statView(state, View.STAT_SIMPLE)
+                    }
                     View.STAT_ADVANCED -> statView(state, View.STAT_ADVANCED)
                 }
             }
@@ -128,7 +165,7 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
     fun newOrUpdatedUrlFromBrowser(view: View, params: String? = null) {
         println("¤¤¤¤¤¤¤¤¤¤¤¤ In fromUrl(), view=$view, params=$params")
         val filterVals = if (params != null) params else ""
-        val bookmark = parseBookmarkString(view, filterVals)
+        val bookmark = parseBookmarkString(filterVals)
         println("bookmark from filter:")
         console.log(bookmark)
         hippoStore.dispatch(HippoAction.ApplyBookmark(view, bookmark))
@@ -140,8 +177,10 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
                 if (hippoStore.getState().downloadBaseDatesStatus == AsyncActionStatus.COMPLETED)
                     loadIntegrations(hippoStore.getState())
             }
-            View.STAT_SIMPLE -> loadStatistics(hippoStore.getState())
-            View.STAT_ADVANCED -> loadStatistics(hippoStore.getState())
+            else -> {
+                if (hippoStore.getState().downloadBaseItemStatus == AsyncActionStatus.COMPLETED)
+                    loadStatistics(hippoStore.getState())
+            }
         }
     }
 

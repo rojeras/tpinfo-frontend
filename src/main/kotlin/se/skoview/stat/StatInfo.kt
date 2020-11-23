@@ -51,6 +51,8 @@ data class StatisticsBlob(
 
 fun loadStatistics(state: HippoState) {
     // val store = HippoManager.hippoStore
+    HippoManager.dispatchProxy(HippoAction.StartDownloadStatistics)
+
     val urlParameters = state.getParams(state.view)
     val parameters = "statistics$urlParameters"
 
@@ -86,7 +88,7 @@ fun exportStatData(state: HippoState) {
 
     val selectedPlattformChainId = state.selectedPlattformChains[0]
     val selectedTpId = PlattformChain.map[selectedPlattformChainId]!!.last
-    val selectedTpName = Plattform.map[selectedTpId]!!.name
+    val selectedTpName = Plattform.mapp[selectedTpId]!!.name
 
     val selectedContractList: List<String> = state.selectedContracts.map { ServiceContract.map[it]!!.name }
 

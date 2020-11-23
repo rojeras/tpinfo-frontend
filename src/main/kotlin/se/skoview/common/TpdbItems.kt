@@ -281,15 +281,24 @@ data class Plattform(
     override fun toString(): String = name
 
     init {
-        map[id] = this
+        mapp[id] = this
         // if (id > Plattform.maxId) Plattform.maxId = id
     }
 
     companion object {
-        val map = hashMapOf<Int, Plattform>()
+        val mapp = hashMapOf<Int, Plattform>()
         // var maxId = 0
+
+        fun nameToId(name: String): Int? {
+            for ((key, value) in Plattform.mapp) {
+                if (value.name == name) return key
+            }
+            return null
+        }
     }
 }
+
+
 
 @Serializable
 data class PlattformChainJson(
@@ -310,9 +319,9 @@ data class PlattformChain(
     override val synonym: String? = null
 ) : BaseItem() {
 
-    private val firstPlattform = Plattform.map[first]
+    private val firstPlattform = Plattform.mapp[first]
 
-    private val lastPlattform = Plattform.map[last]
+    private val lastPlattform = Plattform.mapp[last]
 
     override val id = calculateId(first, middle, last)
     override val name: String = calculateName()

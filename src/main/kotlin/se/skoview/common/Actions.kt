@@ -28,7 +28,7 @@ import se.skoview.stat.SimpleViewPreSelect
  */
 
 sealed class HippoAction : RAction {
-    data class ApplicationStarted(val App: HippoApplication) : HippoAction()
+    // data class ApplicationStarted(val view: View, val bookmark: BookmarkInformation) : HippoAction()
     data class SetView(val view: View) : HippoAction()
     data class SetDownloadBaseDatesStatus(val status: AsyncActionStatus) : HippoAction()
     object StartDownloadBaseItems : HippoAction()

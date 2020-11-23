@@ -112,7 +112,7 @@ fun HippoState.createBookmarkString(): String {
 }
 
 // fun parseBookmarkString(fullUrl: String = document.baseURI): BookmarkInformation {
-fun parseBookmarkString(view: View, fullUrl: String): BookmarkInformation {
+fun parseBookmarkString(fullUrl: String): BookmarkInformation {
     // ---------------------------------------------------------------------
     fun parseBookmarkType(typeChar: String, filterValue: String): List<Int> {
         // val regex = Regex("""c\d*""")
@@ -152,7 +152,7 @@ fun parseBookmarkString(view: View, fullUrl: String): BookmarkInformation {
 
     val dateEndCodeList = parseBookmarkType("E", filterValue)
     val dateEnd = if (dateEndCodeList.isNotEmpty())
-        daysSinceEpoch2date(dateEffectiveCodeList[0].toInt())
+        daysSinceEpoch2date(dateEndCodeList[0].toInt())
     else null
 
     // Extract and calculate the plattforms values

@@ -16,7 +16,6 @@
  */
 package se.skoview.common
 
-import se.skoview.common.PlattformChain.Companion.calculateId
 import se.skoview.stat.FilteredItems
 import se.skoview.stat.StatisticsBlob
 
@@ -25,39 +24,7 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
     console.log(action)
 
     val newState = when (action) {
-        is HippoAction.ApplicationStarted -> {
-            // If dates not set by URL at startup the default are set here
-            val dEffective: String
-            val dEnd: String
-            val pChainId: List<Int>
-            val app: HippoApplication
-            val view: View
-            when (action.App) {
-                HippoApplication.HIPPO -> {
-                    dEffective = if (state.dateEffective == null) BaseDates.integrationDates[0] else state.dateEffective
-                    dEnd = dEffective
-                    pChainId = state.selectedPlattformChains
-                    app = HippoApplication.HIPPO
-                    view = View.HIPPO
-                }
-                HippoApplication.STATISTIK -> {
-                    app = HippoApplication.STATISTIK
-                    val datePair = getDatesLastMonth()
-                    dEffective = datePair.first.toSwedishDate()
-                    // todo: Following should not be hard coded like this
-                    pChainId = listOf(calculateId(first = 3, middle = null, last = 3))
-                    dEnd = datePair.second.toSwedishDate()
-                    view = View.STAT_SIMPLE
-                }
-            }
-            state.copy(
-                applicationStarted = app,
-                dateEffective = dEffective,
-                selectedPlattformChains = pChainId,
-                dateEnd = dEnd,
-                view = view
-            )
-        }
+
         // is HippoAction.SetView -> state.copy(view = action.view)
         is HippoAction.SetDownloadBaseDatesStatus -> {
             if (action.status == AsyncActionStatus.COMPLETED)
@@ -81,7 +48,7 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
                 logicalAddresses = LogicalAddress.map,
                 serviceContracts = ServiceContract.map,
                 serviceDomains = ServiceDomain.map,
-                plattforms = Plattform.map,
+                plattforms = Plattform.mapp,
                 plattformChains = PlattformChain.map,
                 statisticsPlattforms = StatisticsPlattform.mapp,
                 // Try this
@@ -110,17 +77,37 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
             )
         }
         is HippoAction.ApplyBookmark -> {
-            val newDateEffective: String? =
-                if (action.bookmark.dateEffective != null) action.bookmark.dateEffective
-                else state.dateEffective
-            val newDateEnd: String? =
-                if (action.bookmark.dateEnd != null) action.bookmark.dateEnd
-                else state.dateEnd
+            state.applyBookmark(action.view, action.bookmark)
+            /*
+            val newState = if (state.view == View.HIPPO) {
+                val newDateEffective: String? =
+                    if (action.bookmark.dateEffective != null) action.bookmark.dateEffective
+                    else state.dateEffective
+                val newDateEnd: String? =
+                    if (action.bookmark.dateEnd != null) action.bookmark.dateEnd
+                    else state.dateEnd
 
-            state.copy(
+                state.copy(
+                    dateEffective = newDateEffective,
+                    dateEnd = newDateEnd,
+                )
+            } else {
+                val datesLastMonth = getDatesLastMonth()
+                val newDateEffective: String =
+                    if (action.bookmark.dateEffective != null) action.bookmark.dateEffective!!
+                    else datesLastMonth.first.toSwedishDate()
+                val newDateEnd: String =
+                    if (action.bookmark.dateEnd != null) action.bookmark.dateEnd!!
+                    else datesLastMonth.second.toSwedishDate()
+
+                state.copy(
+                    statDateEffective = newDateEffective,
+                    statDateEnd = newDateEnd
+                )
+            }
+
+            newState.copy(
                 view = action.view,
-                dateEffective = newDateEffective,
-                dateEnd = newDateEnd,
                 selectedConsumers = action.bookmark.selectedConsumers,
                 selectedProducers = action.bookmark.selectedProducers,
                 selectedLogicalAddresses = action.bookmark.selectedLogicalAddresses,
@@ -128,6 +115,7 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
                 selectedDomains = action.bookmark.selectedDomains,
                 selectedPlattformChains = action.bookmark.selectedPlattformChains
             )
+             */
         }
         is HippoAction.StartDownloadStatistics ->
             state.copy(

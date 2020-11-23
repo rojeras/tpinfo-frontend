@@ -148,63 +148,12 @@ import se.skoview.common.HippoManager.mainLoop
 class App : Application() {
 
     override fun start() {
-
-        // val startUrl = window.location.href
-        // println("window.location.href: $startUrl")
-
-        // Pace.init()
         HippoManager.initialize()
 
         root("hippo") {
             mainLoop() // In HippoManager
-            // place for common header
-            /*
-            header(HippoManager.hippoStore) { state ->
-                headerNav(state)
-            }
-
-            main(HippoManager.hippoStore) { state ->
-                // setUrlFilter(state)
-                if (state.downloadBaseItemStatus == AsyncActionStatus.COMPLETED) {
-                    when (state.view) {
-                        View.HOME -> println("View.HOME found in main")
-                        View.HIPPO -> {
-                            if (
-                                state.downloadBaseItemStatus == AsyncActionStatus.COMPLETED &&
-                                state.downloadIntegrationStatus == AsyncActionStatus.COMPLETED
-                            ) {
-                                hippoView(state)
-                            }
-                        }
-                        View.STAT_SIMPLE -> statView(state, View.STAT_SIMPLE)
-                        View.STAT_ADVANCED -> statView(state, View.STAT_ADVANCED)
-                    }
-                }
-            }
-            // footer()
-            */
         }
     }
-
-    /*
-
-    fun startStat() {
-        store.dispatch(HippoAction.ApplicationStarted(HippoApplication.STATISTIK))
-        store.dispatch(HippoAction.SetSimpleViewPreselect(SimpleViewPreSelect.getDefault()))
-        // store.dispatch(HippoAction.PreSelectedLabelSet("Alla"))
-        loadStatistics(store.getState())
-        // loadHistory(store.getState())
-
-        root("hippo") {
-
-            vPanel {
-                add(StatPage)
-            }.apply {
-                width = 100.perc
-            }
-        }
-    }
-    */
 }
 
 fun main() {

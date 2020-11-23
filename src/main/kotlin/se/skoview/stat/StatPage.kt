@@ -87,7 +87,10 @@ fun Container.statView(state: HippoState, view: View) {
                         cell { +"Startdatum:" }
                         cell {
                             simpleSelectInput(
-                                options = state.statisticsDates.sortedByDescending { it }.map { Pair(it, it) },
+                                options = state.statisticsDates
+                                    .sortedByDescending { it }
+                                    .filter { it <= state.statDateEnd }
+                                    .map { Pair(it, it) },
                                 value = state.statDateEffective
                             ) {
                                 addCssStyle(formControlXs)
@@ -160,7 +163,10 @@ fun Container.statView(state: HippoState, view: View) {
                         cell { +"Slutdatum:" }
                         cell {
                             simpleSelectInput(
-                                options = state.statisticsDates.sortedByDescending { it }.map { Pair(it, it) },
+                                options = state.statisticsDates
+                                    .sortedByDescending { it }
+                                    .filter { it >= state.statDateEffective }
+                                    .map { Pair(it, it) },
                                 value = state.statDateEnd
                             ) {
                                 addCssStyle(formControlXs)

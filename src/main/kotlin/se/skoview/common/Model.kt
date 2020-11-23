@@ -113,11 +113,11 @@ data class HippoState(
 fun initializeHippoState(): HippoState {
     val datesPair = getDatesLastMonth()
     val statDateEffective = datesPair.first.toSwedishDate()
-    val statDdateEnd = datesPair.second.toSwedishDate()
+    val statDateEnd = datesPair.second.toSwedishDate()
 
     return HippoState(
         statDateEffective = statDateEffective,
-        statDateEnd = statDdateEnd,
+        statDateEnd = statDateEnd,
     )
 }
 
@@ -329,7 +329,7 @@ fun HippoState.setView(newView: View): HippoState {
 }
 
 fun HippoState.dateSelected(selectedDate: String, dateType: DateType): HippoState {
-      //  is HippoAction.DateSelected -> {
+    //  is HippoAction.DateSelected -> {
     return when (dateType) {
         DateType.EFFECTIVE -> this.copy(dateEffective = selectedDate)
         DateType.END -> this.copy(dateEnd = selectedDate)
@@ -340,4 +340,49 @@ fun HippoState.dateSelected(selectedDate: String, dateType: DateType): HippoStat
         DateType.STAT_EFFECTIVE -> this.copy(statDateEffective = selectedDate)
         DateType.STAT_END -> this.copy(statDateEnd = selectedDate)
     }
+}
+
+// is HippoAction.ApplyBookmark -> {
+fun HippoState.applyBookmark(view: View, bookmark: BookmarkInformation): HippoState {
+
+    val newState =
+
+        if (view == View.HIPPO) {
+            val newDateEffective: String? =
+                if (bookmark.dateEffective != null) bookmark.dateEffective
+                else this.dateEffective
+            val newDateEnd: String? =
+                if (bookmark.dateEnd != null) bookmark.dateEnd
+                else this.dateEnd
+
+            this.copy(
+                dateEffective = newDateEffective,
+                dateEnd = newDateEnd,
+            )
+        } else {
+            val datesLastMonth = getDatesLastMonth()
+
+            val newDateEffective: String =
+                if (bookmark.dateEffective != null) bookmark.dateEffective!!
+                else datesLastMonth.first.toSwedishDate()
+
+            val newDateEnd: String =
+                if (bookmark.dateEnd != null) bookmark.dateEnd!!
+                else datesLastMonth.second.toSwedishDate()
+
+            this.copy(
+                statDateEffective = newDateEffective,
+                statDateEnd = newDateEnd
+            )
+        }
+
+    return newState.copy(
+        view = view,
+        selectedConsumers = bookmark.selectedConsumers,
+        selectedProducers = bookmark.selectedProducers,
+        selectedLogicalAddresses = bookmark.selectedLogicalAddresses,
+        selectedContracts = bookmark.selectedContracts,
+        selectedDomains = bookmark.selectedDomains,
+        selectedPlattformChains = bookmark.selectedPlattformChains
+    )
 }
