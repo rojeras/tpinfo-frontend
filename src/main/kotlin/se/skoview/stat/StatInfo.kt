@@ -19,7 +19,7 @@ package se.skoview.stat
 import kotlinx.serialization.Serializable
 import org.w3c.files.Blob
 import org.w3c.files.BlobPropertyBag
-import se.skoview.common.*
+import se.skoview.common.* // ktlint-disable no-wildcard-imports
 
 @Serializable
 val statArrArrCache: HashMap<String, Array<Array<Int>>> = hashMapOf<String, Array<Array<Int>>>()
@@ -50,7 +50,6 @@ data class StatisticsBlob(
 }
 
 fun loadStatistics(state: HippoState) {
-    // val store = HippoManager.hippoStore
     HippoManager.dispatchProxy(HippoAction.StartDownloadStatistics)
 
     val urlParameters = state.getParams(state.view)
@@ -90,7 +89,7 @@ fun exportStatData(state: HippoState) {
     val selectedTpId = PlattformChain.map[selectedPlattformChainId]!!.last
     val selectedTpName = Plattform.mapp[selectedTpId]!!.name
 
-    val selectedContractList: List<String> = state.selectedContracts.map { ServiceContract.map[it]!!.name }
+    // val selectedContractList: List<String> = state.selectedContracts.map { ServiceContract.map[it]!!.name }
 
     var csvData = """
      Informationen är baserad på följande filtrering:

@@ -29,48 +29,18 @@ data class BookmarkInformation(
     var selectedPlattformChains: List<Int> = listOf()
 )
 
-// Let the URL mirror the current state
-/*
-fun setUrlFilter(state: HippoState) {
-    val hostname = window.location.hostname
-    val protocol = window.location.protocol
-    val port = window.location.port
-    val pathname = window.location.pathname
-
-    val portSpec = if (port.isNotEmpty()) ":$port" else ""
-    var newUrl = "$protocol//$hostname$portSpec$pathname"
-
-    val bookmark = state.createBookmarkString()
-    val filterString =
-        if (bookmark.length > 1) "?filter=$bookmark"
-        else ""
-
-    // And if the current URL contains "app=statistik" then it should be kept (once)
-    val href = window.location.href
-
-    var statString = ""
-    if (href.contains("app=statistik")) {
-        statString =
-            if (filterString.isEmpty()) "?app=statistik"
-            else "&app=statistik"
-    }
-
-    window.history.pushState(newUrl, "hippo-utforska integrationer", newUrl + filterString + statString)
-}
-*/
-
 fun HippoState.createBookmarkString(): String {
     println("getBookmars(), updateDates:")
     println("Length ${this.updateDates.size}")
 
-    var bookmark: String = ""
+    var bookmark = ""
 
     if (this.view == View.HIPPO) {
         if (this.updateDates.isNullOrEmpty() || this.dateEffective.isNullOrEmpty()) return ""
 
         // Exclude dates if dateEnd == current date (first in updateDates list)
         if (this.dateEnd != this.updateDates[0]) {
-            bookmark += "S" + date2DaysSinceEpoch(this.dateEffective!!)
+            bookmark += "S" + date2DaysSinceEpoch(this.dateEffective)
             bookmark += "E" + date2DaysSinceEpoch(this.dateEnd!!)
         }
     } else {
@@ -111,7 +81,6 @@ fun HippoState.createBookmarkString(): String {
     return bookmark
 }
 
-// fun parseBookmarkString(fullUrl: String = document.baseURI): BookmarkInformation {
 fun parseBookmarkString(fullUrl: String): BookmarkInformation {
     // ---------------------------------------------------------------------
     fun parseBookmarkType(typeChar: String, filterValue: String): List<Int> {
@@ -129,8 +98,6 @@ fun parseBookmarkString(fullUrl: String): BookmarkInformation {
         return iDList
     }
     // ---------------------------------------------------------------------
-
-    // val fullUrl = document.baseURI
 
     println("In parseBookmarkString, string=$fullUrl")
 
@@ -152,7 +119,7 @@ fun parseBookmarkString(fullUrl: String): BookmarkInformation {
 
     val dateEndCodeList = parseBookmarkType("E", filterValue)
     val dateEnd = if (dateEndCodeList.isNotEmpty())
-        daysSinceEpoch2date(dateEndCodeList[0].toInt())
+        daysSinceEpoch2date(dateEndCodeList[0])
     else null
 
     // Extract and calculate the plattforms values
@@ -169,7 +136,7 @@ fun parseBookmarkString(fullUrl: String): BookmarkInformation {
         plattformChainList = listOf(plattformChainId)
     }
 
-    val bookmarkInformation = BookmarkInformation(
+    return BookmarkInformation(
         dateEffective,
         dateEnd,
         parseBookmarkType("c", filterValue),
@@ -179,9 +146,6 @@ fun parseBookmarkString(fullUrl: String): BookmarkInformation {
         parseBookmarkType("d", filterValue),
         plattformChainList
     )
-    // val cList = parseBookmarkType("c", filterValue)
-
-    return bookmarkInformation
 }
 
 private fun date2DaysSinceEpoch(dateString: String): Double {

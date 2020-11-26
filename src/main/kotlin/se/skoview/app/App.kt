@@ -19,6 +19,7 @@ package se.skoview.app
 import pl.treksoft.kvision.Application
 import pl.treksoft.kvision.module
 import pl.treksoft.kvision.panel.root
+import pl.treksoft.kvision.require
 import pl.treksoft.kvision.startApplication
 import se.skoview.common.HippoManager
 import se.skoview.common.HippoManager.mainLoop
@@ -30,20 +31,23 @@ import se.skoview.common.HippoManager.mainLoop
 */
 
 // Common
+// todo: Se över HippoManager och API-anrop. Behöver förenklas. Ev ta base items först.
 
-// todo: Lägg med Visa-menyn i hippo. Ett snabbt sätt för vyer för olika domäner/tjänster
 // todo: Show messages to user
 // todo: Make it possible to participate in discussion, maybe through slack channel
 // todo: Verifiera att zip bygger en produktionsversion
 // todo: Visa antal användare senaste 24 timmarna
-// todo: Lägg in stöd för Navigo routing
 // todo: Börja använda Karma och enhetstester
-// todo: Investigate Kotlin JS blocking: runBlocking workaround https://youtrack.jetbrains.com/issue/KT-22228
+// done: Lägg in stöd för Navigo routing
+// done: Investigate Kotlin JS blocking: runBlocking workaround https://youtrack.jetbrains.com/issue/KT-22228
 
 // Hippo
 
+// todo: Add link to statistics
+// todo: Plattform chains syns inte vid omladdning - troligen måste plattforms laddas först
+
+// todo: Lägg med Visa-menyn i hippo. Ett snabbt sätt för vyer för olika domäner/tjänster
 // todo: Opera does not add any filter to URL, remove its mention in index.html
-// todo: Check link to statistics
 // todo: Make it possible to see diffs, that is, changes between certain dates (from John)
 // todo: Check if it is possible to make each column in hippo scrollable - without showing a scrollbar
 // todo: Lös detta med att visa SE för vägval
@@ -51,29 +55,32 @@ import se.skoview.common.HippoManager.mainLoop
 // todo: Lös trädklättringen, kanske mha HSA-trädet
 // todo: Titta på Tabulator igen
 // todo: Hippo kanske skulle uppdateras varje dygn om browsern skulle vara öppen över natten
+// done: Se till att det blir ett pekarfinger på items i tabellen
 
 // Statistik
 
-// done: Byt ut "SLL" mot "Region Stockholm" i texterna.
-// todo: Byt ut "SLL" i plattformsnamnen. Stäm av lösning med MLA. Bör också ske i hippo och i BS.
 // todo: Addera förval för; Infektionsverktyget, Listning
-// done: Döp om förvalet "Bokade tider" till "Tidbokningar"
 // todo: Tydliggör vad som är valt (dvs vad som kan väljas bort)
-// todo: Fixa Back-knappen i webbläsaren så att den backar i applikationen.
-// done: Använda samma typsnitt i statistiken som i hippo
-// todo: Inför RestClient() och (därmed) kotlinx.serialization
-// todo: Testa med andra browsers, inte minst Edge (ML 2020-09-17)
-// todo: Måste få BACK-pil att fungera (ML 2020-09-17)
-// todo: Prestanda! (ML 2020-09-17)
-// todo: Simple view blinks when selecting preSelects
 // todo: Knapp för att komma till hippo
+// todo: Driftsättning och koppling till proxy
+
+// todo: Byt ut "SLL" i plattformsnamnen. Stäm av lösning med MLA. Bör också ske i hippo och i BS.
+// todo: Testa med andra browsers, inte minst Edge (ML 2020-09-17)
 // todo: Fixa "about" för statistiken
 // todo: Se över synonymerna. Måste passa med de olika förvalen
-// todo: Begränsa datumlistorna så att man inte kan välja start/slutdatum "på vel sida" om varandra
-// todo: URL-hantering. Driftsättning och koppling till proxy
-// todo: A more intelligent way to decide when to do a loadStatistics()
 // todo: Och så visa svarstider
 // todo: Dokumentation
+// done: Prestanda! (ML 2020-09-17)
+// done: Byt ut "SLL" mot "Region Stockholm" i texterna.
+// done: Döp om förvalet "Bokade tider" till "Tidbokningar"
+// done: Fixa Back-knappen i webbläsaren så att den backar i applikationen.
+// done: Använda samma typsnitt i statistiken som i hippo
+// done: Inför RestClient() och (därmed) kotlinx.serialization
+// done: Måste få BACK-pil att fungera (ML 2020-09-17)
+// done: Simple view blinks when selecting preSelects
+// done: Begränsa datumlistorna så att man inte kan välja start/slutdatum "på vel sida" om varandra
+// done: URL-hantering.
+// done: A more intelligent way to decide when to do a loadStatistics()
 // done: Kolla varför pekaren försvunnit i hippo
 // done: Väljer man item som är del av en preselect så försvinner valet. Kolla Remissvyn.
 // done: Select of a already preselected item de-selects all items of same type
@@ -146,7 +153,9 @@ import se.skoview.common.HippoManager.mainLoop
 // done: ”Återställ tjänsteplattform(ar)” bör flyttas ned någon centimeter.
 
 class App : Application() {
-
+    init {
+        require("css/hippo.css")
+    }
     override fun start() {
         HippoManager.initialize()
 

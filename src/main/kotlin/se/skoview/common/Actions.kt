@@ -28,7 +28,6 @@ import se.skoview.stat.SimpleViewPreSelect
  */
 
 sealed class HippoAction : RAction {
-    // data class ApplicationStarted(val view: View, val bookmark: BookmarkInformation) : HippoAction()
     data class SetView(val view: View) : HippoAction()
     data class SetDownloadBaseDatesStatus(val status: AsyncActionStatus) : HippoAction()
     object StartDownloadBaseItems : HippoAction()
@@ -63,7 +62,6 @@ sealed class HippoAction : RAction {
     data class SetVMax(val type: ItemType, val size: Int) : HippoAction()
     data class ShowTimeGraph(val isShown: Boolean) : HippoAction()
     data class ShowTechnicalTerms(val isShown: Boolean) : HippoAction()
-    // data class SetViewMode(val viewMode: ViewMode) : HippoAction()
     data class SetSimpleViewPreselect(val preSelect: SimpleViewPreSelect) : HippoAction()
     data class SetAdvancedViewPreselect(val preSelect: AdvancedViewPreSelect) : HippoAction()
 }

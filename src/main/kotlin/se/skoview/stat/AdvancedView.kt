@@ -29,15 +29,12 @@ import se.skoview.common.HippoState
 import se.skoview.common.ItemType
 import se.skoview.common.getHeightToRemainingViewPort
 
-// object AdvancedView : VPanel() {
 fun Container.statAdvancedView(state: HippoState) {
     div {
-        // val store = HippoManager.hippoStore
         // The whole item table
         hPanel(
             spacing = 1
         ) {
-            // }.bind(store) { state ->
             overflow = Overflow.HIDDEN
             // background = Background(Color.name(Col.YELLOW))
             setStyle("height", getHeightToRemainingViewPort(statPageTop, 50))
@@ -126,7 +123,6 @@ class StatPieTableView(
     label: String
 ) : SimplePanel() {
     init {
-        // background = Background(Color.name(Col.GREEN))
         setStyle("height", getHeightToRemainingViewPort(statPageTop, 50))
         // height = 100.perc
         width = 25.vw
@@ -145,7 +141,6 @@ class StatPieTableView(
             pieChart
                 .apply {
                     height = 30.perc
-                    // background = Background(Color.name(Col.ALICEBLUE))
                 }
         )
         add(

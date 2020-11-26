@@ -37,21 +37,10 @@ enum class DateType {
     STAT_END
 }
 
-enum class HippoApplication {
-    HIPPO,
-    STATISTIK
-}
-
-enum class ViewMode {
-    SIMPLE,
-    ADVANCED
-}
-
 data class HippoState(
     // Status information
     val currentAction: KClass<out HippoAction> = HippoAction.SetView::class,
     val view: View = View.HOME,
-    val applicationStarted: HippoApplication? = null,
     val downloadBaseDatesStatus: AsyncActionStatus = AsyncActionStatus.NOT_INITIALIZED,
     val downloadBaseItemStatus: AsyncActionStatus = AsyncActionStatus.NOT_INITIALIZED,
     val downloadIntegrationStatus: AsyncActionStatus = AsyncActionStatus.NOT_INITIALIZED,

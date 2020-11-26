@@ -16,7 +16,7 @@
  */
 package se.skoview.hippo
 
-import se.skoview.common.*
+import se.skoview.common.* // ktlint-disable no-wildcard-imports
 
 // todo: Speed up and simplify
 data class IntegrationLists(
@@ -30,8 +30,6 @@ data class IntegrationLists(
 )
 
 fun createHippoViewData(state: HippoState): IntegrationLists {
-    // val store = HippoManager.hippoStore
-    // val filteredIntegrations = filterViewData(state)
     val filteredIntegrations = state.integrationArrs
     println("In createHippoViewData()")
     val plattformChains =
@@ -50,7 +48,7 @@ fun createHippoViewData(state: HippoState): IntegrationLists {
     // Extract logical addresses
     val logicalAddresses =
         filteredIntegrations.asSequence()
-            .map { integration: Integration -> integration.logicalAddressId } //iarr: Array<Int> -> iarr[4] }
+            .map { integration: Integration -> integration.logicalAddressId }
             .distinct()
             .map { LogicalAddress.map[it] ?: LogicalAddress(-1, "", "", "") }
             .sortedWith(compareBy(LogicalAddress::description))
@@ -79,7 +77,6 @@ fun createHippoViewData(state: HippoState): IntegrationLists {
             }
             .sortedWith(compareBy(ServiceContract::description))
             .toList()
-
 
     // Consumers
     val serviceConsumers =
@@ -134,4 +131,3 @@ private fun addUnique(item: BaseItem, list: MutableList<BaseItem>) {
     if (list.contains(item)) return
     list.add(item)
 }
-

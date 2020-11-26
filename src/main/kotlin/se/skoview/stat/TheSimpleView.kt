@@ -29,38 +29,22 @@ import se.skoview.common.ItemType
 import se.skoview.common.getHeightToRemainingViewPort
 
 // Below is the code to show the different graphs for the simple version
-// object SimpleView : SimplePanel() {
 fun Container.statSimpleView(state: HippoState) {
     div {
-        // val store = HippoManager.hippoStore
         println("In the simple view")
         id = "TheSimpleView:SimplePanel"
-        // background = Background(Color.name(Col.RED))
-        // height = 100.perc
-        // div { }.bind(store) { state ->
+
         id = "TheSimpleView:SimplePanel-Bind"
         height = 100.perc
-        // background = Background(Color.name(Col.LIGHTBLUE))
 
         flexPanel() {
-            // spacing = 1
             id = "TheSimpleViewBigPanel:FlexPanel"
             overflow = Overflow.HIDDEN
             width = 100.vw
 
-            // val occupiedViewPortArea = (statPageTop.getElementJQuery()?.innerHeight() ?: 153).toInt()
-            /*
-            val occupiedViewPortArea = (statPageTop.getElementJQuery()?.height() ?: 153).toInt()
-            println("+++++++++- Inner height: $occupiedViewPortArea")
-            val heightToRemove = occupiedViewPortArea + 40
-            setStyle("height", "calc(100vh - ${heightToRemove}px)")
-             */
-            // setStyle("height", "calc(100vh - 200px)")
-
             setStyle("height", getHeightToRemainingViewPort(statPageTop, 40))
 
             height = 100.perc
-            // background = Background(Color.name(Col.YELLOW))
 
             SInfo.createStatViewData(state)
 
@@ -114,7 +98,6 @@ fun Container.statSimpleView(state: HippoState) {
                     height = 80.perc
                     marginTop = 6.vw
                     marginLeft = 5.vw
-                    // background = Background(Color.name(Col.ALICEBLUE))
                 },
                 grow = 1
             )
@@ -133,7 +116,6 @@ fun Container.statSimpleView(state: HippoState) {
                     height = 97.perc
                     width = 40.vw
                     margin = 1.vw
-                    // background = Background(Color.name(Col.LIGHTPINK))
                 },
                 grow = 1
             )

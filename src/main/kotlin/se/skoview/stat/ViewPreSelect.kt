@@ -45,7 +45,7 @@ val REQUEST_ITEMS_FILTER = FilteredItems(contracts = listOf(215))
 
 interface ViewPreSelect
 
-data class SimpleViewPreSelect (
+data class SimpleViewPreSelect(
     val label: String,
     val filteredItems: FilteredItems,
     val simpleModeViewOrder: List<ItemType>
@@ -80,7 +80,7 @@ data class AdvancedViewPreSelect(
 val simpleViewPreSelectDefault: SimpleViewPreSelect =
     SimpleViewPreSelect(
         label = SIMPLE_VIEW_DEFAULT_PRESELECT,
-        filteredItems = ALL_ITEMS_FILTER,   //hashMapOf(),
+        filteredItems = ALL_ITEMS_FILTER, // hashMapOf(),
         simpleModeViewOrder = listOf(ItemType.CONSUMER)
     )
 
@@ -167,8 +167,3 @@ val advancedViewPreSelects = listOf<AdvancedViewPreSelect>(
         )
     ),
 )
-
-
-
-
-

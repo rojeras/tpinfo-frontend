@@ -25,7 +25,6 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
 
     val newState = when (action) {
 
-        // is HippoAction.SetView -> state.copy(view = action.view)
         is HippoAction.SetDownloadBaseDatesStatus -> {
             if (action.status == AsyncActionStatus.COMPLETED)
                 state.copy(
@@ -35,9 +34,11 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
                 )
             else state.copy(downloadBaseDatesStatus = AsyncActionStatus.COMPLETED)
         }
+
         is HippoAction.StartDownloadBaseItems -> state.copy(
             downloadBaseItemStatus = AsyncActionStatus.INITIALIZED
         )
+
         is HippoAction.DoneDownloadBaseItems -> {
 
             state.copy(
@@ -51,9 +52,9 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
                 plattforms = Plattform.mapp,
                 plattformChains = PlattformChain.map,
                 statisticsPlattforms = StatisticsPlattform.mapp,
-                // Try this
             )
         }
+
         is HippoAction.ErrorDownloadBaseItems -> state.copy(
             downloadBaseItemStatus = AsyncActionStatus.ERROR,
             errorMessage = action.errorMessage
@@ -76,51 +77,16 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
                 vLogicalAddressesMax = 100
             )
         }
+
         is HippoAction.ApplyBookmark -> {
             state.applyBookmark(action.view, action.bookmark)
-            /*
-            val newState = if (state.view == View.HIPPO) {
-                val newDateEffective: String? =
-                    if (action.bookmark.dateEffective != null) action.bookmark.dateEffective
-                    else state.dateEffective
-                val newDateEnd: String? =
-                    if (action.bookmark.dateEnd != null) action.bookmark.dateEnd
-                    else state.dateEnd
-
-                state.copy(
-                    dateEffective = newDateEffective,
-                    dateEnd = newDateEnd,
-                )
-            } else {
-                val datesLastMonth = getDatesLastMonth()
-                val newDateEffective: String =
-                    if (action.bookmark.dateEffective != null) action.bookmark.dateEffective!!
-                    else datesLastMonth.first.toSwedishDate()
-                val newDateEnd: String =
-                    if (action.bookmark.dateEnd != null) action.bookmark.dateEnd!!
-                    else datesLastMonth.second.toSwedishDate()
-
-                state.copy(
-                    statDateEffective = newDateEffective,
-                    statDateEnd = newDateEnd
-                )
-            }
-
-            newState.copy(
-                view = action.view,
-                selectedConsumers = action.bookmark.selectedConsumers,
-                selectedProducers = action.bookmark.selectedProducers,
-                selectedLogicalAddresses = action.bookmark.selectedLogicalAddresses,
-                selectedContracts = action.bookmark.selectedContracts,
-                selectedDomains = action.bookmark.selectedDomains,
-                selectedPlattformChains = action.bookmark.selectedPlattformChains
-            )
-             */
         }
+
         is HippoAction.StartDownloadStatistics ->
             state.copy(
                 downloadStatisticsStatus = AsyncActionStatus.INITIALIZED
             )
+
         is HippoAction.DoneDownloadStatistics -> {
             val statBlob = StatisticsBlob(action.statisticsArrArr)
             state.copy(
@@ -128,39 +94,34 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
                 statBlob = statBlob
             )
         }
+
         is HippoAction.StartDownloadHistory ->
             state.copy(
                 downloadHistoryStatus = AsyncActionStatus.INITIALIZED
             )
+
         is HippoAction.DoneDownloadHistory -> {
             println("In reducer DonwDownloadHistory")
             state.copy(historyMap = action.historyMap)
         }
+
         is HippoAction.ErrorDownloadIntegrations -> state.copy(
             downloadIntegrationStatus = AsyncActionStatus.ERROR,
             errorMessage = action.errorMessage
         )
+
         is HippoAction.DateSelected -> {
             state.dateSelected(action.selectedDate, action.dateType)
-            /*
-            when (action.dateType) {
-                DateType.EFFECTIVE -> state.copy(dateEffective = action.selectedDate)
-                DateType.END -> state.copy(dateEnd = action.selectedDate)
-                DateType.EFFECTIVE_AND_END -> state.copy(
-                    dateEffective = action.selectedDate,
-                    dateEnd = action.selectedDate
-                )
-                DateType.STAT_EFFECTIVE -> state.copy(statDateEffective = action.selectedDate)
-                DateType.STAT_END -> state.copy(statDateEnd = action.selectedDate)
-            }
-            */
         }
+
         is HippoAction.StatTpSelected -> {
             state.statTpSelected(action.tpId)
         }
+
         is HippoAction.ItemIdSelected -> {
             state.itemIdSeclected(action.id, action.viewType)
         }
+
         is HippoAction.ItemIdDeselected -> {
             state.itemIdSeclected(action.id, action.viewType)
         }
@@ -251,8 +212,3 @@ fun applyFilteredItemsSelection(inState: HippoState, filteredItems: FilteredItem
 
     return state2
 }
-
-// todo: Maybe add common reducer logic in private functions here
-// Would make it possible to do a number of state updates within the same action
-
-// todo: Maybe add HippoThunk creators here

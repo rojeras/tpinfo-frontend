@@ -18,25 +18,26 @@ package se.skoview.hippo
 
 import kotlinx.browser.document
 import kotlinx.browser.window
-import pl.treksoft.kvision.core.*
+import pl.treksoft.kvision.core.* // ktlint-disable no-wildcard-imports
 import pl.treksoft.kvision.core.Color.Companion.hex
-import pl.treksoft.kvision.core.FlexWrap
 import pl.treksoft.kvision.data.BaseDataComponent
 import pl.treksoft.kvision.data.dataContainer
 import pl.treksoft.kvision.form.select.simpleSelectInput
 import pl.treksoft.kvision.form.text.TextInput
 import pl.treksoft.kvision.form.text.TextInputType
 import pl.treksoft.kvision.form.text.textInput
-import pl.treksoft.kvision.html.*
+import pl.treksoft.kvision.html.* // ktlint-disable no-wildcard-imports
 import pl.treksoft.kvision.modal.Modal
 import pl.treksoft.kvision.modal.ModalSize
-import pl.treksoft.kvision.panel.*
+import pl.treksoft.kvision.panel.flexPanel
+import pl.treksoft.kvision.panel.hPanel
+import pl.treksoft.kvision.panel.vPanel
 import pl.treksoft.kvision.state.observableListOf
 import pl.treksoft.kvision.utils.perc
 import pl.treksoft.kvision.utils.px
 import pl.treksoft.kvision.utils.vw
 import se.skoview.app.formControlXs
-import se.skoview.common.*
+import se.skoview.common.* // ktlint-disable no-wildcard-imports
 import kotlin.math.min
 
 class TextSearchInfo : BaseDataComponent() {
@@ -59,7 +60,6 @@ class TextSearchInfo : BaseDataComponent() {
     }
 }
 
-// object HippoTablePage : SimplePanel() {
 fun Container.hippoView(state: HippoState) {
     println("In hippoView()")
     val integrationLists = createHippoViewData(state)
@@ -82,10 +82,9 @@ fun Container.hippoView(state: HippoState) {
         }
 
         // Date selector
-        // hPanel { clear = Clear.BOTH
         flexPanel(
             // FlexDir.ROW, FlexWrap.WRAP, FlexJustify.SPACEBETWEEN, FlexAlignItems.CENTER, // Before upgrading to 3.13.1
-            FlexDir.ROW, FlexWrap.WRAP, FlexJustify.SPACEBETWEEN, FlexAlignItems.CENTER,
+            FlexDirection.ROW, FlexWrap.WRAP, JustifyContent.SPACEBETWEEN, AlignItems.CENTER,
             spacing = 5
         ) {
             clear = Clear.BOTH
@@ -93,7 +92,6 @@ fun Container.hippoView(state: HippoState) {
             background = Background(hex(0xf6efe9))
 
             // Select date
-
             div {
                 align = Align.LEFT
 //             }.bind(HippoManager.hippoStore) { state ->
@@ -126,7 +124,8 @@ fun Container.hippoView(state: HippoState) {
                     if (chain!!.first == sllRtpProdId || chain.last == sllRtpProdId) {
                         button("SLL statistiktjänst", style = ButtonStyle.INFO).onClick {
                             size = ButtonSize.SMALL
-                            window.open("https://statistik.tjansteplattform.se/", "_blank")
+                            // window.open("https://statistik.tjansteplattform.se/", "_blank")
+                            HippoManager.setView(View.STAT_ADVANCED)
                         }.apply {
                             addBsBgColor(BsBgColor.INFO)
                             addBsColor(BsColor.WHITE)
@@ -158,7 +157,6 @@ fun Container.hippoView(state: HippoState) {
 
         // The whole item table
         hPanel {
-
             overflow = Overflow.HIDDEN
 
             hippoItemsView(state, ItemType.CONSUMER, integrationLists, "Tjänstekonsumenter", 21) // , grow = 1)
@@ -178,18 +176,13 @@ private fun Container.hippoItemsView(
     bredd: Int = 20
 ) {
     div {
-        // val store = HippoManager.hippoStore
-        // background = Background((hex(0x0fffff)))
         width = (bredd - 0.5).vw
         overflow = Overflow.HIDDEN
         margin = (0.3).vw
         wordBreak = WordBreak.BREAKALL
 
-        // Render the search field
         val textSearchInfo = TextSearchInfo()
         searchField(type, textSearchInfo)
-
-        // div {}.bind(store) { state ->
 
         // Go to top for most rendering actions
         if (state.currentAction != HippoAction.SetVMax::class) {
@@ -202,8 +195,6 @@ private fun Container.hippoItemsView(
         var maxCounter = -1
         var maxNoItems = -1
 
-        // val integrationLists = createHippoViewData(state)
-        // background = Background(Col.LIGHTSTEELBLUE)
         when (type) {
             ItemType.CONSUMER -> {
                 // vList = state.vServiceConsumers
@@ -278,7 +269,6 @@ private fun Container.hippoItemsView(
                                     rich = true
                                 ) {
                                     margin = 5.px
-                                    // wordBreak = WordBreak.BREAKALL
                                     margin = 5.px
 
                                     // Difference for contracts, domains and rest

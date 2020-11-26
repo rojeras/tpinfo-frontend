@@ -33,8 +33,6 @@ import kotlin.js.Promise
 
 suspend fun loadBaseItems(store: ReduxStore<HippoState, HippoAction>) { // : Deferred<Unit> {
     println("Will now load BaseItems")
-    // We must ensure the dates are loaded synchronisly - integration and statistics fetch are dependent
-
     // store.dispatch(HippoAction.StartDownloadBaseItems)
 
     // GlobalScope.async {
@@ -145,7 +143,6 @@ data class ServiceComponent(
 
     init {
         map[id] = this
-        // if (id > maxId) maxId = id
     }
 
     override val name: String = hsaId
@@ -167,7 +164,6 @@ data class ServiceComponent(
 
     companion object {
         val map = hashMapOf<Int, ServiceComponent>()
-        // var maxId = 0
     }
 }
 
@@ -179,12 +175,9 @@ data class LogicalAddress constructor(
     val logicalAddress: String
 ) : BaseItem() {
     override val name = logicalAddress
-    var colorValue: Int = (0..(256 * 256 * 256) - 1).random()
 
     init {
         map[id] = this
-
-        //  if (id > LogicalAddress.maxId) LogicalAddress.maxId = id
     }
 
     override val searchField = "$name $description"
@@ -193,7 +186,6 @@ data class LogicalAddress constructor(
 
     companion object {
         val map = hashMapOf<Int, LogicalAddress>()
-        // var maxId = 0
     }
 }
 
@@ -209,7 +201,6 @@ data class ServiceContract(
 
     init {
         map[id] = this
-        // if (id > ServiceContract.maxId) ServiceContract.maxId = id
     }
 
     override var searchField: String = namespace
@@ -220,8 +211,6 @@ data class ServiceContract(
 
     companion object {
         val map = hashMapOf<Int, ServiceContract>()
-
-        // var maxId = 0
     }
 }
 
@@ -240,7 +229,6 @@ data class ServiceDomain(
     init {
         // todo: Add logic to populate contracts
         map[id] = this
-        // if (id > ServiceDomain.maxId) ServiceDomain.maxId = id
     }
 
     override val searchField: String = name
@@ -249,7 +237,6 @@ data class ServiceDomain(
 
     companion object {
         val map = hashMapOf<Int, ServiceDomain>()
-        // var maxId = 0
 
         fun attachContractsToDomains() {
             // Connect the contracts to its domain
@@ -274,7 +261,6 @@ data class Plattform(
     override val synonym: String? = null
 ) :
     BaseItem() {
-    // override val itemType = ItemType.PLATTFORM
     override val name: String = "$platform-$environment"
     override val description = ""
     override val searchField: String = name
@@ -282,15 +268,13 @@ data class Plattform(
 
     init {
         mapp[id] = this
-        // if (id > Plattform.maxId) Plattform.maxId = id
     }
 
     companion object {
         val mapp = hashMapOf<Int, Plattform>()
-        // var maxId = 0
 
         fun nameToId(name: String): Int? {
-            for ((key, value) in Plattform.mapp) {
+            for ((key, value) in mapp) {
                 if (value.name == name) return key
             }
             return null
@@ -298,10 +282,8 @@ data class Plattform(
     }
 }
 
-
-
 @Serializable
-data class PlattformChainJson(
+private data class PlattformChainJson(
     val id: Int,
     val plattforms: Array<Int?>
 ) {
@@ -345,7 +327,6 @@ data class PlattformChain(
 
     companion object {
         val map = hashMapOf<Int, PlattformChain>()
-
         // Calculate a plattformChainId based on ids of three separate plattforms
         fun calculateId(first: Int, middle: Int?, last: Int): Int {
             val saveM: Int = middle ?: 0

@@ -18,7 +18,7 @@ package se.skoview.stat
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import se.skoview.common.*
+import se.skoview.common.* // ktlint-disable no-wildcard-imports
 
 @Serializable
 data class HistoryEntry(
@@ -45,7 +45,6 @@ data class HistoryCache(
 }
 
 fun loadHistory(state: HippoState) {
-    // val store = HippoManager.hippoStore
     val urlParameters = state.getParams(state.view)
     val parameters = "history$urlParameters"
 
@@ -58,10 +57,7 @@ fun loadHistory(state: HippoState) {
     } else {
         println(">>> History data NOT found in cache - will download")
         console.log(parameters)
-        /* Orginalversion som fungerar
-                    val json = Json(JsonConfiguration.Stable)
-            val history = json.parse(HistoryInfo.serializer(), response)
-         */
+
         getAsyncTpDb(parameters) { response ->
             println(">>> Size of fetched history data is: ${response.length}")
             val json = Json {}

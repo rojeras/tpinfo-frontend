@@ -125,7 +125,7 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
             headerNav(state)
         }
          */
-        main(HippoManager.hippoStore) { state ->
+        main(hippoStore) { state ->
             // setUrlFilter(state)
             if (state.downloadBaseItemStatus == AsyncActionStatus.COMPLETED) {
                 when (state.view) {
@@ -164,7 +164,7 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
 
     fun newOrUpdatedUrlFromBrowser(view: View, params: String? = null) {
         println("¤¤¤¤¤¤¤¤¤¤¤¤ In fromUrl(), view=$view, params=$params")
-        val filterVals = if (params != null) params else ""
+        val filterVals = params ?: ""
         val bookmark = parseBookmarkString(filterVals)
         println("bookmark from filter:")
         console.log(bookmark)
@@ -230,6 +230,8 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
     fun statSetViewModePreselect(preSelectLabel: String) {
         // todo: Change to navigate call
         when (hippoStore.getState().view) {
+            View.HOME -> {}
+            View.HIPPO -> {}
             View.STAT_SIMPLE -> {
                 val preSelect = SimpleViewPreSelect.mapp[preSelectLabel]
                     ?: throw NullPointerException("Internal error in Select View")

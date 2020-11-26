@@ -17,14 +17,14 @@
 package se.skoview.stat
 
 import com.github.snabbdom._get
-import pl.treksoft.kvision.chart.*
-import pl.treksoft.kvision.core.*
+import pl.treksoft.kvision.chart.* // ktlint-disable no-wildcard-imports
+import pl.treksoft.kvision.core.* // ktlint-disable no-wildcard-imports
 import pl.treksoft.kvision.html.Div
 import pl.treksoft.kvision.panel.SimplePanel
 import pl.treksoft.kvision.table.TableType
-import pl.treksoft.kvision.tabulator.*
+import pl.treksoft.kvision.tabulator.* // ktlint-disable no-wildcard-imports
 import pl.treksoft.kvision.utils.perc
-import se.skoview.common.*
+import se.skoview.common.* // ktlint-disable no-wildcard-imports
 
 fun getPieChartConfig(
     state: HippoState,
@@ -59,7 +59,6 @@ fun getPieChartConfig(
     )
 }
 
-
 open class ChartLabelTable(
     state: HippoState,
     itemType: ItemType,
@@ -67,11 +66,9 @@ open class ChartLabelTable(
     dataField: String = "description",
     colorField: String = "color",
     callsField: String = "calls",
-    //formatterField: String = "formatter",
     heading: String
 ) : SimplePanel() {
     init {
-        // val store = HippoManager.hippoStore
         id = "ChartLabelTable: SimpleTable"
 
         // Footer pagination buttons hidden through CSS
@@ -81,14 +78,10 @@ open class ChartLabelTable(
             options = TabulatorOptions(
                 layout = Layout.FITCOLUMNS,
                 pagination = PaginationMode.LOCAL,
-                //height = "calc(100vh - 300px)",
-                //height = "100%",
-                //height = 100.vh,
                 paginationSize = 1000,
                 paginationButtonCount = 0,
                 selectable = true,
                 columns = listOf(
-                    //firstCol,
                     ColumnDefinition<Any>(
                         headerSort = false,
                         title = "",
@@ -100,20 +93,15 @@ open class ChartLabelTable(
                         headerSort = false,
                         title = "$heading (${itemSInfoList.size})",
                         field = dataField,
-                        //topCalc = Calc.COUNT,
                         topCalcFormatter = Formatter.COLOR,
                         headerFilter = Editor.INPUT,
                         headerFilterPlaceholder = "Sök ${heading.toLowerCase()}",
-                        //headerFilterPlaceholder = "Sök...",
                         editable = { false },
-                        //width = "20.vw",
                         widthGrow = 3,
-                        //formatter = Formatter.TEXTAREA,
                         formatterComponentFunction = { cell, _, item ->
                             val itemRecord = item as SInfoRecord
                             Div {
                                 if (state.isItemSelected(itemRecord.itemType, itemRecord.itemId)) {
-                                    //background = Background(Color.name(Col.LIGHTPINK))
                                     fontWeight = FontWeight.BOLD
                                     cell.apply { background = Background(Color.name(Col.YELLOW)) }
                                 }
@@ -136,42 +124,22 @@ open class ChartLabelTable(
                     if (item.calls > -1) itemSelectDeselect(state, item.itemId, item.itemType)
                 },
                 // todo: Hide the tabulator footer here
-                //dataLoaded = setStyle( ".tabulator-footer")
             )
         )
             .apply {
-                //height = 50.vh
                 height = 100.perc
             }
     }
 }
 
 private fun itemSelectDeselect(state: HippoState, itemId: Int, itemType: ItemType) {
-    // val store = HippoManager.hippoStore
     println("In itemSelectDeselect()")
-    //store.dispatch(HippoAction.PreSelectedLabelSet("default"))
     if (state.isItemSelected(itemType, itemId)) {
-        // De-select of an item
-        // If we deselect an item which is part of the current PreSelect, then restore the default view
-        //if (store.getState().preSelect!!.selectedItemsMap[itemType]!!.contains(itemId))
-        //selectPreSelect("default")
-        //else {
-            HippoManager.itemDeselected(itemId, itemType)
-            // store.dispatch(HippoAction.ItemIdDeselected(itemType, itemId))
-            /// loadStatistics(store.getState())
-        //}
-//        store.dispatch(HippoAction.ItemIdDeselectedAll(itemType))
+        HippoManager.itemDeselected(itemId, itemType)
     } else {
         // Select an item
         if (state.view == View.STAT_SIMPLE)
             HippoManager.setView(View.STAT_ADVANCED)
-            // store.dispatch(HippoAction.SetView(View.STAT_ADVANCED))
         HippoManager.itemSelected(itemId, itemType)
-        // store.dispatch(HippoAction.ItemIdSelected(itemType, itemId))
-        // loadStatistics(store.getState())
     }
 }
-
-
-
-

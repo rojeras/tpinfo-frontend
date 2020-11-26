@@ -34,19 +34,12 @@ import pl.treksoft.kvision.utils.vh
 import se.skoview.app.formControlXs
 import se.skoview.common.* // ktlint-disable no-wildcard-imports
 
-// ktlint-disable no-wildcard-imports
-
-// ktlint-disable no-wildcard-imports
-
 var statPageTop: Div = Div()
 
-// object StatPage : SimplePanel() {
 fun Container.statView(state: HippoState, view: View) {
     div {
-        // val store = HippoManager.hippoStore
         fontFamily = "Times New Roman"
         id = "StatPage:SimplePanel()"
-        // background = Background(Color.name(Col.RED))
         println("In CharTab():init()")
         this.marginTop = 10.px
 
@@ -134,8 +127,6 @@ fun Container.statView(state: HippoState, view: View) {
                             checkBoxInput(
                                 value = state.showTimeGraph
                             ).onClick {
-                                // if (value) loadHistory(state)
-                                // store.dispatch(HippoAction.ShowTimeGraph(value))
                                 HippoManager.statHistorySelected(value)
                             }
                             +" Visa utveckling över tid"
@@ -173,7 +164,6 @@ fun Container.statView(state: HippoState, view: View) {
                                 background = Background(Color.name(Col.WHITE))
                                 println("Time to show end date, vale=$value")
                                 console.log(options)
-
                             }.onEvent {
                                 change = {
                                     HippoManager.dateSelected(DateType.STAT_END, self.value ?: "")
@@ -189,18 +179,11 @@ fun Container.statView(state: HippoState, view: View) {
                             when (state.view) {
                                 View.STAT_SIMPLE -> {
                                     console.log(state.simpleViewPreSelect)
-                                    /*
-                                    val preSelect =
-                                        if (state.simpleViewPreSelect == undefined) SimpleViewPreSelect.getDefault()
-                                        else state.simpleViewPreSelect
-                                    selectedPreSelectLabel = preSelect.label
-                                     */
                                     selectedPreSelectLabel = state.simpleViewPreSelect.label
                                     options = SimpleViewPreSelect.mapp
                                         .toList()
                                         .sortedBy { it.first }
                                         .map { Pair(it.first, it.first) }
-                                    // .map { Pair(it.value.label, it.value.label) }
                                 }
                                 View.STAT_ADVANCED -> {
                                     selectedPreSelectLabel =
@@ -224,22 +207,6 @@ fun Container.statView(state: HippoState, view: View) {
                                 change = {
                                     val preSelectLabel: String = self.value ?: "dummy"
                                     HippoManager.statSetViewModePreselect(preSelectLabel)
-                                    /*
-                                    when (state.viewMode) {
-                                        ViewMode.SIMPLE -> {
-                                            val preSelect = SimpleViewPreSelect.mapp[preSelectLabel]
-                                                ?: throw NullPointerException("Internal error in Select View")
-                                            store.dispatch(HippoAction.SetSimpleViewPreselect(preSelect))
-                                        }
-                                        ViewMode.ADVANCED -> {
-                                            val preSelect = AdvancedViewPreSelect.mapp[preSelectLabel]
-                                                ?: throw NullPointerException("Internal error in Select View")
-                                            store.dispatch(HippoAction.SetAdvancedViewPreselect(preSelect))
-                                        }
-                                    }
-                                    loadStatistics(store.getState())
-                                    */
-                                    // }
                                 }
                             }
                         }
@@ -247,13 +214,8 @@ fun Container.statView(state: HippoState, view: View) {
                             checkBoxInput(
                                 value = state.showTechnicalTerms
                             ).onClick {
-                                // if (value) loadHistory(state)
                                 println("In showTechnicalTerms, value = $value")
                                 HippoManager.statTechnialTermsSelected(value)
-                                // store.dispatch(HippoAction.ShowTechnicalTerms(value))
-                                if (!value) { // Restore labels for current preselect
-                                    // store.dispatch(HippoAction.PreSelectedSet(state.statPreSelect!!))
-                                }
                             }
                             +" Tekniska termer"
                         }
@@ -270,8 +232,6 @@ fun Container.statView(state: HippoState, view: View) {
                         addBsColor(BsColor.BLACK50)
                         marginBottom = 5.px
                     }
-                    // background = Background(Col.LIGHTSKYBLUE)
-                    // align = Align.RIGHT
                     val modal = Modal("Om Statistikfunktionen")
                     modal.iframe(src = "about.html", iframeHeight = 400, iframeWidth = 700)
                     modal.size = ModalSize.LARGE
@@ -337,19 +297,15 @@ fun Container.statView(state: HippoState, view: View) {
                     )
                 ).apply {
                     height = 26.vh
-                    // width = 99.vw
-                    // background = Background(Color.name(Col.LIGHTCORAL))
                 }
             }
         }
 
-        // div {}.bind(store) { state ->
         println("Time to select the view: ${state.view}")
         when (state.view) {
             View.STAT_ADVANCED -> statAdvancedView(state)
             View.STAT_SIMPLE -> statSimpleView(state)
             else -> println("Error in StatPage bottom, view = ${state.view}")
         }
-        // }
     }
 }

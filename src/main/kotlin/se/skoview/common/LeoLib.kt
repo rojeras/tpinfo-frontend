@@ -27,13 +27,14 @@ fun tpdbBaseUrl(): String {
     val currentHost = window.location.host
     // tpdb is assumed to be on the 'qa.integrationer.tjansteplattform.se' server if we run in development or test environment
     return if (currentHost.contains("localhost") || currentHost.contains("192.168.0.") || currentHost.contains("www.hippokrates.se")) {
-        "http://localhost:5555/tpdb/tpdbapi.php/api/v1/"
-        // "https://qa.integrationer.tjansteplattform.se/tpdb/tpdbapi.php/api/v1/"
+        // "http://localhost:5555/tpdb/tpdbapi.php/api/v1/"
+        "https://qa.integrationer.tjansteplattform.se/tpdb/tpdbapi.php/api/v1/"
     } else {
         "$currentProtocol//$currentHost/../tpdb/tpdbapi.php/api/v1/"
     }
 }
 
+/*
 fun getAsync(url: String, callback: (String) -> Unit) {
     console.log("getAsync(): URL: $url")
     val xmlHttp = XMLHttpRequest()
@@ -45,6 +46,7 @@ fun getAsync(url: String, callback: (String) -> Unit) {
     }
     xmlHttp.send()
 }
+ */
 
 // todo: Evaluate the use of the KVision client CallAgent. See CallAgentExample.kt
 fun getAsyncTpDb(url: String, callback: (String) -> Unit) {
@@ -63,6 +65,7 @@ fun getAsyncTpDb(url: String, callback: (String) -> Unit) {
     xmlHttp.send()
 }
 
+/*
 fun getSyncTpDb(url: String): String? {
     val baseUrl = "https://qa.integrationer.tjansteplattform.se/tpdb/tpdbapi.php/api/v1/"
     val fullUrl = baseUrl + url
@@ -77,6 +80,7 @@ fun getSyncTpDb(url: String): String? {
         null
     }
 }
+ */
 
 // Added an extension function to the Date class
 fun Date.toSwedishDate(): String {
