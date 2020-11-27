@@ -116,22 +116,31 @@ fun Container.hippoView(state: HippoState) {
             div {
                 align = Align.CENTER
                 //       }.bind(HippoManager.hippoStore) { state ->
-                val sllRtpProdId = 3
-                val chainId = if (integrationLists.plattformChains.size == 1) integrationLists.plattformChains[0].id else -1
+                val chainId =
+                    if (integrationLists.plattformChains.size == 1) integrationLists.plattformChains[0].id else -1
+                var disabled: Boolean = true
                 if (chainId > 0) {
                     println("Show statistics button")
                     val chain = PlattformChain.map[chainId]
-                    if (chain!!.first == sllRtpProdId || chain.last == sllRtpProdId) {
-                        button("SLL statistiktjänst", style = ButtonStyle.INFO).onClick {
-                            size = ButtonSize.SMALL
-                            // window.open("https://statistik.tjansteplattform.se/", "_blank")
-                            HippoManager.setView(View.STAT_ADVANCED)
-                        }.apply {
-                            addBsBgColor(BsBgColor.INFO)
-                            addBsColor(BsColor.WHITE)
-                        }
-                    }
+
+                    disabled = !(
+                    state.statisticsPlattforms.containsKey(chain!!.first) ||
+                            state.statisticsPlattforms.containsKey(chain.last)
+                    )
                 }
+                button(
+                    "Visa statistik",
+                    style = ButtonStyle.INFO,
+                    disabled = disabled
+                ) {
+                    size = ButtonSize.SMALL
+                }.onClick {
+                    HippoManager.setView(View.STAT_ADVANCED)
+                }.apply {
+                    addBsBgColor(BsBgColor.LIGHT)
+                    addBsColor(BsColor.BLACK50)
+                }
+
             }
 
             // About button
@@ -141,12 +150,18 @@ fun Container.hippoView(state: HippoState) {
                 modal.iframe(src = "about.html", iframeHeight = 400, iframeWidth = 700)
                 modal.size = ModalSize.LARGE
                 modal.addButton(
-                    Button("Stäng").onClick {
+                    Button(
+                        "Stäng"
+                    ).onClick {
                         modal.hide()
                     }
                 )
-                button("Om Hippo ${getVersion("hippoVersion")}", style = ButtonStyle.INFO).onClick {
+                button(
+                    "Om Hippo ${getVersion("hippoVersion")}",
+                    style = ButtonStyle.INFO
+                ) {
                     size = ButtonSize.SMALL
+                }.onClick {
                     modal.show()
                 }.apply {
                     addBsBgColor(BsBgColor.LIGHT)
@@ -155,7 +170,7 @@ fun Container.hippoView(state: HippoState) {
             }
         }
 
-        // The whole item table
+// The whole item table
         hPanel {
             overflow = Overflow.HIDDEN
 
@@ -364,13 +379,16 @@ private fun Div.insertResetButton(item: BaseItem, type: ItemType) {
         ItemType.PLATTFORM_CHAIN -> "Återställ tjänsteplattform(ar)"
     }
     div {
-        button(buttonText, style = ButtonStyle.PRIMARY) {
+        button(
+            buttonText,
+            style = ButtonStyle.PRIMARY
+        ) {
+            size = ButtonSize.SMALL
             marginTop = 20.px
             width = 100.perc
             background = Background(Color.name(Col.GRAY))
-            onClick {
-                HippoManager.itemDeselected(item.id, type)
-            }
+        }.onClick {
+            HippoManager.itemDeselected(item.id, type)
         }
     }
 }

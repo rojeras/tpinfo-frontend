@@ -70,7 +70,6 @@ open class ChartLabelTable(
 ) : SimplePanel() {
     init {
         id = "ChartLabelTable: SimpleTable"
-
         // Footer pagination buttons hidden through CSS
         tabulator(
             data = itemSInfoList,
@@ -99,7 +98,7 @@ open class ChartLabelTable(
                         editable = { false },
                         widthGrow = 3,
                         formatterComponentFunction = { cell, _, item ->
-                            val itemRecord = item as SInfoRecord
+                            val itemRecord = item.unsafeCast<SInfoRecord>()
                             Div {
                                 if (state.isItemSelected(itemRecord.itemType, itemRecord.itemId)) {
                                     fontWeight = FontWeight.BOLD
@@ -120,7 +119,7 @@ open class ChartLabelTable(
                     )
                 ),
                 rowSelected = { row ->
-                    val item = row.getData() as SInfoRecord
+                    val item = row.getData().unsafeCast<SInfoRecord>()
                     if (item.calls > -1) itemSelectDeselect(state, item.itemId, item.itemType)
                 },
                 // todo: Hide the tabulator footer here

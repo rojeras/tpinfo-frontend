@@ -23,7 +23,6 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.ListSerializer
-import pl.treksoft.kvision.redux.ReduxStore
 import pl.treksoft.kvision.rest.HttpMethod
 import pl.treksoft.kvision.rest.RestClient
 import kotlin.collections.component1
@@ -31,17 +30,16 @@ import kotlin.collections.component2
 import kotlin.collections.set
 import kotlin.js.Promise
 
-suspend fun loadBaseItems(store: ReduxStore<HippoState, HippoAction>) { // : Deferred<Unit> {
+suspend fun loadBaseItems() { // : Deferred<Unit> {
     println("Will now load BaseItems")
     // store.dispatch(HippoAction.StartDownloadBaseItems)
 
     // GlobalScope.async {
-    /*
+
     val baseDatesJob = GlobalScope.launch {
         val p1 = loadBaseItem("dates", Dates.serializer())
         println("Dates loaded")
     }
-     */
 
     val domainsJob = GlobalScope.launch {
         loadBaseItem("domains", ListSerializer(ServiceDomain.serializer()))
@@ -72,7 +70,7 @@ suspend fun loadBaseItems(store: ReduxStore<HippoState, HippoAction>) { // : Def
     }
 
     joinAll(
-        // baseDatesJob,
+        baseDatesJob,
         domainsJob,
         contractsJob,
         componentJob,
@@ -301,32 +299,37 @@ data class PlattformChain(
     override val synonym: String? = null
 ) : BaseItem() {
 
-    private val firstPlattform = Plattform.mapp[first]
+    private fun firstPlattform() = Plattform.mapp[first]
 
-    private val lastPlattform = Plattform.mapp[last]
+    private fun lastPlattform() = Plattform.mapp[last]
 
     override val id = calculateId(first, middle, last)
-    override val name: String = calculateName()
+    override val name: String
+        get() = calculateName()
+
     override val description = ""
-    override val searchField: String = calculateName()
+    override val searchField: String
+        get() = calculateName()
 
     init {
         map[id] = this
     }
 
-    override fun toString(): String = firstPlattform!!.name + "->" + lastPlattform!!.name
+    override fun toString(): String = calculateName() // firstPlattform!!.name + "->" + lastPlattform!!.name
 
     private fun calculateName(): String {
         val arrow = '\u2192'
-        return if (firstPlattform == lastPlattform) {
-            lastPlattform?.name ?: ""
-        } else {
-            firstPlattform?.name + " " + arrow + " " + lastPlattform?.name
-        }
+
+        if (firstPlattform() == null || lastPlattform() == null) return ""
+
+        if (firstPlattform() == lastPlattform()) return lastPlattform()!!.name
+
+        return firstPlattform()!!.name + " " + arrow + " " + lastPlattform()!!.name
     }
 
     companion object {
         val map = hashMapOf<Int, PlattformChain>()
+
         // Calculate a plattformChainId based on ids of three separate plattforms
         fun calculateId(first: Int, middle: Int?, last: Int): Int {
             val saveM: Int = middle ?: 0

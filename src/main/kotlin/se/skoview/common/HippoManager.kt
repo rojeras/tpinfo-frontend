@@ -51,18 +51,24 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
         hippoStore.dispatch(HippoAction.ApplyBookmark(view, bookmark))
 
         GlobalScope.launch {
-            println("Will start to load dates")
-            loadBaseItem("dates", Dates.serializer())
-            println("--- Dates loaded")
-            hippoStore.dispatch(HippoAction.SetDownloadBaseDatesStatus(AsyncActionStatus.COMPLETED))
 
             hippoStore.dispatch(HippoAction.StartDownloadBaseItems)
-            loadBaseItems(hippoStore)
+            loadBaseItems()
             hippoStore.dispatch(HippoAction.DoneDownloadBaseItems)
+
+            if (hippoStore.getState().view == View.HIPPO) loadIntegrations(hippoStore.getState())
+            else {
+                if (hippoStore.getState().selectedPlattformChains.isEmpty()) {
+                    val tpId: Int? = Plattform.nameToId("SLL-PROD")
+                    if (tpId != null) {
+                        hippoStore.dispatch(HippoAction.StatTpSelected(tpId))
+                    }
+                }
+                loadStatistics(hippoStore.getState())
+            }
         }
 
-        // Initialize the state change listener in the manager
-        actUponStateChangeInitialize()
+        // actUponStateChangeInitialize()
 
         println("""Exiting Manager initialize()""")
     }
@@ -73,6 +79,7 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
      * It ensures integrations and/or statistics load is initialized at program start when
      * necessary base data is available.
      */
+/*
     private fun actUponStateChangeInitialize() {
         hippoStore.subscribe { state ->
             println("--- In actUponStateChange() - subscribe")
@@ -117,6 +124,7 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
             }
         }
     }
+*/
 
     fun Container.mainLoop() {
         // place for common header
@@ -222,16 +230,17 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
     }
 
     fun setView(view: View) {
-        println("In setView, view=$view")
-        val nextState = hippoStore.getState().setView(view)
+        val nextState = hippoStore.getState().setNewView(view)
         navigateWithBookmark(nextState)
     }
 
     fun statSetViewModePreselect(preSelectLabel: String) {
         // todo: Change to navigate call
         when (hippoStore.getState().view) {
-            View.HOME -> {}
-            View.HIPPO -> {}
+            View.HOME -> {
+            }
+            View.HIPPO -> {
+            }
             View.STAT_SIMPLE -> {
                 val preSelect = SimpleViewPreSelect.mapp[preSelectLabel]
                     ?: throw NullPointerException("Internal error in Select View")
@@ -248,8 +257,7 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
 
     private fun navigateWithBookmark(nextState: HippoState) {
         val bookmarkString = nextState.createBookmarkString()
-        println("In navigateWithBookmark, bookmarkString = '$bookmarkString', preState:")
-        console.log(nextState)
+        println("In navigateWithBookmark, bookmarkString = '$bookmarkString'")
         val route: String =
             if (bookmarkString.isNotEmpty()) "/filter=$bookmarkString"
             else ""

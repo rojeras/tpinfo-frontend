@@ -52,6 +52,9 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
                 plattforms = Plattform.mapp,
                 plattformChains = PlattformChain.map,
                 statisticsPlattforms = StatisticsPlattform.mapp,
+                dateEffective = BaseDates.integrationDates[0],
+                dateEnd = BaseDates.integrationDates[0],
+                downloadBaseDatesStatus = AsyncActionStatus.COMPLETED
             )
         }
 
@@ -149,7 +152,7 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
         }
 
         is HippoAction.SetView -> {
-            state.setView(action.view)
+            state.setNewView(action.view)
         }
 
         is HippoAction.ShowTechnicalTerms -> {

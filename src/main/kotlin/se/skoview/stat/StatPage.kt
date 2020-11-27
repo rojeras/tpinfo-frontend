@@ -219,18 +219,36 @@ fun Container.statView(state: HippoState, view: View) {
                             }
                             +" Tekniska termer"
                         }
+                        cell {
+
+                            button(
+                                "Se urval i hippo",
+                                style = ButtonStyle.INFO,
+                            ) {
+                                size = ButtonSize.SMALL
+                            }.onClick {
+                                HippoManager.setView(View.HIPPO)
+                            }.apply {
+                                addBsBgColor(BsBgColor.LIGHT)
+                                addBsColor(BsColor.BLACK50)
+                            }
+                        }
                     }
                 }
 
                 // About button
-                vPanel {
-                    id = "Buttonpanel: vPanel"
-                    button("Exportera").onClick {
+                vPanel(spacing = 4) {
+
+                    button(
+                        "Exportera",
+                        style = ButtonStyle.INFO,
+                    ) {
+                        size = ButtonSize.SMALL
+                    }.onClick {
                         exportStatData(state)
                     }.apply {
                         addBsBgColor(BsBgColor.LIGHT)
                         addBsColor(BsColor.BLACK50)
-                        marginBottom = 5.px
                     }
                     val modal = Modal("Om Statistikfunktionen")
                     modal.iframe(src = "about.html", iframeHeight = 400, iframeWidth = 700)
@@ -241,8 +259,13 @@ fun Container.statView(state: HippoState, view: View) {
                             modal.hide()
                         }
                     )
-                    button("Om Statistik ${getVersion("hippoVersion")}", style = ButtonStyle.INFO).onClick {
+
+                    button(
+                        "Om Statistik ${getVersion("hippoVersion")}",
+                        style = ButtonStyle.INFO
+                    ) {
                         size = ButtonSize.SMALL
+                    }.onClick {
                         modal.show()
                     }.apply {
                         addBsBgColor(BsBgColor.LIGHT)

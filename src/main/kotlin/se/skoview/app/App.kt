@@ -31,20 +31,19 @@ import se.skoview.common.HippoManager.mainLoop
 */
 
 // Common
-// todo: Se över HippoManager och API-anrop. Behöver förenklas. Ev ta base items först.
 
 // todo: Show messages to user
 // todo: Make it possible to participate in discussion, maybe through slack channel
 // todo: Verifiera att zip bygger en produktionsversion
 // todo: Visa antal användare senaste 24 timmarna
 // todo: Börja använda Karma och enhetstester
+// done: Se över HippoManager och API-anrop. Behöver förenklas. Ev ta base items först.
 // done: Lägg in stöd för Navigo routing
 // done: Investigate Kotlin JS blocking: runBlocking workaround https://youtrack.jetbrains.com/issue/KT-22228
 
 // Hippo
 
-// todo: Add link to statistics
-// todo: Plattform chains syns inte vid omladdning - troligen måste plattforms laddas först
+// todo: Must pick up and apply legacy links
 
 // todo: Lägg med Visa-menyn i hippo. Ett snabbt sätt för vyer för olika domäner/tjänster
 // todo: Opera does not add any filter to URL, remove its mention in index.html
@@ -55,13 +54,14 @@ import se.skoview.common.HippoManager.mainLoop
 // todo: Lös trädklättringen, kanske mha HSA-trädet
 // todo: Titta på Tabulator igen
 // todo: Hippo kanske skulle uppdateras varje dygn om browsern skulle vara öppen över natten
+// done: Add link to statistics
+// done: Plattform chains syns inte vid omladdning - troligen måste plattforms laddas först
 // done: Se till att det blir ett pekarfinger på items i tabellen
 
 // Statistik
 
 // todo: Addera förval för; Infektionsverktyget, Listning
 // todo: Tydliggör vad som är valt (dvs vad som kan väljas bort)
-// todo: Knapp för att komma till hippo
 // todo: Driftsättning och koppling till proxy
 
 // todo: Byt ut "SLL" i plattformsnamnen. Stäm av lösning med MLA. Bör också ske i hippo och i BS.
@@ -70,6 +70,7 @@ import se.skoview.common.HippoManager.mainLoop
 // todo: Se över synonymerna. Måste passa med de olika förvalen
 // todo: Och så visa svarstider
 // todo: Dokumentation
+// done: Knapp för att komma till hippo
 // done: Prestanda! (ML 2020-09-17)
 // done: Byt ut "SLL" mot "Region Stockholm" i texterna.
 // done: Döp om förvalet "Bokade tider" till "Tidbokningar"

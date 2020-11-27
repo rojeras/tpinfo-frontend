@@ -285,9 +285,74 @@ fun HippoState.statTpSelected(tpId: Int): HippoState {
 }
 
 // is HippoAction.SetView -> {
+fun HippoState.setNewView(newView: View): HippoState {
+
+    val currentView = this.view
+    if (currentView == newView) throw RuntimeException("Current view  == new  in reducer SetViewMode")
+
+    // If the new mode have a preselect with the same label as the current, apply it. Otherwise use its default.
+    if (
+        currentView == View.STAT_ADVANCED &&
+        newView == View.STAT_SIMPLE
+    ) {
+        val currentAdvancedPreSelect = this.advancedViewPreSelect ?: AdvancedViewPreSelect.getDefault()
+        val currentAdvancedPreSelectLabel = currentAdvancedPreSelect.label
+        val newSimpleViewPreSelect =
+            SimpleViewPreSelect.mapp[currentAdvancedPreSelectLabel] ?: SimpleViewPreSelect.getDefault()
+        return applyFilteredItemsSelection(
+            this,
+            newSimpleViewPreSelect.filteredItems
+        ).copy(
+            simpleViewPreSelect = newSimpleViewPreSelect,
+            view = newView
+        )
+    }
+
+    if (currentView == View.STAT_SIMPLE &&
+        newView == View.STAT_ADVANCED
+    ) {
+        val currentSimplePreSelectLabel = this.simpleViewPreSelect.label
+        val newAdvancedViewPreSelect =
+            AdvancedViewPreSelect.mapp[currentSimplePreSelectLabel] ?: AdvancedViewPreSelect.getDefault()
+        return applyFilteredItemsSelection(
+            this,
+            newAdvancedViewPreSelect.filteredItems
+        ).copy(
+            advancedViewPreSelect = newAdvancedViewPreSelect,
+            view = newView
+        )
+    }
+
+    // Switch from hippo to statistics
+    if (
+        currentView == View.HIPPO &&
+        (newView == View.STAT_SIMPLE || newView == View.STAT_ADVANCED)
+    ) {
+        if (this.selectedPlattformChains.isNotEmpty()) {
+            val pcId = this.selectedPlattformChains[0]
+            val pc = PlattformChain.map[pcId]!!
+            val tpFirstId = Plattform.mapp[pc.first]!!.id
+            val tpLastId = Plattform.mapp[pc.last]!!.id
+
+            val tpId = if (this.statisticsPlattforms.containsKey(tpFirstId)) tpFirstId
+            else if (this.statisticsPlattforms.containsKey(tpLastId)) tpLastId
+            else Plattform.nameToId("SLL-PROD")
+
+            return this.copy(
+                selectedPlattformChains = listOf(PlattformChain.calculateId(tpId!!, 0, tpId)),
+                view = newView
+            )
+        }
+    }
+
+    return this.copy(view = newView)
+}
+
+/*
 fun HippoState.setView(newView: View): HippoState {
 
-    if (this.view == newView) throw RuntimeException("Current view  == new  in reducer SetViewMode")
+    val currentView = this.view
+    if (currentView == newView) throw RuntimeException("Current view  == new  in reducer SetViewMode")
 
     // If the new mode have a preselect with the same label as the current, apply it. Otherwise use its default.
     return when (newView) {
@@ -316,7 +381,7 @@ fun HippoState.setView(newView: View): HippoState {
         else -> this.copy(view = View.HIPPO)
     }
 }
-
+*/
 fun HippoState.dateSelected(selectedDate: String, dateType: DateType): HippoState {
     //  is HippoAction.DateSelected -> {
     return when (dateType) {
