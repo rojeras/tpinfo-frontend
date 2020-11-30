@@ -40,7 +40,6 @@ fun Container.statView(state: HippoState, view: View) {
     div {
         fontFamily = "Times New Roman"
         id = "StatPage:SimplePanel()"
-        println("In CharTab():init()")
         this.marginTop = 10.px
 
         statPageTop = div {
@@ -61,7 +60,10 @@ fun Container.statView(state: HippoState, view: View) {
             }
 
             flexPanel(
-                FlexDirection.ROW, FlexWrap.WRAP, JustifyContent.SPACEBETWEEN, AlignItems.CENTER,
+                FlexDirection.ROW,
+                FlexWrap.WRAP,
+                JustifyContent.SPACEBETWEEN,
+                AlignItems.CENTER,
             ) {
                 // }.bind(store) { state ->
                 spacing = 5
@@ -80,7 +82,8 @@ fun Container.statView(state: HippoState, view: View) {
                         cell { +"Startdatum:" }
                         cell {
                             simpleSelectInput(
-                                options = state.statisticsDates
+                                // options = state.statisticsDates
+                                options = BaseDates.statisticsDates
                                     .sortedByDescending { it }
                                     .filter { it <= state.statDateEnd }
                                     .map { Pair(it, it) },
@@ -97,8 +100,8 @@ fun Container.statView(state: HippoState, view: View) {
                         cell { +"Plattform:" }
                         cell {
                             val selectedPlattformId =
-                                if (state.selectedPlattformChains.size > 0)
-                                    PlattformChain.map[state.selectedPlattformChains[0]]!!.last.toString()
+                                if (state.selectedPlattformChainsIds.size > 0)
+                                    PlattformChain.mapp[state.selectedPlattformChainsIds[0]]!!.last.toString()
                                 else ""
 
                             val options =
@@ -154,7 +157,7 @@ fun Container.statView(state: HippoState, view: View) {
                         cell { +"Slutdatum:" }
                         cell {
                             simpleSelectInput(
-                                options = state.statisticsDates
+                                options = BaseDates.statisticsDates
                                     .sortedByDescending { it }
                                     .filter { it >= state.statDateEffective }
                                     .map { Pair(it, it) },
@@ -162,7 +165,6 @@ fun Container.statView(state: HippoState, view: View) {
                             ) {
                                 addCssStyle(formControlXs)
                                 background = Background(Color.name(Col.WHITE))
-                                println("Time to show end date, vale=$value")
                                 console.log(options)
                             }.onEvent {
                                 change = {
@@ -214,7 +216,6 @@ fun Container.statView(state: HippoState, view: View) {
                             checkBoxInput(
                                 value = state.showTechnicalTerms
                             ).onClick {
-                                println("In showTechnicalTerms, value = $value")
                                 HippoManager.statTechnialTermsSelected(value)
                             }
                             +" Tekniska termer"
@@ -237,7 +238,10 @@ fun Container.statView(state: HippoState, view: View) {
                 }
 
                 // About button
-                vPanel(spacing = 4) {
+                vPanel(
+                    spacing = 2,
+                ) {
+                    marginRight = 17.px
 
                     button(
                         "Exportera",
@@ -297,7 +301,6 @@ fun Container.statView(state: HippoState, view: View) {
                         -2
                     }
 
-                println("Will display time graph")
                 val xAxis = state.historyMap.keys.toList()
                 val yAxis = state.historyMap.values.toList()
                 chart(
@@ -324,7 +327,6 @@ fun Container.statView(state: HippoState, view: View) {
             }
         }
 
-        println("Time to select the view: ${state.view}")
         when (state.view) {
             View.STAT_ADVANCED -> statAdvancedView(state)
             View.STAT_SIMPLE -> statSimpleView(state)

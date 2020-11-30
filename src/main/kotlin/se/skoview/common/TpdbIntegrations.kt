@@ -84,7 +84,6 @@ fun loadIntegrations(state: HippoState) {
     HippoManager.dispatchProxy(HippoAction.StartDownloadIntegrations)
 
     if (IntegrationCache.map.containsKey(parameters)) {
-        println(">>> Integrations found in cache")
         val integrationsCache = IntegrationCache.map[parameters]
         // todo: Make sure to remove the !! below
         HippoManager.dispatchProxy(
@@ -95,7 +94,6 @@ fun loadIntegrations(state: HippoState) {
             )
         )
     } else {
-        println(">>> Integrations NOT found in cache - will download")
 
         val restClient = RestClient()
 
@@ -128,7 +126,6 @@ fun loadIntegrations(state: HippoState) {
 
             IntegrationCache(parameters, integrationArrs, integrationInfo.maxCounters, integrationInfo.updateDates)
 
-            println("Number of integrations: ${integrationArrs.size}")
             HippoManager.dispatchProxy(
                 HippoAction.DoneDownloadIntegrations(
                     integrationArrs,

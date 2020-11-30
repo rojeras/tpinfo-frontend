@@ -48,30 +48,18 @@ data class HippoState(
     val downloadHistoryStatus: AsyncActionStatus = AsyncActionStatus.NOT_INITIALIZED,
     val errorMessage: String? = null,
 
-    // Base Items
-    // todo: Why are the base items stored via the state? Ought to be enough to register when they are loaded.
-    val integrationDates: List<String> = listOf(),
-    val statisticsDates: List<String> = listOf(),
-    val serviceComponents: Map<Int, ServiceComponent> = mapOf(),
-    val logicalAddresses: Map<Int, LogicalAddress> = mapOf(),
-    val serviceContracts: Map<Int, ServiceContract> = mapOf(),
-    val serviceDomains: Map<Int, ServiceDomain> = mapOf(),
-    val plattforms: Map<Int, Plattform> = mapOf(),
-    val plattformChains: Map<Int, PlattformChain> = mapOf(),
-    val statisticsPlattforms: Map<Int, StatisticsPlattform> = mapOf(),
-
     // Filter parameters
     val dateEffective: String? = null,
     val dateEnd: String? = null,
     val statDateEffective: String = "",
     val statDateEnd: String = "",
 
-    val selectedConsumers: List<Int> = listOf(),
-    val selectedProducers: List<Int> = listOf(),
-    val selectedLogicalAddresses: List<Int> = listOf(),
-    val selectedContracts: List<Int> = listOf(),
-    val selectedDomains: List<Int> = listOf(),
-    val selectedPlattformChains: List<Int> = listOf(),
+    val selectedConsumersIds: List<Int> = listOf(),
+    val selectedProducersIds: List<Int> = listOf(),
+    val selectedLogicalAddressesIds: List<Int> = listOf(),
+    val selectedContractsIds: List<Int> = listOf(),
+    val selectedDomainsIds: List<Int> = listOf(),
+    val selectedPlattformChainsIds: List<Int> = listOf(),
 
     // Integrations data
     val selectedPlattformName: String = "",
@@ -112,19 +100,37 @@ fun initializeHippoState(): HippoState {
 
 fun HippoState.isItemSelected(itemType: ItemType, id: Int): Boolean {
     return when (itemType) {
-        ItemType.CONSUMER -> this.selectedConsumers.contains(id)
-        ItemType.DOMAIN -> this.selectedDomains.contains(id)
-        ItemType.CONTRACT -> this.selectedContracts.contains(id)
-        ItemType.PLATTFORM_CHAIN -> this.selectedPlattformChains.contains(id)
-        ItemType.LOGICAL_ADDRESS -> this.selectedLogicalAddresses.contains(id)
-        ItemType.PRODUCER -> this.selectedProducers.contains(id)
+        ItemType.CONSUMER -> this.selectedConsumersIds.contains(id)
+        ItemType.DOMAIN -> this.selectedDomainsIds.contains(id)
+        ItemType.CONTRACT -> this.selectedContractsIds.contains(id)
+        ItemType.PLATTFORM_CHAIN -> this.selectedPlattformChainsIds.contains(id)
+        ItemType.LOGICAL_ADDRESS -> this.selectedLogicalAddressesIds.contains(id)
+        ItemType.PRODUCER -> this.selectedProducersIds.contains(id)
     }
+}
+
+fun HippoState.isStatPlattformSelected(): Boolean {
+    // return isStatPlattformInPlattformChainList(this.selectedPlattformChainsIds, this.statisticsPlattforms)
+    return isStatPlattformInPlattformChainList(this.selectedPlattformChainsIds, StatisticsPlattform.mapp)
+}
+
+private fun isStatPlattformInPlattformChainList(plattformChains: List<Int>, statisticsPlattforms: Map<Int, StatisticsPlattform>): Boolean {
+    if (plattformChains.size != 1) return false
+    val selectedPlattformChainId = plattformChains[0]
+    val selectedPlattformChain = PlattformChain.mapp[selectedPlattformChainId]!!
+
+    if (
+        statisticsPlattforms.contains(selectedPlattformChain.first) ||
+        statisticsPlattforms.contains(selectedPlattformChain.last)
+    ) return true
+
+    return false
 }
 
 fun HippoState.isPlattformSelected(id: Int): Boolean {
     val pChainId = PlattformChain.calculateId(first = id, middle = null, last = id)
 
-    return this.selectedPlattformChains.contains(pChainId)
+    return this.selectedPlattformChainsIds.contains(pChainId)
 }
 
 // The extension function create the part of the URL to fetch integrations
@@ -141,32 +147,32 @@ fun HippoState.getParams(view: View): String {
         params += "&dateEnd=" + this.statDateEnd
     }
 
-    params += if (this.selectedConsumers.isNotEmpty()) this.selectedConsumers.joinToString(
+    params += if (this.selectedConsumersIds.isNotEmpty()) this.selectedConsumersIds.joinToString(
         prefix = "&consumerId=",
         separator = ","
     ) else ""
-    params += if (this.selectedDomains.isNotEmpty()) this.selectedDomains.joinToString(
+    params += if (this.selectedDomainsIds.isNotEmpty()) this.selectedDomainsIds.joinToString(
         prefix = "&domainId=",
         separator = ","
     ) else ""
-    params += if (this.selectedContracts.isNotEmpty()) this.selectedContracts.joinToString(
+    params += if (this.selectedContractsIds.isNotEmpty()) this.selectedContractsIds.joinToString(
         prefix = "&contractId=",
         separator = ","
     ) else ""
-    params += if (this.selectedLogicalAddresses.isNotEmpty()) this.selectedLogicalAddresses.joinToString(
+    params += if (this.selectedLogicalAddressesIds.isNotEmpty()) this.selectedLogicalAddressesIds.joinToString(
         prefix = "&logicalAddressId=",
         separator = ","
     ) else ""
-    params += if (this.selectedProducers.isNotEmpty()) this.selectedProducers.joinToString(
+    params += if (this.selectedProducersIds.isNotEmpty()) this.selectedProducersIds.joinToString(
         prefix = "&producerId=",
         separator = ","
     ) else ""
 
     // Separate plattforms now stored in filter, not the chain
-    for (pcId in this.selectedPlattformChains) {
+    for (pcId in this.selectedPlattformChainsIds) {
         print("In getParams()")
-        val firstId = PlattformChain.map[pcId]?.first
-        val lastId = PlattformChain.map[pcId]?.last
+        val firstId = PlattformChain.mapp[pcId]?.first
+        val lastId = PlattformChain.mapp[pcId]?.last
         params += "&firstPlattformId=$firstId"
         params += "&lastPlattformId=$lastId"
     }
@@ -179,39 +185,39 @@ fun HippoState.itemIdSeclected(id: Int, viewType: ItemType): HippoState {
 
     return when (viewType) {
         ItemType.CONSUMER -> {
-            val newList = listOf(this.selectedConsumers, listOf(id)).flatten().distinct()
+            val newList = listOf(this.selectedConsumersIds, listOf(id)).flatten().distinct()
             this.copy(
-                selectedConsumers = newList
+                selectedConsumersIds = newList
             )
         }
         ItemType.DOMAIN -> {
-            val newList = listOf(this.selectedDomains, listOf(id)).flatten().distinct()
+            val newList = listOf(this.selectedDomainsIds, listOf(id)).flatten().distinct()
             this.copy(
-                selectedDomains = newList
+                selectedDomainsIds = newList
             )
         }
         ItemType.CONTRACT -> {
-            val newList = listOf(this.selectedContracts, listOf(id)).flatten().distinct()
+            val newList = listOf(this.selectedContractsIds, listOf(id)).flatten().distinct()
             this.copy(
-                selectedContracts = newList
+                selectedContractsIds = newList
             )
         }
         ItemType.PLATTFORM_CHAIN -> {
-            val newList = listOf(this.selectedPlattformChains, listOf(id)).flatten().distinct()
+            val newList = listOf(this.selectedPlattformChainsIds, listOf(id)).flatten().distinct()
             this.copy(
-                selectedPlattformChains = newList
+                selectedPlattformChainsIds = newList
             )
         }
         ItemType.LOGICAL_ADDRESS -> {
-            val newList = listOf(this.selectedLogicalAddresses, listOf(id)).flatten().distinct()
+            val newList = listOf(this.selectedLogicalAddressesIds, listOf(id)).flatten().distinct()
             this.copy(
-                selectedLogicalAddresses = newList
+                selectedLogicalAddressesIds = newList
             )
         }
         ItemType.PRODUCER -> {
-            val newList = listOf(this.selectedProducers, listOf(id)).flatten().distinct()
+            val newList = listOf(this.selectedProducersIds, listOf(id)).flatten().distinct()
             this.copy(
-                selectedProducers = newList
+                selectedProducersIds = newList
             )
         }
     }
@@ -221,50 +227,50 @@ fun HippoState.itemIdSeclected(id: Int, viewType: ItemType): HippoState {
 fun HippoState.itemIdDeseclected(id: Int, viewType: ItemType): HippoState {
     return when (viewType) {
         ItemType.CONSUMER -> {
-            val newList = this.selectedConsumers as MutableList<Int>
+            val newList = this.selectedConsumersIds as MutableList<Int>
             newList.remove(id)
             this.copy(
-                selectedConsumers = newList,
+                selectedConsumersIds = newList,
                 advancedViewPreSelect = null
             )
         }
         ItemType.DOMAIN -> {
-            val newList = this.selectedDomains as MutableList<Int>
+            val newList = this.selectedDomainsIds as MutableList<Int>
             newList.remove(id)
             this.copy(
-                selectedDomains = newList,
+                selectedDomainsIds = newList,
                 advancedViewPreSelect = null
             )
         }
         ItemType.CONTRACT -> {
-            val newList = this.selectedContracts as MutableList<Int>
+            val newList = this.selectedContractsIds as MutableList<Int>
             newList.remove(id)
             this.copy(
-                selectedContracts = newList,
+                selectedContractsIds = newList,
                 advancedViewPreSelect = null
             )
         }
         ItemType.PLATTFORM_CHAIN -> {
-            val newList = this.selectedPlattformChains as MutableList<Int>
+            val newList = this.selectedPlattformChainsIds as MutableList<Int>
             newList.remove(id)
             this.copy(
-                selectedPlattformChains = newList,
+                selectedPlattformChainsIds = newList,
                 advancedViewPreSelect = null
             )
         }
         ItemType.LOGICAL_ADDRESS -> {
-            val newList = this.selectedLogicalAddresses as MutableList<Int>
+            val newList = this.selectedLogicalAddressesIds as MutableList<Int>
             newList.remove(id)
             this.copy(
-                selectedLogicalAddresses = newList,
+                selectedLogicalAddressesIds = newList,
                 advancedViewPreSelect = null
             )
         }
         ItemType.PRODUCER -> {
-            val newList = this.selectedProducers as MutableList<Int>
+            val newList = this.selectedProducersIds as MutableList<Int>
             newList.remove(id)
             this.copy(
-                selectedProducers = newList,
+                selectedProducersIds = newList,
                 advancedViewPreSelect = null
             )
         }
@@ -279,7 +285,7 @@ fun HippoState.statTpSelected(tpId: Int): HippoState {
     val pChainId = PlattformChain.calculateId(first = tpId, middle = null, last = tpId)
 
     return this.copy(
-        selectedPlattformChains = listOf(pChainId),
+        selectedPlattformChainsIds = listOf(pChainId),
         advancedViewPreSelect = preSelect
     )
 }
@@ -288,7 +294,8 @@ fun HippoState.statTpSelected(tpId: Int): HippoState {
 fun HippoState.setNewView(newView: View): HippoState {
 
     val currentView = this.view
-    if (currentView == newView) throw RuntimeException("Current view  == new  in reducer SetViewMode")
+    // if (currentView == newView) throw RuntimeException("Current view  == new  in reducer SetViewMode")
+    if (currentView == newView) return this
 
     // If the new mode have a preselect with the same label as the current, apply it. Otherwise use its default.
     if (
@@ -328,21 +335,34 @@ fun HippoState.setNewView(newView: View): HippoState {
         currentView == View.HIPPO &&
         (newView == View.STAT_SIMPLE || newView == View.STAT_ADVANCED)
     ) {
-        if (this.selectedPlattformChains.isNotEmpty()) {
-            val pcId = this.selectedPlattformChains[0]
-            val pc = PlattformChain.map[pcId]!!
+        if (this.selectedPlattformChainsIds.isNotEmpty()) {
+            val pcId = this.selectedPlattformChainsIds[0]
+            val pc = PlattformChain.mapp[pcId]!!
             val tpFirstId = Plattform.mapp[pc.first]!!.id
             val tpLastId = Plattform.mapp[pc.last]!!.id
 
-            val tpId = if (this.statisticsPlattforms.containsKey(tpFirstId)) tpFirstId
-            else if (this.statisticsPlattforms.containsKey(tpLastId)) tpLastId
+            val tpId = if (StatisticsPlattform.mapp.containsKey(tpFirstId)) tpFirstId
+            else if (StatisticsPlattform.mapp.containsKey(tpLastId)) tpLastId
             else Plattform.nameToId("SLL-PROD")
 
             return this.copy(
-                selectedPlattformChains = listOf(PlattformChain.calculateId(tpId!!, 0, tpId)),
+                selectedPlattformChainsIds = listOf(PlattformChain.calculateId(tpId!!, 0, tpId)),
                 view = newView
             )
         }
+    }
+
+    // From statistics to hippo
+    // Filter for all plattform chains containing a stat plattform
+    if (
+        (currentView == View.STAT_SIMPLE || currentView == View.STAT_ADVANCED) &&
+        newView == View.HIPPO
+    ) {
+        return this.copy(
+            // selectedPlattformChainsIds = StatisticsPlattform.getStatisticsPlattformChainIds(),
+            selectedPlattformChainsIds = listOf(),
+            view = newView
+        )
     }
 
     return this.copy(view = newView)
@@ -426,17 +446,17 @@ fun HippoState.applyBookmark(view: View, bookmark: BookmarkInformation): HippoSt
 
             this.copy(
                 statDateEffective = newDateEffective,
-                statDateEnd = newDateEnd
+                statDateEnd = newDateEnd,
             )
         }
 
     return newState.copy(
         view = view,
-        selectedConsumers = bookmark.selectedConsumers,
-        selectedProducers = bookmark.selectedProducers,
-        selectedLogicalAddresses = bookmark.selectedLogicalAddresses,
-        selectedContracts = bookmark.selectedContracts,
-        selectedDomains = bookmark.selectedDomains,
-        selectedPlattformChains = bookmark.selectedPlattformChains
+        selectedConsumersIds = bookmark.selectedConsumers,
+        selectedProducersIds = bookmark.selectedProducers,
+        selectedLogicalAddressesIds = bookmark.selectedLogicalAddresses,
+        selectedContractsIds = bookmark.selectedContracts,
+        selectedDomainsIds = bookmark.selectedDomains,
+        selectedPlattformChainsIds = bookmark.selectedPlattformChains
     )
 }

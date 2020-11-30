@@ -132,13 +132,13 @@ open class ChartLabelTable(
 }
 
 private fun itemSelectDeselect(state: HippoState, itemId: Int, itemType: ItemType) {
-    println("In itemSelectDeselect()")
     if (state.isItemSelected(itemType, itemId)) {
         HippoManager.itemDeselected(itemId, itemType)
     } else {
         // Select an item
         if (state.view == View.STAT_SIMPLE)
-            HippoManager.setView(View.STAT_ADVANCED)
-        HippoManager.itemSelected(itemId, itemType)
+            HippoManager.itemAndViewSelected(itemId, itemType, View.STAT_ADVANCED)
+        else
+            HippoManager.itemSelected(itemId, itemType)
     }
 }

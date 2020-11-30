@@ -74,8 +74,6 @@ fun loadHistory(state: HippoState) {
                 history.history
             )
 
-            println("Time to Dispatch")
-
             HippoManager.dispatchProxy(
                 HippoAction.DoneDownloadHistory(HistoryCache.map[parameters]!!.historyMap)
             )

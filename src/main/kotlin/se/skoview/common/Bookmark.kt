@@ -30,50 +30,52 @@ data class BookmarkInformation(
 )
 
 fun HippoState.createBookmarkString(): String {
-    println("getBookmars(), updateDates:")
-    println("Length ${this.updateDates.size}")
 
     var bookmark = ""
 
     if (this.view == View.HIPPO) {
-        if (this.updateDates.isNullOrEmpty() || this.dateEffective.isNullOrEmpty()) return ""
-
-        // Exclude dates if dateEnd == current date (first in updateDates list)
-        if (this.dateEnd != this.updateDates[0]) {
-            bookmark += "S" + date2DaysSinceEpoch(this.dateEffective)
-            bookmark += "E" + date2DaysSinceEpoch(this.dateEnd!!)
+        if (!(
+            this.updateDates.isNullOrEmpty() ||
+                this.dateEffective.isNullOrEmpty()
+            )
+        ) {
+            // Exclude dates if dateEnd == current date (first in updateDates list)
+            if (this.dateEnd != this.updateDates[0]) {
+                bookmark += "S" + date2DaysSinceEpoch(this.dateEffective)
+                bookmark += "E" + date2DaysSinceEpoch(this.dateEnd!!)
+            }
         }
     } else {
         bookmark += "S" + date2DaysSinceEpoch(this.statDateEffective)
         bookmark += "E" + date2DaysSinceEpoch(this.statDateEnd)
     }
 
-    bookmark += if (this.selectedConsumers.isNotEmpty()) this.selectedConsumers.joinToString(
+    bookmark += if (this.selectedConsumersIds.isNotEmpty()) this.selectedConsumersIds.joinToString(
         prefix = "c",
         separator = "c"
     ) else ""
-    bookmark += if (this.selectedDomains.isNotEmpty()) this.selectedDomains.joinToString(
+    bookmark += if (this.selectedDomainsIds.isNotEmpty()) this.selectedDomainsIds.joinToString(
         prefix = "d",
         separator = "d"
     ) else ""
-    bookmark += if (this.selectedContracts.isNotEmpty()) this.selectedContracts.joinToString(
+    bookmark += if (this.selectedContractsIds.isNotEmpty()) this.selectedContractsIds.joinToString(
         prefix = "C",
         separator = "C"
     ) else ""
-    bookmark += if (this.selectedLogicalAddresses.isNotEmpty()) this.selectedLogicalAddresses.joinToString(
+    bookmark += if (this.selectedLogicalAddressesIds.isNotEmpty()) this.selectedLogicalAddressesIds.joinToString(
         prefix = "l",
         separator = "l"
     ) else ""
-    bookmark += if (this.selectedProducers.isNotEmpty()) this.selectedProducers.joinToString(
+    bookmark += if (this.selectedProducersIds.isNotEmpty()) this.selectedProducersIds.joinToString(
         prefix = "p",
         separator = "p"
     ) else ""
 
     // Separate plattforms now stored in filter, not the chain
-    for (pcId in this.selectedPlattformChains) {
-        println("In getBookmark()")
-        val firstId = PlattformChain.map[pcId]?.first
-        val lastId = PlattformChain.map[pcId]?.last
+    console.log(this)
+    for (pcId in this.selectedPlattformChainsIds) {
+        val firstId = PlattformChain.mapp[pcId]?.first
+        val lastId = PlattformChain.mapp[pcId]?.last
         bookmark += "F$firstId"
         bookmark += "L$lastId"
     }

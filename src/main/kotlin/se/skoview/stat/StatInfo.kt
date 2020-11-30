@@ -45,7 +45,6 @@ data class StatisticsBlob(
                 updateCallsArr(callsProducer, arr[5], arr[6])
             }
         }
-        println("Number of statistics records: ${statisticsArrArr.size}")
     }
 }
 
@@ -85,8 +84,8 @@ private fun updateCallsArr(callsArr: MutableMap<Int, Int>, itemId: Int, calls: I
 
 fun exportStatData(state: HippoState) {
 
-    val selectedPlattformChainId = state.selectedPlattformChains[0]
-    val selectedTpId = PlattformChain.map[selectedPlattformChainId]!!.last
+    val selectedPlattformChainId = state.selectedPlattformChainsIds[0]
+    val selectedTpId = PlattformChain.mapp[selectedPlattformChainId]!!.last
     val selectedTpName = Plattform.mapp[selectedTpId]!!.name
 
     // val selectedContractList: List<String> = state.selectedContracts.map { ServiceContract.map[it]!!.name }
@@ -100,25 +99,25 @@ fun exportStatData(state: HippoState) {
      
     """.trimIndent()
 
-    if (state.selectedConsumers.size > 0)
+    if (state.selectedConsumersIds.size > 0)
         csvData += "Tjänstekonsumenter: ${
-        state.selectedConsumers.map { ServiceComponent.map[it]!!.name }.joinToString()
+        state.selectedConsumersIds.map { ServiceComponent.mapp[it]!!.name }.joinToString()
         }\n"
 
-    if (state.selectedContracts.size > 0)
+    if (state.selectedContractsIds.size > 0)
         csvData += "Tjänstekontrakt: ${
-        state.selectedContracts.map { ServiceContract.map[it]!!.name }.joinToString()
+        state.selectedContractsIds.map { ServiceContract.mapp[it]!!.name }.joinToString()
         } \n"
 
-    if (state.selectedLogicalAddresses.size > 0)
+    if (state.selectedLogicalAddressesIds.size > 0)
         csvData +=
             "Logiska adresser : ${
-            state.selectedLogicalAddresses.map { LogicalAddress.map[it]!!.name }.joinToString()
+            state.selectedLogicalAddressesIds.map { LogicalAddress.mapp[it]!!.name }.joinToString()
             }\n"
 
-    if (state.selectedProducers.size > 0)
+    if (state.selectedProducersIds.size > 0)
         csvData += "Tjänsteproducenter: ${
-        state.selectedProducers.map { ServiceComponent.map[it]!!.name }.joinToString()
+        state.selectedProducersIds.map { ServiceComponent.mapp[it]!!.name }.joinToString()
         }\n"
 
     csvData += "\n"
@@ -126,11 +125,11 @@ fun exportStatData(state: HippoState) {
 
     // todo: Need to save the statisticsArrArr and use to produce the data in the CSV file
     for (arr in state.statBlob.statisticsArrArr) {
-        val logicalAddress = LogicalAddress.map[arr[1]]!!
-        val contract = ServiceContract.map[arr[2]]!!
-        val domain = ServiceDomain.map[arr[3]]!!
-        val consumer = ServiceComponent.map[arr[4]]!!
-        val producer = ServiceComponent.map[arr[5]]!!
+        val logicalAddress = LogicalAddress.mapp[arr[1]]!!
+        val contract = ServiceContract.mapp[arr[2]]!!
+        val domain = ServiceDomain.mapp[arr[3]]!!
+        val consumer = ServiceComponent.mapp[arr[4]]!!
+        val producer = ServiceComponent.mapp[arr[5]]!!
         val calls = arr[6]
 
         csvData += "${consumer.hsaId}; ${consumer.description};"

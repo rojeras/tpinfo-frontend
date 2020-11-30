@@ -43,6 +43,8 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
 
             state.copy(
                 downloadBaseItemStatus = AsyncActionStatus.COMPLETED,
+                downloadBaseDatesStatus = AsyncActionStatus.COMPLETED,
+                /*
                 integrationDates = BaseDates.integrationDates,
                 statisticsDates = BaseDates.statisticsDates,
                 serviceComponents = ServiceComponent.map,
@@ -52,9 +54,9 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
                 plattforms = Plattform.mapp,
                 plattformChains = PlattformChain.map,
                 statisticsPlattforms = StatisticsPlattform.mapp,
+                 */
                 dateEffective = BaseDates.integrationDates[0],
                 dateEnd = BaseDates.integrationDates[0],
-                downloadBaseDatesStatus = AsyncActionStatus.COMPLETED
             )
         }
 
@@ -104,7 +106,6 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
             )
 
         is HippoAction.DoneDownloadHistory -> {
-            println("In reducer DonwDownloadHistory")
             state.copy(historyMap = action.historyMap)
         }
 
@@ -162,13 +163,11 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
         }
 
         is HippoAction.SetSimpleViewPreselect -> {
-            println("In reducer SetSimpleViewPreSelect")
             val preSelect = action.preSelect
             applyFilteredItemsSelection(state, preSelect.filteredItems).copy(simpleViewPreSelect = preSelect)
         }
 
         is HippoAction.SetAdvancedViewPreselect -> {
-            println("In reducer SetAdvancedViewPreSelect")
             val preSelect = action.preSelect
             applyFilteredItemsSelection(state, preSelect.filteredItems).copy(advancedViewPreSelect = preSelect)
         }
@@ -184,22 +183,22 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
 
 private fun itemIdListSelected(inState: HippoState, itemType: ItemType, selectedList: List<Int>): HippoState {
     return when (itemType) {
-        ItemType.CONSUMER -> inState.copy(selectedConsumers = selectedList)
-        ItemType.CONTRACT -> inState.copy(selectedContracts = selectedList)
-        ItemType.LOGICAL_ADDRESS -> inState.copy(selectedLogicalAddresses = selectedList)
-        ItemType.PRODUCER -> inState.copy(selectedProducers = selectedList)
+        ItemType.CONSUMER -> inState.copy(selectedConsumersIds = selectedList)
+        ItemType.CONTRACT -> inState.copy(selectedContractsIds = selectedList)
+        ItemType.LOGICAL_ADDRESS -> inState.copy(selectedLogicalAddressesIds = selectedList)
+        ItemType.PRODUCER -> inState.copy(selectedProducersIds = selectedList)
         else -> inState
     }
 }
 
 private fun itemDeselectAllForAllTypes(inState: HippoState): HippoState {
     return inState.copy(
-        selectedConsumers = listOf(),
-        selectedDomains = listOf(),
-        selectedContracts = listOf(),
+        selectedConsumersIds = listOf(),
+        selectedDomainsIds = listOf(),
+        selectedContractsIds = listOf(),
         // selectedPlattformChains = listOf(),
-        selectedLogicalAddresses = listOf(),
-        selectedProducers = listOf()
+        selectedLogicalAddressesIds = listOf(),
+        selectedProducersIds = listOf()
     )
 }
 

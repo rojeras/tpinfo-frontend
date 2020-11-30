@@ -31,10 +31,8 @@ import se.skoview.common.getHeightToRemainingViewPort
 // Below is the code to show the different graphs for the simple version
 fun Container.statSimpleView(state: HippoState) {
     div {
-        println("In the simple view")
         id = "TheSimpleView:SimplePanel"
 
-        id = "TheSimpleView:SimplePanel-Bind"
         height = 100.perc
 
         flexPanel() {

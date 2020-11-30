@@ -32,6 +32,7 @@ import se.skoview.common.HippoManager.mainLoop
 
 // Common
 
+// todo: PlattformChain och plattforms hänger inte logiskt ihop vad gäller URL-er och filter. TPDB skulle behöva stödja båda. 
 // todo: Show messages to user
 // todo: Make it possible to participate in discussion, maybe through slack channel
 // todo: Verifiera att zip bygger en produktionsversion

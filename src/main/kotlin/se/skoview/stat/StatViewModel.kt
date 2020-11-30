@@ -58,23 +58,23 @@ class SInfoList(private val itemType: ItemType) {
         for (entry in ackMapTmp) {
             when (this.itemType) {
                 ItemType.CONSUMER -> {
-                    item = ServiceComponent.map[entry.key]
+                    item = ServiceComponent.mapp[entry.key]
                     desc =
                         if (showSynonyms && item!!.synonym != null) item.synonym.toString()
                         else "${item!!.description} (${item.hsaId})"
                 }
                 ItemType.PRODUCER -> {
-                    item = ServiceComponent.map[entry.key]
+                    item = ServiceComponent.mapp[entry.key]
                     desc =
                         if (showSynonyms && item!!.synonym != null) item.synonym.toString()
                         else "${item!!.description} (${item.hsaId})"
                 }
                 ItemType.LOGICAL_ADDRESS -> {
-                    item = LogicalAddress.map[entry.key]
+                    item = LogicalAddress.mapp[entry.key]
                     desc = "${item!!.description} (${item.name})"
                 }
                 ItemType.CONTRACT -> {
-                    item = ServiceContract.map[entry.key]
+                    item = ServiceContract.mapp[entry.key]
                     desc =
                         if (showSynonyms && item!!.synonym != null) item.synonym.toString()
                         else item!!.description

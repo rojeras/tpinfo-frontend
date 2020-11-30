@@ -31,7 +31,6 @@ data class IntegrationLists(
 
 fun createHippoViewData(state: HippoState): IntegrationLists {
     val filteredIntegrations = state.integrationArrs
-    println("In createHippoViewData()")
     val plattformChains =
         filteredIntegrations.asSequence()
             .map { integration: Integration ->
@@ -42,7 +41,7 @@ fun createHippoViewData(state: HippoState): IntegrationLists {
                 )
             }
             .distinct()
-            .map { PlattformChain.map.getValue(it) }
+            .map { PlattformChain.mapp.getValue(it) }
             .toList()
 
     // Extract logical addresses
@@ -50,7 +49,7 @@ fun createHippoViewData(state: HippoState): IntegrationLists {
         filteredIntegrations.asSequence()
             .map { integration: Integration -> integration.logicalAddressId }
             .distinct()
-            .map { LogicalAddress.map[it] ?: LogicalAddress(-1, "", "", "") }
+            .map { LogicalAddress.mapp[it] ?: LogicalAddress(-1, "", "", "") }
             .sortedWith(compareBy(LogicalAddress::description))
             .toList()
 
@@ -60,7 +59,7 @@ fun createHippoViewData(state: HippoState): IntegrationLists {
             .map { integration: Integration -> integration.serviceDomainId }
             .distinct()
             .map {
-                ServiceDomain.map[it] ?: ServiceDomain(id = -1, domainName = "")
+                ServiceDomain.mapp[it] ?: ServiceDomain(id = -1, domainName = "")
             }
             .sortedWith(compareBy(ServiceDomain::name))
             .toList()
@@ -72,7 +71,7 @@ fun createHippoViewData(state: HippoState): IntegrationLists {
             .map { integration: Integration -> integration.serviceContractId }
             .distinct()
             .map {
-                ServiceContract.map[it]
+                ServiceContract.mapp[it]
                     ?: ServiceContract(-1, -1, "", "", -1)
             }
             .sortedWith(compareBy(ServiceContract::description))
@@ -84,7 +83,7 @@ fun createHippoViewData(state: HippoState): IntegrationLists {
             .map { integration: Integration -> integration.serviceConsumerId }
             .distinct()
             .map {
-                ServiceComponent.map[it] ?: ServiceComponent(-1, "", "")
+                ServiceComponent.mapp[it] ?: ServiceComponent(-1, "", "")
             }
             .sortedWith(compareBy(ServiceComponent::description))
             .toList()
@@ -94,7 +93,7 @@ fun createHippoViewData(state: HippoState): IntegrationLists {
             .map { integration: Integration -> integration.serviceProducerId }
             .distinct()
             .map {
-                ServiceComponent.map[it] ?: ServiceComponent(-1, "", "")
+                ServiceComponent.mapp[it] ?: ServiceComponent(-1, "", "")
             }
             .sortedWith(compareBy(ServiceComponent::description))
             .toList()
@@ -106,7 +105,7 @@ fun createHippoViewData(state: HippoState): IntegrationLists {
 
         // Need to get hold of the actual domain, not only the BaseItem version of it
         val domainId = domain.id
-        val actualDomain = ServiceDomain.map[domainId]
+        val actualDomain = ServiceDomain.mapp[domainId]
 
         for (contract in serviceContracts) {
             if (contract in actualDomain!!.contracts) {

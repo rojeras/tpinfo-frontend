@@ -61,7 +61,6 @@ class TextSearchInfo : BaseDataComponent() {
 }
 
 fun Container.hippoView(state: HippoState) {
-    println("In hippoView()")
     val integrationLists = createHippoViewData(state)
     div {
         // font-family: Georgia,Times New Roman,Times,serif;
@@ -120,13 +119,12 @@ fun Container.hippoView(state: HippoState) {
                     if (integrationLists.plattformChains.size == 1) integrationLists.plattformChains[0].id else -1
                 var disabled: Boolean = true
                 if (chainId > 0) {
-                    println("Show statistics button")
-                    val chain = PlattformChain.map[chainId]
+                    val chain = PlattformChain.mapp[chainId]
 
                     disabled = !(
-                    state.statisticsPlattforms.containsKey(chain!!.first) ||
-                            state.statisticsPlattforms.containsKey(chain.last)
-                    )
+                        StatisticsPlattform.mapp.containsKey(chain!!.first) ||
+                            StatisticsPlattform.mapp.containsKey(chain.last)
+                        )
                 }
                 button(
                     "Visa statistik",
@@ -140,7 +138,6 @@ fun Container.hippoView(state: HippoState) {
                     addBsBgColor(BsBgColor.LIGHT)
                     addBsColor(BsColor.BLACK50)
                 }
-
             }
 
             // About button

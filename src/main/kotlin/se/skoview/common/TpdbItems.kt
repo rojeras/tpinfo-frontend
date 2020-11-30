@@ -31,13 +31,12 @@ import kotlin.collections.set
 import kotlin.js.Promise
 
 suspend fun loadBaseItems() { // : Deferred<Unit> {
-    println("Will now load BaseItems")
     // store.dispatch(HippoAction.StartDownloadBaseItems)
 
     // GlobalScope.async {
 
     val baseDatesJob = GlobalScope.launch {
-        val p1 = loadBaseItem("dates", Dates.serializer())
+        loadBaseItem("dates", Dates.serializer())
         println("Dates loaded")
     }
 
@@ -125,6 +124,7 @@ data class BaseDates(
         statisticsDates = statistics
     }
 
+    // todo: Try to clean up - get rid of var
     companion object {
         var integrationDates = listOf<String>()
         var statisticsDates = listOf<String>()
@@ -140,7 +140,7 @@ data class ServiceComponent(
 ) : BaseItem() {
 
     init {
-        map[id] = this
+        mapp[id] = this
     }
 
     override val name: String = hsaId
@@ -161,7 +161,7 @@ data class ServiceComponent(
     }
 
     companion object {
-        val map = hashMapOf<Int, ServiceComponent>()
+        val mapp = hashMapOf<Int, ServiceComponent>()
     }
 }
 
@@ -175,7 +175,7 @@ data class LogicalAddress constructor(
     override val name = logicalAddress
 
     init {
-        map[id] = this
+        mapp[id] = this
     }
 
     override val searchField = "$name $description"
@@ -183,7 +183,7 @@ data class LogicalAddress constructor(
     override fun toString(): String = "$name : $description"
 
     companion object {
-        val map = hashMapOf<Int, LogicalAddress>()
+        val mapp = hashMapOf<Int, LogicalAddress>()
     }
 }
 
@@ -198,7 +198,7 @@ data class ServiceContract(
 ) : BaseItem() {
 
     init {
-        map[id] = this
+        mapp[id] = this
     }
 
     override var searchField: String = namespace
@@ -208,7 +208,7 @@ data class ServiceContract(
     override fun toString(): String = namespace
 
     companion object {
-        val map = hashMapOf<Int, ServiceContract>()
+        val mapp = hashMapOf<Int, ServiceContract>()
     }
 }
 
@@ -226,7 +226,7 @@ data class ServiceDomain(
 
     init {
         // todo: Add logic to populate contracts
-        map[id] = this
+        mapp[id] = this
     }
 
     override val searchField: String = name
@@ -234,13 +234,13 @@ data class ServiceDomain(
     override fun toString(): String = name
 
     companion object {
-        val map = hashMapOf<Int, ServiceDomain>()
+        val mapp = hashMapOf<Int, ServiceDomain>()
 
         fun attachContractsToDomains() {
             // Connect the contracts to its domain
-            ServiceContract.map.forEach { (_, contract: ServiceContract) ->
+            ServiceContract.mapp.forEach { (_, contract: ServiceContract) ->
                 val domainId = contract.serviceDomainId
-                val domain = map[domainId]
+                val domain = mapp[domainId]
                 if (domain != null) {
                     val contractList: MutableSet<ServiceContract> = domain.contracts
                     contractList.add(contract)
@@ -312,7 +312,7 @@ data class PlattformChain(
         get() = calculateName()
 
     init {
-        map[id] = this
+        mapp[id] = this
     }
 
     override fun toString(): String = calculateName() // firstPlattform!!.name + "->" + lastPlattform!!.name
@@ -328,7 +328,7 @@ data class PlattformChain(
     }
 
     companion object {
-        val map = hashMapOf<Int, PlattformChain>()
+        val mapp = hashMapOf<Int, PlattformChain>()
 
         // Calculate a plattformChainId based on ids of three separate plattforms
         fun calculateId(first: Int, middle: Int?, last: Int): Int {
@@ -357,5 +357,20 @@ data class StatisticsPlattform(
 
     companion object {
         val mapp = hashMapOf<Int, StatisticsPlattform>()
+
+        fun getStatisticsPlattformChainIds(): List<Int> {
+
+            var chainIds = listOf<Int>()
+
+            for ((statPlattformKey, _) in mapp) {
+                for ((plattformChainKey, plattformChain) in PlattformChain.mapp)
+                    if (
+                        plattformChain.first == statPlattformKey ||
+                        plattformChain.last == statPlattformKey
+                    )
+                        chainIds += plattformChainKey
+            }
+            return chainIds
+        }
     }
 }
