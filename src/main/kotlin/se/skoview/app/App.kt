@@ -32,7 +32,7 @@ import se.skoview.common.HippoManager.mainLoop
 
 // Common
 
-// todo: PlattformChain och plattforms hänger inte logiskt ihop vad gäller URL-er och filter. TPDB skulle behöva stödja båda. 
+// todo: PlattformChain och plattforms hänger inte logiskt ihop vad gäller URL-er och filter. TPDB skulle behöva stödja båda.
 // todo: Show messages to user
 // todo: Make it possible to participate in discussion, maybe through slack channel
 // todo: Verifiera att zip bygger en produktionsversion
@@ -45,6 +45,7 @@ import se.skoview.common.HippoManager.mainLoop
 // Hippo
 
 // todo: Must pick up and apply legacy links
+// todo: Marginalerna. About-knappen syns inte riktigt.
 
 // todo: Lägg med Visa-menyn i hippo. Ett snabbt sätt för vyer för olika domäner/tjänster
 // todo: Opera does not add any filter to URL, remove its mention in index.html
