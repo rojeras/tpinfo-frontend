@@ -19,7 +19,6 @@ package se.skoview.common
 import se.skoview.stat.AdvancedViewPreSelect
 import se.skoview.stat.SimpleViewPreSelect
 import se.skoview.stat.StatisticsBlob
-import se.skoview.stat.simpleViewPreSelectDefault
 import kotlin.reflect.KClass
 
 enum class AsyncActionStatus {
@@ -83,7 +82,8 @@ data class HippoState(
     // View controllers
     val showTechnicalTerms: Boolean = false,
     // val viewMode: ViewMode = ViewMode.SIMPLE,
-    val simpleViewPreSelect: SimpleViewPreSelect = simpleViewPreSelectDefault,
+    // val simpleViewPreSelect: SimpleViewPreSelect = simpleViewPreSelectDefault,
+    val simpleViewPreSelect: SimpleViewPreSelect? = null,
     val advancedViewPreSelect: AdvancedViewPreSelect? = null
 )
 
@@ -114,7 +114,10 @@ fun HippoState.isStatPlattformSelected(): Boolean {
     return isStatPlattformInPlattformChainList(this.selectedPlattformChainsIds, StatisticsPlattform.mapp)
 }
 
-private fun isStatPlattformInPlattformChainList(plattformChains: List<Int>, statisticsPlattforms: Map<Int, StatisticsPlattform>): Boolean {
+private fun isStatPlattformInPlattformChainList(
+    plattformChains: List<Int>,
+    statisticsPlattforms: Map<Int, StatisticsPlattform>
+): Boolean {
     if (plattformChains.size != 1) return false
     val selectedPlattformChainId = plattformChains[0]
     val selectedPlattformChain = PlattformChain.mapp[selectedPlattformChainId]!!
@@ -281,12 +284,16 @@ fun HippoState.itemIdDeseclected(id: Int, viewType: ItemType): HippoState {
 fun HippoState.statTpSelected(tpId: Int): HippoState {
     // TP can only be selected in advanced mode
 
-    val preSelect: AdvancedViewPreSelect = AdvancedViewPreSelect.getDefault()
+    val preSelect: AdvancedViewPreSelect? =
+    if (StatisticsPlattform.mapp[tpId]!!.name == "SLL-PROD")
+        AdvancedViewPreSelect.getDefault()
+    else null
+
     val pChainId = PlattformChain.calculateId(first = tpId, middle = null, last = tpId)
 
     return this.copy(
         selectedPlattformChainsIds = listOf(pChainId),
-        advancedViewPreSelect = preSelect
+        advancedViewPreSelect = preSelect,
     )
 }
 
@@ -303,12 +310,12 @@ fun HippoState.setNewView(newView: View): HippoState {
         newView == View.STAT_SIMPLE
     ) {
         val currentAdvancedPreSelect = this.advancedViewPreSelect ?: AdvancedViewPreSelect.getDefault()
-        val currentAdvancedPreSelectLabel = currentAdvancedPreSelect.label
+        val currentAdvancedPreSelectLabel = currentAdvancedPreSelect!!.label
         val newSimpleViewPreSelect =
             SimpleViewPreSelect.mapp[currentAdvancedPreSelectLabel] ?: SimpleViewPreSelect.getDefault()
         return applyFilteredItemsSelection(
             this,
-            newSimpleViewPreSelect.filteredItems
+            newSimpleViewPreSelect!!.filteredItems
         ).copy(
             simpleViewPreSelect = newSimpleViewPreSelect,
             view = newView
@@ -318,12 +325,12 @@ fun HippoState.setNewView(newView: View): HippoState {
     if (currentView == View.STAT_SIMPLE &&
         newView == View.STAT_ADVANCED
     ) {
-        val currentSimplePreSelectLabel = this.simpleViewPreSelect.label
+        val currentSimplePreSelectLabel = this.simpleViewPreSelect!!.label
         val newAdvancedViewPreSelect =
             AdvancedViewPreSelect.mapp[currentSimplePreSelectLabel] ?: AdvancedViewPreSelect.getDefault()
         return applyFilteredItemsSelection(
             this,
-            newAdvancedViewPreSelect.filteredItems
+            newAdvancedViewPreSelect!!.filteredItems
         ).copy(
             advancedViewPreSelect = newAdvancedViewPreSelect,
             view = newView

@@ -35,6 +35,32 @@ fun tpdbBaseUrl(): String {
 }
 
 /*
+fun setBaseUrl(view: View) {
+    val href = window.location.href
+    val hostname = window.location.hostname
+    val protocol = window.location.protocol
+    val port = window.location.port
+    val pathname = window.location.pathname
+
+    val portSpec = if (port.isNotEmpty()) ":$port" else ""
+
+    println("In setBaseUrl()")
+    println("href = '$href'")
+    println("hostname = '$hostname'")
+    println("protocol = '$protocol'")
+    println("port = '$port'")
+    println("pathname = '$pathname'")
+
+    if (href.contains("localhost")) {
+        val newUrl = href.replace("localhost", "sss.se")
+        println(newUrl)
+        // window.location.replace(newUrl)
+    }
+
+    // window.history.replaceState(newUrl, "hippo-utforska integrationer", newUrl)
+}
+*/
+/*
 fun getAsync(url: String, callback: (String) -> Unit) {
     console.log("getAsync(): URL: $url")
     val xmlHttp = XMLHttpRequest()

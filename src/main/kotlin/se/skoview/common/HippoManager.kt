@@ -53,6 +53,7 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
             hippoStore.dispatch(HippoAction.StartDownloadBaseItems)
             loadBaseItems()
             hippoStore.dispatch(HippoAction.DoneDownloadBaseItems)
+            viewPreSelectInitialize()
 
             if (hippoStore.getState().view == View.HIPPO) loadIntegrations(hippoStore.getState())
             else {
@@ -167,6 +168,7 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
 
     fun newOrUpdatedUrlFromBrowser(view: View, params: String? = null) {
         println("¤¤¤¤¤¤¤¤¤¤¤¤ In fromUrl(), view=$view, params=$params")
+        // setBaseUrl(view)
         val filterVals = params ?: ""
         val bookmark = parseBookmarkString(filterVals)
         println("bookmark from filter:")
@@ -226,8 +228,9 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
     }
 
     fun statTpSelected(tpId: Int) {
-        val nextState = hippoStore.getState().statTpSelected(tpId)
-        navigateWithBookmark(nextState)
+        hippoStore.dispatch(HippoAction.StatTpSelected(tpId))
+        // val nextState = hippoStore.getState().statTpSelected(tpId)
+        navigateWithBookmark(hippoStore.getState())
     }
 
     fun statHistorySelected(flag: Boolean) {

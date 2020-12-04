@@ -16,6 +16,7 @@
  */
 package se.skoview.common
 
+import se.skoview.stat.AdvancedViewPreSelect
 import se.skoview.stat.FilteredItems
 import se.skoview.stat.StatisticsBlob
 
@@ -119,7 +120,14 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
         }
 
         is HippoAction.StatTpSelected -> {
-            state.statTpSelected(action.tpId)
+            val newState: HippoState =
+                // todo: Remove hard coded tp id below
+                if (action.tpId != 3) {
+                    applyFilteredItemsSelection(state, AdvancedViewPreSelect.getDefault()!!.filteredItems)
+                        .copy(advancedViewPreSelect = AdvancedViewPreSelect.getDefault())
+                } else state
+
+            newState.statTpSelected(action.tpId)
         }
 
         is HippoAction.ItemIdSelected -> {

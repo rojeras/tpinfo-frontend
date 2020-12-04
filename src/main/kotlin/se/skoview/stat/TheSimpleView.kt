@@ -52,7 +52,7 @@ fun Container.statSimpleView(state: HippoState) {
                 } else {
                     -1
                 }
-            val preSelect: SimpleViewPreSelect = state.simpleViewPreSelect
+            val preSelect: SimpleViewPreSelect = state.simpleViewPreSelect!!
             val showItemType: ItemType = preSelect.simpleModeViewOrder[0]
 
             val itemSInfoList: SInfoList

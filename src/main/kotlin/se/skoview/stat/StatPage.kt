@@ -181,7 +181,7 @@ fun Container.statView(state: HippoState, view: View) {
                             when (state.view) {
                                 View.STAT_SIMPLE -> {
                                     console.log(state.simpleViewPreSelect)
-                                    selectedPreSelectLabel = state.simpleViewPreSelect.label
+                                    selectedPreSelectLabel = state.simpleViewPreSelect!!.label
                                     options = SimpleViewPreSelect.mapp
                                         .toList()
                                         .sortedBy { it.first }
@@ -283,7 +283,7 @@ fun Container.statView(state: HippoState, view: View) {
 
             val headingText: String =
                 if (state.view == View.STAT_ADVANCED) "Totalt antal anrop för detta urval är: $tCalls"
-                else "${state.simpleViewPreSelect.label}: $tCalls anrop"
+                else "${state.simpleViewPreSelect!!.label}: $tCalls anrop"
 
             h4 {
                 content = headingText

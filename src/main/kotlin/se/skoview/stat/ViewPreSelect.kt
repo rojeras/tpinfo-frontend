@@ -17,6 +17,7 @@
 package se.skoview.stat
 
 import se.skoview.common.ItemType
+import se.skoview.common.ServiceContract
 
 const val SIMPLE_VIEW_DEFAULT_PRESELECT: String = "Alla konsumerande tjänster"
 const val ADVANCED_VIEW_DEFAULT_PRESELECT: String = "Allt"
@@ -37,27 +38,27 @@ data class FilteredItems(
     )
 }
 
-val ALL_ITEMS_FILTER = FilteredItems()
-val TIMEBOOKING_ITEMS_FILTER = FilteredItems(contracts = listOf(117, 118, 114))
-val JOURNAL_ITEMS_FILTER = FilteredItems(consumers = listOf(865))
-val NPO_ITEMS_FILTER = FilteredItems(consumers = listOf(434, 693))
-val REQUEST_ITEMS_FILTER = FilteredItems(contracts = listOf(215))
 
 interface ViewPreSelect
 
 data class SimpleViewPreSelect(
     val label: String,
     val filteredItems: FilteredItems,
-    val simpleModeViewOrder: List<ItemType>
+    val simpleModeViewOrder: List<ItemType>,
+    val default: Boolean = false
 ) : ViewPreSelect {
     init {
         mapp[label] = this
+
+        if (default) simpleViewPreSelectDefault = this
     }
 
     companion object {
         val mapp: HashMap<String, SimpleViewPreSelect> = hashMapOf()
 
-        fun getDefault(): SimpleViewPreSelect = simpleViewPreSelectDefault
+        var simpleViewPreSelectDefault: SimpleViewPreSelect? = null
+
+        fun getDefault(): SimpleViewPreSelect? = simpleViewPreSelectDefault
     }
 }
 
@@ -65,67 +66,91 @@ data class AdvancedViewPreSelect(
     val label: String,
     val filteredItems: FilteredItems,
     val headingsMap: HashMap<ItemType, String>,
+    val default: Boolean = false
 ) : ViewPreSelect {
     init {
         mapp[label] = this
+
+        if (default) advancedViewPreSelectDefault = this
     }
 
     companion object {
         val mapp: HashMap<String, AdvancedViewPreSelect> = hashMapOf()
 
-        fun getDefault(): AdvancedViewPreSelect = advancedViewPreSelectDefault
+        var advancedViewPreSelectDefault: AdvancedViewPreSelect? = null
+
+        fun getDefault(): AdvancedViewPreSelect? = advancedViewPreSelectDefault
     }
 }
 
-val simpleViewPreSelectDefault: SimpleViewPreSelect =
+fun viewPreSelectInitialize() {
+
+    val allItemsFilter = FilteredItems()
+
+    // for ((key, value) in ServiceContract.mapp) { }
+    val timeContracts: List<Int> = ServiceContract.mapp
+        .filterValues {
+            it.name.contains("MakeBooking") ||
+                    it.name.contains("UpdateBooking") ||
+                    it.name.contains("CancelBooking")
+        }
+        .map { it.key }
+
+    val timebookingItemsFilter = FilteredItems(contracts = timeContracts)
+
+    val journalItemsFilter = FilteredItems(consumers = listOf(865))
+    val npoItemsFilter = FilteredItems(consumers = listOf(434, 693))
+    val reguestItemsFilter = FilteredItems(contracts = listOf(215))
+
     SimpleViewPreSelect(
         label = SIMPLE_VIEW_DEFAULT_PRESELECT,
-        filteredItems = ALL_ITEMS_FILTER, // hashMapOf(),
-        simpleModeViewOrder = listOf(ItemType.CONSUMER)
+        filteredItems = allItemsFilter, // hashMapOf(),
+        simpleModeViewOrder = listOf(ItemType.CONSUMER),
+        default = true
     )
 
-val simplePreSelects = listOf<SimpleViewPreSelect>(
-    simpleViewPreSelectDefault,
     SimpleViewPreSelect(
         label = "Anropade producerande tjänster",
-        filteredItems = ALL_ITEMS_FILTER,
+        filteredItems = allItemsFilter,
         simpleModeViewOrder = listOf(ItemType.PRODUCER)
-    ),
+    )
+
     SimpleViewPreSelect(
         label = "Tidbokningar",
-        filteredItems = TIMEBOOKING_ITEMS_FILTER,
+        filteredItems = timebookingItemsFilter,
         simpleModeViewOrder = listOf(ItemType.LOGICAL_ADDRESS),
-    ),
+    )
+
     SimpleViewPreSelect(
         label = "Journalen",
-        filteredItems = JOURNAL_ITEMS_FILTER,
+        filteredItems = journalItemsFilter,
         simpleModeViewOrder = listOf(ItemType.CONTRACT)
-    ),
+    )
+
     SimpleViewPreSelect(
         label = "Nationell patientöversikt (NPÖ)",
-        filteredItems = NPO_ITEMS_FILTER,
+        filteredItems = npoItemsFilter,
         simpleModeViewOrder = listOf(ItemType.CONTRACT),
-    ),
+    )
+
     SimpleViewPreSelect(
         label = "Remisser",
-        filteredItems = REQUEST_ITEMS_FILTER,
+        filteredItems = reguestItemsFilter,
         simpleModeViewOrder = listOf(ItemType.LOGICAL_ADDRESS)
-    ),
-)
+    )
 
-val advancedViewPreSelectDefault =
+
     AdvancedViewPreSelect(
         label = ADVANCED_VIEW_DEFAULT_PRESELECT,
-        filteredItems = ALL_ITEMS_FILTER,
+        filteredItems = allItemsFilter,
         headingsMap = hashMapOf(
             ItemType.CONSUMER to "Applikationer",
             ItemType.CONTRACT to "Tjänster",
             ItemType.PRODUCER to "Informationskällor",
             ItemType.LOGICAL_ADDRESS to "Adresser"
-        )
+        ),
+        default = true
     )
-val advancedViewPreSelects = listOf<AdvancedViewPreSelect>(
-    advancedViewPreSelectDefault,
     AdvancedViewPreSelect(
         label = "Tidbokningar",
         filteredItems = FilteredItems(contracts = listOf(117, 118, 114)),
@@ -135,35 +160,39 @@ val advancedViewPreSelects = listOf<AdvancedViewPreSelect>(
             ItemType.PRODUCER to "Tidbokningsystem",
             ItemType.LOGICAL_ADDRESS to "Enhet"
         )
-    ),
+    )
+
     AdvancedViewPreSelect(
         label = "Journalen",
-        filteredItems = JOURNAL_ITEMS_FILTER,
+        filteredItems = journalItemsFilter,
         headingsMap = hashMapOf(
             ItemType.CONSUMER to "Applikation",
             ItemType.CONTRACT to "Information",
             ItemType.PRODUCER to "Journalsystem",
             ItemType.LOGICAL_ADDRESS to "Journalsystemets adress"
         )
-    ),
+    )
+
     AdvancedViewPreSelect(
         label = "Nationell patientöversikt (NPÖ)",
-        filteredItems = NPO_ITEMS_FILTER,
+        filteredItems = npoItemsFilter,
         headingsMap = hashMapOf(
             ItemType.CONSUMER to "Applikation",
             ItemType.CONTRACT to "Information",
             ItemType.PRODUCER to "Journalsystem",
             ItemType.LOGICAL_ADDRESS to "Journalsystemets adress"
         )
-    ),
+    )
+
     AdvancedViewPreSelect(
         label = "Remisser",
-        filteredItems = REQUEST_ITEMS_FILTER,
+        filteredItems = reguestItemsFilter,
         headingsMap = hashMapOf(
             ItemType.CONSUMER to "Remitterande system",
             ItemType.CONTRACT to "Remisstyp",
             ItemType.PRODUCER to "Remissmottagande system",
             ItemType.LOGICAL_ADDRESS to "Remitterad mottagning"
         )
-    ),
-)
+    )
+
+}

@@ -62,9 +62,8 @@ import se.skoview.common.HippoManager.mainLoop
 
 // Statistik
 
+// todo: Ta bort förval när man går till QA, generellt gå igenom all hantering av förval
 // todo: Addera förval för; Infektionsverktyget, Listning
-// todo: Tydliggör vad som är valt (dvs vad som kan väljas bort)
-// todo: Driftsättning och koppling till proxy
 
 // todo: Byt ut "SLL" i plattformsnamnen. Stäm av lösning med MLA. Bör också ske i hippo och i BS.
 // todo: Testa med andra browsers, inte minst Edge (ML 2020-09-17)
@@ -72,6 +71,8 @@ import se.skoview.common.HippoManager.mainLoop
 // todo: Se över synonymerna. Måste passa med de olika förvalen
 // todo: Och så visa svarstider
 // todo: Dokumentation
+// done: Driftsättning och koppling till proxy
+// dome: Tydliggör vad som är valt (dvs vad som kan väljas bort)
 // done: Knapp för att komma till hippo
 // done: Prestanda! (ML 2020-09-17)
 // done: Byt ut "SLL" mot "Region Stockholm" i texterna.

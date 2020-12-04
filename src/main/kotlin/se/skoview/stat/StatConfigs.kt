@@ -17,14 +17,14 @@
 package se.skoview.stat
 
 import com.github.snabbdom._get
-import pl.treksoft.kvision.chart.* // ktlint-disable no-wildcard-imports
-import pl.treksoft.kvision.core.* // ktlint-disable no-wildcard-imports
+import pl.treksoft.kvision.chart.*
+import pl.treksoft.kvision.core.*
 import pl.treksoft.kvision.html.Div
 import pl.treksoft.kvision.panel.SimplePanel
 import pl.treksoft.kvision.table.TableType
-import pl.treksoft.kvision.tabulator.* // ktlint-disable no-wildcard-imports
+import pl.treksoft.kvision.tabulator.*
 import pl.treksoft.kvision.utils.perc
-import se.skoview.common.* // ktlint-disable no-wildcard-imports
+import se.skoview.common.*
 
 fun getPieChartConfig(
     state: HippoState,
@@ -98,15 +98,22 @@ open class ChartLabelTable(
                         editable = { false },
                         widthGrow = 3,
                         formatterComponentFunction = { cell, _, item ->
+                            // cell.apply { background = Background(Color.name(Col.ALICEBLUE)) }
                             val itemRecord = item.unsafeCast<SInfoRecord>()
-                            Div {
-                                if (state.isItemSelected(itemRecord.itemType, itemRecord.itemId)) {
-                                    fontWeight = FontWeight.BOLD
-                                    cell.apply { background = Background(Color.name(Col.YELLOW)) }
-                                }
+                            var textToShow: String = itemRecord.description
+                            Div(rich = true) {
                                 whiteSpace = WhiteSpace.PREWRAP
                                 wordBreak = WordBreak.BREAKALL
-                                +itemRecord.description
+                                if (state.isItemSelected(itemRecord.itemType, itemRecord.itemId)) {
+                                    fontWeight = FontWeight.BOLD
+                                    cell.apply {
+                                        background = Background(Color.name(Col.LIGHTGRAY))
+                                    }
+                                    textToShow = "$textToShow (<i>vald</i>)"
+                                }
+                                // whiteSpace = WhiteSpace.PREWRAP
+                                // wordBreak = WordBreak.BREAKALL
+                                +textToShow
                             }
                         }
 

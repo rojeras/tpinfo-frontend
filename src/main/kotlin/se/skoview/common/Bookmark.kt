@@ -83,6 +83,25 @@ fun HippoState.createBookmarkString(): String {
     return bookmark
 }
 
+// Let the URL mirror the current state
+/*
+fun setUrlFilter(state: HippoState) {
+    val bookmark = state.getBookmark()
+    val hostname = window.location.hostname
+    val protocol = window.location.protocol
+    val port = window.location.port
+    val pathname = window.location.pathname
+
+    val portSpec = if (port.isNotEmpty()) ":$port" else ""
+    var newUrl = "$protocol//$hostname$portSpec$pathname"
+
+    if (bookmark.length > 1) {
+        newUrl += "?filter=$bookmark"
+    }
+    window.history.pushState(newUrl, "hippo-utforska integrationer", newUrl)
+}
+ */
+
 fun parseBookmarkString(fullUrl: String): BookmarkInformation {
     // ---------------------------------------------------------------------
     fun parseBookmarkType(typeChar: String, filterValue: String): List<Int> {
