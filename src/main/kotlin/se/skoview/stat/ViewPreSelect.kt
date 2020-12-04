@@ -139,7 +139,6 @@ fun viewPreSelectInitialize() {
         simpleModeViewOrder = listOf(ItemType.LOGICAL_ADDRESS)
     )
 
-
     AdvancedViewPreSelect(
         label = ADVANCED_VIEW_DEFAULT_PRESELECT,
         filteredItems = allItemsFilter,
@@ -151,6 +150,7 @@ fun viewPreSelectInitialize() {
         ),
         default = true
     )
+
     AdvancedViewPreSelect(
         label = "Tidbokningar",
         filteredItems = FilteredItems(contracts = listOf(117, 118, 114)),
