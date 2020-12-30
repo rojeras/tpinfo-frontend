@@ -17,7 +17,7 @@
 package se.skoview.common
 
 import se.skoview.stat.AdvancedViewPreSelect
-import se.skoview.stat.FilteredItems
+import se.skoview.stat.itemsFilter
 import se.skoview.stat.StatisticsBlob
 
 fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
@@ -123,7 +123,7 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
             val newState: HippoState =
                 // todo: Remove hard coded tp id below
                 if (action.tpId != 3) {
-                    applyFilteredItemsSelection(state, AdvancedViewPreSelect.getDefault()!!.filteredItems)
+                    applyFilteredItemsSelection(state, AdvancedViewPreSelect.getDefault()!!.itemsFilter)
                         .copy(advancedViewPreSelect = AdvancedViewPreSelect.getDefault())
                 } else state
 
@@ -172,12 +172,12 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
 
         is HippoAction.SetSimpleViewPreselect -> {
             val preSelect = action.preSelect
-            applyFilteredItemsSelection(state, preSelect.filteredItems).copy(simpleViewPreSelect = preSelect)
+            applyFilteredItemsSelection(state, preSelect.itemsFilter).copy(simpleViewPreSelect = preSelect)
         }
 
         is HippoAction.SetAdvancedViewPreselect -> {
             val preSelect = action.preSelect
-            applyFilteredItemsSelection(state, preSelect.filteredItems).copy(advancedViewPreSelect = preSelect)
+            applyFilteredItemsSelection(state, preSelect.itemsFilter).copy(advancedViewPreSelect = preSelect)
         }
     }
 
@@ -210,13 +210,13 @@ private fun itemDeselectAllForAllTypes(inState: HippoState): HippoState {
     )
 }
 
-fun applyFilteredItemsSelection(inState: HippoState, filteredItems: FilteredItems): HippoState {
+fun applyFilteredItemsSelection(inState: HippoState, itemsFilter: itemsFilter): HippoState {
 
-    println("In applyFilteredItemsSelection(): $filteredItems")
+    println("In applyFilteredItemsSelection(): $itemsFilter")
 
     var state2 = itemDeselectAllForAllTypes(inState)
 
-    for ((itemType, itemIdList) in filteredItems.selectedItems) {
+    for ((itemType, itemIdList) in itemsFilter.selectedItems) {
         state2 = itemIdListSelected(state2, itemType, itemIdList)
     }
 

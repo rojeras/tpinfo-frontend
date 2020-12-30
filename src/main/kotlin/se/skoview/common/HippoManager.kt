@@ -238,7 +238,7 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
         hippoStore.dispatch(HippoAction.ShowTimeGraph(flag))
     }
 
-    fun statTechnialTermsSelected(flag: Boolean) {
+    fun statTechnicalTermsSelected(flag: Boolean) {
         hippoStore.dispatch(HippoAction.ShowTechnicalTerms(flag))
     }
 

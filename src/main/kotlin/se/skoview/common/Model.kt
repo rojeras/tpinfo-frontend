@@ -315,7 +315,7 @@ fun HippoState.setNewView(newView: View): HippoState {
             SimpleViewPreSelect.mapp[currentAdvancedPreSelectLabel] ?: SimpleViewPreSelect.getDefault()
         return applyFilteredItemsSelection(
             this,
-            newSimpleViewPreSelect!!.filteredItems
+            newSimpleViewPreSelect!!.itemsFilter
         ).copy(
             simpleViewPreSelect = newSimpleViewPreSelect,
             view = newView
@@ -330,7 +330,7 @@ fun HippoState.setNewView(newView: View): HippoState {
             AdvancedViewPreSelect.mapp[currentSimplePreSelectLabel] ?: AdvancedViewPreSelect.getDefault()
         return applyFilteredItemsSelection(
             this,
-            newAdvancedViewPreSelect!!.filteredItems
+            newAdvancedViewPreSelect!!.itemsFilter
         ).copy(
             advancedViewPreSelect = newAdvancedViewPreSelect,
             view = newView

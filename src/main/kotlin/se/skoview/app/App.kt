@@ -61,7 +61,8 @@ import se.skoview.common.HippoManager.mainLoop
 // done: Se till att det blir ett pekarfinger på items i tabellen
 
 // Statistik
-
+// todo: Kolla marginalerna
+// todo: För kort (eller smal?) datumlist
 // todo: Ta bort förval när man går till QA, generellt gå igenom all hantering av förval
 // todo: Addera förval för; Infektionsverktyget, Listning
 
@@ -112,12 +113,12 @@ import se.skoview.common.HippoManager.mainLoop
 
 // TPDB
 // todo: domainId not supported in stat call: https://qa.integrationer.tjansteplattform.se/tpdb/tpdbapi.php/api/v1/statistics?dummy&dateEffective=2020-07-01&dateEnd=2020-07-31&domainId=11
-// todo: Add header header("Content-type:application/json"); to tpdbapi.php
 // todo: Let TPDB-api add the default dates for integrations and statistics. Maybe extend the answers to contain date information
 // todo: Create v2 of the API
-// todo: Add cache
 // todo: Rewrite in Kotlin
 
+// done: Add cache
+// done: Add header header("Content-type:application/json"); to tpdbapi.php
 // done: Skriv ut versionsnummer på sidan
 // done: Add the initial loading of integrations and stat data to be on demand from the respective view - not from areAllBaseItemsLoaded()
 // done: Bug: Selected dates not included in URL filter

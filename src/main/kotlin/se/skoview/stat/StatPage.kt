@@ -216,7 +216,7 @@ fun Container.statView(state: HippoState, view: View) {
                             checkBoxInput(
                                 value = state.showTechnicalTerms
                             ).onClick {
-                                HippoManager.statTechnialTermsSelected(value)
+                                HippoManager.statTechnicalTermsSelected(value)
                             }
                             +" Tekniska termer"
                         }

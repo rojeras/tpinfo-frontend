@@ -57,7 +57,7 @@ fun Container.statAdvancedView(state: HippoState) {
                     label = getHeading(state, ItemType.CONSUMER)
                 )
             )
-
+/*
             add(
                 StatPieTableView(
                     state,
@@ -77,7 +77,7 @@ fun Container.statAdvancedView(state: HippoState) {
                     label = getHeading(state, ItemType.PRODUCER)
                 )
             )
-
+*/
             add(
                 StatPieTableView(
                     state,
@@ -126,6 +126,7 @@ class StatPieTableView(
         setStyle("height", getHeightToRemainingViewPort(statPageTop, 50))
         // height = 100.perc
         width = 25.vw
+        width = 50.vw
         val pieChart =
             Chart(
                 getPieChartConfig(
@@ -141,6 +142,7 @@ class StatPieTableView(
             pieChart
                 .apply {
                     height = 30.perc
+                    height = 60.perc
                 }
         )
         add(
