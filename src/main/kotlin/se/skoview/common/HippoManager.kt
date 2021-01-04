@@ -70,59 +70,6 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
         // actUponStateChangeInitialize()
     }
 
-    /**
-     * This function is part of the manager. It listen to state changes, evaluates them and,
-     * in some cases, act.
-     * It ensures integrations and/or statistics load is initialized at program start when
-     * necessary base data is available.
-     */
-/*
-    private fun actUponStateChangeInitialize() {
-        hippoStore.subscribe { state ->
-            println("--- In actUponStateChange() - subscribe")
-            if (state.view == View.HIPPO) {
-                // Load integrations if not loaded and dates are available
-                if (
-                    state.downloadIntegrationStatus == AsyncActionStatus.NOT_INITIALIZED &&
-                    state.downloadBaseDatesStatus == AsyncActionStatus.COMPLETED
-                ) {
-                    println("Will now loadIntegrations()")
-                    loadIntegrations(hippoStore.getState())
-                }
-            } else if (
-                state.view == View.STAT_SIMPLE ||
-                state.view == View.STAT_ADVANCED
-            ) {
-                // Load statistics data if not loaded and plattform are available
-                if (
-                    state.statDateEnd.isNotBlank() &&
-                    state.statisticsDates.isNotEmpty() &&
-                    state.statisticsDates.reversed()[0] < state.statDateEnd
-                )
-                    hippoStore.dispatch(
-                        HippoAction.DateSelected(
-                            DateType.STAT_END,
-                            state.statisticsDates.reversed()[0]
-                        )
-                    )
-                else if (
-                    state.downloadStatisticsStatus == AsyncActionStatus.NOT_INITIALIZED &&
-                    state.downloadBaseItemStatus == AsyncActionStatus.COMPLETED
-                ) {
-                    if (state.selectedPlattformChains.isEmpty()) {
-                        val tpId: Int? = Plattform.nameToId("SLL-PROD")
-                        if (tpId != null) {
-                            hippoStore.dispatch(HippoAction.StatTpSelected(tpId))
-                        }
-                    }
-                    println("Will now loadStatistics()")
-                    loadStatistics(hippoStore.getState())
-                }
-            }
-        }
-    }
-*/
-
     fun Container.mainLoop() {
         // place for common header
         /*
@@ -143,7 +90,7 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
                             hippoView(state)
                         }
                     }
-                    View.STAT_SIMPLE -> {
+                    View.STAT -> {
                         // todo: Refactor and clean up code below
                         if (state.selectedPlattformChainsIds.isNotEmpty()) {
                             val pcId = state.selectedPlattformChainsIds[0]
@@ -157,9 +104,9 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
                                 loadStatistics(hippoStore.getState())
                             }
                         }
-                        statView(state, View.STAT_SIMPLE)
+                        statView(state, View.STAT)
                     }
-                    View.STAT_ADVANCED -> statView(state, View.STAT_ADVANCED)
+                    // View.STAT_ADVANCED -> statView(state, View.STAT_ADVANCED)
                 }
             }
         }
@@ -238,9 +185,12 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
         hippoStore.dispatch(HippoAction.ShowTimeGraph(flag))
     }
 
-    fun statTechnicalTermsSelected(flag: Boolean) {
-        hippoStore.dispatch(HippoAction.ShowTechnicalTerms(flag))
-    }
+    fun statTechnicalTermsSelected(flag: Boolean) { hippoStore.dispatch(HippoAction.ShowTechnicalTerms(flag)) }
+
+    fun statShowConsumers(flag: Boolean) { hippoStore.dispatch(HippoAction.ShowConsumers(flag)) }
+    fun statShowProducers(flag: Boolean) { hippoStore.dispatch(HippoAction.ShowProduceras(flag)) }
+    fun statShowContracts(flag: Boolean) { hippoStore.dispatch(HippoAction.ShowContracts(flag)) }
+    fun statShowLogicalAddresses(flag: Boolean) { hippoStore.dispatch(HippoAction.ShowLogicalAddresses(flag)) }
 
     fun setView(view: View) {
         console.log(hippoStore.getState())
@@ -255,16 +205,18 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
         when (hippoStore.getState().view) {
             View.HOME -> { }
             View.HIPPO -> { }
-            View.STAT_SIMPLE -> {
+            View.STAT -> {
                 val preSelect = SimpleViewPreSelect.mapp[preSelectLabel]
                     ?: throw NullPointerException("Internal error in Select View")
                 hippoStore.dispatch(HippoAction.SetSimpleViewPreselect(preSelect))
             }
+            /*
             View.STAT_ADVANCED -> {
                 val preSelect = AdvancedViewPreSelect.mapp[preSelectLabel]
                     ?: throw NullPointerException("Internal error in Select View")
                 hippoStore.dispatch(HippoAction.SetAdvancedViewPreselect(preSelect))
             }
+            */
         }
         loadStatistics(hippoStore.getState())
     }
@@ -282,10 +234,10 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
 
     private fun parseUrlForView(url: String): View {
         if (url.contains("integrationer.tjansteplattform")) return View.HIPPO
-        if (url.contains("statistik.tjansteplattform")) return View.STAT_SIMPLE
+        if (url.contains("statistik.tjansteplattform")) return View.STAT
 
-        if (url.contains(View.STAT_SIMPLE.url)) return View.STAT_SIMPLE
-        if (url.contains(View.STAT_ADVANCED.url)) return View.STAT_ADVANCED
+        if (url.contains(View.STAT.url)) return View.STAT
+        // if (url.contains(View.STAT_ADVANCED.url)) return View.STAT_ADVANCED
 
         return View.HIPPO
     }

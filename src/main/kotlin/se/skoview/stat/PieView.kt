@@ -20,7 +20,7 @@ import pl.treksoft.kvision.chart.Chart
 import pl.treksoft.kvision.core.Container
 import pl.treksoft.kvision.core.Overflow
 import pl.treksoft.kvision.html.div
-import pl.treksoft.kvision.panel.SimplePanel
+import pl.treksoft.kvision.panel.flexPanel
 import pl.treksoft.kvision.panel.hPanel
 import pl.treksoft.kvision.utils.perc
 import pl.treksoft.kvision.utils.vw
@@ -29,7 +29,7 @@ import se.skoview.common.HippoState
 import se.skoview.common.ItemType
 import se.skoview.common.getHeightToRemainingViewPort
 
-fun Container.statAdvancedView(state: HippoState) {
+fun Container.pieView(state: HippoState) {
     div {
         // The whole item table
         hPanel(
@@ -48,50 +48,142 @@ fun Container.statAdvancedView(state: HippoState) {
                     -1
                 }
 
-            add(
-                StatPieTableView(
+            var numberOfColumns: Int = 0
+            if (state.showConsumers) numberOfColumns++
+            if (state.showProducers) numberOfColumns++
+            if (state.showContracts) numberOfColumns++
+            if (state.showLogicalAddresses) numberOfColumns++
+
+            if (numberOfColumns < 1) return@hPanel
+
+            if (state.showConsumers)
+                statPieTableView(
                     state,
                     itemType = ItemType.CONSUMER,
                     itemSInfoList = SInfo.consumerSInfoList,
                     animateTime = animateTime,
-                    label = getHeading(state, ItemType.CONSUMER)
+                    label = getHeading(state, ItemType.CONSUMER),
+                    numberOfColumns
                 )
-            )
-/*
-            add(
-                StatPieTableView(
+
+            if (state.showContracts)
+                statPieTableView(
                     state,
                     itemType = ItemType.CONTRACT,
                     itemSInfoList = SInfo.contractSInfoList,
                     animateTime = animateTime,
-                    label = getHeading(state, ItemType.CONTRACT)
+                    label = getHeading(state, ItemType.CONTRACT),
+                    numberOfColumns
                 )
-            )
 
-            add(
-                StatPieTableView(
+            if (state.showProducers)
+                statPieTableView(
                     state,
                     itemType = ItemType.PRODUCER,
                     itemSInfoList = SInfo.producerSInfoList,
                     animateTime = animateTime,
-                    label = getHeading(state, ItemType.PRODUCER)
+                    label = getHeading(state, ItemType.PRODUCER),
+                    numberOfColumns
                 )
-            )
-*/
-            add(
-                StatPieTableView(
+
+            if (state.showLogicalAddresses)
+                statPieTableView(
                     state,
                     itemType = ItemType.LOGICAL_ADDRESS,
                     itemSInfoList = SInfo.logicalAddressSInfoList,
                     animateTime = animateTime,
-                    label = getHeading(state, ItemType.LOGICAL_ADDRESS)
+                    label = getHeading(state, ItemType.LOGICAL_ADDRESS),
+                    numberOfColumns
                 )
+        }
+    }
+}
+
+fun Container.statPieTableView(
+    state: HippoState,
+    itemType: ItemType,
+    itemSInfoList: SInfoList,
+    animateTime: Int,
+    label: String,
+    numberOfColumns: Int
+) {
+    if (numberOfColumns < 1) return
+    val columnWidth = (100 / numberOfColumns).toInt().vw
+
+    val pieChart =
+        Chart(
+            getPieChartConfig(
+                state,
+                itemType,
+                itemSInfoList,
+                animationTime = animateTime,
+                responsive = true,
+                maintainAspectRatio = false
+            )
+        )
+
+    val chartLabelTable =
+        ChartLabelTable(
+            state,
+            itemType,
+            itemSInfoList.recordList,
+            "description",
+            "color",
+            "calls",
+            label
+        )
+
+    if (numberOfColumns == 1) {
+        // Show one pie and the table at the side
+        flexPanel() {
+            id = "TheSimpleViewBigPanel:FlexPanel"
+            // overflow = Overflow.HIDDEN
+            // height = 100.perc
+            width = columnWidth
+
+            setStyle("height", getHeightToRemainingViewPort(statPageTop, 40))
+
+            add(
+                pieChart.apply {
+                    id = "TheSimpleViewPieChart:Chart"
+                    width = 45.vw
+                    height = 80.perc
+                    marginTop = 6.vw
+                    marginLeft = 5.vw
+                },
+                grow = 1
+            )
+
+            add(
+                chartLabelTable.apply {
+                    id = "TheSimpleViewChartLabelTable:ChartLabelTable"
+                    height = 97.perc
+                    width = 40.vw
+                    margin = 1.vw
+                },
+                grow = 1
+            )
+        }
+    } else {
+        // Show more than one pie, old "advanced mode"
+        div {
+            setStyle("height", getHeightToRemainingViewPort(statPageTop, 50))
+
+            width = columnWidth
+
+            add(
+                pieChart.apply {
+                    height = 30.perc
+                }
+            )
+            add(
+                chartLabelTable.apply { height = 70.perc }
             )
         }
     }
 }
 
-private fun getHeading(state: HippoState, itemType: ItemType): String {
+fun getHeading(state: HippoState, itemType: ItemType): String {
     if (state.showTechnicalTerms)
         return when (itemType) {
             ItemType.CONSUMER -> "Tjänstekonsumenter"
@@ -112,51 +204,5 @@ private fun getHeading(state: HippoState, itemType: ItemType): String {
                 else -> "Internt fel i getHeading() - 2"
             }
         }
-    }
-}
-
-class StatPieTableView(
-    state: HippoState,
-    itemType: ItemType,
-    itemSInfoList: SInfoList,
-    animateTime: Int,
-    label: String
-) : SimplePanel() {
-    init {
-        setStyle("height", getHeightToRemainingViewPort(statPageTop, 50))
-        // height = 100.perc
-        width = 25.vw
-        width = 50.vw
-        val pieChart =
-            Chart(
-                getPieChartConfig(
-                    state,
-                    itemType,
-                    itemSInfoList,
-                    animationTime = animateTime,
-                    responsive = true,
-                    maintainAspectRatio = false
-                )
-            )
-        add(
-            pieChart
-                .apply {
-                    height = 30.perc
-                    height = 60.perc
-                }
-        )
-        add(
-            ChartLabelTable(
-                state,
-                itemType,
-                itemSInfoList.recordList,
-                "description",
-                "color",
-                "calls",
-                label
-            ).apply {
-                height = 70.perc
-            }
-        )
     }
 }

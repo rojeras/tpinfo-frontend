@@ -21,8 +21,8 @@ import pl.treksoft.navigo.Navigo
 enum class View(val url: String) {
     HOME("/"),
     HIPPO("/hippo"),
-    STAT_SIMPLE("/statsimple"),
-    STAT_ADVANCED("/statadvanced")
+    STAT("/stat"),
+    // STAT_ADVANCED("/statadvanced")
 }
 
 fun Navigo.initialize(): Navigo {
@@ -39,18 +39,21 @@ fun Navigo.initialize(): Navigo {
         "${View.HIPPO.url}/:slug",
         { params -> HippoManager.newOrUpdatedUrlFromBrowser(View.HIPPO, stringParameter(params, "slug")) }
     ).on(
-        View.STAT_SIMPLE.url,
-        { _ -> HippoManager.newOrUpdatedUrlFromBrowser(View.STAT_SIMPLE) }
+        View.STAT.url,
+        { _ -> HippoManager.newOrUpdatedUrlFromBrowser(View.STAT) }
     ).on(
-        "${View.STAT_SIMPLE.url}/:slug",
-        { params -> HippoManager.newOrUpdatedUrlFromBrowser(View.STAT_SIMPLE, stringParameter(params, "slug")) }
-    ).on(
+        "${View.STAT.url}/:slug",
+        { params -> HippoManager.newOrUpdatedUrlFromBrowser(View.STAT, stringParameter(params, "slug")) }
+    )
+        /*
+        .on(
         View.STAT_ADVANCED.url,
         { _ -> HippoManager.newOrUpdatedUrlFromBrowser(View.STAT_ADVANCED) }
     ).on(
         "${View.STAT_ADVANCED.url}/:slug",
         { params -> HippoManager.newOrUpdatedUrlFromBrowser(View.STAT_ADVANCED, stringParameter(params, "slug")) }
     )
+         */
 }
 
 fun stringParameter(params: dynamic, parameterName: String): String {

@@ -17,8 +17,8 @@
 package se.skoview.common
 
 import se.skoview.stat.AdvancedViewPreSelect
-import se.skoview.stat.itemsFilter
 import se.skoview.stat.StatisticsBlob
+import se.skoview.stat.itemsFilter
 
 fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
     println("=====Reducer>>> ${action::class} : action = ")
@@ -164,11 +164,11 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
             state.setNewView(action.view)
         }
 
-        is HippoAction.ShowTechnicalTerms -> {
-            state.copy(
-                showTechnicalTerms = action.isShown
-            )
-        }
+        is HippoAction.ShowConsumers -> { state.copy(showConsumers = action.isShown) }
+        is HippoAction.ShowProduceras -> { state.copy(showProducers = action.isShown) }
+        is HippoAction.ShowLogicalAddresses -> { state.copy(showLogicalAddresses = action.isShown) }
+        is HippoAction.ShowContracts -> { state.copy(showContracts = action.isShown) }
+        is HippoAction.ShowTechnicalTerms -> { state.copy(showTechnicalTerms = action.isShown) }
 
         is HippoAction.SetSimpleViewPreselect -> {
             val preSelect = action.preSelect

@@ -133,7 +133,8 @@ fun Container.hippoView(state: HippoState) {
                 ) {
                     size = ButtonSize.SMALL
                 }.onClick {
-                    HippoManager.setView(View.STAT_ADVANCED)
+                    // HippoManager.setView(View.STAT_ADVANCED)
+                    HippoManager.setView(View.STAT)
                 }.apply {
                     addBsBgColor(BsBgColor.LIGHT)
                     addBsColor(BsColor.BLACK50)

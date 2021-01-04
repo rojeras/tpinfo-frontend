@@ -24,6 +24,7 @@ import pl.treksoft.kvision.html.* // ktlint-disable no-wildcard-imports
 import pl.treksoft.kvision.modal.Modal
 import pl.treksoft.kvision.modal.ModalSize
 import pl.treksoft.kvision.panel.flexPanel
+import pl.treksoft.kvision.panel.hPanel
 import pl.treksoft.kvision.panel.vPanel
 import pl.treksoft.kvision.table.TableType
 import pl.treksoft.kvision.table.cell
@@ -104,13 +105,15 @@ fun Container.statView(state: HippoState, view: View) {
                                     PlattformChain.mapp[state.selectedPlattformChainsIds[0]]!!.last.toString()
                                 else ""
 
-                            val options =
-                                if (state.view == View.STAT_ADVANCED)
-                                    StatisticsPlattform.mapp.map { Pair(it.key.toString(), it.value.name) }
-                                else
-                                    StatisticsPlattform.mapp
-                                        .filter { it.value.name == "SLL-PROD" }
-                                        .map { Pair(it.key.toString(), it.value.name) }
+                            val options = StatisticsPlattform.mapp.map { Pair(it.key.toString(), it.value.name) }
+                            /*
+                            if (state.view == View.STAT_ADVANCED)
+                                StatisticsPlattform.mapp.map { Pair(it.key.toString(), it.value.name) }
+                            else
+                                StatisticsPlattform.mapp
+                                    .filter { it.value.name == "SLL-PROD" }
+                                    .map { Pair(it.key.toString(), it.value.name) }
+                        */
                             simpleSelectInput(
                                 options = options,
                                 value = selectedPlattformId
@@ -136,6 +139,7 @@ fun Container.statView(state: HippoState, view: View) {
                         }
 
                         // Use Advanced mode
+                        /*
                         cell {
                             checkBoxInput(
                                 value = state.view == View.STAT_ADVANCED
@@ -143,12 +147,13 @@ fun Container.statView(state: HippoState, view: View) {
                                 // todo: Remove viewMode from state and use view instead
                                 val mode =
                                     if (value) View.STAT_ADVANCED
-                                    else View.STAT_SIMPLE
+                                    else View.STAT
                                 HippoManager.setView(mode)
                                 // loadStatistics(store.getState())
                             }
                             +" Avancerat läge"
                         }
+                         */
                     }
 
                     // End date
@@ -175,11 +180,12 @@ fun Container.statView(state: HippoState, view: View) {
                         }
 
                         cell { +"Visa:" }
+                        /*
                         cell {
                             var options: List<Pair<String, String>> = listOf()
                             var selectedPreSelectLabel: String = ""
                             when (state.view) {
-                                View.STAT_SIMPLE -> {
+                                View.STAT -> {
                                     console.log(state.simpleViewPreSelect)
                                     selectedPreSelectLabel = state.simpleViewPreSelect!!.label
                                     options = SimpleViewPreSelect.mapp
@@ -199,6 +205,7 @@ fun Container.statView(state: HippoState, view: View) {
                                 }
                                 else -> println("Error in StatPage, view = ${state.view}")
                             }
+
                             simpleSelectInput(
                                 options = options,
                                 value = selectedPreSelectLabel
@@ -211,7 +218,9 @@ fun Container.statView(state: HippoState, view: View) {
                                     HippoManager.statSetViewModePreselect(preSelectLabel)
                                 }
                             }
+
                         }
+                         */
                         cell {
                             checkBoxInput(
                                 value = state.showTechnicalTerms
@@ -278,12 +287,56 @@ fun Container.statView(state: HippoState, view: View) {
                 }
             }
 
+            hPanel {
+
+                background = Background(Color.hex(0xf6efe9))
+
+                div {
+                    marginLeft = 20.px
+                    checkBoxInput(
+                        value = state.showConsumers
+                    ).onClick {
+                        HippoManager.statShowConsumers(value)
+                    }
+                    + " Visa ${getHeading(state, ItemType.CONSUMER)} "
+                    // +" Visa tjänstekonsumenter "
+                }
+                div {
+                    marginLeft = 20.px
+                    checkBoxInput(
+                        value = state.showContracts
+                    ).onClick {
+                        HippoManager.statShowContracts(value)
+                    }
+                    + " Visa ${getHeading(state, ItemType.CONTRACT)} "
+                }
+                div {
+                    marginLeft = 20.px
+                    checkBoxInput(
+                        value = state.showProducers
+                    ).onClick {
+                        HippoManager.statShowProducers(value)
+                    }
+                    + " Visa ${getHeading(state, ItemType.PRODUCER)} "
+                }
+                div {
+                    marginLeft = 20.px
+                    checkBoxInput(
+                        value = state.showLogicalAddresses
+                    ).onClick {
+                        HippoManager.statShowLogicalAddresses(value)
+                    }
+                    + " Visa ${getHeading(state, ItemType.LOGICAL_ADDRESS)} "
+                }
+            }
             // Heading
             val tCalls: String = state.statBlob.callsDomain.map { it.value }.sum().toString().thousands()
 
-            val headingText: String =
+            val headingText: String = "Totalt antal anrop för detta urval är: $tCalls"
+                /*
                 if (state.view == View.STAT_ADVANCED) "Totalt antal anrop för detta urval är: $tCalls"
                 else "${state.simpleViewPreSelect!!.label}: $tCalls anrop"
+                 */
 
             h4 {
                 content = headingText
@@ -327,10 +380,14 @@ fun Container.statView(state: HippoState, view: View) {
             }
         }
 
+        /*
         when (state.view) {
             View.STAT_ADVANCED -> statAdvancedView(state)
             View.STAT_SIMPLE -> statSimpleView(state)
             else -> println("Error in StatPage bottom, view = ${state.view}")
         }
+        */
+
+        pieView(state)
     }
 }

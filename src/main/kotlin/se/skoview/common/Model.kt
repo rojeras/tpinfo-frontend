@@ -84,7 +84,11 @@ data class HippoState(
     // val viewMode: ViewMode = ViewMode.SIMPLE,
     // val simpleViewPreSelect: SimpleViewPreSelect = simpleViewPreSelectDefault,
     val simpleViewPreSelect: SimpleViewPreSelect? = null,
-    val advancedViewPreSelect: AdvancedViewPreSelect? = null
+    val advancedViewPreSelect: AdvancedViewPreSelect? = null,
+    val showConsumers: Boolean = true,
+    val showProducers: Boolean = true,
+    val showLogicalAddresses: Boolean = true,
+    val showContracts: Boolean = true
 )
 
 fun initializeHippoState(): HippoState {
@@ -285,9 +289,9 @@ fun HippoState.statTpSelected(tpId: Int): HippoState {
     // TP can only be selected in advanced mode
 
     val preSelect: AdvancedViewPreSelect? =
-    if (StatisticsPlattform.mapp[tpId]!!.name == "SLL-PROD")
-        AdvancedViewPreSelect.getDefault()
-    else null
+        if (StatisticsPlattform.mapp[tpId]!!.name == "SLL-PROD")
+            AdvancedViewPreSelect.getDefault()
+        else null
 
     val pChainId = PlattformChain.calculateId(first = tpId, middle = null, last = tpId)
 
@@ -305,9 +309,10 @@ fun HippoState.setNewView(newView: View): HippoState {
     if (currentView == newView) return this
 
     // If the new mode have a preselect with the same label as the current, apply it. Otherwise use its default.
+    /*
     if (
         currentView == View.STAT_ADVANCED &&
-        newView == View.STAT_SIMPLE
+        newView == View.STAT
     ) {
         val currentAdvancedPreSelect = this.advancedViewPreSelect ?: AdvancedViewPreSelect.getDefault()
         val currentAdvancedPreSelectLabel = currentAdvancedPreSelect!!.label
@@ -322,7 +327,7 @@ fun HippoState.setNewView(newView: View): HippoState {
         )
     }
 
-    if (currentView == View.STAT_SIMPLE &&
+    if (currentView == View.STAT &&
         newView == View.STAT_ADVANCED
     ) {
         val currentSimplePreSelectLabel = this.simpleViewPreSelect!!.label
@@ -336,11 +341,11 @@ fun HippoState.setNewView(newView: View): HippoState {
             view = newView
         )
     }
-
+*/
     // Switch from hippo to statistics
     if (
         currentView == View.HIPPO &&
-        (newView == View.STAT_SIMPLE || newView == View.STAT_ADVANCED)
+        (newView == View.STAT /* || newView == View.STAT_ADVANCED */)
     ) {
         if (this.selectedPlattformChainsIds.isNotEmpty()) {
             val pcId = this.selectedPlattformChainsIds[0]
@@ -362,7 +367,7 @@ fun HippoState.setNewView(newView: View): HippoState {
     // From statistics to hippo
     // Filter for all plattform chains containing a stat plattform
     if (
-        (currentView == View.STAT_SIMPLE || currentView == View.STAT_ADVANCED) &&
+        (currentView == View.STAT /* || currentView == View.STAT_ADVANCED */) &&
         newView == View.HIPPO
     ) {
         return this.copy(

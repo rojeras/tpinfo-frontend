@@ -24,7 +24,10 @@ import pl.treksoft.kvision.panel.SimplePanel
 import pl.treksoft.kvision.table.TableType
 import pl.treksoft.kvision.tabulator.*
 import pl.treksoft.kvision.utils.perc
-import se.skoview.common.*
+import se.skoview.common.HippoManager
+import se.skoview.common.HippoState
+import se.skoview.common.ItemType
+import se.skoview.common.isItemSelected
 
 fun getPieChartConfig(
     state: HippoState,
@@ -143,9 +146,12 @@ private fun itemSelectDeselect(state: HippoState, itemId: Int, itemType: ItemTyp
         HippoManager.itemDeselected(itemId, itemType)
     } else {
         // Select an item
-        if (state.view == View.STAT_SIMPLE)
+            /*
+        if (state.view == View.STAT)
             HippoManager.itemAndViewSelected(itemId, itemType, View.STAT_ADVANCED)
         else
             HippoManager.itemSelected(itemId, itemType)
+             */
+        HippoManager.itemSelected(itemId, itemType)
     }
 }
