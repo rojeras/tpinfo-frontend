@@ -53,7 +53,7 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
             hippoStore.dispatch(HippoAction.StartDownloadBaseItems)
             loadBaseItems()
             hippoStore.dispatch(HippoAction.DoneDownloadBaseItems)
-            viewPreSelectInitialize()
+            preSelectInitialize()
 
             if (hippoStore.getState().view == View.HIPPO) loadIntegrations(hippoStore.getState())
             else {
@@ -63,6 +63,8 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
                         hippoStore.dispatch(HippoAction.StatTpSelected(tpId))
                     }
                 }
+                statSetPreselect("Alla konsumerande tjänster")
+                // hippoStore.dispatch(HippoAction.SetPreselect(PreSelect.getDefault()))
                 loadStatistics(hippoStore.getState())
             }
         }
@@ -77,6 +79,7 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
             headerNav(state)
         }
          */
+        // Called after each state change
         main(hippoStore) { state ->
             // setUrlFilter(state)
             println("In main()")
@@ -92,6 +95,7 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
                     }
                     View.STAT -> {
                         // todo: Refactor and clean up code below
+                        /*
                         if (state.selectedPlattformChainsIds.isNotEmpty()) {
                             val pcId = state.selectedPlattformChainsIds[0]
                             val pc = PlattformChain.mapp[pcId]!!
@@ -104,6 +108,7 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
                                 loadStatistics(hippoStore.getState())
                             }
                         }
+                        */
                         statView(state, View.STAT)
                     }
                     // View.STAT_ADVANCED -> statView(state, View.STAT_ADVANCED)
@@ -150,23 +155,15 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
     }
 
     fun itemSelected(itemId: Int, type: ItemType) {
-        val nextState = hippoStore.getState().itemIdSeclected(itemId, type)
-        navigateWithBookmark(nextState)
-    }
-
-    fun itemAndViewSelected(
-        itemId: Int,
-        type: ItemType,
-        view: View
-    ) {
         val nextState = hippoStore.getState()
-            .setNewView(view)
+            .setShowAllItemTypes(true)
             .itemIdSeclected(itemId, type)
         navigateWithBookmark(nextState)
     }
 
     fun itemDeselected(itemId: Int, type: ItemType) {
-        val nextState = hippoStore.getState().itemIdDeseclected(itemId, type)
+        val nextState = hippoStore.getState()
+            .itemIdDeseclected(itemId, type)
         navigateWithBookmark(nextState)
     }
 
@@ -175,9 +172,9 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
     }
 
     fun statTpSelected(tpId: Int) {
-        hippoStore.dispatch(HippoAction.StatTpSelected(tpId))
-        // val nextState = hippoStore.getState().statTpSelected(tpId)
-        navigateWithBookmark(hippoStore.getState())
+        // hippoStore.dispatch(HippoAction.StatTpSelected(tpId))
+        val nextState = hippoStore.getState().statTpSelected(tpId)
+        navigateWithBookmark(nextState)
     }
 
     fun statHistorySelected(flag: Boolean) {
@@ -185,12 +182,29 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
         hippoStore.dispatch(HippoAction.ShowTimeGraph(flag))
     }
 
-    fun statTechnicalTermsSelected(flag: Boolean) { hippoStore.dispatch(HippoAction.ShowTechnicalTerms(flag)) }
+    fun statTechnicalTermsSelected(flag: Boolean) {
+        hippoStore.dispatch(HippoAction.ShowTechnicalTerms(flag))
+    }
 
-    fun statShowConsumers(flag: Boolean) { hippoStore.dispatch(HippoAction.ShowConsumers(flag)) }
-    fun statShowProducers(flag: Boolean) { hippoStore.dispatch(HippoAction.ShowProduceras(flag)) }
-    fun statShowContracts(flag: Boolean) { hippoStore.dispatch(HippoAction.ShowContracts(flag)) }
-    fun statShowLogicalAddresses(flag: Boolean) { hippoStore.dispatch(HippoAction.ShowLogicalAddresses(flag)) }
+    fun statShowConsumers(flag: Boolean) {
+        hippoStore.dispatch(HippoAction.ShowConsumers(flag))
+    }
+
+    fun statShowProducers(flag: Boolean) {
+        hippoStore.dispatch(HippoAction.ShowProduceras(flag))
+    }
+
+    fun statShowContracts(flag: Boolean) {
+        hippoStore.dispatch(HippoAction.ShowContracts(flag))
+    }
+
+    fun statShowLogicalAddresses(flag: Boolean) {
+        hippoStore.dispatch(HippoAction.ShowLogicalAddresses(flag))
+    }
+
+    fun statShowAllItemTypes(flag: Boolean) {
+        hippoStore.dispatch(HippoAction.ShowAllItemTypes(flag))
+    }
 
     fun setView(view: View) {
         console.log(hippoStore.getState())
@@ -200,25 +214,14 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
         navigateWithBookmark(nextState)
     }
 
-    fun statSetViewModePreselect(preSelectLabel: String) {
+    fun statSetPreselect(preSelectLabel: String) {
         // todo: Change to navigate call
-        when (hippoStore.getState().view) {
-            View.HOME -> { }
-            View.HIPPO -> { }
-            View.STAT -> {
-                val preSelect = SimpleViewPreSelect.mapp[preSelectLabel]
-                    ?: throw NullPointerException("Internal error in Select View")
-                hippoStore.dispatch(HippoAction.SetSimpleViewPreselect(preSelect))
-            }
-            /*
-            View.STAT_ADVANCED -> {
-                val preSelect = AdvancedViewPreSelect.mapp[preSelectLabel]
-                    ?: throw NullPointerException("Internal error in Select View")
-                hippoStore.dispatch(HippoAction.SetAdvancedViewPreselect(preSelect))
-            }
-            */
-        }
-        loadStatistics(hippoStore.getState())
+        val preSelect: PreSelect? = PreSelect.mapp[preSelectLabel]
+        // ?: throw NullPointerException("Internal error in Select View")
+        val nextState = hippoStore.getState().setPreselect(preSelect)
+        // hippoStore.dispatch(HippoAction.SetPreselect(preSelect))
+        navigateWithBookmark(nextState)
+        // loadStatistics(hippoStore.getState())
     }
 
     private fun navigateWithBookmark(nextState: HippoState) {

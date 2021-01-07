@@ -16,15 +16,14 @@
  */
 package se.skoview.stat
 
-import pl.treksoft.kvision.chart.* // ktlint-disable no-wildcard-imports
-import pl.treksoft.kvision.core.* // ktlint-disable no-wildcard-imports
+import pl.treksoft.kvision.chart.*
+import pl.treksoft.kvision.core.*
 import pl.treksoft.kvision.form.check.checkBoxInput
 import pl.treksoft.kvision.form.select.simpleSelectInput
-import pl.treksoft.kvision.html.* // ktlint-disable no-wildcard-imports
+import pl.treksoft.kvision.html.*
 import pl.treksoft.kvision.modal.Modal
 import pl.treksoft.kvision.modal.ModalSize
 import pl.treksoft.kvision.panel.flexPanel
-import pl.treksoft.kvision.panel.hPanel
 import pl.treksoft.kvision.panel.vPanel
 import pl.treksoft.kvision.table.TableType
 import pl.treksoft.kvision.table.cell
@@ -33,7 +32,7 @@ import pl.treksoft.kvision.table.table
 import pl.treksoft.kvision.utils.px
 import pl.treksoft.kvision.utils.vh
 import se.skoview.app.formControlXs
-import se.skoview.common.* // ktlint-disable no-wildcard-imports
+import se.skoview.common.*
 
 var statPageTop: Div = Div()
 
@@ -106,14 +105,6 @@ fun Container.statView(state: HippoState, view: View) {
                                 else ""
 
                             val options = StatisticsPlattform.mapp.map { Pair(it.key.toString(), it.value.name) }
-                            /*
-                            if (state.view == View.STAT_ADVANCED)
-                                StatisticsPlattform.mapp.map { Pair(it.key.toString(), it.value.name) }
-                            else
-                                StatisticsPlattform.mapp
-                                    .filter { it.value.name == "SLL-PROD" }
-                                    .map { Pair(it.key.toString(), it.value.name) }
-                        */
                             simpleSelectInput(
                                 options = options,
                                 value = selectedPlattformId
@@ -138,22 +129,20 @@ fun Container.statView(state: HippoState, view: View) {
                             +" Visa utveckling över tid"
                         }
 
-                        // Use Advanced mode
-                        /*
                         cell {
-                            checkBoxInput(
-                                value = state.view == View.STAT_ADVANCED
-                            ).onClick {
-                                // todo: Remove viewMode from state and use view instead
-                                val mode =
-                                    if (value) View.STAT_ADVANCED
-                                    else View.STAT
-                                HippoManager.setView(mode)
-                                // loadStatistics(store.getState())
+
+                            button(
+                                "Se urval i hippo",
+                                style = ButtonStyle.INFO,
+                            ) {
+                                size = ButtonSize.SMALL
+                            }.onClick {
+                                HippoManager.setView(View.HIPPO)
+                            }.apply {
+                                addBsBgColor(BsBgColor.LIGHT)
+                                addBsColor(BsColor.BLACK50)
                             }
-                            +" Avancerat läge"
                         }
-                         */
                     }
 
                     // End date
@@ -180,31 +169,17 @@ fun Container.statView(state: HippoState, view: View) {
                         }
 
                         cell { +"Visa:" }
-                        /*
                         cell {
-                            var options: List<Pair<String, String>> = listOf()
-                            var selectedPreSelectLabel: String = ""
-                            when (state.view) {
-                                View.STAT -> {
-                                    console.log(state.simpleViewPreSelect)
-                                    selectedPreSelectLabel = state.simpleViewPreSelect!!.label
-                                    options = SimpleViewPreSelect.mapp
+                            val selectedPreSelectLabel: String =
+                                if (state.viewPreSelect == null) ""
+                                else state.viewPreSelect.label
+
+                            val options: List<Pair<String, String>> =
+                                listOf(Pair("", "")) +
+                                    PreSelect.mapp
                                         .toList()
                                         .sortedBy { it.first }
                                         .map { Pair(it.first, it.first) }
-                                }
-                                View.STAT_ADVANCED -> {
-                                    selectedPreSelectLabel =
-                                        if (state.advancedViewPreSelect != null) state.advancedViewPreSelect.label
-                                        else ""
-                                    options = AdvancedViewPreSelect.mapp
-                                        .toList()
-                                        .sortedBy { it.first }
-                                        .map { Pair(it.first, it.first) }
-                                    // .map { Pair(it.value.label, it.value.label) }
-                                }
-                                else -> println("Error in StatPage, view = ${state.view}")
-                            }
 
                             simpleSelectInput(
                                 options = options,
@@ -215,12 +190,11 @@ fun Container.statView(state: HippoState, view: View) {
                             }.onEvent {
                                 change = {
                                     val preSelectLabel: String = self.value ?: "dummy"
-                                    HippoManager.statSetViewModePreselect(preSelectLabel)
+                                    HippoManager.statSetPreselect(preSelectLabel)
                                 }
                             }
-
                         }
-                         */
+
                         cell {
                             checkBoxInput(
                                 value = state.showTechnicalTerms
@@ -231,13 +205,21 @@ fun Container.statView(state: HippoState, view: View) {
                         }
                         cell {
 
+                            val disabled: Boolean = (
+                                state.showConsumers &&
+                                    state.showProducers &&
+                                    state.showContracts &&
+                                    state.showLogicalAddresses
+                                )
+
                             button(
-                                "Se urval i hippo",
+                                "Visa allt",
                                 style = ButtonStyle.INFO,
+                                disabled = disabled
                             ) {
                                 size = ButtonSize.SMALL
                             }.onClick {
-                                HippoManager.setView(View.HIPPO)
+                                HippoManager.statShowAllItemTypes(true)
                             }.apply {
                                 addBsBgColor(BsBgColor.LIGHT)
                                 addBsColor(BsColor.BLACK50)
@@ -287,6 +269,7 @@ fun Container.statView(state: HippoState, view: View) {
                 }
             }
 
+            /*
             hPanel {
 
                 background = Background(Color.hex(0xf6efe9))
@@ -295,11 +278,8 @@ fun Container.statView(state: HippoState, view: View) {
                     marginLeft = 20.px
                     checkBoxInput(
                         value = state.showConsumers
-                    ).onClick {
-                        HippoManager.statShowConsumers(value)
-                    }
-                    + " Visa ${getHeading(state, ItemType.CONSUMER)} "
-                    // +" Visa tjänstekonsumenter "
+                    ).onClick { HippoManager.statShowConsumers(value) }
+                    +" Visa ${getHeading(state, ItemType.CONSUMER)} "
                 }
                 div {
                     marginLeft = 20.px
@@ -308,7 +288,7 @@ fun Container.statView(state: HippoState, view: View) {
                     ).onClick {
                         HippoManager.statShowContracts(value)
                     }
-                    + " Visa ${getHeading(state, ItemType.CONTRACT)} "
+                    +" Visa ${getHeading(state, ItemType.CONTRACT)} "
                 }
                 div {
                     marginLeft = 20.px
@@ -317,7 +297,7 @@ fun Container.statView(state: HippoState, view: View) {
                     ).onClick {
                         HippoManager.statShowProducers(value)
                     }
-                    + " Visa ${getHeading(state, ItemType.PRODUCER)} "
+                    +" Visa ${getHeading(state, ItemType.PRODUCER)} "
                 }
                 div {
                     marginLeft = 20.px
@@ -326,17 +306,28 @@ fun Container.statView(state: HippoState, view: View) {
                     ).onClick {
                         HippoManager.statShowLogicalAddresses(value)
                     }
-                    + " Visa ${getHeading(state, ItemType.LOGICAL_ADDRESS)} "
+                    +" Visa ${getHeading(state, ItemType.LOGICAL_ADDRESS)} "
+                }
+                div(rich = true) {
+                    marginLeft = 20.px
+                    checkBoxInput(
+                        value = state.lockShowAllItemTypes
+                    ).onClick {
+                        HippoManager.statShowAllItemTypes(value)
+                    }
+                    val label = if (state.lockShowAllItemTypes) " <b>Visa alla</b>"
+                    else " Visa alla "
+                    +label
                 }
             }
+            */
+
             // Heading
             val tCalls: String = state.statBlob.callsDomain.map { it.value }.sum().toString().thousands()
 
-            val headingText: String = "Totalt antal anrop för detta urval är: $tCalls"
-                /*
-                if (state.view == View.STAT_ADVANCED) "Totalt antal anrop för detta urval är: $tCalls"
-                else "${state.simpleViewPreSelect!!.label}: $tCalls anrop"
-                 */
+            val headingText: String =
+                if (state.viewPreSelect == null) "Totalt antal anrop för detta urval är: $tCalls"
+                else "${state.viewPreSelect.label}: $tCalls anrop"
 
             h4 {
                 content = headingText
@@ -379,14 +370,6 @@ fun Container.statView(state: HippoState, view: View) {
                 }
             }
         }
-
-        /*
-        when (state.view) {
-            View.STAT_ADVANCED -> statAdvancedView(state)
-            View.STAT_SIMPLE -> statSimpleView(state)
-            else -> println("Error in StatPage bottom, view = ${state.view}")
-        }
-        */
 
         pieView(state)
     }

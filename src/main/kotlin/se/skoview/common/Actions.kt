@@ -17,8 +17,7 @@
 package se.skoview.common
 
 import pl.treksoft.kvision.redux.RAction
-import se.skoview.stat.AdvancedViewPreSelect
-import se.skoview.stat.SimpleViewPreSelect
+import se.skoview.stat.PreSelect
 
 /** According to: https://github.com/redux-utilities/flux-standard-action
  * An action object should have a type and contain:
@@ -65,7 +64,8 @@ sealed class HippoAction : RAction {
     data class ShowProduceras(val isShown: Boolean) : HippoAction()
     data class ShowLogicalAddresses(val isShown: Boolean) : HippoAction()
     data class ShowContracts(val isShown: Boolean) : HippoAction()
+    data class ShowAllItemTypes(val isShown: Boolean) : HippoAction()
+    data class LockShowAllItemTypes(val isShown: Boolean) : HippoAction()
     data class ShowTechnicalTerms(val isShown: Boolean) : HippoAction()
-    data class SetSimpleViewPreselect(val preSelect: SimpleViewPreSelect) : HippoAction()
-    data class SetAdvancedViewPreselect(val preSelect: AdvancedViewPreSelect) : HippoAction()
+    data class SetPreselect(val preSelect: PreSelect?) : HippoAction()
 }

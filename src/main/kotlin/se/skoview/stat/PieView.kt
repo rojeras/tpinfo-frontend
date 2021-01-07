@@ -193,8 +193,8 @@ fun getHeading(state: HippoState, itemType: ItemType): String {
             else -> "Internt fel i getHeading() - 1"
         }
     else { // ! state.showTechnicalTerms
-        if (state.advancedViewPreSelect != null) {
-            return state.advancedViewPreSelect.headingsMap[itemType]!!
+        if (state.viewPreSelect != null) {
+            return state.viewPreSelect.headingsMap[itemType]!!
         } else { // state.preSelect == null, specify defaults
             return when (itemType) {
                 ItemType.CONSUMER -> "Applikationer"

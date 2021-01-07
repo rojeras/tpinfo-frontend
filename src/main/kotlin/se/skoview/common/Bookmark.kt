@@ -16,7 +16,37 @@
  */
 package se.skoview.common
 
+import se.skoview.stat.PreSelect
 import kotlin.js.Date
+
+/**
+ * Bookmark definition and functions
+ *
+ * The bookmark is stored in the "filter" parameter in the URL.
+ * Syntax: "letter integer"
+ *
+ *  S: dateEffective (start date)
+ *  E: dateEnd
+ *  c: Consumer id
+ *  d: Domain id
+ *  C: Contract id
+ *  l: Logical address id
+ *  p: Producer id
+ *  F: First plattform id
+ *  M: Middle plattform id (optional)
+ *  L: Last plattform id
+ *  Dx: Display item type x, where x:
+ *      1: consumers
+ *      2: producers
+ *      3: contracts
+ *      4: logical addresses
+ *  Px: Select preview x, where x:
+ *      0: none selected (null)
+ *      x > 0: According to preview id
+ *
+ * All bookmark functions except HippoState.applyBookmark() is defined in this file. applyBookmark
+ * is an extension function defined in Model.kt.
+ */
 
 data class BookmarkInformation(
     var dateEffective: String? = null,
@@ -26,7 +56,9 @@ data class BookmarkInformation(
     var selectedLogicalAddresses: List<Int> = listOf(),
     var selectedContracts: List<Int> = listOf(),
     var selectedDomains: List<Int> = listOf(),
-    var selectedPlattformChains: List<Int> = listOf()
+    var selectedPlattformChains: List<Int> = listOf(),
+    var showItemTypes: List<ItemType> = listOf(),
+    var preView: PreSelect? = null,
 )
 
 fun HippoState.createBookmarkString(): String {
@@ -79,6 +111,15 @@ fun HippoState.createBookmarkString(): String {
         bookmark += "F$firstId"
         bookmark += "L$lastId"
     }
+
+    // Add the showItemType settings
+    if (this.showConsumers) bookmark += "D1"
+    if (this.showProducers) bookmark += "D2"
+    if (this.showContracts) bookmark += "D3"
+    if (this.showLogicalAddresses) bookmark += "D4"
+
+    bookmark += if (this.viewPreSelect == null) "P0"
+    else "P${this.viewPreSelect.id}"
 
     return bookmark
 }
@@ -157,6 +198,24 @@ fun parseBookmarkString(fullUrl: String): BookmarkInformation {
         plattformChainList = listOf(plattformChainId)
     }
 
+    var showItemTypesList = mutableListOf<ItemType>()
+    val showItemTypesCodeList = parseBookmarkType("D", filterValue)
+
+    if (showItemTypesCodeList.contains(1)) showItemTypesList.add(ItemType.CONSUMER)
+    if (showItemTypesCodeList.contains(2)) showItemTypesList.add(ItemType.PRODUCER)
+    if (showItemTypesCodeList.contains(3)) showItemTypesList.add(ItemType.CONTRACT)
+    if (showItemTypesCodeList.contains(4)) showItemTypesList.add(ItemType.LOGICAL_ADDRESS)
+
+    val preViewId: Int
+    val preViewodeList = parseBookmarkType("P", filterValue)
+
+    if (preViewodeList.isEmpty()) preViewId = 0
+    else preViewId = preViewodeList[0]
+
+    val preView: PreSelect? =
+        if (preViewId == 0) null
+        else PreSelect.idMapp[preViewId]
+
     return BookmarkInformation(
         dateEffective,
         dateEnd,
@@ -165,7 +224,9 @@ fun parseBookmarkString(fullUrl: String): BookmarkInformation {
         parseBookmarkType("l", filterValue),
         parseBookmarkType("C", filterValue),
         parseBookmarkType("d", filterValue),
-        plattformChainList
+        plattformChainList,
+        showItemTypesList,
+        preView
     )
 }
 

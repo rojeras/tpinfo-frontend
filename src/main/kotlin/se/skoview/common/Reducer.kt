@@ -16,9 +16,8 @@
  */
 package se.skoview.common
 
-import se.skoview.stat.AdvancedViewPreSelect
+import se.skoview.stat.PreSelect
 import se.skoview.stat.StatisticsBlob
-import se.skoview.stat.itemsFilter
 
 fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
     println("=====Reducer>>> ${action::class} : action = ")
@@ -123,15 +122,16 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
             val newState: HippoState =
                 // todo: Remove hard coded tp id below
                 if (action.tpId != 3) {
-                    applyFilteredItemsSelection(state, AdvancedViewPreSelect.getDefault()!!.itemsFilter)
-                        .copy(advancedViewPreSelect = AdvancedViewPreSelect.getDefault())
+                    state.applyFilteredItemsSelection(PreSelect.getDefault()!!.itemsFilter)
+                        .copy(viewPreSelect = PreSelect.getDefault())
                 } else state
 
             newState.statTpSelected(action.tpId)
         }
 
         is HippoAction.ItemIdSelected -> {
-            state.itemIdSeclected(action.id, action.viewType)
+            state
+                .itemIdSeclected(action.id, action.viewType)
         }
 
         is HippoAction.ItemIdDeselected -> {
@@ -164,20 +164,36 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
             state.setNewView(action.view)
         }
 
-        is HippoAction.ShowConsumers -> { state.copy(showConsumers = action.isShown) }
-        is HippoAction.ShowProduceras -> { state.copy(showProducers = action.isShown) }
-        is HippoAction.ShowLogicalAddresses -> { state.copy(showLogicalAddresses = action.isShown) }
-        is HippoAction.ShowContracts -> { state.copy(showContracts = action.isShown) }
-        is HippoAction.ShowTechnicalTerms -> { state.copy(showTechnicalTerms = action.isShown) }
-
-        is HippoAction.SetSimpleViewPreselect -> {
-            val preSelect = action.preSelect
-            applyFilteredItemsSelection(state, preSelect.itemsFilter).copy(simpleViewPreSelect = preSelect)
+        is HippoAction.ShowConsumers -> {
+            state.copy(showConsumers = action.isShown)
+        }
+        is HippoAction.ShowProduceras -> {
+            state.copy(showProducers = action.isShown)
+        }
+        is HippoAction.ShowLogicalAddresses -> {
+            state.copy(showLogicalAddresses = action.isShown)
+        }
+        is HippoAction.ShowContracts -> {
+            state.copy(showContracts = action.isShown)
+        }
+        is HippoAction.ShowAllItemTypes -> {
+            state.setShowAllItemTypes(action.isShown)
+        }
+        is HippoAction.LockShowAllItemTypes -> {
+            if (action.isShown)
+                state.setShowAllItemTypes(true).copy(
+                    lockShowAllItemTypes = true,
+                )
+            else
+                state.copy(lockShowAllItemTypes = false)
         }
 
-        is HippoAction.SetAdvancedViewPreselect -> {
-            val preSelect = action.preSelect
-            applyFilteredItemsSelection(state, preSelect.itemsFilter).copy(advancedViewPreSelect = preSelect)
+        is HippoAction.ShowTechnicalTerms -> {
+            state.copy(showTechnicalTerms = action.isShown)
+        }
+
+        is HippoAction.SetPreselect -> {
+            state.setPreselect(action.preSelect)
         }
     }
 
@@ -189,36 +205,4 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
     return finalState
 }
 
-private fun itemIdListSelected(inState: HippoState, itemType: ItemType, selectedList: List<Int>): HippoState {
-    return when (itemType) {
-        ItemType.CONSUMER -> inState.copy(selectedConsumersIds = selectedList)
-        ItemType.CONTRACT -> inState.copy(selectedContractsIds = selectedList)
-        ItemType.LOGICAL_ADDRESS -> inState.copy(selectedLogicalAddressesIds = selectedList)
-        ItemType.PRODUCER -> inState.copy(selectedProducersIds = selectedList)
-        else -> inState
-    }
-}
 
-private fun itemDeselectAllForAllTypes(inState: HippoState): HippoState {
-    return inState.copy(
-        selectedConsumersIds = listOf(),
-        selectedDomainsIds = listOf(),
-        selectedContractsIds = listOf(),
-        // selectedPlattformChains = listOf(),
-        selectedLogicalAddressesIds = listOf(),
-        selectedProducersIds = listOf()
-    )
-}
-
-fun applyFilteredItemsSelection(inState: HippoState, itemsFilter: itemsFilter): HippoState {
-
-    println("In applyFilteredItemsSelection(): $itemsFilter")
-
-    var state2 = itemDeselectAllForAllTypes(inState)
-
-    for ((itemType, itemIdList) in itemsFilter.selectedItems) {
-        state2 = itemIdListSelected(state2, itemType, itemIdList)
-    }
-
-    return state2
-}

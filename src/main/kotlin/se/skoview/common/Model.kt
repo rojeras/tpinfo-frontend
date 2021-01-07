@@ -16,9 +16,9 @@
  */
 package se.skoview.common
 
-import se.skoview.stat.AdvancedViewPreSelect
-import se.skoview.stat.SimpleViewPreSelect
+import se.skoview.stat.PreSelect
 import se.skoview.stat.StatisticsBlob
+import se.skoview.stat.itemsFilter
 import kotlin.reflect.KClass
 
 enum class AsyncActionStatus {
@@ -83,12 +83,12 @@ data class HippoState(
     val showTechnicalTerms: Boolean = false,
     // val viewMode: ViewMode = ViewMode.SIMPLE,
     // val simpleViewPreSelect: SimpleViewPreSelect = simpleViewPreSelectDefault,
-    val simpleViewPreSelect: SimpleViewPreSelect? = null,
-    val advancedViewPreSelect: AdvancedViewPreSelect? = null,
+    val viewPreSelect: PreSelect? = null,
     val showConsumers: Boolean = true,
     val showProducers: Boolean = true,
     val showLogicalAddresses: Boolean = true,
-    val showContracts: Boolean = true
+    val showContracts: Boolean = true,
+    val lockShowAllItemTypes: Boolean = false
 )
 
 fun initializeHippoState(): HippoState {
@@ -187,10 +187,68 @@ fun HippoState.getParams(view: View): String {
     return params
 }
 
-// is HippoAction.ItemIdSelected -> {
-fun HippoState.itemIdSeclected(id: Int, viewType: ItemType): HippoState {
+fun HippoState.setPreselect(preSelect: PreSelect?): HippoState {
+    if (preSelect == null) {
+        return this
+            .setShowAllItemTypes(true)
+            .itemDeselectAllForAllTypes()
+            .copy(viewPreSelect = null)
+    }
 
-    return when (viewType) {
+    val state2 = this.setShowAllItemTypes(false)
+    val viewItemType: ItemType = preSelect.viewOrder[0]
+    val state3 =
+        when (viewItemType) {
+            ItemType.CONSUMER -> state2.copy(showConsumers = true)
+            ItemType.PRODUCER -> state2.copy(showProducers = true)
+            ItemType.CONTRACT -> state2.copy(showContracts = true)
+            ItemType.LOGICAL_ADDRESS -> state2.copy(showLogicalAddresses = true)
+            else -> {
+                println("Error in HippoAction.SetViewPreselect")
+                state2
+            }
+        }
+    return state3.applyFilteredItemsSelection(preSelect.itemsFilter).copy(viewPreSelect = preSelect)
+}
+
+fun HippoState.itemIdListSelected(itemType: ItemType, selectedList: List<Int>): HippoState {
+    return when (itemType) {
+        ItemType.CONSUMER -> this.copy(selectedConsumersIds = selectedList)
+        ItemType.CONTRACT -> this.copy(selectedContractsIds = selectedList)
+        ItemType.LOGICAL_ADDRESS -> this.copy(selectedLogicalAddressesIds = selectedList)
+        ItemType.PRODUCER -> this.copy(selectedProducersIds = selectedList)
+        else -> this
+    }
+}
+
+fun HippoState.itemDeselectAllForAllTypes(): HippoState {
+    return this.copy(
+        selectedConsumersIds = listOf(),
+        selectedDomainsIds = listOf(),
+        selectedContractsIds = listOf(),
+        // selectedPlattformChains = listOf(),
+        selectedLogicalAddressesIds = listOf(),
+        selectedProducersIds = listOf()
+    )
+}
+
+fun HippoState.applyFilteredItemsSelection(itemsFilter: itemsFilter): HippoState {
+
+    println("In applyFilteredItemsSelection(): $itemsFilter")
+
+    var state2 = this.itemDeselectAllForAllTypes()
+
+    for ((itemType, itemIdList) in itemsFilter.selectedItems) {
+        state2 = state2.itemIdListSelected(itemType, itemIdList)
+    }
+
+    return state2
+}
+
+// is HippoAction.ItemIdSelected -> {
+fun HippoState.itemIdSeclected(id: Int, type: ItemType): HippoState {
+
+    return when (type) {
         ItemType.CONSUMER -> {
             val newList = listOf(this.selectedConsumersIds, listOf(id)).flatten().distinct()
             this.copy(
@@ -231,14 +289,29 @@ fun HippoState.itemIdSeclected(id: Int, viewType: ItemType): HippoState {
 }
 
 // is HippoAction.ItemIdDeselected -> {
-fun HippoState.itemIdDeseclected(id: Int, viewType: ItemType): HippoState {
-    return when (viewType) {
+fun HippoState.itemIdDeseclected(id: Int, type: ItemType): HippoState {
+
+    // If the deselected item is part of the definition of the active preselect - then reset preselect
+    var newPreSelect: PreSelect? = this.viewPreSelect
+
+    if (this.view == View.STAT && this.viewPreSelect != null) {
+        val preSelectedItems = this.viewPreSelect.itemsFilter.selectedItems
+        if (preSelectedItems[type]!!.contains(id)) {
+            return this
+                .itemDeselectAllForAllTypes()
+                .copy(
+                    viewPreSelect = null
+                )
+        }
+    }
+
+    return when (type) {
         ItemType.CONSUMER -> {
             val newList = this.selectedConsumersIds as MutableList<Int>
             newList.remove(id)
             this.copy(
                 selectedConsumersIds = newList,
-                advancedViewPreSelect = null
+                viewPreSelect = newPreSelect
             )
         }
         ItemType.DOMAIN -> {
@@ -246,7 +319,7 @@ fun HippoState.itemIdDeseclected(id: Int, viewType: ItemType): HippoState {
             newList.remove(id)
             this.copy(
                 selectedDomainsIds = newList,
-                advancedViewPreSelect = null
+                viewPreSelect = newPreSelect
             )
         }
         ItemType.CONTRACT -> {
@@ -254,7 +327,7 @@ fun HippoState.itemIdDeseclected(id: Int, viewType: ItemType): HippoState {
             newList.remove(id)
             this.copy(
                 selectedContractsIds = newList,
-                advancedViewPreSelect = null
+                viewPreSelect = newPreSelect
             )
         }
         ItemType.PLATTFORM_CHAIN -> {
@@ -262,7 +335,7 @@ fun HippoState.itemIdDeseclected(id: Int, viewType: ItemType): HippoState {
             newList.remove(id)
             this.copy(
                 selectedPlattformChainsIds = newList,
-                advancedViewPreSelect = null
+                viewPreSelect = newPreSelect
             )
         }
         ItemType.LOGICAL_ADDRESS -> {
@@ -270,7 +343,7 @@ fun HippoState.itemIdDeseclected(id: Int, viewType: ItemType): HippoState {
             newList.remove(id)
             this.copy(
                 selectedLogicalAddressesIds = newList,
-                advancedViewPreSelect = null
+                viewPreSelect = newPreSelect
             )
         }
         ItemType.PRODUCER -> {
@@ -278,7 +351,7 @@ fun HippoState.itemIdDeseclected(id: Int, viewType: ItemType): HippoState {
             newList.remove(id)
             this.copy(
                 selectedProducersIds = newList,
-                advancedViewPreSelect = null
+                viewPreSelect = newPreSelect
             )
         }
     }
@@ -286,18 +359,28 @@ fun HippoState.itemIdDeseclected(id: Int, viewType: ItemType): HippoState {
 
 // is HippoAction.StatTpSelected -> {
 fun HippoState.statTpSelected(tpId: Int): HippoState {
+
+    /*
     // TP can only be selected in advanced mode
-
-    val preSelect: AdvancedViewPreSelect? =
+    val preSelect: PreSelect? =
         if (StatisticsPlattform.mapp[tpId]!!.name == "SLL-PROD")
-            AdvancedViewPreSelect.getDefault()
+            PreSelect.getDefault()
         else null
-
+    */
     val pChainId = PlattformChain.calculateId(first = tpId, middle = null, last = tpId)
 
     return this.copy(
         selectedPlattformChainsIds = listOf(pChainId),
-        advancedViewPreSelect = preSelect,
+        // viewPreSelect = preSelect,
+    )
+}
+
+fun HippoState.setShowAllItemTypes(isShown: Boolean): HippoState {
+    return this.copy(
+        showConsumers = isShown,
+        showProducers = isShown,
+        showLogicalAddresses = isShown,
+        showContracts = isShown,
     )
 }
 
@@ -308,40 +391,6 @@ fun HippoState.setNewView(newView: View): HippoState {
     // if (currentView == newView) throw RuntimeException("Current view  == new  in reducer SetViewMode")
     if (currentView == newView) return this
 
-    // If the new mode have a preselect with the same label as the current, apply it. Otherwise use its default.
-    /*
-    if (
-        currentView == View.STAT_ADVANCED &&
-        newView == View.STAT
-    ) {
-        val currentAdvancedPreSelect = this.advancedViewPreSelect ?: AdvancedViewPreSelect.getDefault()
-        val currentAdvancedPreSelectLabel = currentAdvancedPreSelect!!.label
-        val newSimpleViewPreSelect =
-            SimpleViewPreSelect.mapp[currentAdvancedPreSelectLabel] ?: SimpleViewPreSelect.getDefault()
-        return applyFilteredItemsSelection(
-            this,
-            newSimpleViewPreSelect!!.itemsFilter
-        ).copy(
-            simpleViewPreSelect = newSimpleViewPreSelect,
-            view = newView
-        )
-    }
-
-    if (currentView == View.STAT &&
-        newView == View.STAT_ADVANCED
-    ) {
-        val currentSimplePreSelectLabel = this.simpleViewPreSelect!!.label
-        val newAdvancedViewPreSelect =
-            AdvancedViewPreSelect.mapp[currentSimplePreSelectLabel] ?: AdvancedViewPreSelect.getDefault()
-        return applyFilteredItemsSelection(
-            this,
-            newAdvancedViewPreSelect!!.itemsFilter
-        ).copy(
-            advancedViewPreSelect = newAdvancedViewPreSelect,
-            view = newView
-        )
-    }
-*/
     // Switch from hippo to statistics
     if (
         currentView == View.HIPPO &&
@@ -380,40 +429,6 @@ fun HippoState.setNewView(newView: View): HippoState {
     return this.copy(view = newView)
 }
 
-/*
-fun HippoState.setView(newView: View): HippoState {
-
-    val currentView = this.view
-    if (currentView == newView) throw RuntimeException("Current view  == new  in reducer SetViewMode")
-
-    // If the new mode have a preselect with the same label as the current, apply it. Otherwise use its default.
-    return when (newView) {
-        View.STAT_SIMPLE -> {
-            val currentAdvancedPreSelect = this.advancedViewPreSelect ?: AdvancedViewPreSelect.getDefault()
-            val currentAdvancedPreSelectLabel = currentAdvancedPreSelect.label
-            val newSimpleViewPreSelect =
-                SimpleViewPreSelect.mapp[currentAdvancedPreSelectLabel] ?: SimpleViewPreSelect.getDefault()
-            applyFilteredItemsSelection(
-                this,
-                newSimpleViewPreSelect.filteredItems
-            ).copy(
-                simpleViewPreSelect = newSimpleViewPreSelect,
-                view = View.STAT_SIMPLE
-            )
-        }
-        View.STAT_ADVANCED -> {
-            val currentSimplePreSelectLabel = this.simpleViewPreSelect.label
-            val newAdvancedViewPreSelect =
-                AdvancedViewPreSelect.mapp[currentSimplePreSelectLabel] ?: AdvancedViewPreSelect.getDefault()
-            applyFilteredItemsSelection(this, newAdvancedViewPreSelect.filteredItems).copy(
-                advancedViewPreSelect = newAdvancedViewPreSelect,
-                view = View.STAT_ADVANCED
-            )
-        }
-        else -> this.copy(view = View.HIPPO)
-    }
-}
-*/
 fun HippoState.dateSelected(selectedDate: String, dateType: DateType): HippoState {
     //  is HippoAction.DateSelected -> {
     return when (dateType) {
@@ -428,7 +443,6 @@ fun HippoState.dateSelected(selectedDate: String, dateType: DateType): HippoStat
     }
 }
 
-// is HippoAction.ApplyBookmark -> {
 fun HippoState.applyBookmark(view: View, bookmark: BookmarkInformation): HippoState {
 
     val newState =
@@ -456,19 +470,58 @@ fun HippoState.applyBookmark(view: View, bookmark: BookmarkInformation): HippoSt
                 if (bookmark.dateEnd != null) bookmark.dateEnd!!
                 else datesLastMonth.second.toSwedishDate()
 
+            val showConsumers: Boolean
+            val showProducers: Boolean
+            val showContracts: Boolean
+            val showLogicalAddresses: Boolean
+
+            if (bookmark.showItemTypes.isNotEmpty()) {
+                showConsumers = if (bookmark.showItemTypes.contains(ItemType.CONSUMER)) true else false
+                showProducers = if (bookmark.showItemTypes.contains(ItemType.PRODUCER)) true else false
+                showContracts = if (bookmark.showItemTypes.contains(ItemType.CONTRACT)) true else false
+                showLogicalAddresses =
+                    if (bookmark.showItemTypes.contains(ItemType.LOGICAL_ADDRESS)) true else false
+            } else {
+                // If no display flag is set the default is to show all item types
+                showConsumers = true
+                showProducers = true
+                showContracts = true
+                showLogicalAddresses = true
+            }
+
             this.copy(
                 statDateEffective = newDateEffective,
                 statDateEnd = newDateEnd,
+                showConsumers = showConsumers,
+                showProducers = showProducers,
+                showContracts = showContracts,
+                showLogicalAddresses = showLogicalAddresses
             )
         }
 
-    return newState.copy(
+    val nextState = newState.copy(
         view = view,
         selectedConsumersIds = bookmark.selectedConsumers,
         selectedProducersIds = bookmark.selectedProducers,
         selectedLogicalAddressesIds = bookmark.selectedLogicalAddresses,
         selectedContractsIds = bookmark.selectedContracts,
         selectedDomainsIds = bookmark.selectedDomains,
-        selectedPlattformChainsIds = bookmark.selectedPlattformChains
+        selectedPlattformChainsIds = bookmark.selectedPlattformChains,
+        viewPreSelect = bookmark.preView
     )
+
+    /*
+    // If preview explicitly set as null then all filters should be reset
+    if (bookmark.preView == null) {
+        return nextState.copy(
+            selectedConsumersIds = listOf(),
+            selectedProducersIds = listOf(),
+            selectedLogicalAddressesIds = listOf(),
+            selectedContractsIds = listOf(),
+            selectedDomainsIds = listOf(),
+        )
+    }
+     */
+
+    return nextState
 }
