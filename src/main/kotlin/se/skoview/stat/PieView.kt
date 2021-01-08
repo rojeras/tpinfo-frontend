@@ -22,6 +22,7 @@ import pl.treksoft.kvision.core.Overflow
 import pl.treksoft.kvision.html.div
 import pl.treksoft.kvision.panel.flexPanel
 import pl.treksoft.kvision.panel.hPanel
+import pl.treksoft.kvision.utils.minus
 import pl.treksoft.kvision.utils.perc
 import pl.treksoft.kvision.utils.vw
 import se.skoview.common.HippoAction
@@ -37,7 +38,7 @@ fun Container.pieView(state: HippoState) {
         ) {
             overflow = Overflow.HIDDEN
             // background = Background(Color.name(Col.YELLOW))
-            setStyle("height", getHeightToRemainingViewPort(statPageTop, 50))
+            setStyle("height", getHeightToRemainingViewPort(statPageTop, 80))
             // height = 100.perc
             SInfo.createStatViewData(state)
 
@@ -108,7 +109,7 @@ fun Container.statPieTableView(
     numberOfColumns: Int
 ) {
     if (numberOfColumns < 1) return
-    val columnWidth = (100 / numberOfColumns).toInt().vw
+    val columnWidth = (100 / numberOfColumns).vw - 0.1
 
     val pieChart =
         Chart(
@@ -141,7 +142,7 @@ fun Container.statPieTableView(
             // height = 100.perc
             width = columnWidth
 
-            setStyle("height", getHeightToRemainingViewPort(statPageTop, 40))
+            setStyle("height", getHeightToRemainingViewPort(statPageTop, 90))
 
             add(
                 pieChart.apply {
@@ -158,7 +159,7 @@ fun Container.statPieTableView(
                 chartLabelTable.apply {
                     id = "TheSimpleViewChartLabelTable:ChartLabelTable"
                     height = 97.perc
-                    width = 40.vw
+                    width = 45.vw
                     margin = 1.vw
                 },
                 grow = 1

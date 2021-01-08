@@ -87,9 +87,10 @@ fun Container.statView(state: HippoState, view: View) {
                                     .sortedByDescending { it }
                                     .filter { it <= state.statDateEnd }
                                     .map { Pair(it, it) },
-                                value = state.statDateEffective
+                                value = state.statDateEffective,
                             ) {
                                 addCssStyle(formControlXs)
+                                width = 80.px
                                 background = Background(Color.name(Col.WHITE))
                             }.onEvent {
                                 change = {
@@ -159,7 +160,6 @@ fun Container.statView(state: HippoState, view: View) {
                             ) {
                                 addCssStyle(formControlXs)
                                 background = Background(Color.name(Col.WHITE))
-                                console.log(options)
                             }.onEvent {
                                 change = {
                                     HippoManager.dateSelected(DateType.STAT_END, self.value ?: "")

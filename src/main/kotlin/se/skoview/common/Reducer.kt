@@ -130,8 +130,7 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
         }
 
         is HippoAction.ItemIdSelected -> {
-            state
-                .itemIdSeclected(action.id, action.viewType)
+            state.itemIdSeclected(action.id, action.viewType)
         }
 
         is HippoAction.ItemIdDeselected -> {

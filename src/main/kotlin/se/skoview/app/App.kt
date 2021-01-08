@@ -61,10 +61,8 @@ import se.skoview.common.HippoManager.mainLoop
 // done: Se till att det blir ett pekarfinger på items i tabellen
 
 // Statistik
-// todo: Kolla marginalerna
-// todo: För kort (eller smal?) datumlist
-// todo: Ta bort förval när man går till QA, generellt gå igenom all hantering av förval
-// todo: Addera förval för; Infektionsverktyget, Listning
+
+
 
 // todo: Byt ut "SLL" i plattformsnamnen. Stäm av lösning med MLA. Bör också ske i hippo och i BS.
 // todo: Testa med andra browsers, inte minst Edge (ML 2020-09-17)
@@ -72,6 +70,15 @@ import se.skoview.common.HippoManager.mainLoop
 // todo: Se över synonymerna. Måste passa med de olika förvalen
 // todo: Och så visa svarstider
 // todo: Dokumentation
+
+// done: Den ensamma pajjen för stor
+// done: Vid övergång till hippo går det inte att återställa/avvälja de förvalda itemsarna. Förekommer vid förval av mer än ett item
+// done: Gör hippos Visa statistikknapp grön (eller nån highlight) när den är aktiv
+// done: Knappen ”Visa allt” återspeglas inte i URL-en. Går ej att backa till bilden med fyra pajjer.
+// done: Kolla marginalerna
+// done: För kort (eller smal?) datumlist
+// done: Ta bort förval när man går till QA, generellt gå igenom all hantering av förval
+// done: Addera förval för; Infektionsverktyget, Listning
 // done: Driftsättning och koppling till proxy
 // dome: Tydliggör vad som är valt (dvs vad som kan väljas bort)
 // done: Knapp för att komma till hippo

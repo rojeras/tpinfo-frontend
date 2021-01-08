@@ -38,12 +38,18 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
     )
 
     fun initialize() {
+
         Pace.init()
         routing.initialize().resolve()
 
         val startUrl = window.location.href
 
-        val view = parseUrlForView(startUrl)
+        // val view = parseUrlForView(startUrl)
+        val view: View =
+            if (startUrl.contains("integrationer.tjansteplattform")) View.HIPPO
+            else if (startUrl.contains("statistik.tjansteplattform")) View.STAT
+            else if (startUrl.contains(View.STAT.url)) View.STAT
+            else View.HIPPO
 
         val bookmark = parseBookmarkString(startUrl)
         hippoStore.dispatch(HippoAction.ApplyBookmark(view, bookmark))
@@ -63,13 +69,9 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
                         hippoStore.dispatch(HippoAction.StatTpSelected(tpId))
                     }
                 }
-                statSetPreselect("Alla konsumerande tjänster")
-                // hippoStore.dispatch(HippoAction.SetPreselect(PreSelect.getDefault()))
                 loadStatistics(hippoStore.getState())
             }
         }
-
-        // actUponStateChangeInitialize()
     }
 
     fun Container.mainLoop() {
@@ -81,7 +83,6 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
          */
         // Called after each state change
         main(hippoStore) { state ->
-            // setUrlFilter(state)
             println("In main()")
             if (state.downloadBaseItemStatus == AsyncActionStatus.COMPLETED) {
                 when (state.view) {
@@ -94,24 +95,8 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
                         }
                     }
                     View.STAT -> {
-                        // todo: Refactor and clean up code below
-                        /*
-                        if (state.selectedPlattformChainsIds.isNotEmpty()) {
-                            val pcId = state.selectedPlattformChainsIds[0]
-                            val pc = PlattformChain.mapp[pcId]!!
-                            val tp = Plattform.mapp[pc.last]!!
-                            if (tp.name != "SLL-PROD") {
-                                val tpId: Int? = Plattform.nameToId("SLL-PROD")
-                                if (tpId != null) {
-                                    hippoStore.dispatch(HippoAction.StatTpSelected(tpId))
-                                }
-                                loadStatistics(hippoStore.getState())
-                            }
-                        }
-                        */
                         statView(state, View.STAT)
                     }
-                    // View.STAT_ADVANCED -> statView(state, View.STAT_ADVANCED)
                 }
             }
         }
@@ -120,15 +105,12 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
 
     fun newOrUpdatedUrlFromBrowser(view: View, params: String? = null) {
         println("¤¤¤¤¤¤¤¤¤¤¤¤ In fromUrl(), view=$view, params=$params")
-        // setBaseUrl(view)
         val filterVals = params ?: ""
         val bookmark = parseBookmarkString(filterVals)
         println("bookmark from filter:")
         console.log(bookmark)
         hippoStore.dispatch(HippoAction.ApplyBookmark(view, bookmark))
-        // hippoStore.dispatch(HippoAction.SetView(view))
         when (view) {
-            // If HOME go to HIPPO
             View.HOME -> routing.navigate(View.HIPPO.url)
             View.HIPPO -> {
                 if (hippoStore.getState().downloadBaseDatesStatus == AsyncActionStatus.COMPLETED)
@@ -177,10 +159,12 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
         navigateWithBookmark(nextState)
     }
 
+    /*
     fun statHistorySelected(flag: Boolean) {
         if (flag) loadHistory(hippoStore.getState()) // Preload of history
         hippoStore.dispatch(HippoAction.ShowTimeGraph(flag))
     }
+     */
 
     fun statTechnicalTermsSelected(flag: Boolean) {
         hippoStore.dispatch(HippoAction.ShowTechnicalTerms(flag))
@@ -203,45 +187,38 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
     }
 
     fun statShowAllItemTypes(flag: Boolean) {
-        hippoStore.dispatch(HippoAction.ShowAllItemTypes(flag))
+        // hippoStore.dispatch(HippoAction.ShowAllItemTypes(flag))
+        val nextState = hippoStore.getState().setShowAllItemTypes(true)
+        navigateWithBookmark(nextState)
+    }
+
+    fun statHistorySelected(flag: Boolean) {
+        if (flag) loadHistory(hippoStore.getState()) // Preload of history
+        hippoStore.dispatch(HippoAction.ShowTimeGraph(flag))
     }
 
     fun setView(view: View) {
         console.log(hippoStore.getState())
-        println("State change by setNewView")
+        println("State change by HippoManager.setView(), nextState:")
         val nextState = hippoStore.getState().setNewView(view)
         console.log(nextState)
         navigateWithBookmark(nextState)
     }
 
     fun statSetPreselect(preSelectLabel: String) {
-        // todo: Change to navigate call
         val preSelect: PreSelect? = PreSelect.mapp[preSelectLabel]
-        // ?: throw NullPointerException("Internal error in Select View")
         val nextState = hippoStore.getState().setPreselect(preSelect)
-        // hippoStore.dispatch(HippoAction.SetPreselect(preSelect))
         navigateWithBookmark(nextState)
-        // loadStatistics(hippoStore.getState())
     }
 
     private fun navigateWithBookmark(nextState: HippoState) {
         val bookmarkString = nextState.createBookmarkString()
-        println("In navigateWithBookmark, bookmarkString = '$bookmarkString'")
+        println("In navigateWithBookmark, bookmarkString = '$bookmarkString', nextState:")
         console.log(nextState)
         val route: String =
             if (bookmarkString.isNotEmpty()) "/filter=$bookmarkString"
             else ""
         val newView = nextState.view
         routing.navigate(newView.url + route)
-    }
-
-    private fun parseUrlForView(url: String): View {
-        if (url.contains("integrationer.tjansteplattform")) return View.HIPPO
-        if (url.contains("statistik.tjansteplattform")) return View.STAT
-
-        if (url.contains(View.STAT.url)) return View.STAT
-        // if (url.contains(View.STAT_ADVANCED.url)) return View.STAT_ADVANCED
-
-        return View.HIPPO
     }
 }

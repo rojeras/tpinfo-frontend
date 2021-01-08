@@ -495,7 +495,7 @@ fun HippoState.applyBookmark(view: View, bookmark: BookmarkInformation): HippoSt
                 showConsumers = showConsumers,
                 showProducers = showProducers,
                 showContracts = showContracts,
-                showLogicalAddresses = showLogicalAddresses
+                showLogicalAddresses = showLogicalAddresses,
             )
         }
 

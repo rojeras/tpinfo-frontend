@@ -165,7 +165,12 @@ fun parseBookmarkString(fullUrl: String): BookmarkInformation {
 
     val filterParam = "filter"
     var ix = fullUrl.indexOf(filterParam)
-    if (ix < 0) return BookmarkInformation()
+
+    if (ix < 0) return BookmarkInformation(
+        // We end up here at initial start up when application is invoked without filter
+        preView = PreSelect.getDefault(),
+        showItemTypes = listOf(ItemType.CONSUMER)
+    )
 
     ix += filterParam.length + 1
 
@@ -212,8 +217,10 @@ fun parseBookmarkString(fullUrl: String): BookmarkInformation {
     if (preViewodeList.isEmpty()) preViewId = 0
     else preViewId = preViewodeList[0]
 
+    println("filterValue='$filterValue'")
     val preView: PreSelect? =
-        if (preViewId == 0) null
+        if (filterValue.isEmpty()) PreSelect.getDefault()
+        else if (preViewId == 0) null
         else PreSelect.idMapp[preViewId]
 
     return BookmarkInformation(

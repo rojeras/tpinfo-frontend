@@ -99,6 +99,7 @@ fun Container.hippoView(state: HippoState) {
                     value = state.dateEffective
                 ) {
                     addCssStyle(formControlXs)
+                    width = 80.px
                     background = Background(Color.name(Col.WHITE))
                 }.onEvent {
                     change = {
@@ -116,19 +117,24 @@ fun Container.hippoView(state: HippoState) {
                 align = Align.CENTER
                 //       }.bind(HippoManager.hippoStore) { state ->
                 val chainId =
-                    if (integrationLists.plattformChains.size == 1) integrationLists.plattformChains[0].id else -1
+                    if (integrationLists.plattformChains.size == 1) integrationLists.plattformChains[0].id
+                    else -1
+
                 var disabled: Boolean = true
                 if (chainId > 0) {
                     val chain = PlattformChain.mapp[chainId]
 
                     disabled = !(
-                        StatisticsPlattform.mapp.containsKey(chain!!.first) ||
-                            StatisticsPlattform.mapp.containsKey(chain.last)
-                        )
+                            StatisticsPlattform.mapp.containsKey(chain!!.first) ||
+                                    StatisticsPlattform.mapp.containsKey(chain.last)
+                            )
                 }
+                val buttonStyle: ButtonStyle =
+                    if (disabled) ButtonStyle.LIGHT
+                    else ButtonStyle.INFO
                 button(
                     "Visa statistik",
-                    style = ButtonStyle.INFO,
+                    style = buttonStyle,
                     disabled = disabled
                 ) {
                     size = ButtonSize.SMALL
@@ -136,8 +142,8 @@ fun Container.hippoView(state: HippoState) {
                     // HippoManager.setView(View.STAT_ADVANCED)
                     HippoManager.setView(View.STAT)
                 }.apply {
-                    addBsBgColor(BsBgColor.LIGHT)
-                    addBsColor(BsColor.BLACK50)
+                    // addBsBgColor(BsBgColor.LIGHT)
+                    // addBsColor(BsColor.BLACK50)
                 }
             }
 
@@ -288,8 +294,10 @@ private fun Container.hippoItemsView(
                                     if (item::class.simpleName == "ServiceContract") {
                                         +item.description
                                         if (
-                                            state.isItemSelected(ItemType.CONTRACT, item.id) &&
-                                            integrationLists.serviceContracts.size == 1
+                                            state.isItemSelected(
+                                                ItemType.CONTRACT,
+                                                item.id
+                                            ) // && integrationLists.serviceContracts.size == 1
                                         ) {
                                             insertResetButton(item, ItemType.CONTRACT)
                                         } else itemSelect(item, ItemType.CONTRACT, textSearchInfo)
@@ -298,8 +306,10 @@ private fun Container.hippoItemsView(
                                         borderTop = Border(1.px, BorderStyle.SOLID, Color.name(Col.GRAY))
 
                                         if (
-                                            state.isItemSelected(ItemType.DOMAIN, item.id) &&
-                                            integrationLists.serviceDomains.size == 1
+                                            state.isItemSelected(
+                                                ItemType.DOMAIN,
+                                                item.id
+                                            )  // && integrationLists.serviceDomains.size == 1
                                         ) {
                                             insertResetButton(item, ItemType.DOMAIN)
                                         } else itemSelect(item, ItemType.DOMAIN, textSearchInfo)
@@ -312,8 +322,7 @@ private fun Container.hippoItemsView(
                                         borderTop = Border(1.px, BorderStyle.SOLID, Color.name(Col.GRAY))
 
                                         if (
-                                            state.isItemSelected(type, item.id) &&
-                                            vList.size == 1
+                                            state.isItemSelected(type, item.id) // && vList.size == 1
                                         ) {
                                             insertResetButton(item, type)
                                         } else itemSelect(item, type, textSearchInfo)
