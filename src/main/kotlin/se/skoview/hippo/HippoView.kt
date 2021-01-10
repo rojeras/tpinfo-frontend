@@ -31,6 +31,7 @@ import pl.treksoft.kvision.modal.Modal
 import pl.treksoft.kvision.modal.ModalSize
 import pl.treksoft.kvision.panel.flexPanel
 import pl.treksoft.kvision.panel.hPanel
+import pl.treksoft.kvision.panel.simplePanel
 import pl.treksoft.kvision.panel.vPanel
 import pl.treksoft.kvision.state.observableListOf
 import pl.treksoft.kvision.utils.perc
@@ -40,31 +41,12 @@ import se.skoview.app.formControlXs
 import se.skoview.common.* // ktlint-disable no-wildcard-imports
 import kotlin.math.min
 
-class TextSearchInfo : BaseDataComponent() {
-    var widgetTextSearchField = TextInput()
-    val textSearchFilterObsList = observableListOf("")
-
-    fun set(characters: String) {
-        if (characters.isEmpty()) clear()
-        else {
-            textSearchFilterObsList[0] = characters
-            widgetTextSearchField.value = characters
-            widgetTextSearchField.background = Background(Color.name(Col.LIGHTGRAY))
-        }
-    }
-
-    fun clear() {
-        widgetTextSearchField.background = Background(Color.name(Col.WHITE))
-        widgetTextSearchField.value = null
-        textSearchFilterObsList[0] = ""
-    }
-}
-
 fun Container.hippoView(state: HippoState) {
     val integrationLists = createHippoViewData(state)
-    div {
+    simplePanel {
         // font-family: Georgia,Times New Roman,Times,serif;
         fontFamily = "Times New Roman"
+        width = 99.vw
         // Page header
         vPanel {
             // marginRight = 5.px
@@ -125,9 +107,9 @@ fun Container.hippoView(state: HippoState) {
                     val chain = PlattformChain.mapp[chainId]
 
                     disabled = !(
-                            StatisticsPlattform.mapp.containsKey(chain!!.first) ||
-                                    StatisticsPlattform.mapp.containsKey(chain.last)
-                            )
+                        StatisticsPlattform.mapp.containsKey(chain!!.first) ||
+                            StatisticsPlattform.mapp.containsKey(chain.last)
+                        )
                 }
                 val buttonStyle: ButtonStyle =
                     if (disabled) ButtonStyle.LIGHT
@@ -309,7 +291,7 @@ private fun Container.hippoItemsView(
                                             state.isItemSelected(
                                                 ItemType.DOMAIN,
                                                 item.id
-                                            )  // && integrationLists.serviceDomains.size == 1
+                                            ) // && integrationLists.serviceDomains.size == 1
                                         ) {
                                             insertResetButton(item, ItemType.DOMAIN)
                                         } else itemSelect(item, ItemType.DOMAIN, textSearchInfo)
@@ -414,5 +396,25 @@ private fun Container.showMoreItemsButton(type: ItemType, size: Int, maxItemsToS
                 }
             }
         }
+    }
+}
+
+class TextSearchInfo : BaseDataComponent() {
+    var widgetTextSearchField = TextInput()
+    val textSearchFilterObsList = observableListOf("")
+
+    fun set(characters: String) {
+        if (characters.isEmpty()) clear()
+        else {
+            textSearchFilterObsList[0] = characters
+            widgetTextSearchField.value = characters
+            widgetTextSearchField.background = Background(Color.name(Col.LIGHTGRAY))
+        }
+    }
+
+    fun clear() {
+        widgetTextSearchField.background = Background(Color.name(Col.WHITE))
+        widgetTextSearchField.value = null
+        textSearchFilterObsList[0] = ""
     }
 }
