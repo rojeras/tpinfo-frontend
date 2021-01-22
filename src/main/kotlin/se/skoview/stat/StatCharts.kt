@@ -41,18 +41,25 @@ fun Container.statCharts(state: HippoState) {
         ) {
             overflow = Overflow.HIDDEN
             // background = Background(Color.name(Col.YELLOW))
-            setStyle("height", getHeightToRemainingViewPort(statPageTop, 80))
+            if (state.showTimeGraph)
+                setStyle("height", getHeightToRemainingViewPort(statPageTop, 300))
+            else
+                setStyle("height", getHeightToRemainingViewPort(statPageTop, 80))
+
             // height = 100.perc
             SInfo.createStatViewData(state)
 
             val animateTime =
-                if (state.currentAction == HippoAction.DoneDownloadStatistics::class) {
+                if (
+                    state.currentAction == HippoAction.DoneDownloadStatistics::class ||
+                    state.currentAction == HippoAction.DoneDownloadHistory::class
+                ) {
                     1299
                 } else {
                     -1
                 }
 
-            var numberOfColumns: Int = 0
+            var numberOfColumns = 0
             if (state.showConsumers) numberOfColumns++
             if (state.showProducers) numberOfColumns++
             if (state.showContracts) numberOfColumns++
@@ -114,11 +121,9 @@ fun Container.statChartTableView(
     if (numberOfColumns < 1) return
     val columnWidth = (100 / numberOfColumns).vw - 0.1
 
-
     val chartLabelTable =
         ChartLabelTable(
             state,
-            itemType,
             itemSInfoList.recordList,
             "description",
             "color",

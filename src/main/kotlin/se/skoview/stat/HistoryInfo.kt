@@ -21,12 +21,6 @@ import kotlinx.serialization.json.Json
 import se.skoview.common.* // ktlint-disable no-wildcard-imports
 
 @Serializable
-data class HistoryEntry(
-    val aDate: String,
-    val numberOf: Int
-)
-
-@Serializable
 data class HistoryInfo(
     val history: Map<String, Int>
 )
@@ -63,7 +57,6 @@ fun loadHistory(state: HippoState) {
             val json = Json {}
             val history = json.decodeFromString(HistoryInfo.serializer(), response)
             console.log(history.history)
-            val historyMap = mutableMapOf<String, Int>()
             for ((key, value) in history.history) {
                 println("$key : $value")
             }

@@ -103,14 +103,14 @@ fun Container.hippoView(state: HippoState) {
                     if (integrationLists.plattformChains.size == 1) integrationLists.plattformChains[0].id
                     else -1
 
-                var disabled: Boolean = true
+                var disabled = true
                 if (chainId > 0) {
                     val chain = PlattformChain.mapp[chainId]
 
                     disabled = !(
-                            StatisticsPlattform.mapp.containsKey(chain!!.first) ||
-                                    StatisticsPlattform.mapp.containsKey(chain.last)
-                            )
+                        StatisticsPlattform.mapp.containsKey(chain!!.first) ||
+                            StatisticsPlattform.mapp.containsKey(chain.last)
+                        )
                 }
                 val buttonStyle: ButtonStyle =
                     if (disabled) ButtonStyle.LIGHT

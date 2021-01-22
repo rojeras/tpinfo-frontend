@@ -358,6 +358,7 @@ data class StatisticsPlattform(
     companion object {
         val mapp = hashMapOf<Int, StatisticsPlattform>()
 
+        /*
         fun getStatisticsPlattformChainIds(): List<Int> {
 
             var chainIds = listOf<Int>()
@@ -372,5 +373,6 @@ data class StatisticsPlattform(
             }
             return chainIds
         }
+         */
     }
 }

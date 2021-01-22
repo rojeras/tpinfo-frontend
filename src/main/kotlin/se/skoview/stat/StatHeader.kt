@@ -35,6 +35,7 @@ import se.skoview.common.*
 var statPageTop: Div = Div()
 
 fun Container.statHeader(state: HippoState) {
+    println("In statHeader()")
     div {
         fontFamily = "Times New Roman"
         id = "StatPage:SimplePanel()"
@@ -99,7 +100,7 @@ fun Container.statHeader(state: HippoState) {
                         cell { +"Plattform:" }
                         cell {
                             val selectedPlattformId =
-                                if (state.selectedPlattformChainsIds.size > 0)
+                                if (state.selectedPlattformChainsIds.isNotEmpty())
                                     PlattformChain.mapp[state.selectedPlattformChainsIds[0]]!!.last.toString()
                                 else ""
 
@@ -217,7 +218,7 @@ fun Container.statHeader(state: HippoState) {
                             ) {
                                 size = ButtonSize.SMALL
                             }.onClick {
-                                HippoManager.statShowAllItemTypes(true)
+                                HippoManager.statShowAllItemTypes()
                             }.apply {
                                 addBsBgColor(BsBgColor.LIGHT)
                                 addBsColor(BsColor.BLACK50)

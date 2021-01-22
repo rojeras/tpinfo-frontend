@@ -136,11 +136,13 @@ private fun isStatPlattformInPlattformChainList(
     return false
 }
 
+/*
 fun HippoState.isPlattformSelected(id: Int): Boolean {
     val pChainId = PlattformChain.calculateId(first = id, middle = null, last = id)
 
     return this.selectedPlattformChainsIds.contains(pChainId)
 }
+ */
 
 // The extension function create the part of the URL to fetch integrations
 fun HippoState.getParams(view: View): String {
@@ -305,7 +307,7 @@ fun HippoState.itemIdSeclected(id: Int, type: ItemType): HippoState {
 fun HippoState.itemIdDeseclected(id: Int, type: ItemType): HippoState {
 
     // If the deselected item is part of the definition of the active preselect - then reset preselect
-    var newPreSelect: PreSelect? = this.viewPreSelect
+    val newPreSelect: PreSelect? = this.viewPreSelect
 
     if (this.view == View.STAT && this.viewPreSelect != null) {
         val preSelectedItems = this.viewPreSelect.itemsFilter.selectedItems

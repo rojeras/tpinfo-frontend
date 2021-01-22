@@ -92,6 +92,7 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
             println("In main()")
             if (state.downloadBaseItemStatus == AsyncActionStatus.COMPLETED) {
                 when (state.view) {
+                    View.HOME -> println("Got View.HOME in main()")
                     View.HIPPO -> {
                         if (
                             state.downloadBaseItemStatus == AsyncActionStatus.COMPLETED // &&
@@ -211,6 +212,7 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
         // navigateWithBookmark(nextState)
     }
 
+    /*
     fun statShowConsumers(flag: Boolean) {
         hippoStore.dispatch(HippoAction.ShowConsumers(flag))
     }
@@ -226,8 +228,8 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
     fun statShowLogicalAddresses(flag: Boolean) {
         hippoStore.dispatch(HippoAction.ShowLogicalAddresses(flag))
     }
-
-    fun statShowAllItemTypes(flag: Boolean) {
+*/
+    fun statShowAllItemTypes() {
         // hippoStore.dispatch(HippoAction.ShowAllItemTypes(flag))
         val nextState = hippoStore.getState().setShowAllItemTypes(true)
         navigateWithBookmark(nextState)

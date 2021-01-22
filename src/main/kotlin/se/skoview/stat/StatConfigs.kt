@@ -61,7 +61,6 @@ fun getPieChartConfig(
     )
 }
 
-
 // Time graph
 fun Container.showHistoryChart(state: HippoState) {
     if (
@@ -102,10 +101,8 @@ fun Container.showHistoryChart(state: HippoState) {
     }
 }
 
-
 open class ChartLabelTable(
     state: HippoState,
-    itemType: ItemType,
     itemSInfoList: List<SInfoRecord>,
     dataField: String = "description",
     colorField: String = "color",

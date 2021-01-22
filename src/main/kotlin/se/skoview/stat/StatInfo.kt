@@ -59,9 +59,8 @@ fun loadStatistics(state: HippoState) {
         println(">>> Statistics found in cache, parameters: $parameters")
         val statisticsArrArr = statArrArrCache[parameters]!!
 
-        HippoManager.dispatchProxy(
-            HippoAction.DoneDownloadStatistics(statisticsArrArr)
-        )
+        HippoManager.dispatchProxy(HippoAction.DoneDownloadStatistics(statisticsArrArr))
+        loadHistory(state)
     } else {
         println(">>> Statistics data NOT found in cache - will now download, parameters: $parameters")
         console.log(parameters)
@@ -72,9 +71,10 @@ fun loadStatistics(state: HippoState) {
 
             statArrArrCache[parameters] = statisticsArrArr
             HippoManager.dispatchProxy(HippoAction.DoneDownloadStatistics(statisticsArrArr))
+            loadHistory(state)
         }
     }
-    if (state.showTimeGraph) loadHistory(state)
+    // if (state.showTimeGraph) loadHistory(state)
 }
 
 private fun updateCallsArr(callsArr: MutableMap<Int, Int>, itemId: Int, calls: Int) {

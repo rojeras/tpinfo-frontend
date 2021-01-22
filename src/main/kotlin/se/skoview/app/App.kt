@@ -64,16 +64,17 @@ import se.skoview.common.HippoManager.mainLoop
 
 // TODO: Fixa "about" för statistiken
 // TODO: Go to "Alla konsumerande tjänster" när statistiken anropas utan parametrar
-// todo: Fix the with of the history chart
 
+// todo: Load statistics and history data in coroutines (as integrations)
 // TODO: Evaluate to let the history chart be an alternative to the pie charts. And use radio buttons so choose between them.
-// TODO: Fix so that back button works for historical chart and technical terms
 // todo: Byt ut "SLL" i plattformsnamnen. Stäm av lösning med MLA. Bör också ske i hippo och i BS.
 // todo: Testa med andra browsers, inte minst Edge (ML 2020-09-17)
 // todo: Se över synonymerna. Måste passa med de olika förvalen
 // todo: Och så visa svarstider
 // todo: Dokumentation
 
+// done: Fix the with of the history chart
+// done: Fix so that back button works for historical chart
 // done: Den ensamma pajjen för stor
 // done: Vid övergång till hippo går det inte att återställa/avvälja de förvalda itemsarna. Förekommer vid förval av mer än ett item
 // done: Gör hippos Visa statistikknapp grön (eller nån highlight) när den är aktiv

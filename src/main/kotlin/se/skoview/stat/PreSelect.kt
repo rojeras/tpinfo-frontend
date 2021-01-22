@@ -20,9 +20,6 @@ import se.skoview.common.ItemType
 import se.skoview.common.ServiceComponent
 import se.skoview.common.ServiceContract
 
-const val SIMPLE_VIEW_DEFAULT_PRESELECT: String = "Alla konsumerande tjänster"
-const val ADVANCED_VIEW_DEFAULT_PRESELECT: String = "Allt"
-
 data class itemsFilter(
     val consumers: List<Int> = listOf(),
     val contracts: List<Int> = listOf(),

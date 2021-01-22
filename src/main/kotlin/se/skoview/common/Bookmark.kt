@@ -69,9 +69,9 @@ fun HippoState.createBookmarkString(): String {
 
     if (this.view == View.HIPPO) {
         if (!(
-                    this.updateDates.isNullOrEmpty() ||
-                            this.dateEffective.isNullOrEmpty()
-                    )
+            this.updateDates.isNullOrEmpty() ||
+                this.dateEffective.isNullOrEmpty()
+            )
         ) {
             // Exclude dates if dateEnd == current date (first in updateDates list)
             if (this.dateEnd != this.updateDates[0]) {
