@@ -16,6 +16,7 @@
  */
 package se.skoview.common
 
+import se.skoview.common.HippoAction.ShowTechnicalTerms
 import se.skoview.stat.PreSelect
 import se.skoview.stat.StatisticsBlob
 
@@ -156,7 +157,8 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
         }
 
         is HippoAction.ShowTimeGraph -> {
-            state.copy(showTimeGraph = action.isShown)
+            state.setFlag(action)
+            // state.copy(showTimeGraph = action.isShown)
         }
 
         is HippoAction.SetView -> {
@@ -187,8 +189,9 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
                 state.copy(lockShowAllItemTypes = false)
         }
 
-        is HippoAction.ShowTechnicalTerms -> {
-            state.copy(showTechnicalTerms = action.isShown)
+        is ShowTechnicalTerms -> {
+            state.setFlag(action)
+            // state.copy(showTechnicalTerms = action.isShown)
         }
 
         is HippoAction.SetPreselect -> {

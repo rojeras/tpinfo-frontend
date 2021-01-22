@@ -42,6 +42,7 @@ import se.skoview.common.* // ktlint-disable no-wildcard-imports
 import kotlin.math.min
 
 fun Container.hippoView(state: HippoState) {
+    println("In hippoView")
     val integrationLists = createHippoViewData(state)
     simplePanel {
         // font-family: Georgia,Times New Roman,Times,serif;
@@ -107,9 +108,9 @@ fun Container.hippoView(state: HippoState) {
                     val chain = PlattformChain.mapp[chainId]
 
                     disabled = !(
-                        StatisticsPlattform.mapp.containsKey(chain!!.first) ||
-                            StatisticsPlattform.mapp.containsKey(chain.last)
-                        )
+                            StatisticsPlattform.mapp.containsKey(chain!!.first) ||
+                                    StatisticsPlattform.mapp.containsKey(chain.last)
+                            )
                 }
                 val buttonStyle: ButtonStyle =
                     if (disabled) ButtonStyle.LIGHT
@@ -312,7 +313,8 @@ private fun Container.hippoItemsView(
                                 }
                             }
                     }
-                    showMoreItemsButton(type, filteredList.size, maxNoItems)
+                    if (state.downloadIntegrationStatus == AsyncActionStatus.COMPLETED)
+                        showMoreItemsButton(type, filteredList.size, maxNoItems)
                 }
             }
         ) // end of dataContainer

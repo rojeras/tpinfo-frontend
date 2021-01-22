@@ -16,7 +16,6 @@
  */
 package se.skoview.stat
 
-import pl.treksoft.kvision.chart.*
 import pl.treksoft.kvision.core.*
 import pl.treksoft.kvision.form.check.checkBoxInput
 import pl.treksoft.kvision.form.select.simpleSelectInput
@@ -30,13 +29,12 @@ import pl.treksoft.kvision.table.cell
 import pl.treksoft.kvision.table.row
 import pl.treksoft.kvision.table.table
 import pl.treksoft.kvision.utils.px
-import pl.treksoft.kvision.utils.vh
 import se.skoview.app.formControlXs
 import se.skoview.common.*
 
 var statPageTop: Div = Div()
 
-fun Container.statView(state: HippoState, view: View) {
+fun Container.statHeader(state: HippoState) {
     div {
         fontFamily = "Times New Roman"
         id = "StatPage:SimplePanel()"
@@ -269,59 +267,6 @@ fun Container.statView(state: HippoState, view: View) {
                 }
             }
 
-            /*
-            hPanel {
-
-                background = Background(Color.hex(0xf6efe9))
-
-                div {
-                    marginLeft = 20.px
-                    checkBoxInput(
-                        value = state.showConsumers
-                    ).onClick { HippoManager.statShowConsumers(value) }
-                    +" Visa ${getHeading(state, ItemType.CONSUMER)} "
-                }
-                div {
-                    marginLeft = 20.px
-                    checkBoxInput(
-                        value = state.showContracts
-                    ).onClick {
-                        HippoManager.statShowContracts(value)
-                    }
-                    +" Visa ${getHeading(state, ItemType.CONTRACT)} "
-                }
-                div {
-                    marginLeft = 20.px
-                    checkBoxInput(
-                        value = state.showProducers
-                    ).onClick {
-                        HippoManager.statShowProducers(value)
-                    }
-                    +" Visa ${getHeading(state, ItemType.PRODUCER)} "
-                }
-                div {
-                    marginLeft = 20.px
-                    checkBoxInput(
-                        value = state.showLogicalAddresses
-                    ).onClick {
-                        HippoManager.statShowLogicalAddresses(value)
-                    }
-                    +" Visa ${getHeading(state, ItemType.LOGICAL_ADDRESS)} "
-                }
-                div(rich = true) {
-                    marginLeft = 20.px
-                    checkBoxInput(
-                        value = state.lockShowAllItemTypes
-                    ).onClick {
-                        HippoManager.statShowAllItemTypes(value)
-                    }
-                    val label = if (state.lockShowAllItemTypes) " <b>Visa alla</b>"
-                    else " Visa alla "
-                    +label
-                }
-            }
-            */
-
             // Heading
             val tCalls: String = state.statBlob.callsDomain.map { it.value }.sum().toString().thousands()
 
@@ -335,42 +280,9 @@ fun Container.statView(state: HippoState, view: View) {
                 fontWeight = FontWeight.BOLD
             }
 
-            // Time graph
-            id = "StatPage-Timegraph:Div.bind"
-            if (state.showTimeGraph && state.historyMap.isNotEmpty()) {
-                val animateTime =
-                    if (state.currentAction == HippoAction.DoneDownloadHistory::class) {
-                        1298
-                    } else {
-                        -2
-                    }
-
-                val xAxis = state.historyMap.keys.toList()
-                val yAxis = state.historyMap.values.toList()
-                chart(
-                    Configuration(
-                        ChartType.LINE,
-                        listOf(
-                            DataSets(
-                                label = "Antal anrop per dag",
-                                data = yAxis,
-                                lineTension = 0
-                            )
-                        ),
-                        xAxis,
-                        options = ChartOptions(
-                            animation = AnimationOptions(duration = animateTime),
-                            legend = LegendOptions(display = true),
-                            responsive = true,
-                            maintainAspectRatio = false
-                        )
-                    )
-                ).apply {
-                    height = 26.vh
-                }
-            }
+            // showHistoryChart(state)
         }
 
-        pieView(state)
+        // pieView(state)
     }
 }

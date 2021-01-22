@@ -35,6 +35,7 @@ import kotlin.js.Date
  *  F: First plattform id
  *  M: Middle plattform id (optional)
  *  L: Last plattform id
+ *  H1: Show history
  *  Dx: Display item type x, where x:
  *      1: consumers
  *      2: producers
@@ -59,6 +60,7 @@ data class BookmarkInformation(
     var selectedPlattformChains: List<Int> = listOf(),
     var showItemTypes: List<ItemType> = listOf(),
     var preView: PreSelect? = null,
+    var showTimeGraph: Boolean = false,
 )
 
 fun HippoState.createBookmarkString(): String {
@@ -67,9 +69,9 @@ fun HippoState.createBookmarkString(): String {
 
     if (this.view == View.HIPPO) {
         if (!(
-            this.updateDates.isNullOrEmpty() ||
-                this.dateEffective.isNullOrEmpty()
-            )
+                    this.updateDates.isNullOrEmpty() ||
+                            this.dateEffective.isNullOrEmpty()
+                    )
         ) {
             // Exclude dates if dateEnd == current date (first in updateDates list)
             if (this.dateEnd != this.updateDates[0]) {
@@ -112,6 +114,9 @@ fun HippoState.createBookmarkString(): String {
         bookmark += "L$lastId"
     }
 
+    // History flag
+    if (this.showTimeGraph) bookmark += "H1"
+
     // Add the showItemType settings
     if (this.showConsumers) bookmark += "D1"
     if (this.showProducers) bookmark += "D2"
@@ -143,7 +148,7 @@ fun setUrlFilter(state: HippoState) {
 }
  */
 
-fun parseBookmarkString(fullUrl: String): BookmarkInformation {
+fun parseBookmarkString(fullUrl: String?): BookmarkInformation {
     // ---------------------------------------------------------------------
     fun parseBookmarkType(typeChar: String, filterValue: String): List<Int> {
         // val regex = Regex("""c\d*""")
@@ -159,10 +164,31 @@ fun parseBookmarkString(fullUrl: String): BookmarkInformation {
         }
         return iDList
     }
+
+    fun getFilterValue(fullUrl: String?): String? {
+        if (fullUrl == null) return null
+
+        val regex = Regex("""filter=[a-zA-Z0-9]*""")
+        val matchResult: MatchResult? = regex.find(fullUrl)
+        if (matchResult != null) {
+            val fullFilter = matchResult.value
+            if (fullFilter.startsWith("filter=")) return fullFilter.substring("filter=".length)
+        }
+        return null
+    }
     // ---------------------------------------------------------------------
 
     println("In parseBookmarkString, string=$fullUrl")
 
+    val filterValue: String? = getFilterValue(fullUrl)
+
+    if (filterValue == null) return BookmarkInformation(
+        // We end up here at initial start up when application is invoked without filter
+        preView = PreSelect.getDefault(),
+        showItemTypes = listOf(ItemType.CONSUMER)
+    )
+
+    /*
     val filterParam = "filter"
     var ix = fullUrl.indexOf(filterParam)
 
@@ -177,6 +203,8 @@ fun parseBookmarkString(fullUrl: String): BookmarkInformation {
     val filterValueStart = fullUrl.substring(ix)
     val parts = filterValueStart.split('&')
     val filterValue = parts[0]
+     */
+    println("filterValue='$filterValue'")
 
     // Extract and calculate the date values for hippo
     val dateEffectiveCodeList = parseBookmarkType("S", filterValue)
@@ -203,7 +231,12 @@ fun parseBookmarkString(fullUrl: String): BookmarkInformation {
         plattformChainList = listOf(plattformChainId)
     }
 
-    var showItemTypesList = mutableListOf<ItemType>()
+    val showTimeGraphCodeList = parseBookmarkType("H", filterValue)
+    val showTimeGraphFlag: Boolean =
+        if (showTimeGraphCodeList.size == 0) false
+        else showTimeGraphCodeList[0] == 1
+
+    val showItemTypesList = mutableListOf<ItemType>()
     val showItemTypesCodeList = parseBookmarkType("D", filterValue)
 
     if (showItemTypesCodeList.contains(1)) showItemTypesList.add(ItemType.CONSUMER)
@@ -217,7 +250,6 @@ fun parseBookmarkString(fullUrl: String): BookmarkInformation {
     if (preViewodeList.isEmpty()) preViewId = 0
     else preViewId = preViewodeList[0]
 
-    println("filterValue='$filterValue'")
     val preView: PreSelect? =
         if (filterValue.isEmpty()) PreSelect.getDefault()
         else if (preViewId == 0) null
@@ -233,7 +265,8 @@ fun parseBookmarkString(fullUrl: String): BookmarkInformation {
         parseBookmarkType("d", filterValue),
         plattformChainList,
         showItemTypesList,
-        preView
+        preView,
+        showTimeGraphFlag
     )
 }
 

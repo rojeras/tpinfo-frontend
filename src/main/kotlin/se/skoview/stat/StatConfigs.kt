@@ -24,10 +24,9 @@ import pl.treksoft.kvision.panel.SimplePanel
 import pl.treksoft.kvision.table.TableType
 import pl.treksoft.kvision.tabulator.*
 import pl.treksoft.kvision.utils.perc
-import se.skoview.common.HippoManager
-import se.skoview.common.HippoState
-import se.skoview.common.ItemType
-import se.skoview.common.isItemSelected
+import pl.treksoft.kvision.utils.vh
+import pl.treksoft.kvision.utils.vw
+import se.skoview.common.*
 
 fun getPieChartConfig(
     state: HippoState,
@@ -62,6 +61,48 @@ fun getPieChartConfig(
     )
 }
 
+
+// Time graph
+fun Container.showHistoryChart(state: HippoState) {
+    if (
+        // state.showTimeGraph &&
+        state.historyMap.isNotEmpty()
+    ) {
+        val animateTime =
+            if (state.currentAction == HippoAction.DoneDownloadHistory::class) {
+                1298
+            } else {
+                -2
+            }
+
+        val xAxis = state.historyMap.keys.toList()
+        val yAxis = state.historyMap.values.toList()
+        chart(
+            Configuration(
+                ChartType.LINE,
+                listOf(
+                    DataSets(
+                        label = "Antal anrop per dag",
+                        data = yAxis,
+                        lineTension = 0
+                    )
+                ),
+                xAxis,
+                options = ChartOptions(
+                    animation = AnimationOptions(duration = animateTime),
+                    legend = LegendOptions(display = true),
+                    responsive = true,
+                    maintainAspectRatio = false
+                )
+            )
+        ).apply {
+            height = 24.vh
+            width = 99.vw
+        }
+    }
+}
+
+
 open class ChartLabelTable(
     state: HippoState,
     itemType: ItemType,
@@ -95,7 +136,7 @@ open class ChartLabelTable(
                         headerSort = false,
                         title = "$heading (${itemSInfoList.size})",
                         field = dataField,
-                        topCalcFormatter = Formatter.COLOR,
+                        // topCalcFormatter = Formatter.COLOR,
                         headerFilter = Editor.INPUT,
                         headerFilterPlaceholder = "Sök ${heading.toLowerCase()}",
                         editable = { false },
@@ -145,13 +186,6 @@ private fun itemSelectDeselect(state: HippoState, itemId: Int, itemType: ItemTyp
     if (state.isItemSelected(itemType, itemId)) {
         HippoManager.itemDeselected(itemId, itemType)
     } else {
-        // Select an item
-            /*
-        if (state.view == View.STAT)
-            HippoManager.itemAndViewSelected(itemId, itemType, View.STAT_ADVANCED)
-        else
-            HippoManager.itemSelected(itemId, itemType)
-             */
         HippoManager.itemSelected(itemId, itemType)
     }
 }

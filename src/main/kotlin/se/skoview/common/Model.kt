@@ -16,6 +16,8 @@
  */
 package se.skoview.common
 
+import se.skoview.common.HippoAction.ShowTechnicalTerms
+import se.skoview.common.HippoAction.ShowTimeGraph
 import se.skoview.stat.PreSelect
 import se.skoview.stat.StatisticsBlob
 import se.skoview.stat.itemsFilter
@@ -187,6 +189,17 @@ fun HippoState.getParams(view: View): String {
     return params
 }
 
+fun HippoState.setFlag(action: HippoAction): HippoState {
+    return when (action) {
+        is ShowTechnicalTerms -> this.copy(showTechnicalTerms = action.isShown)
+        is ShowTimeGraph -> this.copy(showTimeGraph = action.isShown)
+        else -> {
+            println("Error in HippoState.setFlag(), action = $action")
+            this
+        }
+    }
+}
+
 fun HippoState.setPreselect(preSelect: PreSelect?): HippoState {
     if (preSelect == null) {
         return this
@@ -307,50 +320,38 @@ fun HippoState.itemIdDeseclected(id: Int, type: ItemType): HippoState {
 
     return when (type) {
         ItemType.CONSUMER -> {
-            val newList = this.selectedConsumersIds as MutableList<Int>
-            newList.remove(id)
             this.copy(
-                selectedConsumersIds = newList,
+                selectedConsumersIds = this.selectedConsumersIds.filter { it != id },
                 viewPreSelect = newPreSelect
             )
         }
         ItemType.DOMAIN -> {
-            val newList = this.selectedDomainsIds as MutableList<Int>
-            newList.remove(id)
             this.copy(
-                selectedDomainsIds = newList,
+                selectedDomainsIds = this.selectedDomainsIds.filter { it != id },
                 viewPreSelect = newPreSelect
             )
         }
         ItemType.CONTRACT -> {
-            val newList = this.selectedContractsIds as MutableList<Int>
-            newList.remove(id)
             this.copy(
-                selectedContractsIds = newList,
+                selectedContractsIds = this.selectedContractsIds.filter { it != id },
                 viewPreSelect = newPreSelect
             )
         }
         ItemType.PLATTFORM_CHAIN -> {
-            val newList = this.selectedPlattformChainsIds as MutableList<Int>
-            newList.remove(id)
             this.copy(
-                selectedPlattformChainsIds = newList,
+                selectedPlattformChainsIds = this.selectedPlattformChainsIds.filter { it != id },
                 viewPreSelect = newPreSelect
             )
         }
         ItemType.LOGICAL_ADDRESS -> {
-            val newList = this.selectedLogicalAddressesIds as MutableList<Int>
-            newList.remove(id)
             this.copy(
-                selectedLogicalAddressesIds = newList,
+                selectedLogicalAddressesIds = this.selectedLogicalAddressesIds.filter { it != id },
                 viewPreSelect = newPreSelect
             )
         }
         ItemType.PRODUCER -> {
-            val newList = this.selectedProducersIds as MutableList<Int>
-            newList.remove(id)
             this.copy(
-                selectedProducersIds = newList,
+                selectedProducersIds = this.selectedProducersIds.filter { it != id },
                 viewPreSelect = newPreSelect
             )
         }
@@ -360,13 +361,6 @@ fun HippoState.itemIdDeseclected(id: Int, type: ItemType): HippoState {
 // is HippoAction.StatTpSelected -> {
 fun HippoState.statTpSelected(tpId: Int): HippoState {
 
-    /*
-    // TP can only be selected in advanced mode
-    val preSelect: PreSelect? =
-        if (StatisticsPlattform.mapp[tpId]!!.name == "SLL-PROD")
-            PreSelect.getDefault()
-        else null
-    */
     val pChainId = PlattformChain.calculateId(first = tpId, middle = null, last = tpId)
 
     return this.copy(
@@ -443,6 +437,33 @@ fun HippoState.dateSelected(selectedDate: String, dateType: DateType): HippoStat
     }
 }
 
+fun HippoState.isSelectedItemsUnChanged(oldState: HippoState): Boolean {
+    return (
+        this.selectedConsumersIds.equals(oldState.selectedConsumersIds) &&
+            this.selectedContractsIds.equals(oldState.selectedContractsIds) &&
+            this.selectedLogicalAddressesIds.equals(oldState.selectedLogicalAddressesIds) &&
+            this.selectedDomainsIds.equals(oldState.selectedDomainsIds) &&
+            this.selectedProducersIds.equals(oldState.selectedProducersIds) &&
+            this.selectedPlattformChainsIds.equals(oldState.selectedPlattformChainsIds)
+        )
+}
+
+fun HippoState.isIntegrationSelectionsChanged(oldState: HippoState): Boolean {
+    return !(
+        this.dateEffective == oldState.dateEffective &&
+            this.dateEnd == oldState.dateEnd &&
+            this.isSelectedItemsUnChanged(oldState)
+        )
+}
+
+fun HippoState.isStatisticsSelectionsChanged(oldState: HippoState): Boolean {
+    return !(
+        this.statDateEffective == oldState.statDateEffective &&
+            this.statDateEnd == oldState.statDateEnd &&
+            this.isSelectedItemsUnChanged(oldState)
+        )
+}
+
 fun HippoState.applyBookmark(view: View, bookmark: BookmarkInformation): HippoState {
 
     val newState =
@@ -489,6 +510,8 @@ fun HippoState.applyBookmark(view: View, bookmark: BookmarkInformation): HippoSt
                 showLogicalAddresses = true
             }
 
+            val showTimeGraph = bookmark.showTimeGraph
+
             this.copy(
                 statDateEffective = newDateEffective,
                 statDateEnd = newDateEnd,
@@ -496,6 +519,7 @@ fun HippoState.applyBookmark(view: View, bookmark: BookmarkInformation): HippoSt
                 showProducers = showProducers,
                 showContracts = showContracts,
                 showLogicalAddresses = showLogicalAddresses,
+                showTimeGraph = showTimeGraph
             )
         }
 

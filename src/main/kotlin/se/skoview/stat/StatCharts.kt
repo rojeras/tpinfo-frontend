@@ -30,8 +30,11 @@ import se.skoview.common.HippoState
 import se.skoview.common.ItemType
 import se.skoview.common.getHeightToRemainingViewPort
 
-fun Container.pieView(state: HippoState) {
+fun Container.statCharts(state: HippoState) {
     div {
+
+        if (state.showTimeGraph) showHistoryChart(state)
+
         // The whole item table
         hPanel(
             spacing = 1
@@ -58,7 +61,7 @@ fun Container.pieView(state: HippoState) {
             if (numberOfColumns < 1) return@hPanel
 
             if (state.showConsumers)
-                statPieTableView(
+                statChartTableView(
                     state,
                     itemType = ItemType.CONSUMER,
                     itemSInfoList = SInfo.consumerSInfoList,
@@ -68,7 +71,7 @@ fun Container.pieView(state: HippoState) {
                 )
 
             if (state.showContracts)
-                statPieTableView(
+                statChartTableView(
                     state,
                     itemType = ItemType.CONTRACT,
                     itemSInfoList = SInfo.contractSInfoList,
@@ -78,7 +81,7 @@ fun Container.pieView(state: HippoState) {
                 )
 
             if (state.showProducers)
-                statPieTableView(
+                statChartTableView(
                     state,
                     itemType = ItemType.PRODUCER,
                     itemSInfoList = SInfo.producerSInfoList,
@@ -88,7 +91,7 @@ fun Container.pieView(state: HippoState) {
                 )
 
             if (state.showLogicalAddresses)
-                statPieTableView(
+                statChartTableView(
                     state,
                     itemType = ItemType.LOGICAL_ADDRESS,
                     itemSInfoList = SInfo.logicalAddressSInfoList,
@@ -100,7 +103,7 @@ fun Container.pieView(state: HippoState) {
     }
 }
 
-fun Container.statPieTableView(
+fun Container.statChartTableView(
     state: HippoState,
     itemType: ItemType,
     itemSInfoList: SInfoList,
@@ -110,6 +113,18 @@ fun Container.statPieTableView(
 ) {
     if (numberOfColumns < 1) return
     val columnWidth = (100 / numberOfColumns).vw - 0.1
+
+
+    val chartLabelTable =
+        ChartLabelTable(
+            state,
+            itemType,
+            itemSInfoList.recordList,
+            "description",
+            "color",
+            "calls",
+            label
+        )
 
     val pieChart =
         Chart(
@@ -123,17 +138,6 @@ fun Container.statPieTableView(
             )
         )
 
-    val chartLabelTable =
-        ChartLabelTable(
-            state,
-            itemType,
-            itemSInfoList.recordList,
-            "description",
-            "color",
-            "calls",
-            label
-        )
-
     if (numberOfColumns == 1) {
         // Show one pie and the table at the side
         flexPanel() {
@@ -144,16 +148,17 @@ fun Container.statPieTableView(
 
             setStyle("height", getHeightToRemainingViewPort(statPageTop, 90))
 
-            add(
-                pieChart.apply {
-                    id = "TheSimpleViewPieChart:Chart"
-                    width = 45.vw
-                    height = 80.perc
-                    marginTop = 6.vw
-                    marginLeft = 5.vw
-                },
-                grow = 1
-            )
+            if (!state.showTimeGraph)
+                add(
+                    pieChart.apply {
+                        id = "TheSimpleViewPieChart:Chart"
+                        width = 45.vw
+                        height = 80.perc
+                        marginTop = 6.vw
+                        marginLeft = 5.vw
+                    },
+                    grow = 1
+                )
 
             add(
                 chartLabelTable.apply {
@@ -172,11 +177,12 @@ fun Container.statPieTableView(
 
             width = columnWidth
 
-            add(
-                pieChart.apply {
-                    height = 30.perc
-                }
-            )
+            if (!state.showTimeGraph)
+                add(
+                    pieChart.apply {
+                        height = 30.perc
+                    }
+                )
             add(
                 chartLabelTable.apply { height = 70.perc }
             )

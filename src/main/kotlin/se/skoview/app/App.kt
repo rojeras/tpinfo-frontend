@@ -32,7 +32,7 @@ import se.skoview.common.HippoManager.mainLoop
 
 // Common
 
-// todo: PlattformChain och plattforms hänger inte logiskt ihop vad gäller URL-er och filter. TPDB skulle behöva stödja båda.
+// todo: PlattformChain och plattforms hänger inte logiskt ihop vad gäller URL-er och filter. TPDB skulle behöva stödja båda, åtminstone för utsäkningar.
 // todo: Show messages to user
 // todo: Make it possible to participate in discussion, maybe through slack channel
 // todo: Verifiera att zip bygger en produktionsversion
@@ -44,8 +44,7 @@ import se.skoview.common.HippoManager.mainLoop
 
 // Hippo
 
-// todo: Must pick up and apply legacy links
-// todo: Marginalerna. About-knappen syns inte riktigt.
+// TODafs: Must pick up and apply legacy links
 
 // todo: Lägg med Visa-menyn i hippo. Ett snabbt sätt för vyer för olika domäner/tjänster
 // todo: Opera does not add any filter to URL, remove its mention in index.html
@@ -56,17 +55,21 @@ import se.skoview.common.HippoManager.mainLoop
 // todo: Lös trädklättringen, kanske mha HSA-trädet
 // todo: Titta på Tabulator igen
 // todo: Hippo kanske skulle uppdateras varje dygn om browsern skulle vara öppen över natten
+// done: Marginalerna. About-knappen syns inte riktigt.
 // done: Add link to statistics
 // done: Plattform chains syns inte vid omladdning - troligen måste plattforms laddas först
 // done: Se till att det blir ett pekarfinger på items i tabellen
 
 // Statistik
 
+// TODO: Fixa "about" för statistiken
+// TODO: Go to "Alla konsumerande tjänster" när statistiken anropas utan parametrar
+// todo: Fix the with of the history chart
 
-
+// TODO: Evaluate to let the history chart be an alternative to the pie charts. And use radio buttons so choose between them.
+// TODO: Fix so that back button works for historical chart and technical terms
 // todo: Byt ut "SLL" i plattformsnamnen. Stäm av lösning med MLA. Bör också ske i hippo och i BS.
 // todo: Testa med andra browsers, inte minst Edge (ML 2020-09-17)
-// todo: Fixa "about" för statistiken
 // todo: Se över synonymerna. Måste passa med de olika förvalen
 // todo: Och så visa svarstider
 // todo: Dokumentation

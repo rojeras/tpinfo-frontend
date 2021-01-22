@@ -44,16 +44,22 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
 
         val startUrl = window.location.href
 
+        println("In HippoManager.initialize(), startUrl = $startUrl")
+
         // val view = parseUrlForView(startUrl)
+
         val view: View =
             if (startUrl.contains("integrationer.tjansteplattform")) View.HIPPO
             else if (startUrl.contains("statistik.tjansteplattform")) View.STAT
             else if (startUrl.contains(View.STAT.url)) View.STAT
             else View.HIPPO
 
+        hippoStore.dispatch(HippoAction.SetView(view))
+
+        /*
         val bookmark = parseBookmarkString(startUrl)
         hippoStore.dispatch(HippoAction.ApplyBookmark(view, bookmark))
-
+        */
         GlobalScope.launch {
 
             hippoStore.dispatch(HippoAction.StartDownloadBaseItems)
@@ -88,14 +94,15 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
                 when (state.view) {
                     View.HIPPO -> {
                         if (
-                            state.downloadBaseItemStatus == AsyncActionStatus.COMPLETED &&
-                            state.downloadIntegrationStatus == AsyncActionStatus.COMPLETED
+                            state.downloadBaseItemStatus == AsyncActionStatus.COMPLETED // &&
+                            // state.downloadIntegrationStatus == AsyncActionStatus.COMPLETED
                         ) {
                             hippoView(state)
                         }
                     }
                     View.STAT -> {
-                        statView(state, View.STAT)
+                        statHeader(state)
+                        statCharts(state)
                     }
                 }
             }
@@ -103,26 +110,56 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
         // footer()
     }
 
-    fun newOrUpdatedUrlFromBrowser(view: View, params: String? = null) {
-        println("¤¤¤¤¤¤¤¤¤¤¤¤ In fromUrl(), view=$view, params=$params")
-        val filterVals = params ?: ""
-        val bookmark = parseBookmarkString(filterVals)
+    fun newOrUpdatedUrlFromBrowser(
+        view: View,
+        params: String? = null,
+        origin: String = ""
+    ) {
+        println("¤¤¤ In fromUrl(), view=$view, params=$params, origin=$origin")
+        val fullUrl = window.location.href
+        println("URL is: $fullUrl")
+
+        // If no params then we might have an old saved hippo link with a filter parameter in the wrong place
+        // Check the whole URL
+        val filter: String = if (params == null) fullUrl
+        else params
+
+        val bookmark = parseBookmarkString(filter)
         println("bookmark from filter:")
         console.log(bookmark)
+
+        val oldState = hippoStore.getState()
         hippoStore.dispatch(HippoAction.ApplyBookmark(view, bookmark))
+        val newState = hippoStore.getState()
+
+        val isIntegrationSelectionsChanged: Boolean = newState.isIntegrationSelectionsChanged(oldState)
+        if (isIntegrationSelectionsChanged) println("Update integrations")
+        else println("Do NOT update integrations")
+
+        val isStatisticsSelectionsChanged = newState.isStatisticsSelectionsChanged(oldState)
+        if (isStatisticsSelectionsChanged) println("Update statistics")
+        else println("Do NOT update statistics")
+
         when (view) {
             View.HOME -> routing.navigate(View.HIPPO.url)
             View.HIPPO -> {
-                if (hippoStore.getState().downloadBaseDatesStatus == AsyncActionStatus.COMPLETED)
+                if (
+                    newState.downloadBaseDatesStatus == AsyncActionStatus.COMPLETED &&
+                    newState.isIntegrationSelectionsChanged(oldState)
+                )
                     loadIntegrations(hippoStore.getState())
             }
-            else -> {
-                val state = hippoStore.getState()
-                if (state.downloadBaseItemStatus == AsyncActionStatus.COMPLETED)
-                    if (state.isStatPlattformSelected())
-                        loadStatistics(hippoStore.getState())
-                    else
-                        statTpSelected(Plattform.nameToId("SLL-PROD")!!)
+            View.STAT -> {
+                if (newState.downloadBaseItemStatus == AsyncActionStatus.COMPLETED) {
+                    if (newState.isStatPlattformSelected()) {
+                        if (newState.isStatisticsSelectionsChanged(oldState)) {
+                            loadStatistics(hippoStore.getState())
+                            if (newState.showTimeGraph) loadHistory(hippoStore.getState())
+                        }
+                    } else statTpSelected(Plattform.nameToId("SLL-PROD")!!)
+
+                    // if (hippoStore.getState().showTimeGraph) loadHistory(hippoStore.getState())
+                }
             }
         }
     }
@@ -144,6 +181,8 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
     }
 
     fun itemDeselected(itemId: Int, type: ItemType) {
+        println("Deselect item, state:")
+        console.log(hippoStore.getState())
         val nextState = hippoStore.getState()
             .itemIdDeseclected(itemId, type)
         navigateWithBookmark(nextState)
@@ -168,6 +207,8 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
 
     fun statTechnicalTermsSelected(flag: Boolean) {
         hippoStore.dispatch(HippoAction.ShowTechnicalTerms(flag))
+        // val nextState = hippoStore.getState().setFlag(HippoAction.ShowTechnicalTerms(flag))
+        // navigateWithBookmark(nextState)
     }
 
     fun statShowConsumers(flag: Boolean) {
@@ -193,13 +234,13 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
     }
 
     fun statHistorySelected(flag: Boolean) {
-        if (flag) loadHistory(hippoStore.getState()) // Preload of history
-        hippoStore.dispatch(HippoAction.ShowTimeGraph(flag))
+        // if (flag) loadHistory(hippoStore.getState()) // Preload of history
+        // hippoStore.dispatch(HippoAction.ShowTimeGraph(flag))
+        val nextState = hippoStore.getState().setFlag(HippoAction.ShowTimeGraph(flag)) // .setShowAllItemTypes(true)
+        navigateWithBookmark(nextState)
     }
 
     fun setView(view: View) {
-        console.log(hippoStore.getState())
-        println("State change by HippoManager.setView(), nextState:")
         val nextState = hippoStore.getState().setNewView(view)
         console.log(nextState)
         navigateWithBookmark(nextState)
