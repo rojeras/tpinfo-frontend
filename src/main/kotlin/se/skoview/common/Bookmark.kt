@@ -167,8 +167,9 @@ fun parseBookmarkString(fullUrl: String?): BookmarkInformation {
 
     fun getFilterValue(fullUrl: String?): String? {
         if (fullUrl == null) return null
+        if (!fullUrl.contains("filter=")) return null
 
-        val regex = Regex("""filter=[a-zA-Z0-9]*""")
+        val regex = Regex("""filter=[a-zA-Z0-9]*""") // Will find last "filter=" string if more than one
         val matchResult: MatchResult? = regex.find(fullUrl)
         if (matchResult != null) {
             val fullFilter = matchResult.value
@@ -181,30 +182,13 @@ fun parseBookmarkString(fullUrl: String?): BookmarkInformation {
     println("In parseBookmarkString, string=$fullUrl")
 
     val filterValue: String? = getFilterValue(fullUrl)
+    println("filterValue='$filterValue'")
 
     if (filterValue == null) return BookmarkInformation(
         // We end up here at initial start up when application is invoked without filter
         preView = PreSelect.getDefault(),
         showItemTypes = listOf(ItemType.CONSUMER)
     )
-
-    /*
-    val filterParam = "filter"
-    var ix = fullUrl.indexOf(filterParam)
-
-    if (ix < 0) return BookmarkInformation(
-        // We end up here at initial start up when application is invoked without filter
-        preView = PreSelect.getDefault(),
-        showItemTypes = listOf(ItemType.CONSUMER)
-    )
-
-    ix += filterParam.length + 1
-
-    val filterValueStart = fullUrl.substring(ix)
-    val parts = filterValueStart.split('&')
-    val filterValue = parts[0]
-     */
-    println("filterValue='$filterValue'")
 
     // Extract and calculate the date values for hippo
     val dateEffectiveCodeList = parseBookmarkType("S", filterValue)

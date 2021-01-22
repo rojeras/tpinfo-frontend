@@ -47,7 +47,7 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
         println("In HippoManager.initialize(), startUrl = $startUrl")
 
         // val view = parseUrlForView(startUrl)
-
+/*
         val view: View =
             if (startUrl.contains("integrationer.tjansteplattform")) View.HIPPO
             else if (startUrl.contains("statistik.tjansteplattform")) View.STAT
@@ -55,7 +55,7 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
             else View.HIPPO
 
         hippoStore.dispatch(HippoAction.SetView(view))
-
+*/
         /*
         val bookmark = parseBookmarkString(startUrl)
         hippoStore.dispatch(HippoAction.ApplyBookmark(view, bookmark))
@@ -155,7 +155,7 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
                     if (newState.isStatPlattformSelected()) {
                         if (newState.isStatisticsSelectionsChanged(oldState)) {
                             loadStatistics(hippoStore.getState())
-                            if (newState.showTimeGraph) loadHistory(hippoStore.getState())
+                            // if (newState.showTimeGraph) loadHistory(hippoStore.getState())
                         }
                     } else statTpSelected(Plattform.nameToId("SLL-PROD")!!)
 
