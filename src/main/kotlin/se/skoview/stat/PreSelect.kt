@@ -20,7 +20,7 @@ import se.skoview.common.ItemType
 import se.skoview.common.ServiceComponent
 import se.skoview.common.ServiceContract
 
-data class itemsFilter(
+data class ItemsFilter(
     val consumers: List<Int> = listOf(),
     val contracts: List<Int> = listOf(),
     val plattformChains: List<Int> = listOf(),
@@ -41,7 +41,7 @@ data class itemsFilter(
 data class PreSelect(
     val id: Int,
     val label: String,
-    val itemsFilter: itemsFilter,
+    val itemsFilter: ItemsFilter,
     val headingsMap: HashMap<ItemType, String>,
     val viewOrder: List<ItemType>,
     val default: Boolean = false
@@ -59,13 +59,27 @@ data class PreSelect(
 
         var viewPreSelectDefault: PreSelect? = null
 
-        fun getDefault(): PreSelect? = viewPreSelectDefault
+        fun getDefault(): PreSelect? = defaultPreSelect
     }
 }
 
+val defaultPreSelect = PreSelect(
+    id = 1,
+    label = "Alla konsumerande tjänster",
+    itemsFilter = ItemsFilter(),
+    viewOrder = listOf(ItemType.CONSUMER),
+    headingsMap = hashMapOf(
+        ItemType.CONSUMER to "Applikationer",
+        ItemType.CONTRACT to "Tjänster",
+        ItemType.PRODUCER to "Informationskällor",
+        ItemType.LOGICAL_ADDRESS to "Adresser"
+    ),
+    default = true
+)
+
 fun preSelectInitialize() {
 
-    val allItemsFilter = itemsFilter()
+    val allItemsFilter = ItemsFilter()
 
     val journalConsumers: List<Int> = ServiceComponent.mapp
         .filterValues { it.description.contains("Journalen") }
@@ -96,28 +110,14 @@ fun preSelectInitialize() {
                 it.name.contains("CancelBooking")
         }.map { it.key }
 
-    val timebookingItemsFilter = itemsFilter(contracts = timeContracts)
-    val journalItemsFilter = itemsFilter(consumers = journalConsumers)
+    val timebookingItemsFilter = ItemsFilter(contracts = timeContracts)
+    val journalItemsFilter = ItemsFilter(consumers = journalConsumers)
     // val journalItemsFilter = itemsFilter(consumers = listOf(865))
-    val ivItemsFilter = itemsFilter(contracts = ivDomain)
-    val npoItemsFilter = itemsFilter(consumers = npoConsumers)
+    val ivItemsFilter = ItemsFilter(contracts = ivDomain)
+    val npoItemsFilter = ItemsFilter(consumers = npoConsumers)
     // val npoItemsFilter = itemsFilter(consumers = listOf(434, 693))
-    val reguestItemsFilter = itemsFilter(contracts = requestContracts)
+    val reguestItemsFilter = ItemsFilter(contracts = requestContracts)
     // val reguestItemsFilter = itemsFilter(contracts = listOf(215))
-
-    PreSelect(
-        id = 1,
-        label = "Alla konsumerande tjänster",
-        itemsFilter = allItemsFilter,
-        viewOrder = listOf(ItemType.CONSUMER),
-        headingsMap = hashMapOf(
-            ItemType.CONSUMER to "Applikationer",
-            ItemType.CONTRACT to "Tjänster",
-            ItemType.PRODUCER to "Informationskällor",
-            ItemType.LOGICAL_ADDRESS to "Adresser"
-        ),
-        default = true
-    )
 
     PreSelect(
         id = 2,

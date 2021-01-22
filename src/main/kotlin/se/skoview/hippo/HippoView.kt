@@ -134,7 +134,7 @@ fun Container.hippoView(state: HippoState) {
             div {
                 align = Align.RIGHT
                 val modal = Modal("Om Hippo")
-                modal.iframe(src = "about.html", iframeHeight = 400, iframeWidth = 700)
+                modal.iframe(src = "about-hippo.html", iframeHeight = 400, iframeWidth = 700)
                 modal.size = ModalSize.LARGE
                 modal.addButton(
                     Button(

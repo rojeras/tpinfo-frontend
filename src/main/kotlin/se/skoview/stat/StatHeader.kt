@@ -244,8 +244,9 @@ fun Container.statHeader(state: HippoState) {
                         addBsBgColor(BsBgColor.LIGHT)
                         addBsColor(BsColor.BLACK50)
                     }
+
                     val modal = Modal("Om Statistikfunktionen")
-                    modal.iframe(src = "about.html", iframeHeight = 400, iframeWidth = 700)
+                    modal.iframe(src = "about-stat.html", iframeHeight = 400, iframeWidth = 700)
                     modal.size = ModalSize.LARGE
                     // modal.add(H(require("img/dog.jpg")))
                     modal.addButton(
@@ -253,7 +254,6 @@ fun Container.statHeader(state: HippoState) {
                             modal.hide()
                         }
                     )
-
                     button(
                         "Om Statistik ${getVersion("hippoVersion")}",
                         style = ButtonStyle.INFO

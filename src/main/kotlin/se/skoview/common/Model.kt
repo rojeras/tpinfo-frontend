@@ -20,7 +20,7 @@ import se.skoview.common.HippoAction.ShowTechnicalTerms
 import se.skoview.common.HippoAction.ShowTimeGraph
 import se.skoview.stat.PreSelect
 import se.skoview.stat.StatisticsBlob
-import se.skoview.stat.itemsFilter
+import se.skoview.stat.ItemsFilter
 import kotlin.reflect.KClass
 
 enum class AsyncActionStatus {
@@ -247,7 +247,7 @@ fun HippoState.itemDeselectAllForAllTypes(): HippoState {
     )
 }
 
-fun HippoState.applyFilteredItemsSelection(itemsFilter: itemsFilter): HippoState {
+fun HippoState.applyFilteredItemsSelection(itemsFilter: ItemsFilter): HippoState {
 
     println("In applyFilteredItemsSelection(): $itemsFilter")
 

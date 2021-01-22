@@ -43,7 +43,6 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
         routing.initialize().resolve()
 
         val startUrl = window.location.href
-
         println("In HippoManager.initialize(), startUrl = $startUrl")
 
         // val view = parseUrlForView(startUrl)

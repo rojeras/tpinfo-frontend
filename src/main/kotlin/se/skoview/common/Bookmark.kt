@@ -69,9 +69,9 @@ fun HippoState.createBookmarkString(): String {
 
     if (this.view == View.HIPPO) {
         if (!(
-            this.updateDates.isNullOrEmpty() ||
-                this.dateEffective.isNullOrEmpty()
-            )
+                    this.updateDates.isNullOrEmpty() ||
+                            this.dateEffective.isNullOrEmpty()
+                    )
         ) {
             // Exclude dates if dateEnd == current date (first in updateDates list)
             if (this.dateEnd != this.updateDates[0]) {
@@ -184,11 +184,12 @@ fun parseBookmarkString(fullUrl: String?): BookmarkInformation {
     val filterValue: String? = getFilterValue(fullUrl)
     println("filterValue='$filterValue'")
 
-    if (filterValue == null) return BookmarkInformation(
-        // We end up here at initial start up when application is invoked without filter
-        preView = PreSelect.getDefault(),
-        showItemTypes = listOf(ItemType.CONSUMER)
-    )
+    if (filterValue == null)
+        return BookmarkInformation(
+            // We end up here at initial start up when application is invoked without filter
+            preView = PreSelect.getDefault(),
+            showItemTypes = listOf(ItemType.CONSUMER)
+        )
 
     // Extract and calculate the date values for hippo
     val dateEffectiveCodeList = parseBookmarkType("S", filterValue)
