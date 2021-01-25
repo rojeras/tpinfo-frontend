@@ -95,7 +95,7 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
                     View.HIPPO -> {
                         if (
                             state.downloadBaseItemStatus == AsyncActionStatus.COMPLETED // &&
-                            // state.downloadIntegrationStatus == AsyncActionStatus.COMPLETED
+                        // state.downloadIntegrationStatus == AsyncActionStatus.COMPLETED
                         ) {
                             hippoView(state)
                         }
@@ -152,9 +152,11 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
             View.STAT -> {
                 if (newState.downloadBaseItemStatus == AsyncActionStatus.COMPLETED) {
                     if (newState.isStatPlattformSelected()) {
-                        if (newState.isStatisticsSelectionsChanged(oldState)) {
+                        if (
+                            newState.isStatisticsSelectionsChanged(oldState) ||
+                            oldState.view != View.STAT
+                        ) {
                             loadStatistics(hippoStore.getState())
-                            // if (newState.showTimeGraph) loadHistory(hippoStore.getState())
                         }
                     } else statTpSelected(Plattform.nameToId("SLL-PROD")!!)
 

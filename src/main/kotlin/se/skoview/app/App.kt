@@ -63,16 +63,18 @@ import se.skoview.common.HippoManager.mainLoop
 // Statistik
 
 // TODO: Fixa "about" för statistiken
-// TODO: Go to "Alla konsumerande tjänster" när statistiken anropas utan parametrar
 
 // todo: Load statistics and history data in coroutines (as integrations)
-// TODO: Evaluate to let the history chart be an alternative to the pie charts. And use radio buttons so choose between them.
 // todo: Byt ut "SLL" i plattformsnamnen. Stäm av lösning med MLA. Bör också ske i hippo och i BS.
 // todo: Testa med andra browsers, inte minst Edge (ML 2020-09-17)
 // todo: Se över synonymerna. Måste passa med de olika förvalen
 // todo: Och så visa svarstider
 // todo: Dokumentation
 
+// done: Going from hippo to stat does not issue a loadStatistics()
+// done: Swedish characters does not display correctly in CSV export in Windows excel
+// done: Evaluate to let the history chart be an alternative to the pie charts.
+// done: Go to "Alla konsumerande tjänster" när statistiken anropas utan parametrar
 // done: Fix the with of the history chart
 // done: Fix so that back button works for historical chart
 // done: Den ensamma pajjen för stor

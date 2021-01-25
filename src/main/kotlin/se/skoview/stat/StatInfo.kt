@@ -90,7 +90,7 @@ fun exportStatData(state: HippoState) {
 
     // val selectedContractList: List<String> = state.selectedContracts.map { ServiceContract.map[it]!!.name }
 
-    var csvData = """
+    var csvData: String = """
      Informationen är baserad på följande filtrering:
      
      Från datum: ${state.dateEffective}
@@ -143,7 +143,7 @@ fun exportStatData(state: HippoState) {
     }
 
     val fileSaver = pl.treksoft.kvision.require("file-saver")
-    val csv =
-        Blob(arrayOf(csvData), BlobPropertyBag("text/csv;charset=utf-8,\uFEFF"))
+    val BOM = "\uFEFF"
+    val csv = Blob(arrayOf(BOM + csvData), BlobPropertyBag("text/csv;charset=utf-8"))
     fileSaver.saveAs(csv, "tp-anropsstatistik.csv")
 }
