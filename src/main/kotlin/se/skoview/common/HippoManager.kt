@@ -239,7 +239,7 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
     fun statHistorySelected(flag: Boolean) {
         // if (flag) loadHistory(hippoStore.getState()) // Preload of history
         // hippoStore.dispatch(HippoAction.ShowTimeGraph(flag))
-        val nextState = hippoStore.getState().setFlag(HippoAction.ShowTimeGraph(flag)) // .setShowAllItemTypes(true)
+        val nextState = hippoStore.getState().setFlag(HippoAction.ShowTimeGraph(flag))// .setShowAllItemTypes(true)
         navigateWithBookmark(nextState)
     }
 

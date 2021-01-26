@@ -174,7 +174,7 @@ fun Container.statHeader(state: HippoState) {
                                 else state.viewPreSelect.label
 
                             val options: List<Pair<String, String>> =
-                                listOf(Pair("", "")) +
+                                listOf(Pair("", "Allt")) +
                                     PreSelect.mapp
                                         .toList()
                                         .sortedBy { it.first }
@@ -212,7 +212,7 @@ fun Container.statHeader(state: HippoState) {
                                 )
 
                             button(
-                                "Visa allt",
+                                "Visa samtliga",
                                 style = ButtonStyle.INFO,
                                 disabled = disabled
                             ) {

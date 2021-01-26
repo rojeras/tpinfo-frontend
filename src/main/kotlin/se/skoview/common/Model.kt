@@ -18,9 +18,9 @@ package se.skoview.common
 
 import se.skoview.common.HippoAction.ShowTechnicalTerms
 import se.skoview.common.HippoAction.ShowTimeGraph
+import se.skoview.stat.ItemsFilter
 import se.skoview.stat.PreSelect
 import se.skoview.stat.StatisticsBlob
-import se.skoview.stat.ItemsFilter
 import kotlin.reflect.KClass
 
 enum class AsyncActionStatus {
@@ -493,10 +493,10 @@ fun HippoState.applyBookmark(view: View, bookmark: BookmarkInformation): HippoSt
                 if (bookmark.dateEnd != null) bookmark.dateEnd!!
                 else datesLastMonth.second.toSwedishDate()
 
-            val showConsumers: Boolean
-            val showProducers: Boolean
-            val showContracts: Boolean
-            val showLogicalAddresses: Boolean
+            var showConsumers: Boolean
+            var showProducers: Boolean
+            var showContracts: Boolean
+            var showLogicalAddresses: Boolean
 
             if (bookmark.showItemTypes.isNotEmpty()) {
                 showConsumers = if (bookmark.showItemTypes.contains(ItemType.CONSUMER)) true else false
@@ -513,6 +513,12 @@ fun HippoState.applyBookmark(view: View, bookmark: BookmarkInformation): HippoSt
             }
 
             val showTimeGraph = bookmark.showTimeGraph
+            if (showTimeGraph) {
+                showConsumers = true
+                showProducers = true
+                showContracts = true
+                showLogicalAddresses = true
+            }
 
             this.copy(
                 statDateEffective = newDateEffective,

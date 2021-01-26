@@ -114,7 +114,7 @@ open class ChartLabelTable(
         // Footer pagination buttons hidden through CSS
         tabulator(
             data = itemSInfoList,
-            types = setOf(TableType.BORDERED, TableType.STRIPED, TableType.HOVER),
+            types = setOf(TableType.BORDERED, TableType.STRIPED, TableType.HOVER, TableType.SMALL),
             options = TabulatorOptions(
                 layout = Layout.FITCOLUMNS,
                 pagination = PaginationMode.LOCAL,
@@ -131,7 +131,7 @@ open class ChartLabelTable(
                     ),
                     ColumnDefinition(
                         headerSort = false,
-                        title = "$heading (${itemSInfoList.size})",
+                        title = "$heading (${itemSInfoList.size} stycken)",
                         field = dataField,
                         // topCalcFormatter = Formatter.COLOR,
                         headerFilter = Editor.INPUT,

@@ -49,15 +49,11 @@ fun Container.statCharts(state: HippoState) {
             // height = 100.perc
             SInfo.createStatViewData(state)
 
-            val animateTime =
-                if (
-                    state.currentAction == HippoAction.DoneDownloadStatistics::class ||
-                    state.currentAction == HippoAction.DoneDownloadHistory::class
-                ) {
-                    1299
-                } else {
-                    -1
-                }
+            val animateTime = if (
+                state.currentAction == HippoAction.DoneDownloadStatistics::class // ||
+                // state.currentAction == HippoAction.DoneDownloadHistory::class
+            ) 1299
+            else -1
 
             var numberOfColumns = 0
             if (state.showConsumers) numberOfColumns++

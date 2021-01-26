@@ -282,7 +282,7 @@ private fun Container.hippoItemsView(
                                                 item.id
                                             ) // && integrationLists.serviceContracts.size == 1
                                         ) {
-                                            insertResetButton(item, ItemType.CONTRACT)
+                                            insertResetButton(state.downloadIntegrationStatus, item, ItemType.CONTRACT)
                                         } else itemSelect(item, ItemType.CONTRACT, textSearchInfo)
                                     } else if (item::class.simpleName == "ServiceDomain") {
                                         +"<b>${item.description}</b>"
@@ -294,7 +294,7 @@ private fun Container.hippoItemsView(
                                                 item.id
                                             ) // && integrationLists.serviceDomains.size == 1
                                         ) {
-                                            insertResetButton(item, ItemType.DOMAIN)
+                                            insertResetButton(state.downloadIntegrationStatus, item, ItemType.DOMAIN)
                                         } else itemSelect(item, ItemType.DOMAIN, textSearchInfo)
                                     } else {
                                         val itemText =
@@ -307,7 +307,7 @@ private fun Container.hippoItemsView(
                                         if (
                                             state.isItemSelected(type, item.id) // && vList.size == 1
                                         ) {
-                                            insertResetButton(item, type)
+                                            insertResetButton(state.downloadIntegrationStatus, item, type)
                                         } else itemSelect(item, type, textSearchInfo)
                                     }
                                 }
@@ -360,7 +360,8 @@ private fun Div.itemSelect(item: BaseItem, type: ItemType, textSearchInfo: TextS
     }
 }
 
-private fun Div.insertResetButton(item: BaseItem, type: ItemType) {
+private fun Div.insertResetButton(statusDownloadIntegrations: AsyncActionStatus, item: BaseItem, type: ItemType) {
+    // if (statusDownloadIntegrations != AsyncActionStatus.COMPLETED) return
     val buttonText = when (type) {
         ItemType.CONSUMER -> "Återställ tjänstekonsument"
         ItemType.CONTRACT -> "Återställ tjänstekontrakt"
