@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta charset="UTF-8">
+<title>Title</title>
+<script>
+    //Per Icycool, one liner
+    function isIE() {
+        console.log(window.navigator.userAgent)
+        return window.navigator.userAgent.match(/(MSIE|Trident)/);
+    }
+
+
+    //function to show alert if it's IE
+    function ShowIEAlert() {
+        console.log("In ShowIEAlert")
+        if (isIE()) {
+            alert("User is using IE");
+        }
+    }
+</script>
+</head>
+<body onload="ShowIEAlert()">
+<h1>User is not using IE</h1>
+</body>
+</html>

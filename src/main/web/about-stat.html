@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h1>Användarinformation</h1>
+<div id="gui-version"></div>
+<div id="tpdb-version"></div>
+<p>
+    Denna statistikapplikation visar information om hur många meddelanden som förmedlas av Region Stockholms regionala tjänsteplattformar, produktions- och QA-miljö.
+    Det finns två grundlägen:</p>
+    <ol>
+        <li>Antal anrop fördelat på tjänst.</li>
+        <li>Antal anrop fördelat för berörd tjänstekonsument, tjänsteproducent, tjänstekontrakt och logisk adress (mottagning).</li>
+        <li>Antal anrop per dag för ett specifikt urval. Detta läge nås genom att välja <b>Visa utveckling över tid</b>.</li>
+    </ol>
+<p>Historik är tillgängligt tillbaka till 2017-07-30. Man väljer tidsintervall via vallistorna uppe till vänster. Vid uppstart visas senaste hela kalendermånad.</p>
+<h3>Filtrering</h3>
+<p>
+    Du kan välja (klicka på) valfri rad i tabellen eller motsvarande tårtbit i pajdiagrammet. Genom flera efterföljande val kan man "borra sig ner" till detaljerad information om anropsvolymer.</p>
+<p>
+Via rutan <b>Visa</b> väljer du en förval filtrering. Aktivt förval visar trafik för en eller flera specifika tjänster. Väljs exempelvis tjänsten "Tidbokningar" filtreras den på antal ny- av- och om-bokningar vald för tidsperiod. Aktuellt förval visar anpassade rubriker.
+</p>
+<h3>Övriga funktioner</h3>
+<ul>
+    <li>Knappen <b>Visa allt</b> aktiverar visning av trafikflöde från initierande till slutligt besvarande system.</li>
+    <li>Knappen <b>Se urval i hippo</b> växlar till hippo och tar med sig delar av aktuellt urval. (<i>Denna funktion kommer att förbättras i kommande versioner</i>).</li>
+    <li>Knappen <b>Exportera</b> exorterar ut aktuellt urval i en CSV-fil möjlig att öppnas i t ex Excel.</li>
+    <li>Valet <b>Tekniska termer</b> växlar till de termer som används inom RIV-TA för att beskriva integrationer.</li>
+</ul>
+<h3>Anslutning av ytterligare tjänsteplattform</h3>
+<p>En förutsättning för att denna statistik kan presenteras i denna vy är att aktuell tjänsteplattforms tjänsteadresseringskatalog (TAK) finns tillgänglig
+    via Ineras TAK-api, se <a href="http://api.ntjp.se/coop/doc/index.html">http://api.ntjp.se/coop/doc/index.html</a>. Dessutom måste anropsdata tillhandahållas via en JSON-fil. Kontakta Regions Stockholms Förvaltningsobjekt <a href="mailto:informationsinfrastruktur.hsf@sll.se" target="_top">Informationsinfrastruktur</a> för mera information.</p>
+<p>
+    <a href="mailto:hippokrates@skoview.se" target="_top">Maila gärna synpunkter</a>.
+</p>
+<h3>Historik</h3>
+<h4>2021-01-XX: Version 7.1</h4>
+<ul>
+    <li>Fullständigt ombyggd, nu baserad på bl a</li>
+    <ul>
+        <li><a href="https://kotlinlang.org/">Kotlin</a>
+        <li><a href="https://kvision.io/">KVision</a></li>
+        <li>Redux</li>
+        <li>Tabulator</li>
+        <li>Navigo</li>
+        <li>Bootstrap</li>
+        <li>chart.js</li>
+    </ul>
+    <li>Tätare integration med hippo. De två applikationerna delar kodbas.</li>
+    <li>Webbläsarens framåt- och bakåtknappar fungerar.</li>
+    <li>Nu möjligt att samtidigt visualisera samtliga informationstyper genom att välja <b>Visa allt</b>.</li>
+    <li>Fritextsökning införd för alla informationstyper.</li>
+    <li>Stora grafiska förbättringar. All information visas inom webbläsarfönstret - det inte längre nödvändigt att bläddra upp och ner.</li>
+    <li>Intelligent övergång till hippo där (de flesta) utsökningarna tas med.</li>
+    <li>Sidans URL återspeglar det som syns på skärmen. Dessa kan sparas, och hänvisas till.</li>
+    <li>Mycket stora prestandaförbättringar.</li>
+    <li>Internet Explorer stöds inte längre.</li>
+</ul>
+<h4>2018-11-13: Version 2.0.1</h4>
+<ul>
+    <li>Felrättningar</li>
+</ul>
+<h4>2018-02-13: Version 1.0</h4>
+<ul>
+    <li>Första publika versionen, med data tillbaka till 2017-07-30.</li>
+    <li>Visar anropsstatistik både i form av ett pajdiagram samt i tabellform.</li>
+    <li>Du kan välja en information, antingen via en rad från tabellen eller som tårtbit från pajdiagrammet. Applikationen visar detaljerad information utifrån valet.</li>
+    <li>Knappen <b>Visa utveckling över tid</b> producerar ett linjediagram med historik utifrån aktuellt urval.</li>
+</ul>
+
+</body>
+</html>

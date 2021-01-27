@@ -14,10 +14,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package se.skoview.data
+package se.skoview.common
 
 import pl.treksoft.kvision.redux.RAction
-import se.skoview.view.IntegrationLists
+import se.skoview.stat.PreSelect
 
 /** According to: https://github.com/redux-utilities/flux-standard-action
  * An action object should have a type and contain:
@@ -27,28 +27,45 @@ import se.skoview.view.IntegrationLists
  */
 
 sealed class HippoAction : RAction {
-    object ApplicationStarted : HippoAction()
+    data class SetView(val view: View) : HippoAction()
+    data class SetDownloadBaseDatesStatus(val status: AsyncActionStatus) : HippoAction()
     object StartDownloadBaseItems : HippoAction()
     object DoneDownloadBaseItems : HippoAction()
     data class ErrorDownloadBaseItems(val errorMessage: String) : HippoAction()
+    object StartDownloadIntegrations : HippoAction()
     data class DoneDownloadIntegrations(
         val integrationArrs: List<Integration>,
         val maxCounters: MaxCounter,
-        val updateDates: List<String>
+        val updateDates: Array<String>
     ) : HippoAction()
+    data class ApplyBookmark(
+        val view: View,
+        val bookmark: BookmarkInformation
+    ) : HippoAction()
+    object StartDownloadStatistics : HippoAction()
     data class DoneDownloadStatistics(
-        val callsConsumer: Map<Int, Int>,
-        val callsProducer: Map<Int, Int>,
-        val callsLogicalAddress: Map<Int, Int>,
-        val callsDomain: Map<Int, Int>,
-        val callsContract: Map<Int, Int>
+        val statisticsArrArr: Array<Array<Int>>
+    ) : HippoAction()
+    object StartDownloadHistory : HippoAction()
+    data class DoneDownloadHistory(
+        val historyMap: Map<String, Int>
     ) : HippoAction()
     data class ErrorDownloadIntegrations(val errorMessage: String) : HippoAction()
     data class DateSelected(val dateType: DateType, val selectedDate: String) : HippoAction()
-    data class ItemSelected(
+    data class StatTpSelected(val tpId: Int) : HippoAction()
+    data class ItemIdSelected(
         val viewType: ItemType,
-        val baseItem: BaseItem
+        val id: Int
     ) : HippoAction()
-    data class ViewUpdated(val integrationLists: IntegrationLists) : HippoAction()
-    data class SetVMax(val type: ItemType, val size: Int): HippoAction()
+    data class ItemIdDeselected(val viewType: ItemType, val id: Int) : HippoAction()
+    data class SetVMax(val type: ItemType, val size: Int) : HippoAction()
+    data class ShowTimeGraph(val isShown: Boolean) : HippoAction()
+    data class ShowConsumers(val isShown: Boolean) : HippoAction()
+    data class ShowProduceras(val isShown: Boolean) : HippoAction()
+    data class ShowLogicalAddresses(val isShown: Boolean) : HippoAction()
+    data class ShowContracts(val isShown: Boolean) : HippoAction()
+    data class ShowAllItemTypes(val isShown: Boolean) : HippoAction()
+    data class LockShowAllItemTypes(val isShown: Boolean) : HippoAction()
+    data class ShowTechnicalTerms(val isShown: Boolean) : HippoAction()
+    data class SetPreselect(val preSelect: PreSelect?) : HippoAction()
 }

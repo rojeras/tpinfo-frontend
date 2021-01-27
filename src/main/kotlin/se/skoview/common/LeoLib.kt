@@ -14,15 +14,53 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package se.skoview.lib
+package se.skoview.common
 
+import kotlinx.browser.document
+import kotlinx.browser.window
 import org.w3c.xhr.XMLHttpRequest
-import pl.treksoft.kvision.core.Color
-import kotlin.browser.document
-import kotlin.browser.window
+import pl.treksoft.kvision.core.Component
 import kotlin.js.Date
-import kotlin.math.absoluteValue
 
+fun tpdbBaseUrl(): String {
+    val currentProtocol = window.location.protocol
+    val currentHost = window.location.host
+    // tpdb is assumed to be on the 'qa.integrationer.tjansteplattform.se' server if we run in development or test environment
+    return if (currentHost.contains("localhost") || currentHost.contains("192.168.0.") || currentHost.contains("www.hippokrates.se")) {
+        // "http://localhost:5555/tpdb/tpdbapi.php/api/v1/"
+        "https://qa.integrationer.tjansteplattform.se/tpdb/tpdbapi.php/api/v1/"
+    } else {
+        "$currentProtocol//$currentHost/../tpdb/tpdbapi.php/api/v1/"
+    }
+}
+
+/*
+fun setBaseUrl(view: View) {
+    val href = window.location.href
+    val hostname = window.location.hostname
+    val protocol = window.location.protocol
+    val port = window.location.port
+    val pathname = window.location.pathname
+
+    val portSpec = if (port.isNotEmpty()) ":$port" else ""
+
+    println("In setBaseUrl()")
+    println("href = '$href'")
+    println("hostname = '$hostname'")
+    println("protocol = '$protocol'")
+    println("port = '$port'")
+    println("pathname = '$pathname'")
+
+    if (href.contains("localhost")) {
+        val newUrl = href.replace("localhost", "sss.se")
+        println(newUrl)
+        // window.location.replace(newUrl)
+    }
+
+    // window.history.replaceState(newUrl, "hippo-utforska integrationer", newUrl)
+}
+*/
+/*
 fun getAsync(url: String, callback: (String) -> Unit) {
     console.log("getAsync(): URL: $url")
     val xmlHttp = XMLHttpRequest()
@@ -34,36 +72,30 @@ fun getAsync(url: String, callback: (String) -> Unit) {
     }
     xmlHttp.send()
 }
-
+ */
 
 // todo: Evaluate the use of the KVision client CallAgent. See CallAgentExample.kt
 fun getAsyncTpDb(url: String, callback: (String) -> Unit) {
-    val currentProtocol = window.location.protocol
-    val currentHost = window.location.host
-    // tpdb is assumed to be on the 'qa.integrationer.tjansteplattform.se' server if we run in development or test environment
-    val baseUrl = if (currentHost.contains("localhost") || currentHost.contains("www.hippokrates.se")) {
-        "https://qa.integrationer.tjansteplattform.se/tpdb/tpdbapi.php/api/v1/"
-    }
-    else {
-        "$currentProtocol//$currentHost/../tpdb/tpdbapi.php/api/v1/"
-    }
-    val fullUrl = baseUrl + url
+
+    val fullUrl = tpdbBaseUrl() + url
     console.log("URL: $fullUrl")
 
     val xmlHttp = XMLHttpRequest()
-    xmlHttp.open("GET", fullUrl)
-    xmlHttp.onload = {
+    // xmlHttp.onload = {
+    xmlHttp.onreadystatechange = {
         if (xmlHttp.readyState == 4.toShort() && xmlHttp.status == 200.toShort()) {
             callback.invoke(xmlHttp.responseText)
         }
     }
+    xmlHttp.open("GET", fullUrl, true)
     xmlHttp.send()
 }
 
+/*
 fun getSyncTpDb(url: String): String? {
     val baseUrl = "https://qa.integrationer.tjansteplattform.se/tpdb/tpdbapi.php/api/v1/"
     val fullUrl = baseUrl + url
-    //console.log("URL: $fullUrl")
+    // console.log("URL: $fullUrl")
     val xmlHttp = XMLHttpRequest()
     xmlHttp.open("GET", fullUrl, false)
     xmlHttp.send(null)
@@ -74,12 +106,13 @@ fun getSyncTpDb(url: String): String? {
         null
     }
 }
+ */
 
 // Added an extension function to the Date class
 fun Date.toSwedishDate(): String {
 
     val dd = this.getDate()
-    val mm = this.getMonth() + 1 //January is 0!
+    val mm = this.getMonth() + 1 // January is 0!
     val yyyy = this.getFullYear()
 
     val sDD = if (dd > 9) dd.toString() else "0$dd"
@@ -88,15 +121,15 @@ fun Date.toSwedishDate(): String {
 
     return "$sYYYY-$sMM-$sDD"
 
-    //return this.toISOString().substring(0, 10)
-    //return this.toLocaleDateString().substring(0, 10)
+    // return this.toISOString().substring(0, 10)
+    // return this.toLocaleDateString().substring(0, 10)
 }
 
 fun getDatesLastMonth(): Pair<Date, Date> {
 
     val today = Date()
     println("Today: $today")
-    val mm = today.getMonth() //January is 0!
+    val mm = today.getMonth() // January is 0!
     var yyyy = today.getFullYear()
 
     var month = mm
@@ -105,9 +138,7 @@ fun getDatesLastMonth(): Pair<Date, Date> {
         yyyy -= 1
     }
 
-    val firstDay = Date("${yyyy}-${month}-01")
-    println("firstDay: $firstDay")
-    println("firstDay.toISOString(): ${firstDay.toISOString()}")
+    val firstDay = Date("$yyyy-$month-01")
 
     val lastDate = Date(yyyy, mm, 0)
     val lastDay = "$yyyy-$month-${lastDate.getDate()}"
@@ -118,16 +149,30 @@ fun getDatesLastMonth(): Pair<Date, Date> {
 fun getVersion(versionName: String = "hippoVersion"): String {
     val versionElement = document.getElementById(versionName)
 
-    val version =
-    if (versionElement != null) versionElement.getAttribute("content") ?: "-1.-1.-1"
+    return if (versionElement != null) versionElement.getAttribute("content") ?: "-1.-1.-1"
     else "-2.-2.-2"
-
-    return version
 }
 
-fun getColorForObject(obj: Any): Color {
-    val cValue = obj.hashCode().absoluteValue
-    val fValue = cValue.toDouble() / Int.MAX_VALUE.toDouble()
-    val col = (fValue * 256 * 256 * 256 - 1).toInt()
-    return Color.hex(col)
+fun String.thousands(): String {
+    val s1 = this.reversed()
+    val s2List = s1.chunked(3)
+    var s3 = ""
+
+    for (item in s2List) {
+        s3 += "$item "
+    }
+
+    return s3.trim().reversed()
 }
+
+fun getHeightToRemainingViewPort(
+    topComponent: Component,
+    delta: Int = 48
+): String {
+    val occupiedViewPortArea = (topComponent.getElementJQuery()?.height() ?: 153).toInt()
+    // println("++++++++++ Inner height: $occupiedViewPortArea")
+    val heightToRemove = occupiedViewPortArea + delta
+    return "calc(100vh - ${heightToRemove}px)"
+}
+
+// fun <T> jsRunBlocking(block: suspend () -> T): dynamic = promise { block() }
