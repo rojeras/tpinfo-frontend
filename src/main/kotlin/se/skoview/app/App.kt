@@ -62,7 +62,6 @@ import se.skoview.common.HippoManager.mainLoop
 
 // Statistik
 // todo: UJ vill kunna se 20-25 tjänster i första tabellen direkt. Bättre överblick. ML: Börja med att minska fontstorlek.
-// todo: Ändra defaulturvalet (null) till "Visa Allt". Fundera på vad knappen ska heta.
 // todo: Urbans stora tabell huggs av mitt i en textrad
 
 // todo: Load statistics and history data in coroutines (as integrations)
@@ -71,6 +70,8 @@ import se.skoview.common.HippoManager.mainLoop
 // todo: Se över synonymerna. Måste passa med de olika förvalen
 // todo: Och så visa svarstider
 // todo: Dokumentation
+
+// done: Ändra defaulturvalet (null) till "Visa Allt". Fundera på vad knappen ska heta.
 
 // done: Fixa "about" för statistiken
 // done: Going from hippo to stat does not issue a loadStatistics()

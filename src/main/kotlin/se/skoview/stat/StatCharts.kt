@@ -24,6 +24,7 @@ import pl.treksoft.kvision.panel.flexPanel
 import pl.treksoft.kvision.panel.hPanel
 import pl.treksoft.kvision.utils.minus
 import pl.treksoft.kvision.utils.perc
+import pl.treksoft.kvision.utils.vh
 import pl.treksoft.kvision.utils.vw
 import se.skoview.common.HippoAction
 import se.skoview.common.HippoState
@@ -32,13 +33,14 @@ import se.skoview.common.getHeightToRemainingViewPort
 
 fun Container.statCharts(state: HippoState) {
     div {
-
+        id = "statCharts"
         if (state.showTimeGraph) showHistoryChart(state)
 
         // The whole item table
         hPanel(
             spacing = 1
         ) {
+            id = "statCharts:hPanel"
             overflow = Overflow.HIDDEN
             // background = Background(Color.name(Col.YELLOW))
             if (state.showTimeGraph)
@@ -181,7 +183,8 @@ fun Container.statChartTableView(
             if (!state.showTimeGraph)
                 add(
                     pieChart.apply {
-                        height = 30.perc
+                        height = 24.vh
+                        // height = 30.perc
                     }
                 )
             add(

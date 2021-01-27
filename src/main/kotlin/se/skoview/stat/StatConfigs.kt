@@ -111,6 +111,12 @@ open class ChartLabelTable(
 ) : SimplePanel() {
     init {
         id = "ChartLabelTable: SimpleTable"
+
+        val size = itemSInfoList.size
+        val linesTerm =
+            if (size == 1) "rad"
+            else "rader"
+
         // Footer pagination buttons hidden through CSS
         tabulator(
             data = itemSInfoList,
@@ -131,7 +137,7 @@ open class ChartLabelTable(
                     ),
                     ColumnDefinition(
                         headerSort = false,
-                        title = "$heading (${itemSInfoList.size} stycken)",
+                        title = "$heading ($size $linesTerm)",
                         field = dataField,
                         // topCalcFormatter = Formatter.COLOR,
                         headerFilter = Editor.INPUT,

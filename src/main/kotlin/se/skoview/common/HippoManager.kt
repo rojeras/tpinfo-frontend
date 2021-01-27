@@ -95,7 +95,7 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
                     View.HIPPO -> {
                         if (
                             state.downloadBaseItemStatus == AsyncActionStatus.COMPLETED // &&
-                        // state.downloadIntegrationStatus == AsyncActionStatus.COMPLETED
+                            // state.downloadIntegrationStatus == AsyncActionStatus.COMPLETED
                         ) {
                             hippoView(state)
                         }
@@ -171,7 +171,8 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
     }
 
     fun dateSelected(type: DateType, date: String) {
-        val nextState = hippoStore.getState().dateSelected(date, type)
+        val nextState = hippoStore.getState()
+            .dateSelected(date, type)
         navigateWithBookmark(nextState)
     }
 
@@ -196,7 +197,8 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
 
     fun statTpSelected(tpId: Int) {
         // hippoStore.dispatch(HippoAction.StatTpSelected(tpId))
-        val nextState = hippoStore.getState().statTpSelected(tpId)
+        val nextState = hippoStore.getState()
+            .statTpSelected(tpId)
         navigateWithBookmark(nextState)
     }
 
@@ -232,26 +234,32 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
 */
     fun statShowAllItemTypes() {
         // hippoStore.dispatch(HippoAction.ShowAllItemTypes(flag))
-        val nextState = hippoStore.getState().setShowAllItemTypes(true)
+        val nextState = hippoStore.getState()
+            .setShowAllItemTypes(true)
         navigateWithBookmark(nextState)
     }
 
     fun statHistorySelected(flag: Boolean) {
         // if (flag) loadHistory(hippoStore.getState()) // Preload of history
         // hippoStore.dispatch(HippoAction.ShowTimeGraph(flag))
-        val nextState = hippoStore.getState().setFlag(HippoAction.ShowTimeGraph(flag))// .setShowAllItemTypes(true)
+        val nextState = hippoStore.getState()
+            .setFlag(HippoAction.ShowTimeGraph(flag)) // .setShowAllItemTypes(true)
         navigateWithBookmark(nextState)
     }
 
     fun setView(view: View) {
-        val nextState = hippoStore.getState().setNewView(view)
+        val nextState = hippoStore.getState()
+            .setNewView(view)
         console.log(nextState)
         navigateWithBookmark(nextState)
     }
 
     fun statSetPreselect(preSelectLabel: String) {
         val preSelect: PreSelect? = PreSelect.mapp[preSelectLabel]
-        val nextState = hippoStore.getState().setPreselect(preSelect)
+        val nextState =
+            hippoStore.getState()
+                .setPreselect(preSelect)
+                .setFlag(HippoAction.ShowTimeGraph(false))
         navigateWithBookmark(nextState)
     }
 
