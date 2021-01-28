@@ -68,15 +68,6 @@ fun Navigo.initialize(): Navigo {
         "${View.STAT.url}/:slug",
         { params -> HippoManager.newOrUpdatedUrlFromBrowser(View.STAT, stringParameter(params, "slug"), origin = "stat-slug") }
     )
-        /*
-        .on(
-        View.STAT_ADVANCED.url,
-        { _ -> HippoManager.newOrUpdatedUrlFromBrowser(View.STAT_ADVANCED) }
-    ).on(
-        "${View.STAT_ADVANCED.url}/:slug",
-        { params -> HippoManager.newOrUpdatedUrlFromBrowser(View.STAT_ADVANCED, stringParameter(params, "slug")) }
-    )
-         */
 }
 
 fun stringParameter(params: dynamic, parameterName: String): String {

@@ -25,7 +25,10 @@ import pl.treksoft.kvision.pace.Pace
 import pl.treksoft.kvision.redux.createReduxStore
 import pl.treksoft.navigo.Navigo
 import se.skoview.hippo.hippoView
-import se.skoview.stat.* // ktlint-disable no-wildcard-imports
+import se.skoview.stat.PreSelect
+import se.skoview.stat.loadStatistics
+import se.skoview.stat.preSelectInitialize
+import se.skoview.stat.statPage
 
 object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Default + SupervisorJob()) {
 
@@ -101,8 +104,9 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
                         }
                     }
                     View.STAT -> {
-                        statHeader(state)
-                        statCharts(state)
+                        statPage(state)
+                        // statHeader(state)
+                        // statCharts(state)
                     }
                 }
             }

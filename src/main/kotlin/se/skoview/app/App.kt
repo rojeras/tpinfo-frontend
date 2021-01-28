@@ -73,6 +73,7 @@ import se.skoview.common.HippoManager.mainLoop
 
 // done: Ändra defaulturvalet (null) till "Visa Allt". Fundera på vad knappen ska heta.
 
+// done: Tag bort statistik-specifika filter från hippos URL
 // done: Fixa "about" för statistiken
 // done: Going from hippo to stat does not issue a loadStatistics()
 // done: Swedish characters does not display correctly in CSV export in Windows excel
@@ -172,6 +173,8 @@ import se.skoview.common.HippoManager.mainLoop
 // done: Felstavningar i ”Om hippo”, ändra ”hippo” till ”Hippo”.
 // done: Varför poppar rutan ”SLL statistiktjänst” upp – finns väl ingen anledning till det.
 // done: ”Återställ tjänsteplattform(ar)” bör flyttas ned någon centimeter.
+
+val showBackgroundColorsForDebug: Boolean = false
 
 class App : Application() {
     init {

@@ -23,8 +23,6 @@ import pl.treksoft.kvision.html.Div
 import pl.treksoft.kvision.panel.SimplePanel
 import pl.treksoft.kvision.table.TableType
 import pl.treksoft.kvision.tabulator.*
-import pl.treksoft.kvision.utils.perc
-import pl.treksoft.kvision.utils.vh
 import pl.treksoft.kvision.utils.vw
 import se.skoview.common.*
 
@@ -95,7 +93,8 @@ fun Container.showHistoryChart(state: HippoState) {
                 )
             )
         ).apply {
-            height = 24.vh
+            id = "showHistoryChart"
+            height = StatPanelSize.chartPanelSize
             width = 99.vw
         }
     }
@@ -110,12 +109,16 @@ open class ChartLabelTable(
     heading: String
 ) : SimplePanel() {
     init {
-        id = "ChartLabelTable: SimpleTable"
+        id = "ChartLabelTable:SimpleTable"
 
         val size = itemSInfoList.size
         val linesTerm =
             if (size == 1) "rad"
             else "rader"
+
+        console.log(statHeaderTop.getElementJQuery())
+        // val cssHeight = "calc(100vh - ${dummyDiv.getElementJQuery()?.height()}.px)"
+        // val sss = getPosition("ChartLabelTable:SimpleTable")
 
         // Footer pagination buttons hidden through CSS
         tabulator(
@@ -126,6 +129,9 @@ open class ChartLabelTable(
                 pagination = PaginationMode.LOCAL,
                 paginationSize = 1000,
                 paginationButtonCount = 0,
+                // height = "calc(100vh - 50vh)",
+                // height = "calc(100vh - 24vh - 230px)",
+                height = StatPanelSize.tablePanelCssSize,
                 selectable = true,
                 columns = listOf(
                     ColumnDefinition<Any>(
@@ -179,9 +185,9 @@ open class ChartLabelTable(
                 // todo: Hide the tabulator footer here
             )
         )
-            .apply {
-                height = 100.perc
-            }
+            // .apply {
+                // height = 100.perc
+            // }
     }
 }
 

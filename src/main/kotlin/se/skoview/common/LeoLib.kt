@@ -176,3 +176,8 @@ fun getHeightToRemainingViewPort(
 }
 
 // fun <T> jsRunBlocking(block: suspend () -> T): dynamic = promise { block() }
+fun getPosition(elementId: String): Int {
+    // console.log(document.getElementById(elementId)!!.innerHTML)
+    console.log(document.getElementById(elementId)!!.innerHTML)
+    return 42
+}

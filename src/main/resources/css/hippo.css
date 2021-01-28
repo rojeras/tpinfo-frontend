@@ -1,9 +1,11 @@
 /* Tabulator settings */
 .tabulator-footer {display: none } /* Hide tabulator footer */
 .tabulator {font-size: 12px}
+.tabulator-header {font-size: 12px}
+
 /* .tabulator-header-filter input::placeholder { font-size: 14px } */
 /* Wrap column title */
-.tabulator .tabulator-header .tabulator-col .tabulator-col-content .tabulator-col-title{
+.tabulator .tabulator-header .tabulator-col .tabulator-col-content .tabulator-col-title {
     white-space: normal;
     text-overflow: clip;
 }

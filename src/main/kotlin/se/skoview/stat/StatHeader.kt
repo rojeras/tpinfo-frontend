@@ -30,22 +30,28 @@ import pl.treksoft.kvision.table.row
 import pl.treksoft.kvision.table.table
 import pl.treksoft.kvision.utils.px
 import se.skoview.app.formControlXs
+import se.skoview.app.showBackgroundColorsForDebug
 import se.skoview.common.*
 
-var statPageTop: Div = Div()
+var statHeaderTop: Div = Div()
 
-fun Container.statHeader(state: HippoState) {
+fun Container.statHeader(
+    state: HippoState,
+) {
     println("In statHeader()")
-    div {
+    // Whole header block
+    vPanel {
         fontFamily = "Times New Roman"
-        id = "StatPage:SimplePanel()"
+        id = "statHeader"
+        if (showBackgroundColorsForDebug) background = Background(Color.name(Col.LIGHTGRAY))
+        height = StatPanelSize.statHeaderSize
         this.marginTop = 10.px
 
-        statPageTop = div {
+        statHeaderTop = div {
             // }.bind(store) { state ->
-            id = "StatPageTop"
+            id = "stateHeader:StatPageTop"
 
-            // Page header
+            // Page top
             div {
                 h2("Antal meddelanden genom Region Stockholms tjänsteplattform")
                 div("Detaljerad statistik med diagram och möjlighet att ladda ner informationen för egna analyser.")
@@ -64,17 +70,17 @@ fun Container.statHeader(state: HippoState) {
                 JustifyContent.SPACEBETWEEN,
                 AlignItems.CENTER,
             ) {
-                // }.bind(store) { state ->
+                id = "statHeader:StatPageTop:flexPanel"
                 spacing = 5
                 clear = Clear.BOTH
                 margin = 0.px
                 background = Background(Color.hex(0xf6efe9))
-                id = "StatPage-ControlPanel:FlexPanel-Bind"
                 table(
                     listOf(),
-                    setOf(TableType.BORDERED, TableType.SMALL)
+                    setOf(TableType.BORDERLESS, TableType.SMALL)
                 ) {
-                    id = "ControlPanel-Table"
+                    id = "statHeader:StatPageTop:flexPanel:table"
+                    marginBottom = 0.px
                     // Start date
                     row {
                         id = "First row"
@@ -276,14 +282,11 @@ fun Container.statHeader(state: HippoState) {
                 else "${state.viewPreSelect.label}: $tCalls anrop"
 
             h4 {
+                id = "pageHeading"
                 content = headingText
                 align = Align.CENTER
                 fontWeight = FontWeight.BOLD
             }
-
-            // showHistoryChart(state)
         }
-
-        // pieView(state)
     }
 }

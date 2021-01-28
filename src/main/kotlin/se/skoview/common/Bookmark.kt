@@ -68,16 +68,10 @@ fun HippoState.createBookmarkString(): String {
     var bookmark = ""
 
     if (this.view == View.HIPPO) {
-        if (!(
-                    this.updateDates.isNullOrEmpty() ||
-                            this.dateEffective.isNullOrEmpty()
-                    )
-        ) {
-            // Exclude dates if dateEnd == current date (first in updateDates list)
-            if (this.dateEnd != this.updateDates[0]) {
-                bookmark += "S" + date2DaysSinceEpoch(this.dateEffective)
-                bookmark += "E" + date2DaysSinceEpoch(this.dateEnd!!)
-            }
+        // Exclude dates if dateEnd == current date (first in updateDates list)
+        if (!(this.updateDates.isNullOrEmpty() || this.dateEffective.isNullOrEmpty()) && this.dateEnd != this.updateDates[0]) {
+            bookmark += "S" + date2DaysSinceEpoch(this.dateEffective)
+            bookmark += "E" + date2DaysSinceEpoch(this.dateEnd!!)
         }
     } else {
         bookmark += "S" + date2DaysSinceEpoch(this.statDateEffective)
@@ -114,17 +108,20 @@ fun HippoState.createBookmarkString(): String {
         bookmark += "L$lastId"
     }
 
-    // History flag
-    if (this.showTimeGraph) bookmark += "H1"
+    // Statistic specific flags
+    if (this.view == View.STAT) {
+        // History flag
+        if (this.showTimeGraph) bookmark += "H1"
 
-    // Add the showItemType settings
-    if (this.showConsumers) bookmark += "D1"
-    if (this.showProducers) bookmark += "D2"
-    if (this.showContracts) bookmark += "D3"
-    if (this.showLogicalAddresses) bookmark += "D4"
+        // Add the showItemType settings
+        if (this.showConsumers) bookmark += "D1"
+        if (this.showProducers) bookmark += "D2"
+        if (this.showContracts) bookmark += "D3"
+        if (this.showLogicalAddresses) bookmark += "D4"
 
-    bookmark += if (this.viewPreSelect == null) "P0"
-    else "P${this.viewPreSelect.id}"
+        bookmark += if (this.viewPreSelect == null) "P0"
+        else "P${this.viewPreSelect.id}"
+    }
 
     return bookmark
 }
