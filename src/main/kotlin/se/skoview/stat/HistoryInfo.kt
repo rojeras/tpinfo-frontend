@@ -20,6 +20,9 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import se.skoview.common.* // ktlint-disable no-wildcard-imports
 
+// todo: Handle case when history is null:
+// https://qa.integrationer.tjansteplattform.se/tpdb/tpdbapi.php/api/v1/history?dummy&dateEffective=2020-12-01&dateEnd=2021-01-27&consumerId=38,43,400,610,973,974,975,976,981&firstPlattformId=3&lastPlattformId=3
+
 @Serializable
 data class HistoryInfo(
     val history: Map<String, Int>
@@ -57,9 +60,11 @@ fun loadHistory(state: HippoState) {
             val json = Json {}
             val history = json.decodeFromString(HistoryInfo.serializer(), response)
             console.log(history.history)
+            /*
             for ((key, value) in history.history) {
                 println("$key : $value")
             }
+             */
 
             // Store in cache
             HistoryCache(

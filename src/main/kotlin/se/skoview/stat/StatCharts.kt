@@ -132,7 +132,6 @@ fun Container.statChartTableView(
     val pieChart =
         Chart(
             getPieChartConfig(
-                state,
                 itemType,
                 itemSInfoList,
                 animationTime = animateTime,
@@ -194,26 +193,4 @@ fun Container.statChartTableView(
     }
 }
 
-fun getHeading(state: HippoState, itemType: ItemType): String {
-    if (state.showTechnicalTerms)
-        return when (itemType) {
-            ItemType.CONSUMER -> "Tjänstekonsumenter"
-            ItemType.PRODUCER -> "Tjänsteproducenter"
-            ItemType.CONTRACT -> "Tjänstekontrakt"
-            ItemType.LOGICAL_ADDRESS -> "Logiska adresser"
-            else -> "Internt fel i getHeading() - 1"
-        }
-    else { // ! state.showTechnicalTerms
-        if (state.viewPreSelect != null) {
-            return state.viewPreSelect.headingsMap[itemType]!!
-        } else { // state.preSelect == null, specify defaults
-            return when (itemType) {
-                ItemType.CONSUMER -> "Applikationer"
-                ItemType.PRODUCER -> "Informationskällor"
-                ItemType.CONTRACT -> "Tjänster"
-                ItemType.LOGICAL_ADDRESS -> "Adresser"
-                else -> "Internt fel i getHeading() - 2"
-            }
-        }
-    }
-}
+

@@ -104,6 +104,17 @@ fun initializeHippoState(): HippoState {
     )
 }
 
+fun HippoState.numberOfItemViewsSelected(): Int {
+    var count = 0
+
+    if (this.showConsumers) count++
+    if (this.showProducers) count++
+    if (this.showContracts) count++
+    if (this.showLogicalAddresses) count++
+
+    return count
+}
+
 fun HippoState.isItemSelected(itemType: ItemType, id: Int): Boolean {
     return when (itemType) {
         ItemType.CONSUMER -> this.selectedConsumersIds.contains(id)

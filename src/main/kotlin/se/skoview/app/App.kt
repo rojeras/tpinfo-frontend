@@ -38,6 +38,7 @@ import se.skoview.common.HippoManager.mainLoop
 // todo: Verifiera att zip bygger en produktionsversion
 // todo: Visa antal användare senaste 24 timmarna
 // todo: Börja använda Karma och enhetstester
+// todo: Evaluate sass and bulma
 // done: Se över HippoManager och API-anrop. Behöver förenklas. Ev ta base items först.
 // done: Lägg in stöd för Navigo routing
 // done: Investigate Kotlin JS blocking: runBlocking workaround https://youtrack.jetbrains.com/issue/KT-22228

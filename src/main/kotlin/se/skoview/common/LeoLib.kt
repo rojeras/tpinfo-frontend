@@ -16,10 +16,12 @@
  */
 package se.skoview.common
 
+import com.github.snabbdom.VNode
 import kotlinx.browser.document
 import kotlinx.browser.window
 import org.w3c.xhr.XMLHttpRequest
 import pl.treksoft.kvision.core.Component
+import pl.treksoft.kvision.panel.SimplePanel
 import kotlin.js.Date
 
 fun tpdbBaseUrl(): String {
@@ -180,4 +182,55 @@ fun getPosition(elementId: String): Int {
     // console.log(document.getElementById(elementId)!!.innerHTML)
     console.log(document.getElementById(elementId)!!.innerHTML)
     return 42
+}
+
+/**
+ * HippoPanel enum contains keys to be used in PanelPosition and PanelDimension
+ */
+enum class HippoPanel {
+    CHARTLABELTABLE,
+    EXAMPLE
+}
+
+/**
+ * Add this panel to a point on the screen to be able to get its coordinates
+ * OBS, identify the panel in HippoPanel enum
+ * @param key: Identifies the panel
+ * @param dummy: HippoState. Needed to ensure this panel is re-rendered when state is changed
+ */
+class PanelPosition(val key: HippoPanel, val dummy: HippoState) : SimplePanel() {
+    init {
+        id = "PanelPosition"
+    }
+
+    companion object {
+        val leftPos: MutableMap<HippoPanel, Int> = mutableMapOf()
+        val topPos: MutableMap<HippoPanel, Int> = mutableMapOf()
+    }
+
+    override fun afterInsert(node: VNode) {
+        super.afterInsert(node)
+        val offset = this.getElementJQuery()!!.offset()
+        leftPos[key] = offset.left as Int
+        topPos[key] = offset.top as Int
+    }
+}
+
+/**
+ * Add the afterInster() function to a panel class to get its dimensions through the maps
+ * OBS, identify the panel in HippoPanel enum
+ */
+object PanelDimension {
+
+    val heightMap: MutableMap<HippoPanel, Int> = mutableMapOf()
+    val widthMap: MutableMap<HippoPanel, Int> = mutableMapOf()
+
+    /*
+    // Template function. Add this to container class
+    override fun afterInsert(node: VNode) {
+        super.afterInsert(node)
+        PanelDimension.heightMap[HippoPanel.EXAMPLE] = this.getElementJQuery()!!.height() as Int
+        PanelDimension.widthMap[HippoPanel.EXAMPLE] = this.getElementJQuery()!!.width() as Int
+    }
+     */
 }

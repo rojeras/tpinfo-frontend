@@ -195,6 +195,14 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
         navigateWithBookmark(nextState)
     }
 
+    fun itemSelectDeselect(itemId: Int, itemType: ItemType) {
+        if (hippoStore.getState().isItemSelected(itemType, itemId)) {
+            itemDeselected(itemId, itemType)
+        } else {
+            itemSelected(itemId, itemType)
+        }
+    }
+
     fun setViewMax(type: ItemType, lines: Int) {
         hippoStore.dispatch(HippoAction.SetVMax(type, lines))
     }

@@ -16,12 +16,14 @@
  */
 package se.skoview.stat
 
+import com.github.snabbdom.VNode
 import pl.treksoft.kvision.core.*
 import pl.treksoft.kvision.form.check.checkBoxInput
 import pl.treksoft.kvision.form.select.simpleSelectInput
 import pl.treksoft.kvision.html.*
 import pl.treksoft.kvision.modal.Modal
 import pl.treksoft.kvision.modal.ModalSize
+import pl.treksoft.kvision.panel.VPanel
 import pl.treksoft.kvision.panel.flexPanel
 import pl.treksoft.kvision.panel.vPanel
 import pl.treksoft.kvision.table.TableType
@@ -33,260 +35,274 @@ import se.skoview.app.formControlXs
 import se.skoview.app.showBackgroundColorsForDebug
 import se.skoview.common.*
 
-var statHeaderTop: Div = Div()
-
 fun Container.statHeader(
     state: HippoState,
 ) {
     println("In statHeader()")
     // Whole header block
-    vPanel {
+    // vPanel {
+    add(StatHeader(state))
+}
+
+class StatHeader(state: HippoState) : VPanel() {
+
+    init {
+
         fontFamily = "Times New Roman"
-        id = "statHeader"
+        id = "StatHeader"
         if (showBackgroundColorsForDebug) background = Background(Color.name(Col.LIGHTGRAY))
-        height = StatPanelSize.statHeaderSize
+        height = StatPanelSize.statHeaderHeight
         this.marginTop = 10.px
 
-        statHeaderTop = div {
-            // }.bind(store) { state ->
-            id = "stateHeader:StatPageTop"
+        // statHeaderTop = div
+        // {
+        // }.bind(store) { state ->
 
-            // Page top
-            div {
-                h2("Antal meddelanden genom Region Stockholms tjänsteplattform")
-                div("Detaljerad statistik med diagram och möjlighet att ladda ner informationen för egna analyser.")
-            }.apply {
-                // width = 100.perc
-                id = "StatPage-HeadingArea:Div"
-                background = Background(Color.hex(0x113d3d))
-                align = Align.CENTER
-                color = Color.name(Col.WHITE)
-                marginTop = 5.px
-            }
+        // Page top
+        div {
+            h2("Antal meddelanden genom Region Stockholms tjänsteplattform")
+            div("Detaljerad statistik med diagram och möjlighet att ladda ner informationen för egna analyser.")
+        }.apply {
+            // width = 100.perc
+            id = "StatPage-HeadingArea:Div"
+            background = Background(Color.hex(0x113d3d))
+            align = Align.CENTER
+            color = Color.name(Col.WHITE)
+            marginTop = 5.px
+        }
 
-            flexPanel(
-                FlexDirection.ROW,
-                FlexWrap.WRAP,
-                JustifyContent.SPACEBETWEEN,
-                AlignItems.CENTER,
+        flexPanel(
+            FlexDirection.ROW,
+            FlexWrap.WRAP,
+            JustifyContent.SPACEBETWEEN,
+            AlignItems.CENTER,
+        ) {
+            id = "statHeader:StatPageTop:flexPanel"
+            spacing = 5
+            clear = Clear.BOTH
+            margin = 0.px
+            background = Background(Color.hex(0xf6efe9))
+            table(
+                listOf(),
+                setOf(TableType.BORDERLESS, TableType.SMALL)
             ) {
-                id = "statHeader:StatPageTop:flexPanel"
-                spacing = 5
-                clear = Clear.BOTH
-                margin = 0.px
-                background = Background(Color.hex(0xf6efe9))
-                table(
-                    listOf(),
-                    setOf(TableType.BORDERLESS, TableType.SMALL)
-                ) {
-                    id = "statHeader:StatPageTop:flexPanel:table"
-                    marginBottom = 0.px
-                    // Start date
-                    row {
-                        id = "First row"
-                        cell { +"Startdatum:" }
-                        cell {
-                            simpleSelectInput(
-                                // options = state.statisticsDates
-                                options = BaseDates.statisticsDates
-                                    .sortedByDescending { it }
-                                    .filter { it <= state.statDateEnd }
-                                    .map { Pair(it, it) },
-                                value = state.statDateEffective,
-                            ) {
-                                addCssStyle(formControlXs)
-                                width = 80.px
-                                background = Background(Color.name(Col.WHITE))
-                            }.onEvent {
-                                change = {
-                                    HippoManager.dateSelected(DateType.STAT_EFFECTIVE, self.value ?: "")
-                                }
+                id = "statHeader:StatPageTop:flexPanel:table"
+                marginBottom = 0.px
+                // Start date
+                row {
+                    id = "First row"
+                    cell { +"Startdatum:" }
+                    cell {
+                        simpleSelectInput(
+                            // options = state.statisticsDates
+                            options = BaseDates.statisticsDates
+                                .sortedByDescending { it }
+                                .filter { it <= state.statDateEnd }
+                                .map { Pair(it, it) },
+                            value = state.statDateEffective,
+                        ) {
+                            addCssStyle(formControlXs)
+                            width = 80.px
+                            background = Background(Color.name(Col.WHITE))
+                        }.onEvent {
+                            change = {
+                                HippoManager.dateSelected(DateType.STAT_EFFECTIVE, self.value ?: "")
                             }
                         }
-                        cell { +"Plattform:" }
-                        cell {
-                            val selectedPlattformId =
-                                if (state.selectedPlattformChainsIds.isNotEmpty())
-                                    PlattformChain.mapp[state.selectedPlattformChainsIds[0]]!!.last.toString()
-                                else ""
+                    }
+                    cell { +"Plattform:" }
+                    cell {
+                        val selectedPlattformId =
+                            if (state.selectedPlattformChainsIds.isNotEmpty())
+                                PlattformChain.mapp[state.selectedPlattformChainsIds[0]]!!.last.toString()
+                            else ""
 
-                            val options = StatisticsPlattform.mapp.map { Pair(it.key.toString(), it.value.name) }
-                            simpleSelectInput(
-                                options = options,
-                                value = selectedPlattformId
-                            ) {
-                                addCssStyle(formControlXs)
-                                background = Background(Color.name(Col.WHITE))
-                            }.onEvent {
-                                change = {
-                                    val selectedTp = (self.value ?: "").toInt()
-                                    HippoManager.statTpSelected(selectedTp)
-                                }
-                            }
-                        }
-
-                        // Show time graph
-                        cell {
-                            checkBoxInput(
-                                value = state.showTimeGraph
-                            ).onClick {
-                                HippoManager.statHistorySelected(value)
-                            }
-                            +" Visa utveckling över tid"
-                        }
-
-                        cell {
-
-                            button(
-                                "Se urval i hippo",
-                                style = ButtonStyle.INFO,
-                            ) {
-                                size = ButtonSize.SMALL
-                            }.onClick {
-                                HippoManager.setView(View.HIPPO)
-                            }.apply {
-                                addBsBgColor(BsBgColor.LIGHT)
-                                addBsColor(BsColor.BLACK50)
+                        val options = StatisticsPlattform.mapp.map { Pair(it.key.toString(), it.value.name) }
+                        simpleSelectInput(
+                            options = options,
+                            value = selectedPlattformId
+                        ) {
+                            addCssStyle(formControlXs)
+                            background = Background(Color.name(Col.WHITE))
+                        }.onEvent {
+                            change = {
+                                val selectedTp = (self.value ?: "").toInt()
+                                HippoManager.statTpSelected(selectedTp)
                             }
                         }
                     }
 
-                    // End date
-                    row {
-                        id = "Second row"
-                        cell { +"Slutdatum:" }
-                        cell {
-                            simpleSelectInput(
-                                options = BaseDates.statisticsDates
-                                    .sortedByDescending { it }
-                                    .filter { it >= state.statDateEffective }
-                                    .map { Pair(it, it) },
-                                value = state.statDateEnd
-                            ) {
-                                addCssStyle(formControlXs)
-                                background = Background(Color.name(Col.WHITE))
-                            }.onEvent {
-                                change = {
-                                    HippoManager.dateSelected(DateType.STAT_END, self.value ?: "")
-                                    // }
-                                }
-                            }
+                    // Show time graph
+                    cell {
+                        checkBoxInput(
+                            value = state.showTimeGraph
+                        ).onClick {
+                            HippoManager.statHistorySelected(value)
                         }
+                        +" Visa utveckling över tid"
+                    }
 
-                        cell { +"Visa:" }
-                        cell {
-                            val selectedPreSelectLabel: String =
-                                if (state.viewPreSelect == null) ""
-                                else state.viewPreSelect.label
+                    cell {
 
-                            val options: List<Pair<String, String>> =
-                                listOf(Pair("", "Allt")) +
-                                    PreSelect.mapp
-                                        .toList()
-                                        .sortedBy { it.first }
-                                        .map { Pair(it.first, it.first) }
-
-                            simpleSelectInput(
-                                options = options,
-                                value = selectedPreSelectLabel
-                            ) {
-                                addCssStyle(formControlXs)
-                                background = Background(Color.name(Col.WHITE))
-                            }.onEvent {
-                                change = {
-                                    val preSelectLabel: String = self.value ?: "dummy"
-                                    HippoManager.statSetPreselect(preSelectLabel)
-                                }
-                            }
-                        }
-
-                        cell {
-                            checkBoxInput(
-                                value = state.showTechnicalTerms
-                            ).onClick {
-                                HippoManager.statTechnicalTermsSelected(value)
-                            }
-                            +" Tekniska termer"
-                        }
-                        cell {
-
-                            val disabled: Boolean = (
-                                state.showConsumers &&
-                                    state.showProducers &&
-                                    state.showContracts &&
-                                    state.showLogicalAddresses
-                                )
-
-                            button(
-                                "Visa samtliga",
-                                style = ButtonStyle.INFO,
-                                disabled = disabled
-                            ) {
-                                size = ButtonSize.SMALL
-                            }.onClick {
-                                HippoManager.statShowAllItemTypes()
-                            }.apply {
-                                addBsBgColor(BsBgColor.LIGHT)
-                                addBsColor(BsColor.BLACK50)
-                            }
+                        button(
+                            "Se urval i hippo",
+                            style = ButtonStyle.INFO,
+                        ) {
+                            size = ButtonSize.SMALL
+                        }.onClick {
+                            HippoManager.setView(View.HIPPO)
+                        }.apply {
+                            addBsBgColor(BsBgColor.LIGHT)
+                            addBsColor(BsColor.BLACK50)
                         }
                     }
                 }
 
-                // About button
-                vPanel(
-                    spacing = 2,
-                ) {
-                    marginRight = 17.px
-
-                    button(
-                        "Exportera",
-                        style = ButtonStyle.INFO,
-                    ) {
-                        size = ButtonSize.SMALL
-                    }.onClick {
-                        exportStatData(state)
-                    }.apply {
-                        addBsBgColor(BsBgColor.LIGHT)
-                        addBsColor(BsColor.BLACK50)
+                // End date
+                row {
+                    id = "Second row"
+                    cell { +"Slutdatum:" }
+                    cell {
+                        simpleSelectInput(
+                            options = BaseDates.statisticsDates
+                                .sortedByDescending { it }
+                                .filter { it >= state.statDateEffective }
+                                .map { Pair(it, it) },
+                            value = state.statDateEnd
+                        ) {
+                            addCssStyle(formControlXs)
+                            background = Background(Color.name(Col.WHITE))
+                        }.onEvent {
+                            change = {
+                                HippoManager.dateSelected(DateType.STAT_END, self.value ?: "")
+                                // }
+                            }
+                        }
                     }
 
-                    val modal = Modal("Om Statistikfunktionen")
-                    modal.iframe(src = "about-stat.html", iframeHeight = 400, iframeWidth = 700)
-                    modal.size = ModalSize.LARGE
-                    // modal.add(H(require("img/dog.jpg")))
-                    modal.addButton(
-                        Button("Stäng").onClick {
-                            modal.hide()
+                    cell { +"Visa:" }
+                    cell {
+                        val selectedPreSelectLabel: String =
+                            if (state.viewPreSelect == null) ""
+                            else state.viewPreSelect.label
+
+                        val options: List<Pair<String, String>> =
+                            listOf(Pair("", "Allt")) +
+                                PreSelect.mapp
+                                    .toList()
+                                    .sortedBy { it.first }
+                                    .map { Pair(it.first, it.first) }
+
+                        simpleSelectInput(
+                            options = options,
+                            value = selectedPreSelectLabel
+                        ) {
+                            addCssStyle(formControlXs)
+                            background = Background(Color.name(Col.WHITE))
+                        }.onEvent {
+                            change = {
+                                val preSelectLabel: String = self.value ?: "dummy"
+                                HippoManager.statSetPreselect(preSelectLabel)
+                            }
                         }
-                    )
-                    button(
-                        "Om Statistik ${getVersion("hippoVersion")}",
-                        style = ButtonStyle.INFO
-                    ) {
-                        size = ButtonSize.SMALL
-                    }.onClick {
-                        modal.show()
-                    }.apply {
-                        addBsBgColor(BsBgColor.LIGHT)
-                        addBsColor(BsColor.BLACK50)
+                    }
+
+                    cell {
+                        checkBoxInput(
+                            value = state.showTechnicalTerms
+                        ).onClick {
+                            HippoManager.statTechnicalTermsSelected(value)
+                        }
+                        +" Tekniska termer"
+                    }
+                    cell {
+
+                        val disabled: Boolean = (
+                            state.showConsumers &&
+                                state.showProducers &&
+                                state.showContracts &&
+                                state.showLogicalAddresses
+                            )
+
+                        button(
+                            "Visa samtliga",
+                            style = ButtonStyle.INFO,
+                            disabled = disabled
+                        ) {
+                            size = ButtonSize.SMALL
+                        }.onClick {
+                            HippoManager.statShowAllItemTypes()
+                        }.apply {
+                            addBsBgColor(BsBgColor.LIGHT)
+                            addBsColor(BsColor.BLACK50)
+                        }
                     }
                 }
             }
 
-            // Heading
-            val tCalls: String = state.statBlob.callsDomain.map { it.value }.sum().toString().thousands()
+            // About button
+            vPanel(
+                spacing = 2,
+            ) {
+                marginRight = 17.px
 
-            val headingText: String =
-                if (state.viewPreSelect == null) "Totalt antal anrop för detta urval är: $tCalls"
-                else "${state.viewPreSelect.label}: $tCalls anrop"
+                button(
+                    "Exportera",
+                    style = ButtonStyle.INFO,
+                ) {
+                    size = ButtonSize.SMALL
+                }.onClick {
+                    exportStatData(state)
+                }.apply {
+                    addBsBgColor(BsBgColor.LIGHT)
+                    addBsColor(BsColor.BLACK50)
+                }
 
-            h4 {
-                id = "pageHeading"
-                content = headingText
-                align = Align.CENTER
-                fontWeight = FontWeight.BOLD
+                val modal = Modal("Om Statistikfunktionen")
+                modal.iframe(src = "about-stat.html", iframeHeight = 400, iframeWidth = 700)
+                modal.size = ModalSize.LARGE
+                // modal.add(H(require("img/dog.jpg")))
+                modal.addButton(
+                    Button("Stäng").onClick {
+                        modal.hide()
+                    }
+                )
+                button(
+                    "Om Statistik ${getVersion("hippoVersion")}",
+                    style = ButtonStyle.INFO
+                ) {
+                    size = ButtonSize.SMALL
+                }.onClick {
+                    modal.show()
+                }.apply {
+                    addBsBgColor(BsBgColor.LIGHT)
+                    addBsColor(BsColor.BLACK50)
+                }
             }
+        }
+
+        // Heading
+        val tCalls: String = state.statBlob.callsDomain.map { it.value }.sum().toString().thousands()
+
+        val headingText: String =
+            if (state.viewPreSelect == null) "Totalt antal anrop för detta urval är: $tCalls"
+            else "${state.viewPreSelect.label}: $tCalls anrop"
+
+        h4 {
+            id = "pageHeading"
+            content = headingText
+            align = Align.CENTER
+            fontWeight = FontWeight.BOLD
+        }
+    }
+
+    override fun afterInsert(node: VNode) {
+        super.afterInsert(node)
+        val height = this.getElementJQuery()?.height()
+        if (height != null) {
+            StatPanelSize.statHeaderHeightPx = height.toInt()
+            println("offset is:")
+            console.log(this.getElementJQuery()!!.offset())
         }
     }
 }

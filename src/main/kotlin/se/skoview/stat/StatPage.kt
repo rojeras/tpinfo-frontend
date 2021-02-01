@@ -19,16 +19,24 @@ package se.skoview.stat
 
 import pl.treksoft.kvision.core.*
 import pl.treksoft.kvision.html.Div
+import pl.treksoft.kvision.panel.hPanel
 import pl.treksoft.kvision.panel.vPanel
+import pl.treksoft.kvision.utils.asString
 import pl.treksoft.kvision.utils.px
 import pl.treksoft.kvision.utils.vh
+import pl.treksoft.kvision.utils.vw
 import se.skoview.app.showBackgroundColorsForDebug
 import se.skoview.common.HippoState
+import se.skoview.common.ItemType
+import se.skoview.common.numberOfItemViewsSelected
 
 object StatPanelSize {
-    val statHeaderSize: CssSize = 201.px // 200.99
-    val chartPanelSize: CssSize = 24.vh
-    val tablePanelCssSize = "calc(100vh - ${chartPanelSize.first}${chartPanelSize.second} - ${statHeaderSize.first}${statHeaderSize.second} - 26px)"
+    var statHeaderHeightPx: Int = 100
+    val statHeaderHeight: CssSize = 201.px // 200.99
+    val chartPanelHeight: CssSize = 24.vh
+    val singlePiePanelCssHeight: String = "calc(90vh - ${statHeaderHeight.asString()}"
+    val tablePanelSingleCssHeight: String = "calc(94vh - ${statHeaderHeight.asString()})"
+    val tablePanelMultipleCssHeight: String = "calc(95vh - ${statHeaderHeight.asString()} - ${chartPanelHeight.asString()})"
 }
 
 val statPageTop: Div = Div()
@@ -36,10 +44,57 @@ val statPageTop: Div = Div()
 fun Container.statPage(
     state: HippoState,
 ) {
-    println("TEST of size: ${StatPanelSize.tablePanelCssSize}")
     vPanel {
+        width = 99.vw
         if (showBackgroundColorsForDebug) background = Background(Color.name(Col.LIGHTBLUE))
         statHeader(state)
-        statFourView(state)
+        statMainView(state)
+    }
+}
+
+fun Container.statMainView(state: HippoState) {
+    if (state.showTimeGraph) {
+        vPanel {
+            showHistoryChart(state)
+            showItemTables(state)
+        }
+    } else if (state.numberOfItemViewsSelected() == 1) {
+        hPanel {
+            if (showBackgroundColorsForDebug) background = Background(Color.name(Col.LIGHTSEAGREEN))
+            width = 99.vw
+            setStyle("height", "calc(96vh - ${StatPanelSize.statHeaderHeight.asString()}")
+            showPieCharts(state)
+            showItemTables(state)
+        }
+    } else {
+        vPanel {
+            // width = 98.vw
+            showPieCharts(state) // .apply { height = 30.perc }
+            showItemTables(state) // .apply { height = 70.perc }
+        }
+    }
+}
+
+fun getHeading(state: HippoState, itemType: ItemType): String {
+    if (state.showTechnicalTerms)
+        return when (itemType) {
+            ItemType.CONSUMER -> "Tjänstekonsumenter"
+            ItemType.PRODUCER -> "Tjänsteproducenter"
+            ItemType.CONTRACT -> "Tjänstekontrakt"
+            ItemType.LOGICAL_ADDRESS -> "Logiska adresser"
+            else -> "Internt fel i getHeading() - 1"
+        }
+    else { // ! state.showTechnicalTerms
+        if (state.viewPreSelect != null) {
+            return state.viewPreSelect.headingsMap[itemType]!!
+        } else { // state.preSelect == null, specify defaults
+            return when (itemType) {
+                ItemType.CONSUMER -> "Applikationer"
+                ItemType.PRODUCER -> "Informationskällor"
+                ItemType.CONTRACT -> "Tjänster"
+                ItemType.LOGICAL_ADDRESS -> "Adresser"
+                else -> "Internt fel i getHeading() - 2"
+            }
+        }
     }
 }
