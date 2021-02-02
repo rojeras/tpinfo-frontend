@@ -16,6 +16,7 @@
  */
 package se.skoview.common
 
+import kotlinx.browser.document
 import kotlinx.browser.window
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -147,6 +148,7 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
         when (view) {
             View.HOME -> routing.navigate(View.HIPPO.url)
             View.HIPPO -> {
+                document.title = "hippo v7"
                 if (
                     newState.downloadBaseDatesStatus == AsyncActionStatus.COMPLETED &&
                     newState.isIntegrationSelectionsChanged(oldState)
@@ -154,6 +156,7 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
                     loadIntegrations(hippoStore.getState())
             }
             View.STAT -> {
+                document.title = "Statistik v7"
                 if (newState.downloadBaseItemStatus == AsyncActionStatus.COMPLETED) {
                     if (newState.isStatPlattformSelected()) {
                         if (

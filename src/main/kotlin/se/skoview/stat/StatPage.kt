@@ -45,7 +45,7 @@ fun Container.statPage(
     state: HippoState,
 ) {
     vPanel {
-        width = 99.vw
+        width = 98.vw
         if (showBackgroundColorsForDebug) background = Background(Color.name(Col.LIGHTBLUE))
         statHeader(state)
         statMainView(state)

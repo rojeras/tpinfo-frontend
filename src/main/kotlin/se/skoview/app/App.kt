@@ -63,7 +63,6 @@ import se.skoview.common.HippoManager.mainLoop
 
 // Statistik
 // todo: UJ vill kunna se 20-25 tjänster i första tabellen direkt. Bättre överblick. ML: Börja med att minska fontstorlek.
-// todo: Urbans stora tabell huggs av mitt i en textrad
 
 // todo: Load statistics and history data in coroutines (as integrations)
 // todo: Byt ut "SLL" i plattformsnamnen. Stäm av lösning med MLA. Bör också ske i hippo och i BS.
@@ -72,6 +71,9 @@ import se.skoview.common.HippoManager.mainLoop
 // todo: Och så visa svarstider
 // todo: Dokumentation
 
+// done: Urbans stora tabell huggs av mitt i en textrad
+// done: Title is set to "hippo v7" also for statistics
+// done: Horizontal scroll is displayed since vertical scroll is displayed when zoomed in
 // done: Ändra defaulturvalet (null) till "Visa Allt". Fundera på vad knappen ska heta.
 
 // done: Tag bort statistik-specifika filter från hippos URL
