@@ -63,6 +63,7 @@ fun Container.statMainView(state: HippoState) {
         hPanel {
             if (showBackgroundColorsForDebug) background = Background(Color.name(Col.LIGHTSEAGREEN))
             width = 99.vw
+            overflow = Overflow.HIDDEN
             setStyle("height", "calc(96vh - ${StatPanelSize.statHeaderHeight.asString()}")
             showPieCharts(state)
             showItemTables(state)

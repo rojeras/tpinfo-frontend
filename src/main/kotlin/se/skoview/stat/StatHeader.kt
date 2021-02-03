@@ -51,7 +51,7 @@ class StatHeader(state: HippoState) : VPanel() {
         fontFamily = "Times New Roman"
         id = "StatHeader"
         if (showBackgroundColorsForDebug) background = Background(Color.name(Col.LIGHTGRAY))
-        overflow = Overflow.AUTO
+        overflow = Overflow.HIDDEN
         height = StatPanelSize.statHeaderHeight
         this.marginTop = 10.px
 
