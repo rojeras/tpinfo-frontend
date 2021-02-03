@@ -35,7 +35,7 @@ object StatPanelSize {
     val statHeaderHeight: CssSize = 201.px // 200.99
     val chartPanelHeight: CssSize = 24.vh
     val singlePiePanelCssHeight: String = "calc(90vh - ${statHeaderHeight.asString()}"
-    val tablePanelSingleCssHeight: String = "calc(94vh - ${statHeaderHeight.asString()})"
+    val tablePanelSingleCssHeight: String = "calc(92vh - ${statHeaderHeight.asString()})"
     val tablePanelMultipleCssHeight: String = "calc(95vh - ${statHeaderHeight.asString()} - ${chartPanelHeight.asString()})"
 }
 
