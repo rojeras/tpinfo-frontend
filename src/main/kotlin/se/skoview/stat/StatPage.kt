@@ -46,6 +46,7 @@ fun Container.statPage(
 ) {
     vPanel {
         width = 98.vw
+        overflow = Overflow.HIDDEN
         if (showBackgroundColorsForDebug) background = Background(Color.name(Col.LIGHTBLUE))
         statHeader(state)
         statMainView(state)

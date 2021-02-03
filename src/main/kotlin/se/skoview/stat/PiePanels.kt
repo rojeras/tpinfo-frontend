@@ -102,7 +102,7 @@ fun Container.piePanel(
 
     val columnWidth =
         if (numberOfColumns > 1) (99.7 / numberOfColumns).vw
-        else 49.vw
+        else 48.vw
 
     val pieHight =
         if (numberOfColumns > 1) StatPanelSize.chartPanelHeight.asString()
@@ -111,6 +111,10 @@ fun Container.piePanel(
     val topMargin =
         if (numberOfColumns > 1) 0.px
         else 50.px
+
+    val leftMargin =
+        if (numberOfColumns > 1) 0.px
+        else 10.px
 
     val pieChart =
         Chart(
@@ -128,7 +132,9 @@ fun Container.piePanel(
         if (showBackgroundColorsForDebug) background = Background(Color.name(Col.LIGHTGRAY))
         setStyle("height", pieHight)
         marginTop = topMargin
+        // marginLeft = leftMargin
         width = columnWidth
+        // overflow = Overflow.AUTO
 
         if (!state.showTimeGraph)
             add(
@@ -136,6 +142,7 @@ fun Container.piePanel(
                     height = 95.perc
                     width = 95.perc
                     marginBottom = 10.px
+                    marginLeft = leftMargin
                     // height = StatPanelSize.chartPanelSize
                     // height = columnWidth - 2
                 }

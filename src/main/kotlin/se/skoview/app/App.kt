@@ -62,6 +62,7 @@ import se.skoview.common.HippoManager.mainLoop
 // done: Se till att det blir ett pekarfinger på items i tabellen
 
 // Statistik
+// todo: Horizontal scroll is displayed since vertical scroll is displayed when zoomed in
 // todo: UJ vill kunna se 20-25 tjänster i första tabellen direkt. Bättre överblick. ML: Börja med att minska fontstorlek.
 
 // todo: Load statistics and history data in coroutines (as integrations)
@@ -73,7 +74,6 @@ import se.skoview.common.HippoManager.mainLoop
 
 // done: Urbans stora tabell huggs av mitt i en textrad
 // done: Title is set to "hippo v7" also for statistics
-// done: Horizontal scroll is displayed since vertical scroll is displayed when zoomed in
 // done: Ändra defaulturvalet (null) till "Visa Allt". Fundera på vad knappen ska heta.
 
 // done: Tag bort statistik-specifika filter från hippos URL
