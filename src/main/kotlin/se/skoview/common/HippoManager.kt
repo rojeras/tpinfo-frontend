@@ -49,20 +49,6 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
         val startUrl = window.location.href
         println("In HippoManager.initialize(), startUrl = $startUrl")
 
-        // val view = parseUrlForView(startUrl)
-/*
-        val view: View =
-            if (startUrl.contains("integrationer.tjansteplattform")) View.HIPPO
-            else if (startUrl.contains("statistik.tjansteplattform")) View.STAT
-            else if (startUrl.contains(View.STAT.url)) View.STAT
-            else View.HIPPO
-
-        hippoStore.dispatch(HippoAction.SetView(view))
-*/
-        /*
-        val bookmark = parseBookmarkString(startUrl)
-        hippoStore.dispatch(HippoAction.ApplyBookmark(view, bookmark))
-        */
         GlobalScope.launch {
 
             hippoStore.dispatch(HippoAction.StartDownloadBaseItems)
@@ -85,11 +71,7 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
 
     fun Container.mainLoop() {
         // place for common header
-        /*
-        header(HippoManager.hippoStore) { state ->
-            headerNav(state)
-        }
-         */
+
         // Called after each state change
         main(hippoStore) { state ->
             println("In main()")
@@ -167,7 +149,6 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
                         }
                     } else statTpSelected(Plattform.nameToId("SLL-PROD")!!)
 
-                    // if (hippoStore.getState().showTimeGraph) loadHistory(hippoStore.getState())
                 }
             }
         }
@@ -215,13 +196,6 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
         val nextState = hippoStore.getState().statTpSelected(tpId)
         navigateWithBookmark(nextState)
     }
-
-    /*
-    fun statHistorySelected(flag: Boolean) {
-        if (flag) loadHistory(hippoStore.getState()) // Preload of history
-        hippoStore.dispatch(HippoAction.ShowTimeGraph(flag))
-    }
-     */
 
     fun statTechnicalTermsSelected(flag: Boolean) {
         hippoStore.dispatch(HippoAction.ShowTechnicalTerms(flag))

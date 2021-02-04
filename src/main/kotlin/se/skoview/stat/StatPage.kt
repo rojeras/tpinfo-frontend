@@ -18,7 +18,6 @@
 package se.skoview.stat
 
 import pl.treksoft.kvision.core.*
-import pl.treksoft.kvision.html.Div
 import pl.treksoft.kvision.panel.hPanel
 import pl.treksoft.kvision.panel.vPanel
 import pl.treksoft.kvision.utils.asString
@@ -39,13 +38,11 @@ object StatPanelSize {
     val tablePanelMultipleCssHeight: String = "calc(95vh - ${statHeaderHeight.asString()} - ${chartPanelHeight.asString()})"
 }
 
-val statPageTop: Div = Div()
-
 fun Container.statPage(
     state: HippoState,
 ) {
     vPanel {
-        width = 98.vw
+        width = 99.vw
         overflow = Overflow.HIDDEN
         if (showBackgroundColorsForDebug) background = Background(Color.name(Col.LIGHTBLUE))
         statHeader(state)

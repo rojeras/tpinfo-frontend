@@ -45,17 +45,13 @@ enum class View(val url: String) {
     HOME("/"),
     HIPPO("/hippo"),
     STAT("/stat"),
-    // STAT_ADVANCED("/statadvanced")
 }
 
 fun Navigo.initialize(): Navigo {
     return on(
         View.HOME.url,
         { _ -> HippoManager.newOrUpdatedUrlFromBrowser(view = View.HOME, origin = "home") }
-    ) /* .on(
-        "${View.HOME.url}/:slug",
-        { params -> HippoManager.newOrUpdatedUrlFromBrowser(View.HOME, stringParameter(params, "slug"), origin = "home-slug") }
-    ) */.on(
+    ).on(
         View.HIPPO.url,
         { _ -> HippoManager.newOrUpdatedUrlFromBrowser(view = View.HIPPO, origin = "hippo") }
     ).on(

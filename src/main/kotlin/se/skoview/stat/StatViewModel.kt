@@ -26,7 +26,6 @@ class SInfoRecord(
     val itemId: Int,
     val description: String,
     val calls: Int
-    // val responseTime: Int
 ) {
     var color: Color = Color.name(Col.BLACK)
 }

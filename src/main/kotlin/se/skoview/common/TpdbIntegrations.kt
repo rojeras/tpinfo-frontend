@@ -77,7 +77,6 @@ data class IntegrationCache(
 }
 
 fun loadIntegrations(state: HippoState) {
-    // val store = HippoManager.hippoStore
     val urlParameters = state.getParams(state.view)
     val parameters = "integrations$urlParameters"
 

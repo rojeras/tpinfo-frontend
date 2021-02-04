@@ -45,17 +45,6 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
             state.copy(
                 downloadBaseItemStatus = AsyncActionStatus.COMPLETED,
                 downloadBaseDatesStatus = AsyncActionStatus.COMPLETED,
-                /*
-                integrationDates = BaseDates.integrationDates,
-                statisticsDates = BaseDates.statisticsDates,
-                serviceComponents = ServiceComponent.map,
-                logicalAddresses = LogicalAddress.map,
-                serviceContracts = ServiceContract.map,
-                serviceDomains = ServiceDomain.map,
-                plattforms = Plattform.mapp,
-                plattformChains = PlattformChain.map,
-                statisticsPlattforms = StatisticsPlattform.mapp,
-                 */
                 dateEffective = BaseDates.integrationDates[0],
                 dateEnd = BaseDates.integrationDates[0],
             )

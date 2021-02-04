@@ -34,14 +34,7 @@ fun Container.showPieCharts(
     ) {
         id = "showPieCharts"
         if (showBackgroundColorsForDebug) background = Background(Color.name(Col.BLUE))
-        // overflow = Overflow.HIDDEN
-        /*
-        if (state.showTimeGraph)
-            setStyle("height", getHeightToRemainingViewPort(statPageTop, 300))
-        else
-            setStyle("height", getHeightToRemainingViewPort(statPageTop, 80))
-        */
-        // height = 100.perc
+
         SInfo.createStatViewData(state)
 
         val animateTime = if (
@@ -132,9 +125,7 @@ fun Container.piePanel(
         if (showBackgroundColorsForDebug) background = Background(Color.name(Col.LIGHTGRAY))
         setStyle("height", pieHight)
         marginTop = topMargin
-        // marginLeft = leftMargin
         width = columnWidth
-        // overflow = Overflow.AUTO
 
         if (!state.showTimeGraph)
             add(
@@ -143,8 +134,6 @@ fun Container.piePanel(
                     width = 95.perc
                     marginBottom = 10.px
                     marginLeft = leftMargin
-                    // height = StatPanelSize.chartPanelSize
-                    // height = columnWidth - 2
                 }
             )
     }

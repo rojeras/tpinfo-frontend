@@ -55,10 +55,6 @@ class StatHeader(state: HippoState) : VPanel() {
         height = StatPanelSize.statHeaderHeight
         this.marginTop = 10.px
 
-        // statHeaderTop = div
-        // {
-        // }.bind(store) { state ->
-
         // Page top
         div {
             h2("Antal meddelanden genom Region Stockholms tjänsteplattform")

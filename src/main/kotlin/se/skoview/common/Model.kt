@@ -396,7 +396,6 @@ fun HippoState.setShowAllItemTypes(isShown: Boolean): HippoState {
 fun HippoState.setNewView(newView: View): HippoState {
 
     val currentView = this.view
-    // if (currentView == newView) throw RuntimeException("Current view  == new  in reducer SetViewMode")
     if (currentView == newView) return this
 
     // Switch from hippo to statistics
@@ -553,19 +552,6 @@ fun HippoState.applyBookmark(view: View, bookmark: BookmarkInformation): HippoSt
         selectedPlattformChainsIds = bookmark.selectedPlattformChains,
         viewPreSelect = bookmark.preView
     )
-
-    /*
-    // If preview explicitly set as null then all filters should be reset
-    if (bookmark.preView == null) {
-        return nextState.copy(
-            selectedConsumersIds = listOf(),
-            selectedProducersIds = listOf(),
-            selectedLogicalAddressesIds = listOf(),
-            selectedContractsIds = listOf(),
-            selectedDomainsIds = listOf(),
-        )
-    }
-     */
 
     return nextState
 }

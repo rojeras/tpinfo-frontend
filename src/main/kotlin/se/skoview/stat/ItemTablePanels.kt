@@ -34,21 +34,11 @@ fun Container.showItemTables(state: HippoState) {
     ) {
         id = "showItemTables"
         if (showBackgroundColorsForDebug) background = Background(Color.name(Col.YELLOW))
-        // add(PanelPosition(HippoPanel.CHARTLABELTABLE, state))
-        // height = 50.vh
-        // setStyle("height", "calc(100vh - 24vh - 230px)")
+
         marginTop = 5.px
         overflow = Overflow.HIDDEN
-        width = 100.vw
-        // background = Background(Color.name(Col.YELLOW))
-        /*
-        if (state.showTimeGraph)
-            setStyle("height", getHeightToRemainingViewPort(statPageTop, 300))
-        else
-            setStyle("height", getHeightToRemainingViewPort(statPageTop, 80))
-         */
+        width = 99.vw
 
-        // height = 100.perc
         SInfo.createStatViewData(state)
 
         var numberOfColumns = 0
@@ -107,9 +97,7 @@ fun Container.itemTablePanel(
 
     val columnWidth =
         if (numberOfColumns == 1) 45.vw
-        else (99.7 / numberOfColumns).vw // - 0.1
-
-    // add(Position())
+        else (99.3 / numberOfColumns).vw // - 0.1
 
     val chartLabelTable =
         ChartLabelTable(
@@ -141,9 +129,6 @@ class ChartLabelTable(
     init {
         id = "ChartLabelTable:SimpleTable"
 
-        // val myPos = PanelPosition.topPos[HippoPanel.CHARTLABELTABLE]
-        // println("Read pos from object: $myPos, size = ${PanelPosition.topPos.size}")
-
         val size = itemSInfoList.size
         val linesTerm =
             if (size == 1) "rad"
@@ -155,42 +140,21 @@ class ChartLabelTable(
 
         println("currentHeight = $currentHeight")
 
-        // val cssHeight = "calc(95vh - ${StatPanelSize.topPos}px)"
-        // println("topPos = ${StatPanelSize.topPos}")
-
-        // val sss = getPosition("ChartLabelTable:SimpleTable")
-
-        // Footer pagination buttons hidden through CSS
         tabulator(
             data = itemSInfoList,
             types = setOf(TableType.BORDERED, TableType.STRIPED, TableType.HOVER, TableType.SMALL),
             options = TabulatorOptions(
                 layout = Layout.FITCOLUMNS,
-                // layout = Layout.FITDATA,
                 pagination = PaginationMode.LOCAL,
                 paginationSize = 1000,
                 paginationButtonCount = 0,
-                // height = "100%",
-                // height = cssHeight,
                 height = currentHeight,
                 selectable = true,
                 columns = listOf(
-                    /*
-                    ColumnDefinition<Any>(
-                        headerSort = false,
-                        title = "",
-                        field = colorField,
-                        width = "(0.6)px",
-                        // width = "5%",
-                        // widthGrow = 1,
-                        formatter = Formatter.COLOR
-                    ),
-                     */
                     ColumnDefinition(
                         headerSort = false,
                         title = "$heading ($size $linesTerm)",
                         field = dataField,
-                        // topCalcFormatter = Formatter.COLOR,
                         headerFilter = Editor.INPUT,
                         headerFilterPlaceholder = "Sök ${heading.toLowerCase()}",
                         editable = { false },
@@ -216,8 +180,6 @@ class ChartLabelTable(
                                         }
                                         textToShow = "$textToShow (<i>vald</i>)"
                                     }
-                                    // whiteSpace = WhiteSpace.PREWRAP
-                                    // wordBreak = WordBreak.BREAKALL
                                     +"&nbsp;&nbsp;$textToShow"
                                 }
                             }
@@ -237,39 +199,5 @@ class ChartLabelTable(
                 // todo: Hide the tabulator footer here
             )
         )
-        // .apply {
-        // height = 100.perc
-        // }
     }
-
-    // Template function. Add this to container class
-    /*
-    override fun afterInsert(node: VNode) {
-        super.afterInsert(node)
-
-        val aHeight = this.getElementJQuery()!!.height() as Int
-        val aWidth = this.getElementJQuery()!!.width() as Int
-        if (aHeight != null && aWidth != null) {
-            println("In afterInsert, height = $aHeight, width = $aWidth")
-            PanelDimension.heightMap[HippoPanel.CHARTLABELTABLE] = aHeight
-            PanelDimension.widthMap[HippoPanel.CHARTLABELTABLE] = aWidth
-        }
-    }
-
-     */
-
-    /*
-    override fun afterInsert(node: VNode) {
-        super.afterInsert(node)
-        val height = this.getElementJQuery()?.height() as Int
-        val width = this.getElementJQuery()?.width() as Int
-        if (height != null) {        PanelDimension.heightMap[key] = this.getElementJQuery()!!.height() as Int
-            PanelDimension.widthMap[key] = width
-            PanelDimension.heightMap[key] = height
-
-            println("This table height is: $height")
-            println("This table width is: $width")
-        }
-    }
-    */
 }

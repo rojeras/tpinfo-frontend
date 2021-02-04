@@ -65,7 +65,6 @@ fun Container.hippoView(state: HippoState) {
 
         // Date selector
         flexPanel(
-            // FlexDir.ROW, FlexWrap.WRAP, FlexJustify.SPACEBETWEEN, FlexAlignItems.CENTER, // Before upgrading to 3.13.1
             FlexDirection.ROW, FlexWrap.WRAP, JustifyContent.SPACEBETWEEN, AlignItems.CENTER,
             spacing = 5
         ) {
@@ -98,7 +97,6 @@ fun Container.hippoView(state: HippoState) {
             // Statistics button
             div {
                 align = Align.CENTER
-                //       }.bind(HippoManager.hippoStore) { state ->
                 val chainId =
                     if (integrationLists.plattformChains.size == 1) integrationLists.plattformChains[0].id
                     else -1
@@ -124,9 +122,6 @@ fun Container.hippoView(state: HippoState) {
                 }.onClick {
                     // HippoManager.setView(View.STAT_ADVANCED)
                     HippoManager.setView(View.STAT)
-                }.apply {
-                    // addBsBgColor(BsBgColor.LIGHT)
-                    // addBsColor(BsColor.BLACK50)
                 }
             }
 
@@ -199,32 +194,27 @@ private fun Container.hippoItemsView(
 
         when (type) {
             ItemType.CONSUMER -> {
-                // vList = state.vServiceConsumers
                 vList = integrationLists.serviceConsumers
                 maxCounter = state.maxCounters.consumers
                 maxNoItems = state.vServiceConsumersMax
             }
             ItemType.PRODUCER -> {
-                // vList = state.vServiceProducers
                 vList = integrationLists.serviceProducers
                 maxCounter = state.maxCounters.producers
                 maxNoItems = state.vServiceProducersMax
             }
             ItemType.PLATTFORM_CHAIN -> {
-                // vList = state.vPlattformChains
                 vList = integrationLists.plattformChains
                 maxCounter = state.maxCounters.plattformChains
                 maxNoItems = 100
             }
             ItemType.LOGICAL_ADDRESS -> {
-                // vList = state.vLogicalAddresses
                 vList = integrationLists.logicalAddresses
                 maxCounter = state.maxCounters.logicalAddress
                 maxNoItems = state.vLogicalAddressesMax
                 marginRight = 10.px
             }
             ItemType.CONTRACT -> {
-                // vList = state.vDomainsAndContracts
                 vList = integrationLists.domainsAndContracts
                 maxCounter = state.maxCounters.contracts
                 maxNoItems = state.vServiceContractsMax
@@ -361,7 +351,6 @@ private fun Div.itemSelect(item: BaseItem, type: ItemType, textSearchInfo: TextS
 }
 
 private fun Div.insertResetButton(statusDownloadIntegrations: AsyncActionStatus, item: BaseItem, type: ItemType) {
-    // if (statusDownloadIntegrations != AsyncActionStatus.COMPLETED) return
     val buttonText = when (type) {
         ItemType.CONSUMER -> "Återställ tjänstekonsument"
         ItemType.CONTRACT -> "Återställ tjänstekontrakt"

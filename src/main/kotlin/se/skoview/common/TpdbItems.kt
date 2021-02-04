@@ -31,7 +31,6 @@ import kotlin.collections.set
 import kotlin.js.Promise
 
 suspend fun loadBaseItems() { // : Deferred<Unit> {
-    // store.dispatch(HippoAction.StartDownloadBaseItems)
 
     // GlobalScope.async {
 

@@ -59,7 +59,7 @@ data class PreSelect(
 
         var viewPreSelectDefault: PreSelect? = null
 
-        fun getDefault(): PreSelect? = defaultPreSelect
+        fun getDefault(): PreSelect = defaultPreSelect
     }
 }
 
@@ -112,12 +112,9 @@ fun preSelectInitialize() {
 
     val timebookingItemsFilter = ItemsFilter(contracts = timeContracts)
     val journalItemsFilter = ItemsFilter(consumers = journalConsumers)
-    // val journalItemsFilter = itemsFilter(consumers = listOf(865))
     val ivItemsFilter = ItemsFilter(contracts = ivDomain)
     val npoItemsFilter = ItemsFilter(consumers = npoConsumers)
-    // val npoItemsFilter = itemsFilter(consumers = listOf(434, 693))
     val reguestItemsFilter = ItemsFilter(contracts = requestContracts)
-    // val reguestItemsFilter = itemsFilter(contracts = listOf(215))
 
     PreSelect(
         id = 2,

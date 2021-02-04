@@ -25,7 +25,6 @@ import se.skoview.common.HippoState
 // Time graph
 fun Container.showHistoryChart(state: HippoState) {
     if (
-        // state.showTimeGraph &&
         state.historyMap.isNotEmpty()
     ) {
         val animateTime =
