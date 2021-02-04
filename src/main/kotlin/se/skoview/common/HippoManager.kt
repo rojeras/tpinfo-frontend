@@ -212,8 +212,7 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
 
     fun statTpSelected(tpId: Int) {
         // hippoStore.dispatch(HippoAction.StatTpSelected(tpId))
-        val nextState = hippoStore.getState()
-            .statTpSelected(tpId)
+        val nextState = hippoStore.getState().statTpSelected(tpId)
         navigateWithBookmark(nextState)
     }
 

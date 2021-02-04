@@ -376,8 +376,9 @@ fun HippoState.statTpSelected(tpId: Int): HippoState {
 
     val pChainId = PlattformChain.calculateId(first = tpId, middle = null, last = tpId)
 
-    return this.copy(
+    return this.itemDeselectAllForAllTypes().copy(
         selectedPlattformChainsIds = listOf(pChainId),
+        viewPreSelect = null
         // viewPreSelect = preSelect,
     )
 }

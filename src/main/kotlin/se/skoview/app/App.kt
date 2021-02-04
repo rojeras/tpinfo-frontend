@@ -62,16 +62,17 @@ import se.skoview.common.HippoManager.mainLoop
 // done: Se till att det blir ett pekarfinger på items i tabellen
 
 // Statistik
-// todo: Horizontal scroll is displayed since vertical scroll is displayed when zoomed in
-// todo: UJ vill kunna se 20-25 tjänster i första tabellen direkt. Bättre överblick. ML: Börja med att minska fontstorlek.
 
 // todo: Load statistics and history data in coroutines (as integrations)
 // todo: Byt ut "SLL" i plattformsnamnen. Stäm av lösning med MLA. Bör också ske i hippo och i BS.
-// todo: Testa med andra browsers, inte minst Edge (ML 2020-09-17)
 // todo: Se över synonymerna. Måste passa med de olika förvalen
 // todo: Och så visa svarstider
 // todo: Dokumentation
 
+// done: Men ändra (i ”Om …”mailadressen) från ”hippokrates@skoview.se” till Fo Ii:s mailadress ”informationsinfrastruktur.hsf@sll.se” och om det finns på något annat ställe också.
+// done: Testa med andra browsers, inte minst Edge (ML 2020-09-17)
+// done: UJ vill kunna se 20-25 tjänster i första tabellen direkt. Bättre överblick. ML: Börja med att minska fontstorlek.
+// done: Horizontal scroll is displayed since vertical scroll is displayed when zoomed in
 // done: Urbans stora tabell huggs av mitt i en textrad
 // done: Title is set to "hippo v7" also for statistics
 // done: Ändra defaulturvalet (null) till "Visa Allt". Fundera på vad knappen ska heta.
