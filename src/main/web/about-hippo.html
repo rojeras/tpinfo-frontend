@@ -9,15 +9,15 @@
 <div id="gui-version"></div>
 <div id="tpdb-version"></div>
 <p>
-    Hippo fokuserar på att visa tjänsteintegrationer.
+    Hippo visar RIV-TA-baserade integrationer inom vården i Sverige.
     I denna version visas anslutningar från och med ursprunglig tjänstekonsument till och med slutlig tjänsteproducent.
     Det går därmed, t ex, att se vilka system som producerar information till NPÖ, även när system är anslutna via flera mellanliggande plattformar.
 <p>Historik är tillgängligt tillbaka till 2016-03-14. Man väljer vilken dag informationen skall baseras på i en diskret vallista uppe till vänster.</p>
-<p>En förutsättning för att tjänsteplattform kan presenteras i denna vy är att dess tjänsteadresseringskatalog (TAK) finns tillgänglig
+<p>En förutsättning för att en tjänsteplattform kan presenteras i denna vy är att dess tjänsteadresseringskatalog (TAK) finns tillgänglig
     via Ineras TAK-api, se <a href="http://api.ntjp.se/coop/doc/index.html">http://api.ntjp.se/coop/doc/index.html</a>. Hippo hämtar information från
     TAK-api en gång per dygn, varje natt.</p>
 <p>
-    <a href="mailto:hippokrates@skoview.se?subject=Angående hippo">Fråga eller ge återkoppling om Hippo</a>
+    <a href="mailto:informationsinfrastruktur.hsf@sll.se?subject=Angående hippo">Fråga eller ge återkoppling om Hippo</a>
 </p>
 <h4>Användning:</h4>
 <ul>
@@ -26,7 +26,7 @@
     <li>Filtrera genom att välja (peka på) en konsument, kontrakt, producent, logisk adress eller kedja av tjänsteplattformar. Det finns ett sökfält per typ vilket gör det enkelt att hitta ett specifikt objekt.</li>
     <li>Upprepa föregående steg till ett samband är klarlagt.</li>
     <li>Aktuellt urval återspeglas alltid i sidans URL. Den kan enkelt sparas eller delas med andra användare, och är ett enklare alternativ än att skicka skärmurklipp.</li>
-    <li>Om SLL-PROD ingår i en vald tjänsteplattformskedja visas knappen "Statistik". Den för användaren till en applikation som visar statistik över anrop genom SLL-PROD.</li>
+    <li>Om någon av Region Stockholms plattform ingår i en vald tjänsteplattformskedja visas knappen "Statistik". Den för användaren till en applikation som visar statistik.</li>
     <li>När ett val görs dyker knappen "Återställ" upp - tryck på den för att ta bort valet (och åter visa alla)</li>
 </ul>
 <h4>Exempel 1: Vilka journalsystem i Sverige producerar information till Journalen</h4>
@@ -56,21 +56,35 @@
 </ol>
 <h4>Exempel 5: Vilka e-Tjänster stöds av Knivsta Vårdcentral?</h4>
 <ol>
-    <li>Tryck CTRL-F och sök fram den logiska adressen för Knivsta vårdcentral.</li>
+    <li>Sök fram den logiska adressen för Knivsta vårdcentral.</li>
     <li>Klicka på den.</li>
     <li>Studera listan av tjänstekontrakt.</li>
 </ol>
 
 <p>
-    <a href="mailto:hippokrates@skoview.se" target="_top">Maila gärna synpunkter</a>.
+    <a href="mailto:informationsinfrastruktur.hsf@sll.se" target="_top">Maila gärna synpunkter</a>.
 </p>
 <p>
 
 </p>
 <h3>Historik</h3>
+<h4>2021-02-08: Version 7.1</h4>
+<ul>
+    <li>Tätare integration med statistikfunktionen. De två applikationerna delar nu kodbas.</li>
+    <li>Webbläsarens framåt- och bakåtknappar fungerar.</li>
+    <li>Förbättrad prestanda med hjälp av en ny cachefunktion.</li>
+    <li>Första steget mot en responsiv design.</li>
+</ul>
 <h4>2020-05-18: Version 7.0</h4>
 <ul>
-    <li>Fullständigt ombyggd, nu baserad på <a href="https://kotlinlang.org/">Kotlin</a> och <a href="https://github.com/rjaros/kvision">KVision</a>.</li>
+    <li>Fullständigt ombyggd, nu baserad på bl a</li>
+    <ul>
+        <li><a href="https://kotlinlang.org/">Kotlin</a>
+        <li><a href="https://kvision.io/">KVision</a></li>
+        <li>Redux</li>
+        <li>Navigo</li>
+        <li>Bootstrap</li>
+    </ul>
     <li>Fritextsökningen genomför nu samtidigt en filtrering. Den ersätter många gånger behovet av att explicit välja ett objekt.</li>
     <li>Smärre grafiska förändringar.</li>
     <li>För övrigt skall denna version fungera på samma sätt som version 6.</li>

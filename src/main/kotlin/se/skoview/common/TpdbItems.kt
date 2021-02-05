@@ -23,19 +23,20 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.ListSerializer
-import pl.treksoft.kvision.redux.ReduxStore
 import pl.treksoft.kvision.rest.HttpMethod
 import pl.treksoft.kvision.rest.RestClient
 import kotlin.collections.component1
 import kotlin.collections.component2
 import kotlin.collections.set
+import kotlin.js.Promise
 
-suspend fun loadBaseItems(store: ReduxStore<HippoState, HippoAction>) {
-    println("Will now load BaseItems")
-    store.dispatch(HippoAction.StartDownloadBaseItems)
+suspend fun loadBaseItems() { // : Deferred<Unit> {
+
+    // GlobalScope.async {
 
     val baseDatesJob = GlobalScope.launch {
         loadBaseItem("dates", Dates.serializer())
+        println("Dates loaded")
     }
 
     val domainsJob = GlobalScope.launch {
@@ -66,31 +67,36 @@ suspend fun loadBaseItems(store: ReduxStore<HippoState, HippoAction>) {
         loadBaseItem("statPlattforms", ListSerializer(StatisticsPlattform.serializer()))
     }
 
-    println("Before Joinall")
-    joinAll(baseDatesJob, domainsJob, contractsJob, componentJob, laJob, plattformJob, plattformChainJob, statPlattformJob)
-    println("After Joinall")
+    joinAll(
+        baseDatesJob,
+        domainsJob,
+        contractsJob,
+        componentJob,
+        laJob,
+        plattformJob,
+        plattformChainJob,
+        statPlattformJob
+    )
 
+    println("After join")
     ServiceDomain.attachContractsToDomains()
-
-    store.dispatch(HippoAction.DoneDownloadBaseItems)
+    // }
 }
 
-suspend fun <T : Any> loadBaseItem(type: String, deserializer: DeserializationStrategy<T>) {
+suspend fun <T : Any> loadBaseItem(type: String, deserializer: DeserializationStrategy<T>): Promise<T> {
     val restClient = RestClient()
     val url = "${tpdbBaseUrl()}$type"
-    println("*** In load $type")
     println(url)
 
-    val componentList =
+    val answerPromise =
         restClient.remoteCall(
             url = url,
             method = HttpMethod.GET,
             deserializer = deserializer, // ListSerializer(ServiceComponent.serializer()),
             contentType = ""
         )
-
-    componentList.await()
-    println("*** Leaving load $type")
+    answerPromise.await()
+    return answerPromise
 }
 
 abstract class BaseItem {
@@ -117,6 +123,7 @@ data class BaseDates(
         statisticsDates = statistics
     }
 
+    // todo: Try to clean up - get rid of var
     companion object {
         var integrationDates = listOf<String>()
         var statisticsDates = listOf<String>()
@@ -132,8 +139,7 @@ data class ServiceComponent(
 ) : BaseItem() {
 
     init {
-        map[id] = this
-        // if (id > maxId) maxId = id
+        mapp[id] = this
     }
 
     override val name: String = hsaId
@@ -154,8 +160,7 @@ data class ServiceComponent(
     }
 
     companion object {
-        val map = hashMapOf<Int, ServiceComponent>()
-        // var maxId = 0
+        val mapp = hashMapOf<Int, ServiceComponent>()
     }
 }
 
@@ -167,12 +172,9 @@ data class LogicalAddress constructor(
     val logicalAddress: String
 ) : BaseItem() {
     override val name = logicalAddress
-    var colorValue: Int = (0..(256 * 256 * 256) - 1).random()
 
     init {
-        map[id] = this
-
-      //  if (id > LogicalAddress.maxId) LogicalAddress.maxId = id
+        mapp[id] = this
     }
 
     override val searchField = "$name $description"
@@ -180,8 +182,7 @@ data class LogicalAddress constructor(
     override fun toString(): String = "$name : $description"
 
     companion object {
-        val map = hashMapOf<Int, LogicalAddress>()
-        // var maxId = 0
+        val mapp = hashMapOf<Int, LogicalAddress>()
     }
 }
 
@@ -196,8 +197,7 @@ data class ServiceContract(
 ) : BaseItem() {
 
     init {
-        map[id] = this
-        // if (id > ServiceContract.maxId) ServiceContract.maxId = id
+        mapp[id] = this
     }
 
     override var searchField: String = namespace
@@ -207,9 +207,7 @@ data class ServiceContract(
     override fun toString(): String = namespace
 
     companion object {
-        val map = hashMapOf<Int, ServiceContract>()
-
-        // var maxId = 0
+        val mapp = hashMapOf<Int, ServiceContract>()
     }
 }
 
@@ -227,8 +225,7 @@ data class ServiceDomain(
 
     init {
         // todo: Add logic to populate contracts
-        map[id] = this
-        // if (id > ServiceDomain.maxId) ServiceDomain.maxId = id
+        mapp[id] = this
     }
 
     override val searchField: String = name
@@ -236,14 +233,13 @@ data class ServiceDomain(
     override fun toString(): String = name
 
     companion object {
-        val map = hashMapOf<Int, ServiceDomain>()
-        // var maxId = 0
+        val mapp = hashMapOf<Int, ServiceDomain>()
 
         fun attachContractsToDomains() {
             // Connect the contracts to its domain
-            ServiceContract.map.forEach { (_, contract: ServiceContract) ->
+            ServiceContract.mapp.forEach { (_, contract: ServiceContract) ->
                 val domainId = contract.serviceDomainId
-                val domain = map[domainId]
+                val domain = mapp[domainId]
                 if (domain != null) {
                     val contractList: MutableSet<ServiceContract> = domain.contracts
                     contractList.add(contract)
@@ -262,25 +258,29 @@ data class Plattform(
     override val synonym: String? = null
 ) :
     BaseItem() {
-    // override val itemType = ItemType.PLATTFORM
     override val name: String = "$platform-$environment"
     override val description = ""
     override val searchField: String = name
     override fun toString(): String = name
 
     init {
-        map[id] = this
-        // if (id > Plattform.maxId) Plattform.maxId = id
+        mapp[id] = this
     }
 
     companion object {
-        val map = hashMapOf<Int, Plattform>()
-        // var maxId = 0
+        val mapp = hashMapOf<Int, Plattform>()
+
+        fun nameToId(name: String): Int? {
+            for ((key, value) in mapp) {
+                if (value.name == name) return key
+            }
+            return null
+        }
     }
 }
 
 @Serializable
-data class PlattformChainJson(
+private data class PlattformChainJson(
     val id: Int,
     val plattforms: Array<Int?>
 ) {
@@ -298,38 +298,38 @@ data class PlattformChain(
     override val synonym: String? = null
 ) : BaseItem() {
 
-    var colorValue: Int = (0..(256 * 256 * 256) - 1).random()
-    private val firstPlattform = Plattform.map[first]
+    private fun firstPlattform() = Plattform.mapp[first]
 
-    private val lastPlattform = Plattform.map[last]
+    private fun lastPlattform() = Plattform.mapp[last]
 
     override val id = calculateId(first, middle, last)
-    override val name: String = calculateName()
+    override val name: String
+        get() = calculateName()
+
     override val description = ""
-    override val searchField: String = calculateName()
+    override val searchField: String
+        get() = calculateName()
 
     init {
-        map[id] = this
-
-      //  if (id > PlattformChain.maxId) PlattformChain.maxId = id
+        mapp[id] = this
     }
 
-    override fun toString(): String = firstPlattform!!.name + "->" + lastPlattform!!.name
+    override fun toString(): String = calculateName() // firstPlattform!!.name + "->" + lastPlattform!!.name
 
     private fun calculateName(): String {
         val arrow = '\u2192'
-        return if (firstPlattform == lastPlattform) {
-            lastPlattform?.name ?: ""
-        } else {
-            firstPlattform?.name + " " + arrow + " " + lastPlattform?.name
-        }
+
+        if (firstPlattform() == null || lastPlattform() == null) return ""
+
+        if (firstPlattform() == lastPlattform()) return lastPlattform()!!.name
+
+        return firstPlattform()!!.name + " " + arrow + " " + lastPlattform()!!.name
     }
 
     companion object {
-        val map = hashMapOf<Int, PlattformChain>()
-        // var maxId = 0
+        val mapp = hashMapOf<Int, PlattformChain>()
 
-        // Calculte a plattformChainId based on ids of three separate plattforms
+        // Calculate a plattformChainId based on ids of three separate plattforms
         fun calculateId(first: Int, middle: Int?, last: Int): Int {
             val saveM: Int = middle ?: 0
             return (first * 10000) + saveM * 100 + last

@@ -18,17 +18,9 @@ package se.skoview.stat
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import se.skoview.app.store
-import se.skoview.common.HippoAction
-import se.skoview.common.HippoState
-import se.skoview.common.getAsyncTpDb
-import se.skoview.common.getParams
+import se.skoview.common.* // ktlint-disable no-wildcard-imports
 
-@Serializable
-data class HistoryEntry(
-    val aDate: String,
-    val numberOf: Int
-)
+// todo: Handle case when history is null:
 
 @Serializable
 data class HistoryInfo(
@@ -49,31 +41,24 @@ data class HistoryCache(
 }
 
 fun loadHistory(state: HippoState) {
-    val urlParameters = state.getParams()
+    val urlParameters = state.getParams(state.view)
     val parameters = "history$urlParameters"
 
     // Check if the statistics info is available in the cache
     if (HistoryCache.map.containsKey(parameters)) {
         println(">>> History data found in cache")
-        store.dispatch(
+        HippoManager.dispatchProxy(
             HippoAction.DoneDownloadHistory(HistoryCache.map[parameters]!!.historyMap)
         )
     } else {
         println(">>> History data NOT found in cache - will download")
         console.log(parameters)
-        /* Orginalversion som fungerar
-                    val json = Json(JsonConfiguration.Stable)
-            val history = json.parse(HistoryInfo.serializer(), response)
-         */
+
         getAsyncTpDb(parameters) { response ->
             println(">>> Size of fetched history data is: ${response.length}")
             val json = Json {}
             val history = json.decodeFromString(HistoryInfo.serializer(), response)
             console.log(history.history)
-            val historyMap = mutableMapOf<String, Int>()
-            for ((key, value) in history.history) {
-                println("$key : $value")
-            }
 
             // Store in cache
             HistoryCache(
@@ -81,12 +66,9 @@ fun loadHistory(state: HippoState) {
                 history.history
             )
 
-            println("Time to Dispatch")
-
-            store.dispatch(
+            HippoManager.dispatchProxy(
                 HippoAction.DoneDownloadHistory(HistoryCache.map[parameters]!!.historyMap)
             )
         }
     }
 }
-

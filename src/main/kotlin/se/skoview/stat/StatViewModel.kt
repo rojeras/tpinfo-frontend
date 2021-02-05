@@ -19,22 +19,15 @@ package se.skoview.stat
 import pl.treksoft.kvision.core.Col
 import pl.treksoft.kvision.core.Color
 import pl.treksoft.kvision.data.BaseDataComponent
-import se.skoview.common.*
-
-object STAT_CONSTANTS {
-    val TP_ID = hashMapOf<String, Int>("SLL-PROD" to 3, "SLL-QA" to 4)
-}
-
+import se.skoview.common.* // ktlint-disable no-wildcard-imports
 
 class SInfoRecord(
     val itemType: ItemType,
     val itemId: Int,
     val description: String,
     val calls: Int
-    //val responseTime: Int
 ) {
     var color: Color = Color.name(Col.BLACK)
-
 }
 
 class SInfoList(private val itemType: ItemType) {
@@ -45,10 +38,8 @@ class SInfoList(private val itemType: ItemType) {
         return recordList.map { it.calls }
     }
 
-
     // todo: Maybe this is the correct place to return the Google chart colors in the right order
     fun colorList(): List<Color> {
-        //return mkColorList(recordList.size)
         return recordList.map { it.color }
     }
 
@@ -56,7 +47,7 @@ class SInfoList(private val itemType: ItemType) {
         return recordList.map { it.description }
     }
 
-    fun populate(state: HippoState, ackMap: Map<Int, Int>, showSynonyms: Boolean) {
+    fun populate(ackMap: Map<Int, Int>, showSynonyms: Boolean) {
         // Will go via a temp collection
         val ackMapTmp = ackMap.toList().sortedBy { (_, value) -> value }.reversed().toMap()
         val callsTmp = mutableListOf<SInfoRecord>()
@@ -66,31 +57,29 @@ class SInfoList(private val itemType: ItemType) {
         for (entry in ackMapTmp) {
             when (this.itemType) {
                 ItemType.CONSUMER -> {
-                    item = ServiceComponent.map[entry.key]
+                    item = ServiceComponent.mapp[entry.key]
                     desc =
                         if (showSynonyms && item!!.synonym != null) item.synonym.toString()
                         else "${item!!.description} (${item.hsaId})"
                 }
                 ItemType.PRODUCER -> {
-                    item = ServiceComponent.map[entry.key]
+                    item = ServiceComponent.mapp[entry.key]
                     desc =
                         if (showSynonyms && item!!.synonym != null) item.synonym.toString()
                         else "${item!!.description} (${item.hsaId})"
                 }
                 ItemType.LOGICAL_ADDRESS -> {
-                    item = LogicalAddress.map[entry.key]
+                    item = LogicalAddress.mapp[entry.key]
                     desc = "${item!!.description} (${item.name})"
                 }
                 ItemType.CONTRACT -> {
-                    item = ServiceContract.map[entry.key]
+                    item = ServiceContract.mapp[entry.key]
                     desc =
                         if (showSynonyms && item!!.synonym != null) item.synonym.toString()
                         else item!!.description
-                    //desc = item!!.description
                 }
                 else -> error("Unknown itemType in populate()!")
             }
-            //println("${item!!.description} has calls: ${ackMapTmp[entry.key]}")
 
             callsTmp.add(
                 SInfoRecord(
@@ -98,7 +87,6 @@ class SInfoList(private val itemType: ItemType) {
                     item.id,
                     desc,
                     ackMapTmp[entry.key] ?: error("ackMapTmp is null")
-                    //,0
                 )
             )
         }
@@ -110,8 +98,8 @@ class SInfoList(private val itemType: ItemType) {
         // Populate the color fields
         val colorList = mkColorList(callsTmp.size)
         var colorIx = 0
-        for (item in callsTmp) {
-            item.color = colorList[colorIx]
+        for (anItem in callsTmp) {
+            anItem.color = colorList[colorIx]
             colorIx += 1
             if (colorIx > 30) colorIx = 0
         }
@@ -134,17 +122,16 @@ object SInfo : BaseDataComponent() {
     var contractSInfoList = SInfoList(ItemType.CONTRACT)
 
     fun createStatViewData(state: HippoState) {
-        consumerSInfoList.populate(state, state.statBlob.callsConsumer, !state.showTechnicalTerms)
-        producerSInfoList.populate(state, state.statBlob.callsProducer, !state.showTechnicalTerms)
-        logicalAddressSInfoList.populate(state, state.statBlob.callsLogicalAddress, !state.showTechnicalTerms)
-        contractSInfoList.populate(state, state.statBlob.callsContract, !state.showTechnicalTerms)
-
+        consumerSInfoList.populate(state.statBlob.callsConsumer, !state.showTechnicalTerms)
+        producerSInfoList.populate(state.statBlob.callsProducer, !state.showTechnicalTerms)
+        logicalAddressSInfoList.populate(state.statBlob.callsLogicalAddress, !state.showTechnicalTerms)
+        contractSInfoList.populate(state.statBlob.callsContract, !state.showTechnicalTerms)
     }
 }
 
 fun mkColorList(size: Int): List<Color> {
     /* Google chart color scheme */
-    val gColor: Array<Color> = arrayOf( //arrayOf<Color>()
+    val gColor: Array<Color> = arrayOf( // arrayOf<Color>()
         Color.hex("3366cc".toInt(radix = 16)),
         Color.hex("dc3912".toInt(radix = 16)),
         Color.hex("ff9900".toInt(radix = 16)),

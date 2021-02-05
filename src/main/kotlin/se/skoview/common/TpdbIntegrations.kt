@@ -22,8 +22,6 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import pl.treksoft.kvision.rest.HttpMethod
 import pl.treksoft.kvision.rest.RestClient
-import se.skoview.app.store
-import se.skoview.hippo.createHippoViewData
 
 enum class ItemType {
     CONSUMER,
@@ -79,29 +77,29 @@ data class IntegrationCache(
 }
 
 fun loadIntegrations(state: HippoState) {
-    val urlParameters = state.getParams()
+    val urlParameters = state.getParams(state.view)
     val parameters = "integrations$urlParameters"
 
+    HippoManager.dispatchProxy(HippoAction.StartDownloadIntegrations)
+
     if (IntegrationCache.map.containsKey(parameters)) {
-        println(">>> Integrations found in cache")
         val integrationsCache = IntegrationCache.map[parameters]
         // todo: Make sure to remove the !! below
-        store.dispatch(
+        HippoManager.dispatchProxy(
             HippoAction.DoneDownloadIntegrations(
                 integrationsCache!!.integrationArr,
                 integrationsCache.maxCounters,
                 integrationsCache.updateDates
             )
         )
-        createHippoViewData(store.getState())
     } else {
-        println(">>> Integrations NOT found in cache - will download")
 
         val restClient = RestClient()
 
         val url = "${tpdbBaseUrl()}$parameters"
+        println(url)
 
-        val job = GlobalScope.launch {
+        GlobalScope.launch {
             val integrationInfoPromise =
                 restClient.remoteCall(
                     url = url,
@@ -127,15 +125,13 @@ fun loadIntegrations(state: HippoState) {
 
             IntegrationCache(parameters, integrationArrs, integrationInfo.maxCounters, integrationInfo.updateDates)
 
-            println("Number of integrations: ${integrationArrs.size}")
-            store.dispatch(
+            HippoManager.dispatchProxy(
                 HippoAction.DoneDownloadIntegrations(
                     integrationArrs,
                     integrationInfo.maxCounters,
                     integrationInfo.updateDates
                 )
             )
-            createHippoViewData(store.getState())
         }
     }
 }

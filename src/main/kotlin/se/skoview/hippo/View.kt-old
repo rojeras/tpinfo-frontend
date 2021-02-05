@@ -38,8 +38,6 @@ object hippoPage : SimplePanel() {
 
     init {
 
-        println("In hippoPage")
-
         vPanel {
             div {
                 h2("RHippo - integrationer via tjänsteplattform/ar för nationell e-hälsa")

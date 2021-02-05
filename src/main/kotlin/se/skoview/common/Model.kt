@@ -16,11 +16,11 @@
  */
 package se.skoview.common
 
-import se.skoview.hippo.parseBookmark
-import se.skoview.stat.AdvancedViewPreSelect
-import se.skoview.stat.SimpleViewPreSelect
+import se.skoview.common.HippoAction.ShowTechnicalTerms
+import se.skoview.common.HippoAction.ShowTimeGraph
+import se.skoview.stat.ItemsFilter
+import se.skoview.stat.PreSelect
 import se.skoview.stat.StatisticsBlob
-import se.skoview.stat.simpleViewPreSelectDefault
 import kotlin.reflect.KClass
 
 enum class AsyncActionStatus {
@@ -33,210 +33,168 @@ enum class AsyncActionStatus {
 enum class DateType {
     EFFECTIVE,
     END,
-    EFFECTIVE_AND_END
+    EFFECTIVE_AND_END,
+    STAT_EFFECTIVE,
+    STAT_END
 }
 
-enum class HippoApplication {
-    HIPPO,
-    STATISTIK
-}
-
-enum class ViewMode {
-    SIMPLE,
-    ADVANCED
-}
-
-//@Serializable
 data class HippoState(
     // Status information
-    val currentAction: KClass<out HippoAction>,
-    val applicationStarted: HippoApplication?,
-    val downloadBaseItemStatus: AsyncActionStatus,
-    val downloadIntegrationStatus: AsyncActionStatus,
-    val errorMessage: String?,
-
-    // Base Items
-    // todo: Why are the base items stored via the state? Ought to be enough to register when they are loaded.
-    val integrationDates: List<String>,
-    val statisticsDates: List<String>,
-    val serviceComponents: Map<Int, ServiceComponent>,
-    val logicalAddresses: Map<Int, LogicalAddress>,
-    val serviceContracts: Map<Int, ServiceContract>,
-    val serviceDomains: Map<Int, ServiceDomain>,
-    val plattforms: Map<Int, Plattform>,
-    val plattformChains: Map<Int, PlattformChain>,
-    val statisticsPlattforms: Map<Int, StatisticsPlattform>,
+    val currentAction: KClass<out HippoAction> = HippoAction.SetView::class,
+    val view: View = View.HOME,
+    val downloadBaseDatesStatus: AsyncActionStatus = AsyncActionStatus.NOT_INITIALIZED,
+    val downloadBaseItemStatus: AsyncActionStatus = AsyncActionStatus.NOT_INITIALIZED,
+    val downloadIntegrationStatus: AsyncActionStatus = AsyncActionStatus.NOT_INITIALIZED,
+    val downloadStatisticsStatus: AsyncActionStatus = AsyncActionStatus.NOT_INITIALIZED,
+    val downloadHistoryStatus: AsyncActionStatus = AsyncActionStatus.NOT_INITIALIZED,
+    val errorMessage: String? = null,
 
     // Filter parameters
-    val dateEffective: String,
-    val dateEnd: String,
+    val dateEffective: String? = null,
+    val dateEnd: String? = null,
+    val statDateEffective: String = "",
+    val statDateEnd: String = "",
 
-    val selectedConsumers: List<Int>,
-    val selectedProducers: List<Int>,
-    val selectedLogicalAddresses: List<Int>,
-    val selectedContracts: List<Int>,
-    val selectedDomains: List<Int>,
-    val selectedPlattformChains: List<Int>,
-    val selectedPlattformName: String,
+    val selectedConsumersIds: List<Int> = listOf(),
+    val selectedProducersIds: List<Int> = listOf(),
+    val selectedLogicalAddressesIds: List<Int> = listOf(),
+    val selectedContractsIds: List<Int> = listOf(),
+    val selectedDomainsIds: List<Int> = listOf(),
+    val selectedPlattformChainsIds: List<Int> = listOf(),
 
     // Integrations data
-    val integrationArrs: List<Integration>,
-    val maxCounters: MaxCounter,
-    val updateDates: List<String>,
-
-    // View data
-    val vServiceConsumers: List<ServiceComponent>,
-    val vServiceProducers: List<ServiceComponent>,
-    val vServiceDomains: List<ServiceDomain>,
-    val vServiceContracts: List<ServiceContract>,
-    val vDomainsAndContracts: List<BaseItem>,
-    val vPlattformChains: List<PlattformChain>,
-    val vLogicalAddresses: List<LogicalAddress>,
+    val selectedPlattformName: String = "",
+    val integrationArrs: List<Integration> = listOf(),
+    val maxCounters: MaxCounter = MaxCounter(0, 0, 0, 0, 0, 0),
+    val updateDates: List<String> = listOf(),
 
     // Max number of items to display
-    val vServiceConsumersMax: Int,
-    val vServiceProducersMax: Int,
-    val vLogicalAddressesMax: Int,
-    val vServiceContractsMax: Int,
+    val vServiceConsumersMax: Int = 100,
+    val vServiceProducersMax: Int = 100,
+    val vLogicalAddressesMax: Int = 100,
+    val vServiceContractsMax: Int = 500,
 
     // Statistics information
-    val statBlob: StatisticsBlob,
+    val statBlob: StatisticsBlob = StatisticsBlob(arrayOf(arrayOf())),
 
     // History information
-    val historyMap: Map<String, Int>,
-    val showTimeGraph: Boolean,
+    val historyMap: Map<String, Int> = mapOf(),
+    val showTimeGraph: Boolean = false,
 
     // View controllers
-    val showTechnicalTerms: Boolean,
-    val viewMode: ViewMode,
-    val simpleViewPreSelect: SimpleViewPreSelect,
-    val advancedViewPreSelect: AdvancedViewPreSelect?
+    val showTechnicalTerms: Boolean = false,
+    // val viewMode: ViewMode = ViewMode.SIMPLE,
+    // val simpleViewPreSelect: SimpleViewPreSelect = simpleViewPreSelectDefault,
+    val viewPreSelect: PreSelect? = null,
+    val showConsumers: Boolean = true,
+    val showProducers: Boolean = true,
+    val showLogicalAddresses: Boolean = true,
+    val showContracts: Boolean = true,
+    val lockShowAllItemTypes: Boolean = false
 )
 
-// This function creates the initial state based on an option filter parameter in the URL
-fun initialHippoState(): HippoState {
-
-    val bookmarkInformation = parseBookmark()
+fun initializeHippoState(): HippoState {
+    val datesPair = getDatesLastMonth()
+    val statDateEffective = datesPair.first.toSwedishDate()
+    val statDateEnd = datesPair.second.toSwedishDate()
 
     return HippoState(
-        HippoAction.ApplicationStarted::class,
-        null,
-        AsyncActionStatus.NOT_INITIALIZED,
-        AsyncActionStatus.NOT_INITIALIZED,
-        null,
-        listOf(),
-        listOf(),
-        mapOf(),
-        mapOf(),
-        mapOf(),
-        mapOf(),
-        mapOf(),
-        mapOf(),
-        mapOf(),
-        bookmarkInformation.dateEffective, // todo: Verify if this is a good default - really want empty value
-        bookmarkInformation.dateEnd,
-        bookmarkInformation.selectedConsumers,
-        //listOf(304), // TEMP
-        bookmarkInformation.selectedProducers,
-        bookmarkInformation.selectedLogicalAddresses,
-        bookmarkInformation.selectedContracts,
-        bookmarkInformation.selectedDomains,
-        bookmarkInformation.selectedPlattformChains,
-        "",
-        listOf(),
-        MaxCounter(0, 0, 0, 0, 0, 0),
-        listOf(),
-        listOf(),
-        listOf(),
-        listOf(),
-        listOf(),
-        listOf(),
-        listOf(),
-        listOf(),
-        100,
-        100,
-        100,
-        500,
-        StatisticsBlob(arrayOf(arrayOf())),
-        mapOf(),
-        false,
-        false,
-        ViewMode.SIMPLE, // TEMP
-        simpleViewPreSelectDefault,
-        null
+        statDateEffective = statDateEffective,
+        statDateEnd = statDateEnd,
     )
 }
 
-object HippoStateArr {
-    val states: MutableList<HippoState> = mutableListOf()
-    var currentIndex = -1
+fun HippoState.numberOfItemViewsSelected(): Int {
+    var count = 0
 
-    fun size() = states.size
+    if (this.showConsumers) count++
+    if (this.showProducers) count++
+    if (this.showContracts) count++
+    if (this.showLogicalAddresses) count++
 
-    fun add(newState: HippoState) {
-        states.add(newState)
-        currentIndex += 1
-    }
-
-    fun back(): HippoState {
-        currentIndex -= 1
-        return states[currentIndex]
-    }
-
+    return count
 }
 
 fun HippoState.isItemSelected(itemType: ItemType, id: Int): Boolean {
     return when (itemType) {
-        ItemType.CONSUMER -> this.selectedConsumers.contains(id)
-        ItemType.DOMAIN -> this.selectedDomains.contains(id)
-        ItemType.CONTRACT -> this.selectedContracts.contains(id)
-        ItemType.PLATTFORM_CHAIN -> this.selectedPlattformChains.contains(id)
-        ItemType.LOGICAL_ADDRESS -> this.selectedLogicalAddresses.contains(id)
-        ItemType.PRODUCER -> this.selectedProducers.contains(id)
+        ItemType.CONSUMER -> this.selectedConsumersIds.contains(id)
+        ItemType.DOMAIN -> this.selectedDomainsIds.contains(id)
+        ItemType.CONTRACT -> this.selectedContractsIds.contains(id)
+        ItemType.PLATTFORM_CHAIN -> this.selectedPlattformChainsIds.contains(id)
+        ItemType.LOGICAL_ADDRESS -> this.selectedLogicalAddressesIds.contains(id)
+        ItemType.PRODUCER -> this.selectedProducersIds.contains(id)
     }
 }
 
+fun HippoState.isStatPlattformSelected(): Boolean {
+    // return isStatPlattformInPlattformChainList(this.selectedPlattformChainsIds, this.statisticsPlattforms)
+    return isStatPlattformInPlattformChainList(this.selectedPlattformChainsIds, StatisticsPlattform.mapp)
+}
+
+private fun isStatPlattformInPlattformChainList(
+    plattformChains: List<Int>,
+    statisticsPlattforms: Map<Int, StatisticsPlattform>
+): Boolean {
+    if (plattformChains.size != 1) return false
+    val selectedPlattformChainId = plattformChains[0]
+    val selectedPlattformChain = PlattformChain.mapp[selectedPlattformChainId]!!
+
+    if (
+        statisticsPlattforms.contains(selectedPlattformChain.first) ||
+        statisticsPlattforms.contains(selectedPlattformChain.last)
+    ) return true
+
+    return false
+}
+
+/*
 fun HippoState.isPlattformSelected(id: Int): Boolean {
     val pChainId = PlattformChain.calculateId(first = id, middle = null, last = id)
 
-    return this.selectedPlattformChains.contains(pChainId)
+    return this.selectedPlattformChainsIds.contains(pChainId)
 }
-
+ */
 
 // The extension function create the part of the URL to fetch integrations
-fun HippoState.getParams(): String {
+fun HippoState.getParams(view: View): String {
 
-    //var params = "?dummy&contractId=379"
+    // var params = "?dummy&contractId=379"
     var params = "?dummy"
 
-    params += "&dateEffective=" + this.dateEffective
-    params += "&dateEnd=" + this.dateEnd
+    if (view == View.HIPPO) {
+        params += "&dateEffective=" + this.dateEffective
+        params += "&dateEnd=" + this.dateEnd
+    } else {
+        params += "&dateEffective=" + this.statDateEffective
+        params += "&dateEnd=" + this.statDateEnd
+    }
 
-    params += if (this.selectedConsumers.isNotEmpty()) this.selectedConsumers.joinToString(
+    params += if (this.selectedConsumersIds.isNotEmpty()) this.selectedConsumersIds.joinToString(
         prefix = "&consumerId=",
         separator = ","
     ) else ""
-    params += if (this.selectedDomains.isNotEmpty()) this.selectedDomains.joinToString(
+    params += if (this.selectedDomainsIds.isNotEmpty()) this.selectedDomainsIds.joinToString(
         prefix = "&domainId=",
         separator = ","
     ) else ""
-    params += if (this.selectedContracts.isNotEmpty()) this.selectedContracts.joinToString(
+    params += if (this.selectedContractsIds.isNotEmpty()) this.selectedContractsIds.joinToString(
         prefix = "&contractId=",
         separator = ","
     ) else ""
-    params += if (this.selectedLogicalAddresses.isNotEmpty()) this.selectedLogicalAddresses.joinToString(
+    params += if (this.selectedLogicalAddressesIds.isNotEmpty()) this.selectedLogicalAddressesIds.joinToString(
         prefix = "&logicalAddressId=",
         separator = ","
     ) else ""
-    params += if (this.selectedProducers.isNotEmpty()) this.selectedProducers.joinToString(
+    params += if (this.selectedProducersIds.isNotEmpty()) this.selectedProducersIds.joinToString(
         prefix = "&producerId=",
         separator = ","
     ) else ""
 
     // Separate plattforms now stored in filter, not the chain
-    for (pcId in this.selectedPlattformChains) {
-        val firstId = PlattformChain.map[pcId]?.first
-        val lastId = PlattformChain.map[pcId]?.last
+    for (pcId in this.selectedPlattformChainsIds) {
+        print("In getParams()")
+        val firstId = PlattformChain.mapp[pcId]?.first
+        val lastId = PlattformChain.mapp[pcId]?.last
         params += "&firstPlattformId=$firstId"
         params += "&lastPlattformId=$lastId"
     }
@@ -244,5 +202,356 @@ fun HippoState.getParams(): String {
     return params
 }
 
+fun HippoState.setFlag(action: HippoAction): HippoState {
+    return when (action) {
+        is ShowTechnicalTerms -> this.copy(showTechnicalTerms = action.isShown)
+        is ShowTimeGraph -> this.copy(showTimeGraph = action.isShown)
+        else -> {
+            println("Error in HippoState.setFlag(), action = $action")
+            this
+        }
+    }
+}
 
+fun HippoState.setPreselect(preSelect: PreSelect?): HippoState {
+    if (preSelect == null) {
+        return this
+            .setShowAllItemTypes(true)
+            .itemDeselectAllForAllTypes()
+            .copy(viewPreSelect = null)
+    }
 
+    val state2 = this.setShowAllItemTypes(false)
+    val viewItemType: ItemType = preSelect.viewOrder[0]
+    val state3 =
+        when (viewItemType) {
+            ItemType.CONSUMER -> state2.copy(showConsumers = true)
+            ItemType.PRODUCER -> state2.copy(showProducers = true)
+            ItemType.CONTRACT -> state2.copy(showContracts = true)
+            ItemType.LOGICAL_ADDRESS -> state2.copy(showLogicalAddresses = true)
+            else -> {
+                println("Error in HippoAction.SetViewPreselect")
+                state2
+            }
+        }
+    return state3.applyFilteredItemsSelection(preSelect.itemsFilter).copy(viewPreSelect = preSelect)
+}
+
+fun HippoState.itemIdListSelected(itemType: ItemType, selectedList: List<Int>): HippoState {
+    return when (itemType) {
+        ItemType.CONSUMER -> this.copy(selectedConsumersIds = selectedList)
+        ItemType.CONTRACT -> this.copy(selectedContractsIds = selectedList)
+        ItemType.LOGICAL_ADDRESS -> this.copy(selectedLogicalAddressesIds = selectedList)
+        ItemType.PRODUCER -> this.copy(selectedProducersIds = selectedList)
+        else -> this
+    }
+}
+
+fun HippoState.itemDeselectAllForAllTypes(): HippoState {
+    return this.copy(
+        selectedConsumersIds = listOf(),
+        selectedDomainsIds = listOf(),
+        selectedContractsIds = listOf(),
+        // selectedPlattformChains = listOf(),
+        selectedLogicalAddressesIds = listOf(),
+        selectedProducersIds = listOf()
+    )
+}
+
+fun HippoState.applyFilteredItemsSelection(itemsFilter: ItemsFilter): HippoState {
+
+    println("In applyFilteredItemsSelection(): $itemsFilter")
+
+    var state2 = this.itemDeselectAllForAllTypes()
+
+    for ((itemType, itemIdList) in itemsFilter.selectedItems) {
+        state2 = state2.itemIdListSelected(itemType, itemIdList)
+    }
+
+    return state2
+}
+
+// is HippoAction.ItemIdSelected -> {
+fun HippoState.itemIdSeclected(id: Int, type: ItemType): HippoState {
+
+    return when (type) {
+        ItemType.CONSUMER -> {
+            val newList = listOf(this.selectedConsumersIds, listOf(id)).flatten().distinct()
+            this.copy(
+                selectedConsumersIds = newList
+            )
+        }
+        ItemType.DOMAIN -> {
+            val newList = listOf(this.selectedDomainsIds, listOf(id)).flatten().distinct()
+            this.copy(
+                selectedDomainsIds = newList
+            )
+        }
+        ItemType.CONTRACT -> {
+            val newList = listOf(this.selectedContractsIds, listOf(id)).flatten().distinct()
+            this.copy(
+                selectedContractsIds = newList
+            )
+        }
+        ItemType.PLATTFORM_CHAIN -> {
+            val newList = listOf(this.selectedPlattformChainsIds, listOf(id)).flatten().distinct()
+            this.copy(
+                selectedPlattformChainsIds = newList
+            )
+        }
+        ItemType.LOGICAL_ADDRESS -> {
+            val newList = listOf(this.selectedLogicalAddressesIds, listOf(id)).flatten().distinct()
+            this.copy(
+                selectedLogicalAddressesIds = newList
+            )
+        }
+        ItemType.PRODUCER -> {
+            val newList = listOf(this.selectedProducersIds, listOf(id)).flatten().distinct()
+            this.copy(
+                selectedProducersIds = newList
+            )
+        }
+    }
+}
+
+// is HippoAction.ItemIdDeselected -> {
+fun HippoState.itemIdDeseclected(id: Int, type: ItemType): HippoState {
+
+    // If the deselected item is part of the definition of the active preselect - then reset preselect
+    val newPreSelect: PreSelect? = this.viewPreSelect
+
+    if (this.view == View.STAT && this.viewPreSelect != null) {
+        val preSelectedItems = this.viewPreSelect.itemsFilter.selectedItems
+        if (preSelectedItems[type]!!.contains(id)) {
+            return this
+                .itemDeselectAllForAllTypes()
+                .copy(
+                    viewPreSelect = null
+                )
+        }
+    }
+
+    return when (type) {
+        ItemType.CONSUMER -> {
+            this.copy(
+                selectedConsumersIds = this.selectedConsumersIds.filter { it != id },
+                viewPreSelect = newPreSelect
+            )
+        }
+        ItemType.DOMAIN -> {
+            this.copy(
+                selectedDomainsIds = this.selectedDomainsIds.filter { it != id },
+                viewPreSelect = newPreSelect
+            )
+        }
+        ItemType.CONTRACT -> {
+            this.copy(
+                selectedContractsIds = this.selectedContractsIds.filter { it != id },
+                viewPreSelect = newPreSelect
+            )
+        }
+        ItemType.PLATTFORM_CHAIN -> {
+            this.copy(
+                selectedPlattformChainsIds = this.selectedPlattformChainsIds.filter { it != id },
+                viewPreSelect = newPreSelect
+            )
+        }
+        ItemType.LOGICAL_ADDRESS -> {
+            this.copy(
+                selectedLogicalAddressesIds = this.selectedLogicalAddressesIds.filter { it != id },
+                viewPreSelect = newPreSelect
+            )
+        }
+        ItemType.PRODUCER -> {
+            this.copy(
+                selectedProducersIds = this.selectedProducersIds.filter { it != id },
+                viewPreSelect = newPreSelect
+            )
+        }
+    }
+}
+
+// is HippoAction.StatTpSelected -> {
+fun HippoState.statTpSelected(tpId: Int): HippoState {
+
+    val pChainId = PlattformChain.calculateId(first = tpId, middle = null, last = tpId)
+
+    return this.itemDeselectAllForAllTypes().copy(
+        selectedPlattformChainsIds = listOf(pChainId),
+        viewPreSelect = null
+        // viewPreSelect = preSelect,
+    )
+}
+
+fun HippoState.setShowAllItemTypes(isShown: Boolean): HippoState {
+    return this.copy(
+        showConsumers = isShown,
+        showProducers = isShown,
+        showLogicalAddresses = isShown,
+        showContracts = isShown,
+    )
+}
+
+// is HippoAction.SetView -> {
+fun HippoState.setNewView(newView: View): HippoState {
+
+    val currentView = this.view
+    if (currentView == newView) return this
+
+    // Switch from hippo to statistics
+    if (
+        currentView == View.HIPPO &&
+        (newView == View.STAT /* || newView == View.STAT_ADVANCED */)
+    ) {
+        if (this.selectedPlattformChainsIds.isNotEmpty()) {
+            val pcId = this.selectedPlattformChainsIds[0]
+            val pc = PlattformChain.mapp[pcId]!!
+            val tpFirstId = Plattform.mapp[pc.first]!!.id
+            val tpLastId = Plattform.mapp[pc.last]!!.id
+
+            val tpId = if (StatisticsPlattform.mapp.containsKey(tpFirstId)) tpFirstId
+            else if (StatisticsPlattform.mapp.containsKey(tpLastId)) tpLastId
+            else Plattform.nameToId("SLL-PROD")
+
+            return this.copy(
+                selectedPlattformChainsIds = listOf(PlattformChain.calculateId(tpId!!, 0, tpId)),
+                view = newView
+            )
+        }
+    }
+
+    // From statistics to hippo
+    // Filter for all plattform chains containing a stat plattform
+    if (
+        (currentView == View.STAT /* || currentView == View.STAT_ADVANCED */) &&
+        newView == View.HIPPO
+    ) {
+        return this.copy(
+            // selectedPlattformChainsIds = StatisticsPlattform.getStatisticsPlattformChainIds(),
+            selectedPlattformChainsIds = listOf(),
+            view = newView
+        )
+    }
+
+    return this.copy(view = newView)
+}
+
+fun HippoState.dateSelected(selectedDate: String, dateType: DateType): HippoState {
+    //  is HippoAction.DateSelected -> {
+    return when (dateType) {
+        DateType.EFFECTIVE -> this.copy(dateEffective = selectedDate)
+        DateType.END -> this.copy(dateEnd = selectedDate)
+        DateType.EFFECTIVE_AND_END -> this.copy(
+            dateEffective = selectedDate,
+            dateEnd = selectedDate
+        )
+        DateType.STAT_EFFECTIVE -> this.copy(statDateEffective = selectedDate)
+        DateType.STAT_END -> this.copy(statDateEnd = selectedDate)
+    }
+}
+
+fun HippoState.isSelectedItemsUnChanged(oldState: HippoState): Boolean {
+    return (
+        this.selectedConsumersIds.equals(oldState.selectedConsumersIds) &&
+            this.selectedContractsIds.equals(oldState.selectedContractsIds) &&
+            this.selectedLogicalAddressesIds.equals(oldState.selectedLogicalAddressesIds) &&
+            this.selectedDomainsIds.equals(oldState.selectedDomainsIds) &&
+            this.selectedProducersIds.equals(oldState.selectedProducersIds) &&
+            this.selectedPlattformChainsIds.equals(oldState.selectedPlattformChainsIds)
+        )
+}
+
+fun HippoState.isIntegrationSelectionsChanged(oldState: HippoState): Boolean {
+    return !(
+        this.dateEffective == oldState.dateEffective &&
+            this.dateEnd == oldState.dateEnd &&
+            this.isSelectedItemsUnChanged(oldState)
+        )
+}
+
+fun HippoState.isStatisticsSelectionsChanged(oldState: HippoState): Boolean {
+    return !(
+        this.statDateEffective == oldState.statDateEffective &&
+            this.statDateEnd == oldState.statDateEnd &&
+            this.isSelectedItemsUnChanged(oldState)
+        )
+}
+
+fun HippoState.applyBookmark(view: View, bookmark: BookmarkInformation): HippoState {
+
+    val newState =
+
+        if (view == View.HIPPO) {
+            val newDateEffective: String? =
+                if (bookmark.dateEffective != null) bookmark.dateEffective
+                else this.dateEffective
+            val newDateEnd: String? =
+                if (bookmark.dateEnd != null) bookmark.dateEnd
+                else this.dateEnd
+
+            this.copy(
+                dateEffective = newDateEffective,
+                dateEnd = newDateEnd,
+            )
+        } else {
+            val datesLastMonth = getDatesLastMonth()
+
+            val newDateEffective: String =
+                if (bookmark.dateEffective != null) bookmark.dateEffective!!
+                else datesLastMonth.first.toSwedishDate()
+
+            val newDateEnd: String =
+                if (bookmark.dateEnd != null) bookmark.dateEnd!!
+                else datesLastMonth.second.toSwedishDate()
+
+            var showConsumers: Boolean
+            var showProducers: Boolean
+            var showContracts: Boolean
+            var showLogicalAddresses: Boolean
+
+            if (bookmark.showItemTypes.isNotEmpty()) {
+                showConsumers = if (bookmark.showItemTypes.contains(ItemType.CONSUMER)) true else false
+                showProducers = if (bookmark.showItemTypes.contains(ItemType.PRODUCER)) true else false
+                showContracts = if (bookmark.showItemTypes.contains(ItemType.CONTRACT)) true else false
+                showLogicalAddresses =
+                    if (bookmark.showItemTypes.contains(ItemType.LOGICAL_ADDRESS)) true else false
+            } else {
+                // If no display flag is set the default is to show all item types
+                showConsumers = true
+                showProducers = true
+                showContracts = true
+                showLogicalAddresses = true
+            }
+
+            val showTimeGraph = bookmark.showTimeGraph
+            if (showTimeGraph) {
+                showConsumers = true
+                showProducers = true
+                showContracts = true
+                showLogicalAddresses = true
+            }
+
+            this.copy(
+                statDateEffective = newDateEffective,
+                statDateEnd = newDateEnd,
+                showConsumers = showConsumers,
+                showProducers = showProducers,
+                showContracts = showContracts,
+                showLogicalAddresses = showLogicalAddresses,
+                showTimeGraph = showTimeGraph
+            )
+        }
+
+    val nextState = newState.copy(
+        view = view,
+        selectedConsumersIds = bookmark.selectedConsumers,
+        selectedProducersIds = bookmark.selectedProducers,
+        selectedLogicalAddressesIds = bookmark.selectedLogicalAddresses,
+        selectedContractsIds = bookmark.selectedContracts,
+        selectedDomainsIds = bookmark.selectedDomains,
+        selectedPlattformChainsIds = bookmark.selectedPlattformChains,
+        viewPreSelect = bookmark.preView
+    )
+
+    return nextState
+}

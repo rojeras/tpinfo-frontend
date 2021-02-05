@@ -1,9 +1,6 @@
 package test.se.skoview
 
-import pl.treksoft.kvision.test.SimpleSpec
-import kotlin.test.Test
-import kotlin.test.assertTrue
-
+/*
 class AppSpec : SimpleSpec {
 
     @Test
@@ -12,4 +9,13 @@ class AppSpec : SimpleSpec {
             assertTrue(true, "Dummy test")
         }
     }
+
+    @Test
+    fun check_hippostate() {
+        run {
+            val state = HippoState()
+            assertTrue { true }
+        }
+    }
 }
+ */

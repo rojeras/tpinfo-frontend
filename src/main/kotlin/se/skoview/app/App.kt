@@ -16,23 +16,14 @@
  */
 package se.skoview.app
 
-import kotlinx.browser.window
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
 import pl.treksoft.kvision.Application
-import pl.treksoft.kvision.pace.Pace
+import pl.treksoft.kvision.core.Overflow
+import pl.treksoft.kvision.module
 import pl.treksoft.kvision.panel.root
-import pl.treksoft.kvision.panel.vPanel
-import pl.treksoft.kvision.redux.createReduxStore
 import pl.treksoft.kvision.require
 import pl.treksoft.kvision.startApplication
-import pl.treksoft.kvision.utils.perc
-import se.skoview.common.*
-import se.skoview.hippo.HippoTablePage
-import se.skoview.hippo.setUrlFilter
-import se.skoview.stat.SimpleViewPreSelect
-import se.skoview.stat.StatPage
-import se.skoview.stat.loadStatistics
+import se.skoview.common.HippoManager
+import se.skoview.common.HippoManager.mainLoop
 
 /**
 Övergripande tankar inför sommaruppehållet 2020
@@ -42,18 +33,23 @@ import se.skoview.stat.loadStatistics
 
 // Common
 
-// todo: Lägg med Visa-menyn i hippo. Ett snabbt sätt för vyer för olika domäner/tjänster
+// todo: PlattformChain och plattforms hänger inte logiskt ihop vad gäller URL-er och filter. TPDB skulle behöva stödja båda, åtminstone för utsäkningar.
 // todo: Show messages to user
 // todo: Make it possible to participate in discussion, maybe through slack channel
 // todo: Verifiera att zip bygger en produktionsversion
 // todo: Visa antal användare senaste 24 timmarna
-// todo: Lägg in stöd för Navigo routing
 // todo: Börja använda Karma och enhetstester
+// todo: Evaluate sass and bulma
+// done: Se över HippoManager och API-anrop. Behöver förenklas. Ev ta base items först.
+// done: Lägg in stöd för Navigo routing
+// done: Investigate Kotlin JS blocking: runBlocking workaround https://youtrack.jetbrains.com/issue/KT-22228
 
 // Hippo
 
+// TODafs: Must pick up and apply legacy links
+
+// todo: Lägg med Visa-menyn i hippo. Ett snabbt sätt för vyer för olika domäner/tjänster
 // todo: Opera does not add any filter to URL, remove its mention in index.html
-// todo: Check link to statistics
 // todo: Make it possible to see diffs, that is, changes between certain dates (from John)
 // todo: Check if it is possible to make each column in hippo scrollable - without showing a scrollbar
 // todo: Lös detta med att visa SE för vägval
@@ -61,28 +57,57 @@ import se.skoview.stat.loadStatistics
 // todo: Lös trädklättringen, kanske mha HSA-trädet
 // todo: Titta på Tabulator igen
 // todo: Hippo kanske skulle uppdateras varje dygn om browsern skulle vara öppen över natten
+// done: Marginalerna. About-knappen syns inte riktigt.
+// done: Add link to statistics
+// done: Plattform chains syns inte vid omladdning - troligen måste plattforms laddas först
+// done: Se till att det blir ett pekarfinger på items i tabellen
 
 // Statistik
 
-// done: Byt ut "SLL" mot "Region Stockholm" i texterna.
+// todo: Load statistics and history data in coroutines (as integrations)
 // todo: Byt ut "SLL" i plattformsnamnen. Stäm av lösning med MLA. Bör också ske i hippo och i BS.
-// done: Döp om förvalet "Bokade tider" till "Tidbokningar"
-// todo: Tydliggör vad som är valt (dvs vad som kan väljas bort)
-// todo: Fixa Back-knappen i webbläsaren så att den backar i applikationen.
-// done: Använda samma typsnitt i statistiken som i hippo
-// todo: Inför RestClient() och (därmed) kotlinx.serialization
-// todo: Testa med andra browsers, inte minst Edge (ML 2020-09-17)
-// todo: Måste få BACK-pil att fungera (ML 2020-09-17)
-// todo: Prestanda! (ML 2020-09-17)
-// todo: Simple view blinks when selecting preSelects
-// todo: Knapp för att komma till hippo
-// todo: Fixa "about" för statistiken
 // todo: Se över synonymerna. Måste passa med de olika förvalen
-// todo: Begränsa datumlistorna så att man inte kan välja start/slutdatum "på vel sida" om varandra
-// todo: URL-hantering. Driftsättning och koppling till proxy
-// todo: A more intelligent way to decide when to do a loadStatistics()
 // todo: Och så visa svarstider
 // todo: Dokumentation
+
+// done: Men ändra (i ”Om …”mailadressen) från ”hippokrates@skoview.se” till Fo Ii:s mailadress ”informationsinfrastruktur.hsf@sll.se” och om det finns på något annat ställe också.
+// done: Testa med andra browsers, inte minst Edge (ML 2020-09-17)
+// done: UJ vill kunna se 20-25 tjänster i första tabellen direkt. Bättre överblick. ML: Börja med att minska fontstorlek.
+// done: Horizontal scroll is displayed since vertical scroll is displayed when zoomed in
+// done: Urbans stora tabell huggs av mitt i en textrad
+// done: Title is set to "hippo v7" also for statistics
+// done: Ändra defaulturvalet (null) till "Visa Allt". Fundera på vad knappen ska heta.
+
+// done: Tag bort statistik-specifika filter från hippos URL
+// done: Fixa "about" för statistiken
+// done: Going from hippo to stat does not issue a loadStatistics()
+// done: Swedish characters does not display correctly in CSV export in Windows excel
+// done: Evaluate to let the history chart be an alternative to the pie charts.
+// done: Go to "Alla konsumerande tjänster" när statistiken anropas utan parametrar
+// done: Fix the with of the history chart
+// done: Fix so that back button works for historical chart
+// done: Den ensamma pajjen för stor
+// done: Vid övergång till hippo går det inte att återställa/avvälja de förvalda itemsarna. Förekommer vid förval av mer än ett item
+// done: Gör hippos Visa statistikknapp grön (eller nån highlight) när den är aktiv
+// done: Knappen ”Visa allt” återspeglas inte i URL-en. Går ej att backa till bilden med fyra pajjer.
+// done: Kolla marginalerna
+// done: För kort (eller smal?) datumlist
+// done: Ta bort förval när man går till QA, generellt gå igenom all hantering av förval
+// done: Addera förval för; Infektionsverktyget, Listning
+// done: Driftsättning och koppling till proxy
+// dome: Tydliggör vad som är valt (dvs vad som kan väljas bort)
+// done: Knapp för att komma till hippo
+// done: Prestanda! (ML 2020-09-17)
+// done: Byt ut "SLL" mot "Region Stockholm" i texterna.
+// done: Döp om förvalet "Bokade tider" till "Tidbokningar"
+// done: Fixa Back-knappen i webbläsaren så att den backar i applikationen.
+// done: Använda samma typsnitt i statistiken som i hippo
+// done: Inför RestClient() och (därmed) kotlinx.serialization
+// done: Måste få BACK-pil att fungera (ML 2020-09-17)
+// done: Simple view blinks when selecting preSelects
+// done: Begränsa datumlistorna så att man inte kan välja start/slutdatum "på vel sida" om varandra
+// done: URL-hantering.
+// done: A more intelligent way to decide when to do a loadStatistics()
 // done: Kolla varför pekaren försvunnit i hippo
 // done: Väljer man item som är del av en preselect så försvinner valet. Kolla Remissvyn.
 // done: Select of a already preselected item de-selects all items of same type
@@ -110,9 +135,12 @@ import se.skoview.stat.loadStatistics
 
 // TPDB
 // todo: domainId not supported in stat call: https://qa.integrationer.tjansteplattform.se/tpdb/tpdbapi.php/api/v1/statistics?dummy&dateEffective=2020-07-01&dateEnd=2020-07-31&domainId=11
-// todo: Add header header("Content-type:application/json"); to tpdbapi.php
-// Done
+// todo: Let TPDB-api add the default dates for integrations and statistics. Maybe extend the answers to contain date information
+// todo: Create v2 of the API
+// todo: Rewrite in Kotlin
 
+// done: Add cache
+// done: Add header header("Content-type:application/json"); to tpdbapi.php
 // done: Skriv ut versionsnummer på sidan
 // done: Add the initial loading of integrations and stat data to be on demand from the respective view - not from areAllBaseItemsLoaded()
 // done: Bug: Selected dates not included in URL filter
@@ -151,77 +179,22 @@ import se.skoview.stat.loadStatistics
 // done: Varför poppar rutan ”SLL statistiktjänst” upp – finns väl ingen anledning till det.
 // done: ”Återställ tjänsteplattform(ar)” bör flyttas ned någon centimeter.
 
-// Initialize the redux store
-val store = createReduxStore(
-    ::hippoReducer,
-    initialHippoState()
-)
-
-fun main() {
-    startApplication(::App)
-}
+val showBackgroundColorsForDebug: Boolean = false
 
 class App : Application() {
     init {
-        println("1")
         require("css/hippo.css")
-        println("2")
     }
-
     override fun start() {
-
-        val startUrl = window.location.href
-        println("window.location.href: $startUrl")
-
-        // If hostname or path contains "statistik" then we start the statistik app, else hippo
-        val isStatApp =
-            startUrl.contains("statistik")
-
-        // A listener that sets the URL after each state change
-        store.subscribe { state ->
-            setUrlFilter(state)
-        }
-
-        Pace.init()
-        GlobalScope.async {
-            loadBaseItems(store)
-        }
-
-        store.subscribe { state ->
-            if (state.currentAction == HippoAction.DoneDownloadBaseItems::class) {
-                if (isStatApp) startStat()
-                else startHippo()
-            }
-        }
-    }
-
-    fun startHippo() {
-        store.dispatch(HippoAction.ApplicationStarted(HippoApplication.HIPPO))
-
-        loadIntegrations(store.getState())
-        root("hippo") {
-            vPanel {
-                add(HippoTablePage)
-            }.apply {
-                width = 100.perc
-            }
-        }
-    }
-
-    fun startStat() {
-        store.dispatch(HippoAction.ApplicationStarted(HippoApplication.STATISTIK))
-        store.dispatch(HippoAction.SetSimpleViewPreselect(SimpleViewPreSelect.getDefault()))
-        // store.dispatch(HippoAction.PreSelectedLabelSet("Alla"))
-        loadStatistics(store.getState())
-        // loadHistory(store.getState())
+        HippoManager.initialize()
 
         root("hippo") {
-
-            vPanel {
-                add(StatPage)
-            }.apply {
-                width = 100.perc
-            }
+            overflow = Overflow.HIDDEN
+            mainLoop() // In HippoManager
         }
     }
+}
+
+fun main() {
+    startApplication(::App, module.hot) // startApplication(::App, module.hot)
 }
