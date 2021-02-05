@@ -17,6 +17,7 @@
 package se.skoview.app
 
 import pl.treksoft.kvision.Application
+import pl.treksoft.kvision.core.Overflow
 import pl.treksoft.kvision.module
 import pl.treksoft.kvision.panel.root
 import pl.treksoft.kvision.require
@@ -188,6 +189,7 @@ class App : Application() {
         HippoManager.initialize()
 
         root("hippo") {
+            overflow = Overflow.HIDDEN
             mainLoop() // In HippoManager
         }
     }

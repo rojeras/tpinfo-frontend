@@ -47,7 +47,7 @@ fun Container.hippoView(state: HippoState) {
     simplePanel {
         // font-family: Georgia,Times New Roman,Times,serif;
         fontFamily = "Times New Roman"
-        width = 99.vw
+        // width = 99.vw
         // Page header
         vPanel {
             // marginRight = 5.px
@@ -154,8 +154,6 @@ fun Container.hippoView(state: HippoState) {
 
 // The whole item table
         hPanel {
-            overflow = Overflow.HIDDEN
-
             hippoItemsView(state, ItemType.CONSUMER, integrationLists, "Tjänstekonsumenter", 21) // , grow = 1)
             hippoItemsView(state, ItemType.CONTRACT, integrationLists, "Tjänstekontrakt", 21) // , grow = 1)
             hippoItemsView(state, ItemType.PLATTFORM_CHAIN, integrationLists, "Tjänsteplattformar", 16) // , grow = 1)
@@ -173,8 +171,7 @@ private fun Container.hippoItemsView(
     bredd: Int = 20
 ) {
     div {
-        width = (bredd - 0.5).vw
-        overflow = Overflow.HIDDEN
+        width = (bredd - 1.1).vw
         margin = (0.3).vw
         wordBreak = WordBreak.BREAKALL
 
@@ -260,7 +257,6 @@ private fun Container.hippoItemsView(
                                     classes = setOf("pointer"),
                                     rich = true
                                 ) {
-                                    margin = 5.px
                                     margin = 5.px
 
                                     // Difference for contracts, domains and rest
