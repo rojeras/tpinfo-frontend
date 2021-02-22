@@ -1,3 +1,19 @@
+## Participate in tpinfo development
+This is a preliminary process how to participate and make changes in this tpinfo repo. 
+
+1. Identify a change you want to make
+1. Log on to github
+1. Go to the `rojeras/tpinfo-frontend` repo
+1. Open an issue and describe the change. Wait for feedback from the repo owner.
+1. Fork the repo.
+1. Create a new branch out of the `develop` branch, and give it a meaningful name. A good introduction and best practice to git branching can be found at https://nvie.com/posts/a-successful-git-branching-model/.  
+1. Hack away in your new branch. Use the issue to discuss your change.
+1. When done, create a pull request. Be sure to 
+   * Refer to the open issue
+   * Describe your change
+   * Include the name of your branch
+1. If all is well your change will be accepted and merge into the original repo. 
+1. Delete your fork. 
 ## Migration
 ### From Kvision 3.0.1 to 3.5.2
 1. Clone from bitbucket
