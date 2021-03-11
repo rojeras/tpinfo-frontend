@@ -18,11 +18,11 @@
 package se.skoview.stat
 
 import com.github.snabbdom._get
-import pl.treksoft.kvision.chart.*
-import pl.treksoft.kvision.core.*
-import pl.treksoft.kvision.html.div
-import pl.treksoft.kvision.panel.hPanel
-import pl.treksoft.kvision.utils.*
+import io.kvision.chart.*
+import io.kvision.core.*
+import io.kvision.html.div
+import io.kvision.panel.hPanel
+import io.kvision.utils.*
 import se.skoview.app.showBackgroundColorsForDebug
 import se.skoview.common.*
 

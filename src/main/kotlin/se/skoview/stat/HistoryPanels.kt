@@ -16,9 +16,9 @@
  */
 package se.skoview.stat
 
-import pl.treksoft.kvision.chart.*
-import pl.treksoft.kvision.core.Container
-import pl.treksoft.kvision.utils.vw
+import io.kvision.chart.*
+import io.kvision.core.Container
+import io.kvision.utils.vw
 import se.skoview.common.HippoAction
 import se.skoview.common.HippoState
 

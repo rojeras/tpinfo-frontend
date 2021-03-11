@@ -20,8 +20,8 @@ import com.github.snabbdom.VNode
 import kotlinx.browser.document
 import kotlinx.browser.window
 import org.w3c.xhr.XMLHttpRequest
-import pl.treksoft.kvision.core.Component
-import pl.treksoft.kvision.panel.SimplePanel
+import io.kvision.core.Component
+import io.kvision.panel.SimplePanel
 import kotlin.js.Date
 
 fun tpdbBaseUrl(): String {

@@ -23,8 +23,8 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.ListSerializer
-import pl.treksoft.kvision.rest.HttpMethod
-import pl.treksoft.kvision.rest.RestClient
+import io.kvision.rest.HttpMethod
+import io.kvision.rest.RestClient
 import kotlin.collections.component1
 import kotlin.collections.component2
 import kotlin.collections.set

@@ -17,13 +17,13 @@
 
 package se.skoview.stat
 
-import pl.treksoft.kvision.core.*
-import pl.treksoft.kvision.panel.hPanel
-import pl.treksoft.kvision.panel.vPanel
-import pl.treksoft.kvision.utils.asString
-import pl.treksoft.kvision.utils.px
-import pl.treksoft.kvision.utils.vh
-import pl.treksoft.kvision.utils.vw
+import io.kvision.core.*
+import io.kvision.panel.hPanel
+import io.kvision.panel.vPanel
+import io.kvision.utils.asString
+import io.kvision.utils.px
+import io.kvision.utils.vh
+import io.kvision.utils.vw
 import se.skoview.app.showBackgroundColorsForDebug
 import se.skoview.common.HippoState
 import se.skoview.common.ItemType

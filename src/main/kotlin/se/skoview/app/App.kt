@@ -16,12 +16,13 @@
  */
 package se.skoview.app
 
-import pl.treksoft.kvision.Application
-import pl.treksoft.kvision.core.Overflow
-import pl.treksoft.kvision.module
-import pl.treksoft.kvision.panel.root
-import pl.treksoft.kvision.require
-import pl.treksoft.kvision.startApplication
+import io.kvision.Application
+import io.kvision.core.Overflow
+import io.kvision.module
+import io.kvision.panel.root
+import io.kvision.require
+import io.kvision.routing.Routing
+import io.kvision.startApplication
 import se.skoview.common.HippoManager
 import se.skoview.common.HippoManager.mainLoop
 
@@ -186,6 +187,7 @@ class App : Application() {
         require("css/hippo.css")
     }
     override fun start() {
+        Routing.init()
         HippoManager.initialize()
 
         root("hippo") {

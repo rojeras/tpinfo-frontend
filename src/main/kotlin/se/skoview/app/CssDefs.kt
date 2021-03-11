@@ -16,11 +16,11 @@
  */
 package se.skoview.app
 
-import pl.treksoft.kvision.core.Background
-import pl.treksoft.kvision.core.Col
-import pl.treksoft.kvision.core.Color
-import pl.treksoft.kvision.core.Style
-import pl.treksoft.kvision.utils.rem
+import io.kvision.core.Background
+import io.kvision.core.Col
+import io.kvision.core.Color
+import io.kvision.core.Style
+import io.kvision.utils.rem
 
 val formControlXs = Style {
     setStyle("height", "calc(1.3em + .4rem + 2px)")

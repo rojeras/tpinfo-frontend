@@ -20,11 +20,11 @@ import kotlinx.browser.document
 import kotlinx.browser.window
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import pl.treksoft.kvision.core.Container
-import pl.treksoft.kvision.html.main
-import pl.treksoft.kvision.pace.Pace
-import pl.treksoft.kvision.redux.createReduxStore
-import pl.treksoft.navigo.Navigo
+import io.kvision.core.Container
+import io.kvision.html.main
+import io.kvision.pace.Pace
+import io.kvision.redux.createReduxStore
+import io.kvision.navigo.Navigo
 import se.skoview.hippo.hippoView
 import se.skoview.stat.PreSelect
 import se.skoview.stat.loadStatistics

@@ -16,23 +16,23 @@
  */
 package se.skoview.hippo
 
-import pl.treksoft.kvision.core.*
-import pl.treksoft.kvision.form.InputSize
-import pl.treksoft.kvision.form.select.selectInput
-import pl.treksoft.kvision.html.Align
-import pl.treksoft.kvision.html.Div
-import pl.treksoft.kvision.html.div
-import pl.treksoft.kvision.html.h2
-import pl.treksoft.kvision.panel.SimplePanel
-import pl.treksoft.kvision.panel.vPanel
-import pl.treksoft.kvision.state.stateBinding
-import pl.treksoft.kvision.table.TableType
-import pl.treksoft.kvision.table.cell
-import pl.treksoft.kvision.table.row
-import pl.treksoft.kvision.table.table
-import pl.treksoft.kvision.tabulator.*
-import pl.treksoft.kvision.utils.perc
-import pl.treksoft.kvision.utils.px
+import io.kvision.core.*
+import io.kvision.form.InputSize
+import io.kvision.form.select.selectInput
+import io.kvision.html.Align
+import io.kvision.html.Div
+import io.kvision.html.div
+import io.kvision.html.h2
+import io.kvision.panel.SimplePanel
+import io.kvision.panel.vPanel
+import io.kvision.state.stateBinding
+import io.kvision.table.TableType
+import io.kvision.table.cell
+import io.kvision.table.row
+import io.kvision.table.table
+import io.kvision.tabulator.*
+import io.kvision.utils.perc
+import io.kvision.utils.px
 import se.skoview.common.*
 
 data class ViewInformation(
