@@ -16,7 +16,7 @@
  */
 package se.skoview.common
 
-import pl.treksoft.navigo.Navigo
+import io.kvision.navigo.Navigo
 
 /**
  * The following URL patterns can occur and must be handled

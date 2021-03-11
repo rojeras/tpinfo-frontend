@@ -16,15 +16,15 @@
  */
 package se.skoview.stat
 
-import pl.treksoft.kvision.core.*
-import pl.treksoft.kvision.html.div
-import pl.treksoft.kvision.panel.HPanel
-import pl.treksoft.kvision.panel.SimplePanel
-import pl.treksoft.kvision.panel.hPanel
-import pl.treksoft.kvision.table.TableType
-import pl.treksoft.kvision.tabulator.*
-import pl.treksoft.kvision.utils.px
-import pl.treksoft.kvision.utils.vw
+import io.kvision.core.*
+import io.kvision.html.div
+import io.kvision.panel.HPanel
+import io.kvision.panel.SimplePanel
+import io.kvision.panel.hPanel
+import io.kvision.table.TableType
+import io.kvision.tabulator.*
+import io.kvision.utils.px
+import io.kvision.utils.vw
 import se.skoview.app.showBackgroundColorsForDebug
 import se.skoview.common.*
 

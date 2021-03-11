@@ -20,8 +20,8 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.await
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
-import pl.treksoft.kvision.rest.HttpMethod
-import pl.treksoft.kvision.rest.RestClient
+import io.kvision.rest.HttpMethod
+import io.kvision.rest.RestClient
 
 enum class ItemType {
     CONSUMER,

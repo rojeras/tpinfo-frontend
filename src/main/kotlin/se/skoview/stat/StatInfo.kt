@@ -142,7 +142,7 @@ fun exportStatData(state: HippoState) {
         csvData += "\n"
     }
 
-    val fileSaver = pl.treksoft.kvision.require("file-saver")
+    val fileSaver = io.kvision.require("file-saver")
     val BOM = "\uFEFF"
     val csv = Blob(arrayOf(BOM + csvData), BlobPropertyBag("text/csv;charset=utf-8"))
     fileSaver.saveAs(csv, "tp-anropsstatistik.csv")

@@ -16,7 +16,7 @@
  */
 package se.skoview.common
 
-import pl.treksoft.kvision.redux.RAction
+import io.kvision.redux.RAction
 import se.skoview.stat.PreSelect
 
 /** According to: https://github.com/redux-utilities/flux-standard-action

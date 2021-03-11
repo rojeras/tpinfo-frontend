@@ -18,25 +18,25 @@ package se.skoview.hippo
 
 import kotlinx.browser.document
 import kotlinx.browser.window
-import pl.treksoft.kvision.core.* // ktlint-disable no-wildcard-imports
-import pl.treksoft.kvision.core.Color.Companion.hex
-import pl.treksoft.kvision.data.BaseDataComponent
-import pl.treksoft.kvision.data.dataContainer
-import pl.treksoft.kvision.form.select.simpleSelectInput
-import pl.treksoft.kvision.form.text.TextInput
-import pl.treksoft.kvision.form.text.TextInputType
-import pl.treksoft.kvision.form.text.textInput
-import pl.treksoft.kvision.html.* // ktlint-disable no-wildcard-imports
-import pl.treksoft.kvision.modal.Modal
-import pl.treksoft.kvision.modal.ModalSize
-import pl.treksoft.kvision.panel.flexPanel
-import pl.treksoft.kvision.panel.hPanel
-import pl.treksoft.kvision.panel.simplePanel
-import pl.treksoft.kvision.panel.vPanel
-import pl.treksoft.kvision.state.observableListOf
-import pl.treksoft.kvision.utils.perc
-import pl.treksoft.kvision.utils.px
-import pl.treksoft.kvision.utils.vw
+import io.kvision.core.* // ktlint-disable no-wildcard-imports
+import io.kvision.core.Color.Companion.hex
+import io.kvision.data.BaseDataComponent
+import io.kvision.data.dataContainer
+import io.kvision.form.select.simpleSelectInput
+import io.kvision.form.text.TextInput
+import io.kvision.form.text.TextInputType
+import io.kvision.form.text.textInput
+import io.kvision.html.* // ktlint-disable no-wildcard-imports
+import io.kvision.modal.Modal
+import io.kvision.modal.ModalSize
+import io.kvision.panel.flexPanel
+import io.kvision.panel.hPanel
+import io.kvision.panel.simplePanel
+import io.kvision.panel.vPanel
+import io.kvision.state.observableListOf
+import io.kvision.utils.perc
+import io.kvision.utils.px
+import io.kvision.utils.vw
 import se.skoview.app.formControlXs
 import se.skoview.common.* // ktlint-disable no-wildcard-imports
 import kotlin.math.min
