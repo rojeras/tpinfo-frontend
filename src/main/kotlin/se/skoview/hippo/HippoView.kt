@@ -16,8 +16,6 @@
  */
 package se.skoview.hippo
 
-import kotlinx.browser.document
-import kotlinx.browser.window
 import io.kvision.core.* // ktlint-disable no-wildcard-imports
 import io.kvision.core.Color.Companion.hex
 import io.kvision.data.BaseDataComponent
@@ -37,6 +35,8 @@ import io.kvision.state.observableListOf
 import io.kvision.utils.perc
 import io.kvision.utils.px
 import io.kvision.utils.vw
+import kotlinx.browser.document
+import kotlinx.browser.window
 import se.skoview.app.formControlXs
 import se.skoview.common.* // ktlint-disable no-wildcard-imports
 import kotlin.math.min
@@ -75,9 +75,19 @@ fun Container.hippoView(state: HippoState) {
             // Select date
             div {
                 align = Align.LEFT
-//             }.bind(HippoManager.hippoStore) { state ->
+
+                val opts: List<Pair<String, String>> = listOf(
+                    state.updateDates,
+                    listOf(BaseDates.getLastIntegrationDate()),
+                    listOf(state.dateEffective)
+                ).flatten() // as MutableList<String>
+                    // val opts: List<Pair<String, String>> = state.updateDates
+                    .distinct()
+                    .sortedByDescending { it }
+                    .map { Pair(it, it) } as List<Pair<String, String>>
+
                 simpleSelectInput(
-                    options = state.updateDates.sortedByDescending { it }.map { Pair(it, it) },
+                    options = opts,
                     value = state.dateEffective
                 ) {
                     addCssStyle(formControlXs)
