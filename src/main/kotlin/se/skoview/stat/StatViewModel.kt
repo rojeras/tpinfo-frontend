@@ -16,9 +16,9 @@
  */
 package se.skoview.stat
 
-import pl.treksoft.kvision.core.Col
-import pl.treksoft.kvision.core.Color
-import pl.treksoft.kvision.data.BaseDataComponent
+import io.kvision.core.Col
+import io.kvision.core.Color
+import io.kvision.data.BaseDataComponent
 import se.skoview.common.* // ktlint-disable no-wildcard-imports
 
 class SInfoRecord(

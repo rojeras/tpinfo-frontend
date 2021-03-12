@@ -16,6 +16,8 @@
  */
 package se.skoview.common
 
+import io.kvision.rest.HttpMethod
+import io.kvision.rest.RestClient
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.await
 import kotlinx.coroutines.joinAll
@@ -23,8 +25,6 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.ListSerializer
-import pl.treksoft.kvision.rest.HttpMethod
-import pl.treksoft.kvision.rest.RestClient
 import kotlin.collections.component1
 import kotlin.collections.component2
 import kotlin.collections.set
@@ -127,6 +127,10 @@ data class BaseDates(
     companion object {
         var integrationDates = listOf<String>()
         var statisticsDates = listOf<String>()
+        fun getLastIntegrationDate(): String? {
+            return if (integrationDates.isNotEmpty()) integrationDates[0]
+            else null
+        }
     }
 }
 
