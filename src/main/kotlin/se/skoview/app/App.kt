@@ -182,6 +182,10 @@ import se.skoview.common.HippoManager.mainLoop
 
 val showBackgroundColorsForDebug: Boolean = false
 
+/**
+ * Entry point of application.
+ */
+
 class App : Application() {
     init {
         require("css/hippo.css")

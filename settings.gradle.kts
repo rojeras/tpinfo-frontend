@@ -16,4 +16,4 @@ pluginManagement {
         }
     }
 }
-rootProject.name = "hippo"
+rootProject.name = "tpinfo-frontend"

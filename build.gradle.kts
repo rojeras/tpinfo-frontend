@@ -82,7 +82,7 @@ kotlin {
         implementation("io.kvision:kvision-bootstrap-dialog:$kvisionVersion")
         implementation("io.kvision:kvision-bootstrap-typeahead:$kvisionVersion")
         implementation("io.kvision:kvision-fontawesome:$kvisionVersion")
-        implementation("io.kvision:kvision-i18n:$kvisionVersion")
+        // implementation("io.kvision:kvision-i18n:$kvisionVersion")
         implementation("io.kvision:kvision-richtext:$kvisionVersion")
         implementation("io.kvision:kvision-datacontainer:$kvisionVersion")
         implementation("io.kvision:kvision-chart:$kvisionVersion")
@@ -97,6 +97,19 @@ kotlin {
         implementation("io.kvision:kvision-testutils:$kvisionVersion:tests")
     }
     sourceSets["main"].resources.srcDir(webDir)
+}
+
+tasks.dokkaHtml.configure {
+    // Set module name displayed in the final output
+    moduleName.set("tpinfo-frontend")
+    outputDirectory.set(buildDir.resolve("dokka"))
+    dokkaSourceSets.configureEach {
+        includes.from("src/main/kotlin/se/skoview/MODULE.md")
+        includes.from("src/main/kotlin/se/skoview/app/PACKAGE.md")
+        includes.from("src/main/kotlin/se/skoview/common/PACKAGE.md")
+        includes.from("src/main/kotlin/se/skoview/hippo/PACKAGE.md")
+        includes.from("src/main/kotlin/se/skoview/stat/PACKAGE.md")
+    }
 }
 
 fun getNodeJsBinaryExecutable(): String {
