@@ -12,8 +12,10 @@ buildscript {
 
 plugins {
     val kotlinVersion: String by System.getProperties()
+    val dokkaVersion: String by System.getProperties()
     id("kotlinx-serialization") version kotlinVersion
     kotlin("js") version kotlinVersion
+    id("org.jetbrains.dokka") version dokkaVersion
 }
 
 version = "1.0.0-SNAPSHOT"
@@ -47,11 +49,12 @@ kotlin {
                 devServer = KotlinWebpackConfig.DevServer(
                     open = false,
                     port = 2000,
-                    proxy = mapOf(
+                    proxy = mutableMapOf(
                         "/kv/*" to "http://localhost:8080",
                         "/kvws/*" to mapOf("target" to "ws://localhost:8080", "ws" to true)
                     ),
-                    contentBase = listOf("$buildDir/processedResources/js/main")
+                    // contentBase = listOf("$buildDir/processedResources/js/main")
+                    static = mutableListOf("$buildDir/processedResources/js/main")
                 )
             }
             // Added webpackTask migrating to KVision 3.12.0
@@ -81,7 +84,6 @@ kotlin {
         implementation("io.kvision:kvision-fontawesome:$kvisionVersion")
         implementation("io.kvision:kvision-i18n:$kvisionVersion")
         implementation("io.kvision:kvision-richtext:$kvisionVersion")
-        implementation("io.kvision:kvision-handlebars:$kvisionVersion")
         implementation("io.kvision:kvision-datacontainer:$kvisionVersion")
         implementation("io.kvision:kvision-chart:$kvisionVersion")
         implementation("io.kvision:kvision-tabulator:$kvisionVersion")
