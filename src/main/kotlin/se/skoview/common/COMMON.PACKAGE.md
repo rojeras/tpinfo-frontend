@@ -3,3 +3,5 @@ Och lite dokumenation för en specifik package.
 Och en mening till.
 Och ytterligare en!
 Och en fjärde!
+och en femte.
+Och en sjätte.

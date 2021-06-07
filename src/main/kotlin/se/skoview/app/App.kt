@@ -180,12 +180,22 @@ import se.skoview.common.HippoManager.mainLoop
 // done: Varför poppar rutan ”SLL statistiktjänst” upp – finns väl ingen anledning till det.
 // done: ”Återställ tjänsteplattform(ar)” bör flyttas ned någon centimeter.
 
+/**
+ * Global debug support. Turn on different background colors for most containers.
+ */
 val showBackgroundColorsForDebug: Boolean = false
 
 /**
  * Entry point of application.
  */
+fun main() {
+    startApplication(::App, module.hot) // startApplication(::App, module.hot)
+}
 
+/**
+ * Initialize and startup..
+ * Enter the main loop (in [HippoManager]).
+ */
 class App : Application() {
     init {
         require("css/hippo.css")
@@ -201,6 +211,4 @@ class App : Application() {
     }
 }
 
-fun main() {
-    startApplication(::App, module.hot) // startApplication(::App, module.hot)
-}
+
