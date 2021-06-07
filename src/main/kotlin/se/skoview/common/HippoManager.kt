@@ -80,6 +80,9 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
         }
     }
 
+    /**
+     * Defines the main() which is called at each state change.
+     */
     fun Container.mainLoop() {
         // place for common header
         println("In mainLoop()")
