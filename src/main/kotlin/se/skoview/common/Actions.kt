@@ -19,25 +19,46 @@ package se.skoview.common
 import io.kvision.redux.RAction
 import se.skoview.stat.PreSelect
 
-/** According to: https://github.com/redux-utilities/flux-standard-action
- * An action object should have a type and contain:
- * - payload: data object | error object (if error == true) ?
- * - error: Boolean?
- * - meta: object?
+/**
+ * Definition of the *redux* actions used in *frontend*
  */
 
 sealed class HippoAction : RAction {
+    /**
+     * Select view (hippo or stat).
+     */
     data class SetView(val view: View) : HippoAction()
+
+    /**
+     * The base dates must be downloaded before the first integration download, and gets its own status.
+     */
     data class SetDownloadBaseDatesStatus(val status: AsyncActionStatus) : HippoAction()
     object StartDownloadBaseItems : HippoAction()
     object DoneDownloadBaseItems : HippoAction()
     data class ErrorDownloadBaseItems(val errorMessage: String) : HippoAction()
     object StartDownloadIntegrations : HippoAction()
+
+    /**
+     * Integration contains three different JSON structures
+     */
     data class DoneDownloadIntegrations(
+        /**
+         * A matrix of integration specifications (based on item ids)
+         */
         val integrationArrs: List<Integration>,
+        /**
+         * The total number of each type for this specific day
+         */
         val maxCounters: MaxCounter,
+        /**
+         * The dates where this specific integration has changed
+         */
         val updateDates: Array<String>
     ) : HippoAction()
+
+    /**
+     * The state is updated with information from a bookmark
+     */
     data class ApplyBookmark(
         val view: View,
         val bookmark: BookmarkInformation
@@ -51,8 +72,20 @@ sealed class HippoAction : RAction {
         val historyMap: Map<String, Int>
     ) : HippoAction()
     data class ErrorDownloadIntegrations(val errorMessage: String) : HippoAction()
+
+    /**
+     * Called when a date is selected in hippo
+     */
     data class DateSelected(val dateType: DateType, val selectedDate: String) : HippoAction()
+
+    /**
+     * Called when a plattform is selected in stat
+     */
     data class StatTpSelected(val tpId: Int) : HippoAction()
+
+    /**
+     * Called when an item is selected
+     */
     data class ItemIdSelected(
         val viewType: ItemType,
         val id: Int

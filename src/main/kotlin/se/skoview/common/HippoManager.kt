@@ -31,6 +31,13 @@ import se.skoview.stat.loadStatistics
 import se.skoview.stat.preSelectInitialize
 import se.skoview.stat.statPage
 
+/**
+ * HippoManager is a central component. It manages:
+ * 1. Initialization of the different parts of the applications.
+ * 1. URL and navigation
+ * 1. Bookmarks
+ * 1. All dispatch of state updates
+ */
 object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Default + SupervisorJob()) {
 
     private val routing = Navigo(null, true, "#")
@@ -41,6 +48,10 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
         initializeHippoState()
     )
 
+    /**
+     * Initialize the hippo or statistics application. It loads the base information, and then integrations or
+     * statistics dependeing on the URL.
+     */
     fun initialize() {
 
         Pace.init()
@@ -71,6 +82,7 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
 
     fun Container.mainLoop() {
         // place for common header
+        println("In mainLoop()")
 
         // Called after each state change
         main(hippoStore) { state ->
@@ -79,17 +91,14 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
                 when (state.view) {
                     View.HOME -> println("Got View.HOME in main()")
                     View.HIPPO -> {
-                        if (
+                        if ( // This if-construct should be possible to remove
                             state.downloadBaseItemStatus == AsyncActionStatus.COMPLETED // &&
-                            // state.downloadIntegrationStatus == AsyncActionStatus.COMPLETED
-                        ) {
-                            hippoView(state)
-                        }
+                         ) {
+                             hippoView(state)
+                         }
                     }
                     View.STAT -> {
                         statPage(state)
-                        // statHeader(state)
-                        // statCharts(state)
                     }
                 }
             }

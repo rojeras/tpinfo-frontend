@@ -20,33 +20,22 @@ import se.skoview.stat.PreSelect
 import kotlin.js.Date
 
 /**
- * Bookmark definition and functions
+ * Class which is used to codify the state.
+ * The bookmark object is used when state is translated to and from the filter URL parameter (bookmark string)
  *
- * The bookmark is stored in the "filter" parameter in the URL.
- * Syntax: "letter integer"
+
  *
- *  S: dateEffective (start date)
- *  E: dateEnd
- *  c: Consumer id
- *  d: Domain id
- *  C: Contract id
- *  l: Logical address id
- *  p: Producer id
- *  F: First plattform id
- *  M: Middle plattform id (optional)
- *  L: Last plattform id
- *  H1: Show history
- *  Dx: Display item type x, where x:
- *      1: consumers
- *      2: producers
- *      3: contracts
- *      4: logical addresses
- *  Px: Select preview x, where x:
- *      0: none selected (null)
- *      x > 0: According to preview id
- *
- * All bookmark functions except HippoState.applyBookmark() is defined in this file. applyBookmark
- * is an extension function defined in Model.kt.
+ * @param dateEffective Start date of a selection
+ * @param dateEnd: End date of a selection
+ * @param selectedConsumers List of selected items of this type
+ * @param selectedProducers List of selected items of this type
+ * @param selectedLogicalAddresses List of selected items of this type
+ * @param selectedContracts List of selected items of this type
+ * @param selectedDomains List of selected items of this type
+ * @param selectedConsumers List of selected item of this type
+ * @param selectedPlattformChains List of selected item of this type
+ * @param showItemTypes Specify which item types should be displayed (currently used in statistics only)
+ * @param showTimeGraph Display history graph in statistics if set to true
  */
 
 data class BookmarkInformation(
@@ -63,6 +52,34 @@ data class BookmarkInformation(
     var showTimeGraph: Boolean = false,
 )
 
+/**
+ * Extension function to the redux store.
+ * Reads information from the store and creates the bookmark string (the part after "filter=" in the URL).
+ * @return String which codifies the state to be appended to the URL
+ *
+ * The syntax of the codified state information in the resulting string is a letter followed by an integer id.
+ * The following letters are used:
+ *
+ *  * S: dateEffective (start date)
+ *  * E: dateEnd
+ *  * c: Consumer id
+ *  * d: Domain id
+ *  * C: Contract id
+ *  * l: Logical address id
+ *  * p: Producer id
+ *  * F: First plattform id
+ *  * M: Middle plattform id (optional)
+ *  * L: Last plattform id
+ *  * H1: Show history
+ *  * Dx: Display item type x, where x:
+ *      * 1: consumers
+ *      * 2: producers
+ *      * 3: contracts
+ *      * 4: logical addresses
+ *  * Px: Select preview x, where x:
+ *      * 0: none selected (null)
+ *      * x > 0: According to preview id
+ */
 fun HippoState.createBookmarkString(): String {
 
     var bookmark = ""
@@ -126,25 +143,97 @@ fun HippoState.createBookmarkString(): String {
     return bookmark
 }
 
-// Let the URL mirror the current state
-/*
-fun setUrlFilter(state: HippoState) {
-    val bookmark = state.getBookmark()
-    val hostname = window.location.hostname
-    val protocol = window.location.protocol
-    val port = window.location.port
-    val pathname = window.location.pathname
-
-    val portSpec = if (port.isNotEmpty()) ":$port" else ""
-    var newUrl = "$protocol//$hostname$portSpec$pathname"
-
-    if (bookmark.length > 1) {
-        newUrl += "?filter=$bookmark"
-    }
-    window.history.pushState(newUrl, "hippo-utforska integrationer", newUrl)
-}
+/**
+ * Extension function to the redux state.
+ * The state is updated based on a bookmark object.
+ * @param view View that should be displayed
+ * @param bookmark an object with state information
+ * @return An updated state
  */
+fun HippoState.applyBookmark(view: View, bookmark: BookmarkInformation): HippoState {
 
+    val newState =
+
+        if (view == View.HIPPO) {
+            val newDateEffective: String? =
+                if (bookmark.dateEffective != null) bookmark.dateEffective
+                else this.dateEffective
+            val newDateEnd: String? =
+                if (bookmark.dateEnd != null) bookmark.dateEnd
+                else this.dateEnd
+
+            this.copy(
+                dateEffective = newDateEffective,
+                dateEnd = newDateEnd,
+            )
+        } else {
+            val datesLastMonth = getDatesLastMonth()
+
+            val newDateEffective: String =
+                if (bookmark.dateEffective != null) bookmark.dateEffective!!
+                else datesLastMonth.first.toSwedishDate()
+
+            val newDateEnd: String =
+                if (bookmark.dateEnd != null) bookmark.dateEnd!!
+                else datesLastMonth.second.toSwedishDate()
+
+            var showConsumers: Boolean
+            var showProducers: Boolean
+            var showContracts: Boolean
+            var showLogicalAddresses: Boolean
+
+            if (bookmark.showItemTypes.isNotEmpty()) {
+                showConsumers = if (bookmark.showItemTypes.contains(ItemType.CONSUMER)) true else false
+                showProducers = if (bookmark.showItemTypes.contains(ItemType.PRODUCER)) true else false
+                showContracts = if (bookmark.showItemTypes.contains(ItemType.CONTRACT)) true else false
+                showLogicalAddresses =
+                    if (bookmark.showItemTypes.contains(ItemType.LOGICAL_ADDRESS)) true else false
+            } else {
+                // If no display flag is set the default is to show all item types
+                showConsumers = true
+                showProducers = true
+                showContracts = true
+                showLogicalAddresses = true
+            }
+
+            val showTimeGraph = bookmark.showTimeGraph
+            if (showTimeGraph) {
+                showConsumers = true
+                showProducers = true
+                showContracts = true
+                showLogicalAddresses = true
+            }
+
+            this.copy(
+                statDateEffective = newDateEffective,
+                statDateEnd = newDateEnd,
+                showConsumers = showConsumers,
+                showProducers = showProducers,
+                showContracts = showContracts,
+                showLogicalAddresses = showLogicalAddresses,
+                showTimeGraph = showTimeGraph
+            )
+        }
+
+    val nextState = newState.copy(
+        view = view,
+        selectedConsumersIds = bookmark.selectedConsumers,
+        selectedProducersIds = bookmark.selectedProducers,
+        selectedLogicalAddressesIds = bookmark.selectedLogicalAddresses,
+        selectedContractsIds = bookmark.selectedContracts,
+        selectedDomainsIds = bookmark.selectedDomains,
+        selectedPlattformChainsIds = bookmark.selectedPlattformChains,
+        viewPreSelect = bookmark.preView
+    )
+
+    return nextState
+}
+
+/**
+ * Creates a bookmark object based on a bookmark string
+ * @param fullUrl An URL string which contains a "filter=" parameter which is parsed
+ * @return A bookmark object based on the input string
+ */
 fun parseBookmarkString(fullUrl: String?): BookmarkInformation {
     // ---------------------------------------------------------------------
     fun parseBookmarkType(typeChar: String, filterValue: String): List<Int> {
@@ -252,11 +341,21 @@ fun parseBookmarkString(fullUrl: String?): BookmarkInformation {
     )
 }
 
+/**
+ * Support function to convert a date to an integer value to be used in a bookmakr string
+ * @param   dateString Date in string format
+ * @return The number of days between 1/1 1970 and dateString
+ */
 private fun date2DaysSinceEpoch(dateString: String): Double {
     val day = Date(dateString)
     return (day.getTime() / 8.64e7) - 16874 // Dived by number of millisecs since epoch (1/1 1970)
 }
 
+/**
+ * Support function to convert an integer representing days since 1/1 1970 to a date in string format
+ * @param daysSinceEpoch Number of days since 1/1 1970
+ * @return Date
+ */
 private fun daysSinceEpoch2date(daysSinceEpoch: Int): String {
     val date = Date((daysSinceEpoch + 16874) * 8.64e7)
     return date.toISOString().substring(0, 10)
