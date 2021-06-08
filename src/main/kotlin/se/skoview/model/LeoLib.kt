@@ -24,11 +24,18 @@ import io.kvision.core.Component
 import io.kvision.panel.SimplePanel
 import kotlin.js.Date
 
+/**
+ * Return the first part of the URL to TPDB-api with support for different development environments.
+ */
 fun tpdbBaseUrl(): String {
     val currentProtocol = window.location.protocol
     val currentHost = window.location.host
     // tpdb is assumed to be on the 'qa.integrationer.tjansteplattform.se' server if we run in development or test environment
-    return if (currentHost.contains("localhost") || currentHost.contains("192.168.0.") || currentHost.contains("www.hippokrates.se")) {
+    return if (
+        currentHost.contains( "localhost" ) ||
+        currentHost.contains("192.168.0.") ||
+        currentHost.contains("www.hippokrates.se")
+    ) {
         // "http://localhost:5555/tpdb/tpdbapi.php/api/v1/"
         "https://qa.integrationer.tjansteplattform.se/tpdb/tpdbapi.php/api/v1/"
     } else {

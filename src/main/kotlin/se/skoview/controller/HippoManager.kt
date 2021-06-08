@@ -54,9 +54,7 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
     )
 
     /**
-     * Initialize the hippo or statistics application.
-     *
-     * It loads the base information, and then integrations or statistics depending on the URL.
+     * Initialize the hippo or statistics application. It loads the base information, and then integrations or statistics depending on the URL.
      */
     fun initialize() {
 
@@ -184,7 +182,7 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
     }
 
     /**
-     * Generic function to dispatch redux actions.
+     * Generic facade to dispatch redux actions.
      *
      * @param action Action to dispatch, see [HippoAction]
      */
@@ -192,6 +190,36 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
         hippoStore.dispatch(action)
     }
 
+    /**
+     * Facade to dispatch
+     *
+     * Specify it synonyms or the technical terms should be displayed (in Statistik). Since [navigateWithBookmark]
+     * is not used this action will not be represented in the URL and browser history.
+     *
+     * This function could be replaced by [dispatchProxy] and kept here as a preparation to include this setting in
+     * the browser history.
+     *
+     * @param flag Show technical terms (or synonyms)
+     */
+    fun statTechnicalTermsSelected(flag: Boolean) {
+        hippoStore.dispatch(HippoAction.ShowTechnicalTerms(flag))
+        // val nextState = hippoStore.getState().setFlag(HippoAction.ShowTechnicalTerms(flag))
+        // navigateWithBookmark(nextState)
+    }
+
+    /**
+     * Heart of the routing/navigation algorithm.
+     *
+     * The function is called with a target state object, that is, the next state the application is going
+     * to apply. It is done through the browser URL. A URL (really the bookmakrk part of the URL) is
+     * created, and set in the browser by the [routing].navigate() function. That will invoke the
+     * [newOrUpdatedUrlFromBrowser] which will parse the URL and do the actual state update.
+     *
+     * This seemingly cumbersome way of switching state ensures that the URL match the state, and also enables browser
+     * history and the use of the backward and forward browser buttons.
+     *
+     * @param nextState A state object representing the next state the application shoould apply.
+     */
     private fun navigateWithBookmark(nextState: HippoState) {
         val bookmarkString = nextState.createBookmarkString()
         println("In navigateWithBookmark, bookmarkString = '$bookmarkString', nextState:")
@@ -203,12 +231,24 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
         routing.navigate(newView.url + route)
     }
 
+    /**
+     * Navigate function which creates an updated state object and calls [navigateWithBookmark] to select a date.
+     *
+     * @param type Type of date
+     * @param date New date
+     */
     fun dateSelected(type: DateType, date: String) {
         val nextState = hippoStore.getState()
             .dateSelected(date, type)
         navigateWithBookmark(nextState)
     }
 
+    /**
+     * Navigate function which creates an updated state object and calls [navigateWithBookmark] to select an item.
+     *
+     * @param itemId The id of the selected item
+     * @param type Type of the selected item
+     */
     fun itemSelected(itemId: Int, type: ItemType) {
         val nextState = hippoStore.getState()
             .setShowAllItemTypes(true)
@@ -216,6 +256,12 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
         navigateWithBookmark(nextState)
     }
 
+    /**
+     * Navigate function which creates an updated state object and calls [navigateWithBookmark] to deselect an item.
+     *
+     * @param itemId The id of the deselected item
+     * @param type Type of the deselected item
+     */
     fun itemDeselected(itemId: Int, type: ItemType) {
         println("Deselect item, state:")
         console.log(hippoStore.getState())
@@ -224,6 +270,12 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
         navigateWithBookmark(nextState)
     }
 
+    /**
+     * Navigate function which creates an updated state object and calls [navigateWithBookmark] to toggle a selection of an item
+     *
+     * @param itemId Id of item which shuould toogle its selection status
+     * @param itemType Type of the item
+     */
     fun itemSelectDeselect(itemId: Int, itemType: ItemType) {
         if (hippoStore.getState().isItemSelected(itemType, itemId)) {
             itemDeselected(itemId, itemType)
@@ -232,21 +284,28 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
         }
     }
 
+    /**
+     * Navigate function which creates an updated state object and calls [navigateWithBookmark] to set the maximum number of items to show in a certain column (in hippo)
+     *
+     * @param type Type of the items in the column
+     * @param lines Number of items to show in the column
+     */
     fun setViewMax(type: ItemType, lines: Int) {
         hippoStore.dispatch(HippoAction.SetVMax(type, lines))
     }
 
+    /**
+     * Navigate function which creates an updated state object and calls [navigateWithBookmark] to select a platform to show (in Statistik)
+     *
+     * @param tpId Id of the plattform
+     */
     fun statTpSelected(tpId: Int) {
         // hippoStore.dispatch(HippoAction.StatTpSelected(tpId))
         val nextState = hippoStore.getState().statTpSelected(tpId)
         navigateWithBookmark(nextState)
     }
 
-    fun statTechnicalTermsSelected(flag: Boolean) {
-        hippoStore.dispatch(HippoAction.ShowTechnicalTerms(flag))
-        // val nextState = hippoStore.getState().setFlag(HippoAction.ShowTechnicalTerms(flag))
-        // navigateWithBookmark(nextState)
-    }
+
 
     /*
     fun statShowConsumers(flag: Boolean) {
@@ -265,6 +324,10 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
         hippoStore.dispatch(HippoAction.ShowLogicalAddresses(flag))
     }
 */
+    /**
+     * Navigate function which creates an updated state object and calls [navigateWithBookmark] for slection in Statistik to show all items types.
+     *
+     */
     fun statShowAllItemTypes() {
         // hippoStore.dispatch(HippoAction.ShowAllItemTypes(flag))
         val nextState = hippoStore.getState()
@@ -272,6 +335,11 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
         navigateWithBookmark(nextState)
     }
 
+    /**
+     * Navigate function which creates an updated state object and calls [navigateWithBookmark] with flag to display the history chart.
+     *
+     * @param flag Show history chart or not
+     */
     fun statHistorySelected(flag: Boolean) {
         // if (flag) loadHistory(hippoStore.getState()) // Preload of history
         // hippoStore.dispatch(HippoAction.ShowTimeGraph(flag))
@@ -280,6 +348,11 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
         navigateWithBookmark(nextState)
     }
 
+    /**
+     * Navigate function which creates an updated state object and calls [navigateWithBookmark] to switch between hippo and Statistik.
+     *
+     * @param view Which view (application) should be visible
+     */
     fun setView(view: View) {
         val nextState = hippoStore.getState()
             .setNewView(view)
@@ -287,6 +360,11 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
         navigateWithBookmark(nextState)
     }
 
+    /**
+     * Navigate function which creates an updated state object and calls [navigateWithBookmark] to apply a preselect (to the Statistik)
+     *
+     * @param preSelectLabel Label which identifies a preSelect
+     */
     fun statSetPreselect(preSelectLabel: String) {
         val preSelect: PreSelect? = PreSelect.mapp[preSelectLabel]
         val nextState =

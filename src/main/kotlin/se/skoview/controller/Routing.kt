@@ -41,12 +41,18 @@ import io.kvision.navigo.Navigo
  *
  */
 
+/**
+ * Definition of View types and URL representation.
+ */
 enum class View(val url: String) {
     HOME("/"),
     HIPPO("/hippo"),
     STAT("/stat"),
 }
 
+/**
+ * Initialization of Navigo routing and the connection to the [HippoManager.newOrUpdatedUrlFromBrowser].
+ */
 fun Navigo.initialize(): Navigo {
     return on(
         View.HOME.url,
@@ -66,6 +72,9 @@ fun Navigo.initialize(): Navigo {
     )
 }
 
+/**
+ * Obtains the URL parameter list.
+ */
 fun stringParameter(params: dynamic, parameterName: String): String {
     return (params[parameterName]).toString()
 }
