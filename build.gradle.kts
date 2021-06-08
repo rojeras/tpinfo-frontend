@@ -108,10 +108,10 @@ tasks.dokkaHtml.configure {
     cacheRoot.set(file("$USER_HOME/.cache/dokka"))
     dokkaSourceSets.configureEach {
         includes.from("src/main/kotlin/se/skoview/MODULE.md")
-        includes.from("src/main/kotlin/se/skoview/app/APP.PACKAGE.md")
-        includes.from("src/main/kotlin/se/skoview/common/COMMON.PACKAGE.md")
-        includes.from("src/main/kotlin/se/skoview/hippo/HIPPO.PACKAGE.md")
-        includes.from("src/main/kotlin/se/skoview/stat/STAT.PACKAGE.md")
+        includes.from("src/main/kotlin/se/skoview/controller/CONTROLLER.PACKAGE.md")
+        includes.from("src/main/kotlin/se/skoview/model/MODEL.PACKAGE.md")
+        includes.from("src/main/kotlin/se/skoview/view/hippo/HIPPO.PACKAGE.md")
+        includes.from("src/main/kotlin/se/skoview/view/stat/STAT.PACKAGE.md")
     }
 }
 
