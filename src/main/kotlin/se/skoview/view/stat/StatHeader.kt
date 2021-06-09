@@ -31,10 +31,7 @@ import io.kvision.table.cell
 import io.kvision.table.row
 import io.kvision.table.table
 import io.kvision.utils.px
-import se.skoview.controller.HippoManager
-import se.skoview.controller.View
-import se.skoview.controller.formControlXs
-import se.skoview.controller.showBackgroundColorsForDebug
+import se.skoview.controller.*
 import se.skoview.model.*
 
 fun Container.statHeader(

@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package se.skoview.model
+package se.skoview.controller
 
 import com.github.snabbdom.VNode
 import kotlinx.browser.document
@@ -22,6 +22,7 @@ import kotlinx.browser.window
 import org.w3c.xhr.XMLHttpRequest
 import io.kvision.core.Component
 import io.kvision.panel.SimplePanel
+import se.skoview.model.HippoState
 import kotlin.js.Date
 
 /**
@@ -84,6 +85,12 @@ fun getAsync(url: String, callback: (String) -> Unit) {
  */
 
 // todo: Evaluate the use of the KVision client CallAgent. See CallAgentExample.kt
+/**
+ * Make an asynchronous call to TPDB and invoke callback on response.
+ *
+ * @param url API specific part of the URL (excluding host information)
+ * @param callback lambda to invoke on the response
+ */
 fun getAsyncTpDb(url: String, callback: (String) -> Unit) {
 
     val fullUrl = tpdbBaseUrl() + url
@@ -117,7 +124,11 @@ fun getSyncTpDb(url: String): String? {
 }
  */
 
-// Added an extension function to the Date class
+/**
+ * Extension function to the Date class to convert a date to ISO representation string.
+ *
+ * @return YYYY-MM-DD formatted string
+ */
 fun Date.toSwedishDate(): String {
 
     val dd = this.getDate()
@@ -129,11 +140,13 @@ fun Date.toSwedishDate(): String {
     val sYYYY = yyyy.toString()
 
     return "$sYYYY-$sMM-$sDD"
-
-    // return this.toISOString().substring(0, 10)
-    // return this.toLocaleDateString().substring(0, 10)
 }
 
+/**
+ * Returns two dates representing first and last day of last month.
+ *
+ * @return Pair of first and last [Date] of last month.
+ */
 fun getDatesLastMonth(): Pair<Date, Date> {
 
     val today = Date()
@@ -155,6 +168,12 @@ fun getDatesLastMonth(): Pair<Date, Date> {
     return Pair(firstDay, Date(lastDay))
 }
 
+/**
+ * Obtains the version information. It is added to a meta tag with id=hippoVersion, in [index.html],
+ * as part of the [build process](bin/buildDockerImage.kts).
+ *
+ * @return Version string
+ */
 fun getVersion(versionName: String = "hippoVersion"): String {
     val versionElement = document.getElementById(versionName)
 
@@ -162,6 +181,11 @@ fun getVersion(versionName: String = "hippoVersion"): String {
     else "-2.-2.-2"
 }
 
+/**
+ * String extension function that adds a space between every three character. Intended to format big numbers
+ * whith space as thousands separator. "123456789" becomes "123 456 789"
+ * @return The string where a space is inserted betwwen every third character,
+ */
 fun String.thousands(): String {
     val s1 = this.reversed()
     val s2List = s1.chunked(3)
@@ -174,6 +198,7 @@ fun String.thousands(): String {
     return s3.trim().reversed()
 }
 
+/*
 fun getHeightToRemainingViewPort(
     topComponent: Component,
     delta: Int = 48
@@ -183,21 +208,27 @@ fun getHeightToRemainingViewPort(
     val heightToRemove = occupiedViewPortArea + delta
     return "calc(100vh - ${heightToRemove}px)"
 }
+*/
 
+/*
 // fun <T> jsRunBlocking(block: suspend () -> T): dynamic = promise { block() }
 fun getPosition(elementId: String): Int {
     // console.log(document.getElementById(elementId)!!.innerHTML)
     console.log(document.getElementById(elementId)!!.innerHTML)
     return 42
 }
+*/
 
 /**
  * HippoPanel enum contains keys to be used in PanelPosition and PanelDimension
  */
+
+/*
 enum class HippoPanel {
     CHARTLABELTABLE,
     EXAMPLE
 }
+*/
 
 /**
  * Add this panel to a point on the screen to be able to get its coordinates
@@ -205,6 +236,7 @@ enum class HippoPanel {
  * @param key: Identifies the panel
  * @param dummy: HippoState. Needed to ensure this panel is re-rendered when state is changed
  */
+/*
 class PanelPosition(val key: HippoPanel, val dummy: HippoState) : SimplePanel() {
     init {
         id = "PanelPosition"
@@ -222,11 +254,14 @@ class PanelPosition(val key: HippoPanel, val dummy: HippoState) : SimplePanel() 
         topPos[key] = offset.top as Int
     }
 }
+*/
 
 /**
  * Add the afterInster() function to a panel class to get its dimensions through the maps
  * OBS, identify the panel in HippoPanel enum
  */
+
+/*
 object PanelDimension {
 
     val heightMap: MutableMap<HippoPanel, Int> = mutableMapOf()
@@ -241,3 +276,4 @@ object PanelDimension {
     }
      */
 }
+*/

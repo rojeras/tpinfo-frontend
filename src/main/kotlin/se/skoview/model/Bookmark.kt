@@ -17,6 +17,8 @@
 package se.skoview.model
 
 import se.skoview.controller.View
+import se.skoview.controller.getDatesLastMonth
+import se.skoview.controller.toSwedishDate
 import se.skoview.view.hippo.ItemType
 import se.skoview.view.stat.PreSelect
 import kotlin.js.Date

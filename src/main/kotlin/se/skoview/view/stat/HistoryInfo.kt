@@ -19,6 +19,7 @@ package se.skoview.view.stat
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import se.skoview.controller.HippoManager
+import se.skoview.controller.getAsyncTpDb
 import se.skoview.model.* // ktlint-disable no-wildcard-imports
 
 // todo: Handle case when history is null:

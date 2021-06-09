@@ -40,6 +40,7 @@ import kotlinx.browser.window
 import se.skoview.controller.HippoManager
 import se.skoview.controller.View
 import se.skoview.controller.formControlXs
+import se.skoview.controller.getVersion
 import se.skoview.model.* // ktlint-disable no-wildcard-imports
 import kotlin.math.min
 

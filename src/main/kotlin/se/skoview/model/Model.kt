@@ -17,6 +17,8 @@
 package se.skoview.model
 
 import se.skoview.controller.View
+import se.skoview.controller.getDatesLastMonth
+import se.skoview.controller.toSwedishDate
 import se.skoview.model.HippoAction.ShowTechnicalTerms
 import se.skoview.model.HippoAction.ShowTimeGraph
 import se.skoview.view.hippo.Integration
@@ -27,6 +29,9 @@ import se.skoview.view.stat.PreSelect
 import se.skoview.view.stat.StatisticsBlob
 import kotlin.reflect.KClass
 
+/**
+ * Defines the states an asynchronous call can take
+ */
 enum class AsyncActionStatus {
     NOT_INITIALIZED,
     INITIALIZED,
@@ -34,6 +39,15 @@ enum class AsyncActionStatus {
     ERROR
 }
 
+/**
+ * Defines the legal types for dates managed in the application.
+ *
+ * @param EFFECTIVE First date in a time span
+ * @param END Last date in a time span
+ * @param EFFECTIVE_AND_END Time span of one day
+ * @param STAT_EFFECTIVE First date of a time span in Statistik
+ * @param STAT_END End date of a time span in Statistik
+ */
 enum class DateType {
     EFFECTIVE,
     END,
@@ -42,6 +56,45 @@ enum class DateType {
     STAT_END
 }
 
+/**
+ * The redux state. The defaults serve as initial values.
+ *
+ * @param currentAction Used to store the last action (which created the current state).
+ * @param view View (application) to present.
+ * @param downloadBaseDatesStatus State of a certain asynchronous call.
+ * @param downloadBaseItemStatus State of a certain asynchronous call.
+ * @param downloadIntegrationStatus State of a certain asynchronous call.
+ * @param downloadStatisticsStatus State of a certain asynchronous call.
+ * @param downloadHistoryStatus State of a certain asynchronous call.
+ * @param dateEffective The first date of a time span (used in hippo).
+ * @param dateEnd The last date of a time span (used in hippo).
+ * @param statDateEffective The first date in a time span (used in Statistik).
+ * @param statDateEnd The last date in a time span (used in Statistik).
+ * @param selectedConsumersIds List of id's (integers) representing currently selected consumers.
+ * @param selectedProducersIds List of id's (integers) representing currently selected producers.
+ * @param selectedLogicalAddressesIds List of id's (integers) representing currently selected logical addresses.
+ * @param selectedContractsIds List of id's (integers) representing currently selected contracts.
+ * @param selectedDomainsIds List of id's (integers) representing currently selected domains.
+ * @param selectedPlattformChainsIds List of id's (integers) representing currently selected platform chains.
+ * @param selectedPlattformName Name of currently selected TP (used in Statistik).
+ * @param integrationArrs List of currently selected integrations.
+ * @param maxCounters The number of items of each type that exist for the current time span (dateEffecitve to dateEnd). Shown in column headers in hippo.
+ * @param updateDates The list of dates where the current selection changed. Used to populate the date list in hippo.
+ * @param vServiceConsumersMax Maximal number of items to show/add of each type in the columns in hippo.
+ * @param vServiceProducersMax Maximal number of items to show/add of each type in the columns in hippo.
+ * @param vLogicalAddressesMax Maximal number of items to show/add of each type in the columns in hippo.
+ * @param vServiceContractsMax Maximal number of items to show/add of each type in the columns in hippo.
+ * @param statBlob Contains the statistic information for the current selection.
+ * @param historyMap Contains the history data for the current selection.
+ * @param showTimeGraph Flag to show/hide the history chart.
+ * @param showTechnicalTerms Flag to show technical terms or their synonyms.
+ * @param viewPreSelect Contains a selected [PreSelect]
+ * @param showConsumers Flag to show/hide consumer chart in Statistik (not in use but kept for future extensions).
+ * @param showProducers Flag to show/hide producer chart in Statistik (not in use but kept for future extensions).
+ * @param showLogicalAddresses Flag to show/hide logical address chart in Statistik (not in use but kept for future extensions).
+ * @param showContracts Flag to show/hide contract chart in Statistik (not in use but kept for future extensions).
+ * @param lockShowAllItemTypes Override to ensure all type charts are displayed.
+ */
 data class HippoState(
     // Status information
     val currentAction: KClass<out HippoAction> = HippoAction.SetView::class,
@@ -87,8 +140,6 @@ data class HippoState(
 
     // View controllers
     val showTechnicalTerms: Boolean = false,
-    // val viewMode: ViewMode = ViewMode.SIMPLE,
-    // val simpleViewPreSelect: SimpleViewPreSelect = simpleViewPreSelectDefault,
     val viewPreSelect: PreSelect? = null,
     val showConsumers: Boolean = true,
     val showProducers: Boolean = true,
@@ -97,6 +148,10 @@ data class HippoState(
     val lockShowAllItemTypes: Boolean = false
 )
 
+/**
+ * Initialize the state. Beside the default values the [HippoState.statDateEffective] and [HippoState.statDateEnd]
+ * are set to start and end date of last month.
+ */
 fun initializeHippoState(): HippoState {
     val datesPair = getDatesLastMonth()
     val statDateEffective = datesPair.first.toSwedishDate()
@@ -108,6 +163,11 @@ fun initializeHippoState(): HippoState {
     )
 }
 
+/**
+ * Extension function to the redux state. Counts how how many of the (statistik) views currently are visible.
+ *
+ * @return Number of visible views.
+ */
 fun HippoState.numberOfItemViewsSelected(): Int {
     var count = 0
 
@@ -119,6 +179,14 @@ fun HippoState.numberOfItemViewsSelected(): Int {
     return count
 }
 
+/**
+ * Extension function to the redux state. Checks if a certain item is selected.
+ *
+ * @param itemType Type of item to check.
+ * @param id Id of the item to check.
+ *
+ * @return <i>true</i> if the item is currently selected.
+ */
 fun HippoState.isItemSelected(itemType: ItemType, id: Int): Boolean {
     return when (itemType) {
         ItemType.CONSUMER -> this.selectedConsumersIds.contains(id)
@@ -130,15 +198,16 @@ fun HippoState.isItemSelected(itemType: ItemType, id: Int): Boolean {
     }
 }
 
+/**
+ * Extension function to the redux state. Checks if a certain platform is selected in the statistik application.
+ *
+ * @return <i>true</i> if the plattform is currently selected.
+ */
 fun HippoState.isStatPlattformSelected(): Boolean {
-    // return isStatPlattformInPlattformChainList(this.selectedPlattformChainsIds, this.statisticsPlattforms)
-    return isStatPlattformInPlattformChainList(this.selectedPlattformChainsIds, StatisticsPlattform.mapp)
-}
 
-private fun isStatPlattformInPlattformChainList(
-    plattformChains: List<Int>,
-    statisticsPlattforms: Map<Int, StatisticsPlattform>
-): Boolean {
+    val plattformChains: List<Int> = this.selectedPlattformChainsIds
+    val statisticsPlattforms: Map<Int, StatisticsPlattform> = StatisticsPlattform.mapp
+
     if (plattformChains.size != 1) return false
     val selectedPlattformChainId = plattformChains[0]
     val selectedPlattformChain = PlattformChain.mapp[selectedPlattformChainId]!!
@@ -150,14 +219,6 @@ private fun isStatPlattformInPlattformChainList(
 
     return false
 }
-
-/*
-fun HippoState.isPlattformSelected(id: Int): Boolean {
-    val pChainId = PlattformChain.calculateId(first = id, middle = null, last = id)
-
-    return this.selectedPlattformChainsIds.contains(pChainId)
-}
- */
 
 // The extension function create the part of the URL to fetch integrations
 fun HippoState.getParams(view: View): String {
@@ -456,28 +517,28 @@ fun HippoState.dateSelected(selectedDate: String, dateType: DateType): HippoStat
 
 fun HippoState.isSelectedItemsUnChanged(oldState: HippoState): Boolean {
     return (
-        this.selectedConsumersIds.equals(oldState.selectedConsumersIds) &&
-            this.selectedContractsIds.equals(oldState.selectedContractsIds) &&
-            this.selectedLogicalAddressesIds.equals(oldState.selectedLogicalAddressesIds) &&
-            this.selectedDomainsIds.equals(oldState.selectedDomainsIds) &&
-            this.selectedProducersIds.equals(oldState.selectedProducersIds) &&
-            this.selectedPlattformChainsIds.equals(oldState.selectedPlattformChainsIds)
-        )
+            this.selectedConsumersIds.equals(oldState.selectedConsumersIds) &&
+                    this.selectedContractsIds.equals(oldState.selectedContractsIds) &&
+                    this.selectedLogicalAddressesIds.equals(oldState.selectedLogicalAddressesIds) &&
+                    this.selectedDomainsIds.equals(oldState.selectedDomainsIds) &&
+                    this.selectedProducersIds.equals(oldState.selectedProducersIds) &&
+                    this.selectedPlattformChainsIds.equals(oldState.selectedPlattformChainsIds)
+            )
 }
 
 fun HippoState.isIntegrationSelectionsChanged(oldState: HippoState): Boolean {
     return !(
-        this.dateEffective == oldState.dateEffective &&
-            this.dateEnd == oldState.dateEnd &&
-            this.isSelectedItemsUnChanged(oldState)
-        )
+            this.dateEffective == oldState.dateEffective &&
+                    this.dateEnd == oldState.dateEnd &&
+                    this.isSelectedItemsUnChanged(oldState)
+            )
 }
 
 fun HippoState.isStatisticsSelectionsChanged(oldState: HippoState): Boolean {
     return !(
-        this.statDateEffective == oldState.statDateEffective &&
-            this.statDateEnd == oldState.statDateEnd &&
-            this.isSelectedItemsUnChanged(oldState)
-        )
+            this.statDateEffective == oldState.statDateEffective &&
+                    this.statDateEnd == oldState.statDateEnd &&
+                    this.isSelectedItemsUnChanged(oldState)
+            )
 }
 

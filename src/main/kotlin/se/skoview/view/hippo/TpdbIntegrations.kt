@@ -26,7 +26,7 @@ import se.skoview.controller.HippoManager
 import se.skoview.model.HippoAction
 import se.skoview.model.HippoState
 import se.skoview.model.getParams
-import se.skoview.model.tpdbBaseUrl
+import se.skoview.controller.tpdbBaseUrl
 
 enum class ItemType {
     CONSUMER,

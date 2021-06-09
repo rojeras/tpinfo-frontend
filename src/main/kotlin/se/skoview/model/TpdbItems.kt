@@ -25,6 +25,7 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.ListSerializer
+import se.skoview.controller.tpdbBaseUrl
 import kotlin.collections.component1
 import kotlin.collections.component2
 import kotlin.collections.set

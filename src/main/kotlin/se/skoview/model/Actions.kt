@@ -24,7 +24,7 @@ import se.skoview.view.hippo.MaxCounter
 import se.skoview.view.stat.PreSelect
 
 /**
- * Definition of the *redux* actions used in *frontend*
+ * Definition of the *redux* actions used in *frontend*. The state properties are described in [HippoState].
  */
 
 sealed class HippoAction : RAction {
@@ -83,7 +83,7 @@ sealed class HippoAction : RAction {
     data class DateSelected(val dateType: DateType, val selectedDate: String) : HippoAction()
 
     /**
-     * Called when a plattform is selected in stat
+     * Called when a platform is selected in stat
      */
     data class StatTpSelected(val tpId: Int) : HippoAction()
 
