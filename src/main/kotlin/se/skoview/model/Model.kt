@@ -220,10 +220,15 @@ fun HippoState.isStatPlattformSelected(): Boolean {
     return false
 }
 
-// The extension function create the part of the URL to fetch integrations
+/**
+ * Extension function to the redux state. Based on state information the parameters for the TPDB GET calls is generated.
+ *
+ * @param view Indicate which application is active. The parameters for hippo and Statistik are slightly different.
+ *
+ * @return The query string part of the TPDB-API GET call.
+ */
 fun HippoState.getParams(view: View): String {
 
-    // var params = "?dummy&contractId=379"
     var params = "?dummy"
 
     if (view == View.HIPPO) {
@@ -267,6 +272,12 @@ fun HippoState.getParams(view: View): String {
     return params
 }
 
+/**
+ * Extension function to the redux state. Update the state with a flag value.
+ *
+ * @param action An action to set a flag in the state.
+ * @return An updated state object.
+ */
 fun HippoState.setFlag(action: HippoAction): HippoState {
     return when (action) {
         is ShowTechnicalTerms -> this.copy(showTechnicalTerms = action.isShown)
@@ -278,6 +289,13 @@ fun HippoState.setFlag(action: HippoAction): HippoState {
     }
 }
 
+/**
+ * Extension function to the redux state. Apply a pre-select specification to the state.
+ *
+ * @param preSelect The preSelect to apply.
+ *
+ * @return An updated state object.
+ */
 fun HippoState.setPreselect(preSelect: PreSelect?): HippoState {
     if (preSelect == null) {
         return this
@@ -302,6 +320,14 @@ fun HippoState.setPreselect(preSelect: PreSelect?): HippoState {
     return state3.applyFilteredItemsSelection(preSelect.itemsFilter).copy(viewPreSelect = preSelect)
 }
 
+/**
+ * Extension function to the redux state. Make multiple selections for a type.
+ *
+ * @param itemType The type of the items to be selected
+ * @param selectedList List of id's of [itemType] to be selected.
+ *
+ * @return An updated state object.
+ */
 fun HippoState.itemIdListSelected(itemType: ItemType, selectedList: List<Int>): HippoState {
     return when (itemType) {
         ItemType.CONSUMER -> this.copy(selectedConsumersIds = selectedList)
@@ -312,6 +338,11 @@ fun HippoState.itemIdListSelected(itemType: ItemType, selectedList: List<Int>): 
     }
 }
 
+/**
+ * Extension function to the redux state. Clear all selections.
+ *
+ * @return Copy of the state where all selections have been cleared.
+ */
 fun HippoState.itemDeselectAllForAllTypes(): HippoState {
     return this.copy(
         selectedConsumersIds = listOf(),
@@ -323,6 +354,9 @@ fun HippoState.itemDeselectAllForAllTypes(): HippoState {
     )
 }
 
+/**
+ * Extension function to the redux state.
+ */
 fun HippoState.applyFilteredItemsSelection(itemsFilter: ItemsFilter): HippoState {
 
     println("In applyFilteredItemsSelection(): $itemsFilter")
@@ -336,7 +370,6 @@ fun HippoState.applyFilteredItemsSelection(itemsFilter: ItemsFilter): HippoState
     return state2
 }
 
-// is HippoAction.ItemIdSelected -> {
 fun HippoState.itemIdSeclected(id: Int, type: ItemType): HippoState {
 
     return when (type) {
@@ -379,7 +412,6 @@ fun HippoState.itemIdSeclected(id: Int, type: ItemType): HippoState {
     }
 }
 
-// is HippoAction.ItemIdDeselected -> {
 fun HippoState.itemIdDeseclected(id: Int, type: ItemType): HippoState {
 
     // If the deselected item is part of the definition of the active preselect - then reset preselect
