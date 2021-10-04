@@ -16,13 +16,10 @@
  */
 package se.skoview.controller
 
-import io.kvision.Application
+import io.kvision.*
 import io.kvision.core.Overflow
-import io.kvision.module
 import io.kvision.panel.root
-import io.kvision.require
 import io.kvision.routing.Routing
-import io.kvision.startApplication
 import se.skoview.controller.HippoManager.mainLoop
 
 /**
@@ -188,7 +185,18 @@ val showBackgroundColorsForDebug: Boolean = false
  * Entry point of application.
  */
 fun main() {
-    startApplication(::App, module.hot) // startApplication(::App, module.hot)
+    startApplication(
+        ::App,
+        module.hot,
+        BootstrapModule,
+        BootstrapCssModule,
+        FontAwesomeModule,
+        BootstrapSelectModule,
+        BootstrapDatetimeModule,
+        BootstrapUploadModule,
+        CoreModule,
+        panelsCompatibilityMode = true
+    ) // startApplication(::App, module.hot)
 }
 
 /**

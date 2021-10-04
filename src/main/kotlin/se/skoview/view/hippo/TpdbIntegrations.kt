@@ -16,12 +16,12 @@
  */
 package se.skoview.view.hippo
 
+import io.kvision.jquery.rest.HttpMethod
+import io.kvision.jquery.rest.LegacyRestClient
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.await
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
-import io.kvision.rest.HttpMethod
-import io.kvision.rest.RestClient
 import se.skoview.controller.HippoManager
 import se.skoview.model.HippoAction
 import se.skoview.model.HippoState
@@ -99,7 +99,7 @@ fun loadIntegrations(state: HippoState) {
         )
     } else {
 
-        val restClient = RestClient()
+        val restClient = LegacyRestClient()
 
         val url = "${tpdbBaseUrl()}$parameters"
         println(url)

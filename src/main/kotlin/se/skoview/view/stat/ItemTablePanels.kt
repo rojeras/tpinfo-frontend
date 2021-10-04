@@ -21,7 +21,6 @@ import io.kvision.html.div
 import io.kvision.panel.HPanel
 import io.kvision.panel.SimplePanel
 import io.kvision.panel.hPanel
-import io.kvision.table.TableType
 import io.kvision.tabulator.*
 import io.kvision.utils.px
 import io.kvision.utils.vw
