@@ -16,17 +16,17 @@
  */
 package se.skoview.view.stat
 
-import io.kvision.core.*
+import io.kvision.core.* // ktlint-disable no-wildcard-imports
 import io.kvision.html.div
 import io.kvision.panel.HPanel
 import io.kvision.panel.SimplePanel
 import io.kvision.panel.hPanel
-import io.kvision.tabulator.*
+import io.kvision.tabulator.* // ktlint-disable no-wildcard-imports
 import io.kvision.utils.px
 import io.kvision.utils.vw
 import se.skoview.controller.HippoManager
 import se.skoview.controller.showBackgroundColorsForDebug
-import se.skoview.model.*
+import se.skoview.model.* // ktlint-disable no-wildcard-imports
 import se.skoview.view.hippo.ItemType
 
 fun Container.showItemTables(state: HippoState) {
