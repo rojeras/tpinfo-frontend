@@ -16,8 +16,8 @@
  */
 package se.skoview.model
 
-import io.kvision.rest.HttpMethod
-import io.kvision.rest.RestClient
+import io.kvision.jquery.rest.HttpMethod
+import io.kvision.jquery.rest.LegacyRestClient
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.await
 import kotlinx.coroutines.joinAll
@@ -85,7 +85,7 @@ suspend fun loadBaseItems() { // : Deferred<Unit> {
 }
 
 suspend fun <T : Any> loadBaseItem(type: String, deserializer: DeserializationStrategy<T>): Promise<T> {
-    val restClient = RestClient()
+    val restClient = LegacyRestClient()
     val url = "${tpdbBaseUrl()}$type"
     println(url)
 

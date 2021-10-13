@@ -21,6 +21,7 @@ import io.kvision.html.main
 import io.kvision.navigo.Navigo
 import io.kvision.pace.Pace
 import io.kvision.redux.createReduxStore
+import io.kvision.state.bind
 import kotlinx.browser.document
 import kotlinx.browser.window
 import kotlinx.coroutines.GlobalScope
@@ -94,7 +95,7 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
         println("In mainLoop()")
 
         // Called after each state change
-        main(hippoStore) { state ->
+        main().bind(hippoStore) { state ->
             println("In main()")
             if (state.downloadBaseItemStatus == AsyncActionStatus.COMPLETED) {
                 when (state.view) {
@@ -304,8 +305,6 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
         val nextState = hippoStore.getState().statTpSelected(tpId)
         navigateWithBookmark(nextState)
     }
-
-
 
     /*
     fun statShowConsumers(flag: Boolean) {

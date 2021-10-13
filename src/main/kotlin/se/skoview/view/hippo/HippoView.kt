@@ -267,7 +267,7 @@ private fun Container.hippoItemsView(
                             .subList(0, min(filteredList.size, maxNoItems))
                             .map { item ->
                                 div(
-                                    classes = setOf("pointer"),
+                                    className = "pointer",
                                     rich = true
                                 ) {
                                     margin = 5.px

@@ -10,6 +10,17 @@ buildscript {
 }
 */
 
+/* *********************************************************************
+Temporary fix of webpack bug
+See https://youtrack.jetbrains.com/issue/KT-49124
+ */
+rootProject.plugins.withType<org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlugin> {
+    rootProject.the<org.jetbrains.kotlin.gradle.targets.js.yarn.YarnRootExtension>().apply {
+        resolution("@webpack-cli/serve", "1.5.2")
+    }
+}
+// End of bug fix ******************************************************
+
 plugins {
     val kotlinVersion: String by System.getProperties()
     val dokkaVersion: String by System.getProperties()
@@ -89,6 +100,7 @@ kotlin {
         implementation("io.kvision:kvision-chart:$kvisionVersion")
         implementation("io.kvision:kvision-tabulator:$kvisionVersion")
         implementation("io.kvision:kvision-pace:$kvisionVersion")
+        implementation("io.kvision:kvision-rest:$kvisionVersion")
     	implementation("io.kvision:kvision-redux-kotlin:$kvisionVersion")
         implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-js:$coroutinesVersion")
         implementation("io.kvision:kvision-routing-navigo:$kvisionVersion")
