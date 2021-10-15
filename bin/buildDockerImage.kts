@@ -32,15 +32,6 @@ import java.time.ZoneOffset
 // -------------------------------------------------------------------------------------------
 // Main program
 // -------------------------------------------------------------------------------------------
-/**
- * todo:
- * To push a docker image to nogui registry:
- * 1. Mandatory paramters; git repo and git semver tag on the form vM.m.p
- * 2. Check out the branch and and tag and verify that there are no more commits after the git tag
- * 3. gradle clean
- * 4. Build
- * 5. Add the following as docker tag: branch-semver-commit hash
- */
 
 Largument.initialise(
     """

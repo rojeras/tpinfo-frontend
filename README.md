@@ -22,7 +22,7 @@ tpinfo-frontend is implemented in [Kotlin](https://kotlinlang.org/). Kotlin is a
 
 ## Development 
 ### Setup
-tpinfo is developed with [IntelliJ Ultimate](https://www.jetbrains.com/idea/). It is an amazing development environment. In addition you need to install up to date versions of [git](https://git-scm.com/) and [gradle](https://gradle.org/) (I think).  
+tpinfo has been developed with [IntelliJ Ultimate](https://www.jetbrains.com/idea/) (it is an amazing development environment). In addition to an IDE you need to install up to date versions of [git](https://git-scm.com/) and [gradle](https://gradle.org/) (I think).  
 
 Then, to get started, just clone this repo and open it as a project in IntelliJ. Use the gradle tasks to control the development process. 
 
@@ -51,10 +51,66 @@ This is a preliminary process how to participate and make changes in this tpinfo
 1. Delete your fork.
 
 
-###Make a hotfix
+
+### Local testing
+Use the *other/run* gradle task to compile, build and start and instance of the application. If there are no errors it will start and listen to port 2000. Use the following URL to access it: http://localhost:2000/ 
+
+### Remote access to devserver
+To access the devserver from another computer (Windows) on the same lan.
+In webpack.config.d/webpack.js add:
+
+``
+config.devServer.host = '0.0.0.0';
+``
+
+inside `if (config.devServer)`
+
+## Build production image
+A small build script, buildDockerImage.kts, is available in the bin/ folder. It is implemented as a Kotlin script, and [kscript](https://github.com/holgerbrandl/kscript) be installed on the build machine. 
+```
+➜  bin git:(develop) ✗ bin/buildDockerImage.kts --help
+One of '--run' or '--push' must be specified!
+
+This script builds a hippo frontend in a Docker image
+It must be run from the base dir in the git project
+
+Usage: script_name [-p] [-r] [-c] [-h]
+
+     -p | --push : Push image to NoGui docker registry 
+     -r | --run : Run the docker image for local testing 
+     -c | --clean : Do a gradle clean before the build 
+     -h | --help : Show this help information 
+```
+Requirements:
+ * It must be run from the top directory in the project. 
+ * The branch must be committed. 
+ * Either **--run** or **--push** must be used.
+ * The commit must be annotated with a semver version to be able to push the image.  
+
+To run the image in the Nogui server environment the docker-compose file for tpinfo must be updated to refer to the new version - and then restarted. 
+
+### Useful docker commands
+```
+docker container ls # Lista exekverande containers  
+docker container ls -a # Lista alla containers  
+docker image rm -f $(docker image ls -q) # Tag bort alla images  
+docker pull rojeras/tpinfo-backend:latest # Läs ner image från docker hub  
+docker tag rojeras/tpinfo-frontend:latest docker-registry.centrera.se:443/frontend # Tagga imagen för att göra det möjligt att pusha till NGs registry  
+docker push docker-registry.centrera.se:443/frontend # Pusha en taggad image till NGs docker registry  
+docker pull docker-registry.centrera.se:443/backend # Läs ner imagen från NGs registry (ex till tpinfo 
+-servrarna) 
+docker build --rm -t back5 . # Tag bort container back5 och återskapa imagen  
+docker run --env-file=../backend-envir.lst -p 8081:80 back5 # Kör backend med portar, miljövariabler  
+docker run -it back5 /bin/bash # Kör image back5 och ge kontroll till bash i container  
+docker exec -it 3d48b2e5d748 /bin/bash # Attach and start bash in a running container  
+docker save -o backend-image.tar rojeras/tpinfo-backend:latest # Save an image to a tar file  
+docker load -o filename.tar # Load an image from a tar file 
+```
+
+## Make a hotfix
 1. Check out the running version through its tag
     ```
-    git co -b hotfix_7.0.8 v7.0.7`
+    git co -b hotfix_7.0.8 v7.0.7
     ```
 1. Fix the problem and verify/test
 1. Add the changed files and commit the change
@@ -101,40 +157,6 @@ In this case, the merge requires manual input.
     ```
    git br -d hotfix_7.0.8
    ```
-### Local testing
-Use the *other/run* gradle task to compile, build and start and instance of the application. If there are no errors it will start and listen to port 2000. Use the following URL to access it: http://localhost:2000/ 
-
-###Remote access to devserver
-To access the devserver from another computer (Windows) on the same lan.
-In webpack.config.d/webpack.js add:
-
-``
-config.devServer.host = '0.0.0.0';
-``
-
-inside `if (config.devServer)`
-
-## Build production image
-
-
-###Useful docker commands
-```
-docker container ls # Lista exekverande containers  
-docker container ls -a # Lista alla containers  
-docker image rm -f $(docker image ls -q) # Tag bort alla images  
-docker pull rojeras/tpinfo-backend:latest # Läs ner image från docker hub  
-docker tag rojeras/tpinfo-frontend:latest docker-registry.centrera.se:443/frontend # Tagga imagen för att göra det möjligt att pusha till NGs registry  
-docker push docker-registry.centrera.se:443/frontend # Pusha en taggad image till NGs docker registry  
-docker pull docker-registry.centrera.se:443/backend # Läs ner imagen från NGs registry (ex till tpinfo 
--servrarna) 
-docker build --rm -t back5 . # Tag bort container back5 och återskapa imagen  
-docker run --env-file=../backend-envir.lst -p 8081:80 back5 # Kör backend med portar, miljövariabler  
-docker run -it back5 /bin/bash # Kör image back5 och ge kontroll till bash i container  
-docker exec -it 3d48b2e5d748 /bin/bash # Attach and start bash in a running container  
-docker save -o backend-image.tar rojeras/tpinfo-backend:latest # Save an image to a tar file  
-docker load -o filename.tar # Load an image from a tar file 
-```
-
 ## KDoc documentation
 Code documentation is provided as KDoc. To access it:
 1. Run gradle task *documentation/dokkaHtml*
