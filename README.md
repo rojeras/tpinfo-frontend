@@ -22,9 +22,9 @@ tpinfo-frontend is implemented in [Kotlin](https://kotlinlang.org/). Kotlin is a
 
 ## Development 
 ### Setup
-tpinfo has been developed with [IntelliJ Ultimate](https://www.jetbrains.com/idea/) (it is an amazing development environment). In addition to an IDE you need to install up to date versions of [git](https://git-scm.com/) and [gradle](https://gradle.org/) (I think).  
+tpinfo has been developed with [IntelliJ Ultimate](https://www.jetbrains.com/idea/) (it is an amazing development environment). In addition to an IDE you need to install up to date versions of [git](https://git-scm.com/) and [gradle](https://gradle.org/).  
 
-Then, to get started, just clone this repo and open it as a project in IntelliJ. Use the gradle tasks to control the development process. 
+Then, to get started, just clone this repo and open it as a project in a modern IDE (preferably IntelliJ). Use the gradle tasks to control the development process. 
 
 #### Debug
 When starting from the template project you need to remove line
@@ -56,7 +56,7 @@ This is a preliminary process how to participate and make changes in this tpinfo
 Use the *other/run* gradle task to compile, build and start and instance of the application. If there are no errors it will start and listen to port 2000. Use the following URL to access it: http://localhost:2000/ 
 
 ### Remote access to devserver
-To access the devserver from another computer (Windows) on the same lan.
+To access the dev-server from another computer (Windows) on the same lan.
 In webpack.config.d/webpack.js add:
 
 ``
@@ -66,7 +66,7 @@ config.devServer.host = '0.0.0.0';
 inside `if (config.devServer)`
 
 ## Build production image
-A small build script, buildDockerImage.kts, is available in the bin/ folder. It is implemented as a Kotlin script, and [kscript](https://github.com/holgerbrandl/kscript) be installed on the build machine. 
+A small build script, buildDockerImage.kts, is available in the `bin/` folder. It is implemented as a Kotlin script, and [kscript](https://github.com/holgerbrandl/kscript) must be installed on the build machine. 
 ```
 ➜  bin git:(develop) ✗ bin/buildDockerImage.kts --help
 One of '--run' or '--push' must be specified!
@@ -88,6 +88,22 @@ Requirements:
  * The commit must be annotated with a semver version to be able to push the image.  
 
 To run the image in the Nogui server environment the docker-compose file for tpinfo must be updated to refer to the new version - and then restarted. 
+
+The build script write information about the actual version and build in the `index.html` file.  
+
+In the header:  
+`<meta id="hippoVersion" content="7.1.1">`   
+And at the end of the file:  
+```
+<!--
+Build information
+-----------------
+Version:    7.1.1
+Build time: 2021-03-12T14:52:49.927687
+Git branch: master
+Git hash:   550daf5
+-->
+```
 
 ### Useful docker commands
 ```
