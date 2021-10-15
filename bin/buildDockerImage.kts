@@ -35,8 +35,11 @@ import java.time.ZoneOffset
 
 Largument.initialise(
     """
-    This script builds a hippo frontend in a Docker image
-    It must be run from the base dir in the git project
+    This script builds a hippo frontend in a docker image.
+    It must be run from the base dir in the git project.
+    The branch must be committed.
+    Either --run or --push must be used.
+    The commit must be annotated with a semver version to be able to push the image.
     """.trimIndent()
 )
 

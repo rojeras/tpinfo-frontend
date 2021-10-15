@@ -68,16 +68,18 @@ inside `if (config.devServer)`
 ## Build production image
 A small build script, buildDockerImage.kts, is available in the `bin/` folder. It is implemented as a Kotlin script, and [kscript](https://github.com/holgerbrandl/kscript) must be installed on the build machine. 
 ```
-➜  bin git:(develop) ✗ bin/buildDockerImage.kts --help
+➜  tpinfo-frontend git:(develop) ✗ bin/buildDockerImage.kts --help
 One of '--run' or '--push' must be specified!
 
-This script builds a hippo frontend in a Docker image
-It must be run from the base dir in the git project
+This script builds a hippo frontend in a docker image.
+It must be run from the base dir in the git project.
+The branch must be committed.
+The commit must be annotated with a semver version to be able to push the image.
 
 Usage: script_name [-p] [-r] [-c] [-h]
 
      -p | --push : Push image to NoGui docker registry 
-     -r | --run : Run the docker image for local testing 
+     -r | --run : Run the docker image 
      -c | --clean : Do a gradle clean before the build 
      -h | --help : Show this help information 
 ```
@@ -105,7 +107,7 @@ Git hash:   550daf5
 -->
 ```
 
-### Useful docker commands
+### List of useful docker commands
 ```
 docker container ls # Lista exekverande containers  
 docker container ls -a # Lista alla containers  
@@ -116,14 +118,13 @@ docker push docker-registry.centrera.se:443/frontend # Pusha en taggad image til
 docker pull docker-registry.centrera.se:443/backend # Läs ner imagen från NGs registry (ex till tpinfo 
 -servrarna) 
 docker build --rm -t back5 . # Tag bort container back5 och återskapa imagen  
-docker run --env-file=../backend-envir.lst -p 8081:80 back5 # Kör backend med portar, miljövariabler  
 docker run -it back5 /bin/bash # Kör image back5 och ge kontroll till bash i container  
 docker exec -it 3d48b2e5d748 /bin/bash # Attach and start bash in a running container  
 docker save -o backend-image.tar rojeras/tpinfo-backend:latest # Save an image to a tar file  
 docker load -o filename.tar # Load an image from a tar file 
 ```
 
-## Make a hotfix
+## To make a hotfix
 1. Check out the running version through its tag
     ```
     git co -b hotfix_7.0.8 v7.0.7
