@@ -22,7 +22,7 @@ tpinfo-frontend is implemented in [Kotlin](https://kotlinlang.org/). Kotlin is a
 
 ## Development 
 ### Setup
-tpinfo has been developed with [IntelliJ Ultimate](https://www.jetbrains.com/idea/) (it is an amazing development environment). In addition to an IDE you need to install up to date versions of [git](https://git-scm.com/) and [gradle](https://gradle.org/).  
+tpinfo has been developed with [IntelliJ Ultimate](https://www.jetbrains.com/idea/) (it is an amazing development environment). In addition to an IDE you need to install up-to-date versions of [git](https://git-scm.com/) and [gradle](https://gradle.org/).  
 
 Then, to get started, just clone this repo and open it as a project in a modern IDE (preferably IntelliJ). Use the gradle tasks to control the development process. 
 
