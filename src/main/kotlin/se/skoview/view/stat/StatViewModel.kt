@@ -115,7 +115,6 @@ class SInfoList(private val itemType: ItemType) {
  * The singleton for the data displayed in the view
  * It is updated through the view() method with an statisticsInfo object as parameter.
  */
-
 object SInfo : BaseDataComponent() {
     var consumerSInfoList = SInfoList(ItemType.CONSUMER)
     var producerSInfoList = SInfoList(ItemType.PRODUCER)

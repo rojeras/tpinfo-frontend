@@ -1,4 +1,3 @@
-
 /**
  * Copyright (C) 2013-2020 Lars Erik Röjerås
  *
@@ -17,13 +16,14 @@
  */
 package se.skoview.view.stat
 
-import com.github.snabbdom._get
+// import io.kvision.snabbdom._get
 import io.kvision.chart.*
 import io.kvision.core.*
 import io.kvision.html.div
 import io.kvision.panel.hPanel
 import io.kvision.utils.*
 import se.skoview.controller.HippoManager
+import se.skoview.controller.HippoManager.itemSelectDeselect
 import se.skoview.controller.showBackgroundColorsForDebug
 import se.skoview.model.*
 import se.skoview.view.hippo.ItemType
@@ -158,15 +158,20 @@ fun getPieChartConfig(
         ),
         itemSInfoList.descList(),
         options = ChartOptions(
+            // legend = LegendOptions(display = false), // 2022-01-12
+            plugins = PluginsOptions(
+                legend = LegendOptions(display = false), // 2022-01-12
+            ),
             elements = ElementsOptions(arc = ArcOptions(borderWidth = 0)),
             animation = AnimationOptions(duration = animationTime),
             responsive = responsive,
-            legend = LegendOptions(display = false),
+
             maintainAspectRatio = maintainAspectRatio,
-            onClick = { _, activeElements ->
-                val sliceIx = activeElements[0]._get("_index") as Int
+            // 2022-01-12
+            onClick = { _, activeElements, _ ->
+                val sliceIx: Int = activeElements[0].index.toInt()         //_get("_index") as Int
                 val itemId: Int = itemSInfoList.recordList[sliceIx].itemId
-                HippoManager.itemSelectDeselect(itemId, itemType)
+                itemSelectDeselect(itemId, itemType)
                 "" // This lambda returns Any, which mean the last line must be an expression
             }
         )

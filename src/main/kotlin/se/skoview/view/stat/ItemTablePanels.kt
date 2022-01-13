@@ -21,7 +21,15 @@ import io.kvision.html.div
 import io.kvision.panel.HPanel
 import io.kvision.panel.SimplePanel
 import io.kvision.panel.hPanel
-import io.kvision.tabulator.* // ktlint-disable no-wildcard-imports
+import io.kvision.tabulator.Align
+import io.kvision.tabulator.ColumnDefinition
+import io.kvision.tabulator.Editor
+import io.kvision.tabulator.Formatter
+import io.kvision.tabulator.Layout
+import io.kvision.tabulator.PaginationMode
+import io.kvision.tabulator.TableType
+import io.kvision.tabulator.TabulatorOptions
+import io.kvision.tabulator.tabulator
 import io.kvision.utils.px
 import io.kvision.utils.vw
 import se.skoview.controller.HippoManager
@@ -142,11 +150,13 @@ class ChartLabelTable(
         println("currentHeight = $currentHeight")
 
         tabulator(
+            // data = itemSInfoList, 2022-01-12
             data = itemSInfoList,
             types = setOf(TableType.BORDERED, TableType.STRIPED, TableType.HOVER, TableType.SMALL),
+
             options = TabulatorOptions(
                 layout = Layout.FITCOLUMNS,
-                pagination = PaginationMode.LOCAL,
+                // pagination = PaginationMode.LOCAL,   // LOCAL pagination is default 2022-01-12
                 paginationSize = 1000,
                 paginationButtonCount = 0,
                 height = currentHeight,
@@ -184,19 +194,23 @@ class ChartLabelTable(
                                     +"&nbsp;&nbsp;$textToShow"
                                 }
                             }
+                        },
+                        cellClick = { _, cell ->
+                            val item = cell.getData().unsafeCast<SInfoRecord>()
+                            if (item.calls > -1) HippoManager.itemSelectDeselect(item.itemId, item.itemType)
                         }
                     ),
                     ColumnDefinition(
                         widthGrow = 2,
                         title = "Antal anrop",
                         hozAlign = Align.RIGHT,
-                        field = callsField
+                        field = callsField,
+                        cellClick = { _, cell ->
+                            val item = cell.getData().unsafeCast<SInfoRecord>()
+                            if (item.calls > -1) HippoManager.itemSelectDeselect(item.itemId, item.itemType)
+                        }
                     )
                 ),
-                rowSelected = { row ->
-                    val item = row.getData().unsafeCast<SInfoRecord>()
-                    if (item.calls > -1) HippoManager.itemSelectDeselect(item.itemId, item.itemType)
-                },
                 // todo: Hide the tabulator footer here
             )
         )

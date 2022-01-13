@@ -16,7 +16,7 @@
  */
 package se.skoview.view.stat
 
-import com.github.snabbdom.VNode
+ import io.kvision.snabbdom.VNode
 import io.kvision.core.*
 import io.kvision.form.check.checkBoxInput
 import io.kvision.form.select.simpleSelectInput

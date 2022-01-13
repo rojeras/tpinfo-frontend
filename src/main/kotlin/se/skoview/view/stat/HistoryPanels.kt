@@ -43,13 +43,14 @@ fun Container.showHistoryChart(state: HippoState) {
                     DataSets(
                         label = "Antal anrop per dag",
                         data = yAxis,
-                        lineTension = 0
+                        // lineTension = 0 // 2022-01-12
+                        tension = 0
                     )
                 ),
                 xAxis,
                 options = ChartOptions(
                     animation = AnimationOptions(duration = animateTime),
-                    legend = LegendOptions(display = true),
+                    // legend = LegendOptions(display = true), // 2022-01-12
                     responsive = true,
                     maintainAspectRatio = false
                 )

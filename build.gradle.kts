@@ -1,8 +1,8 @@
 
-import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootPlugin
-import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack
+// import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootPlugin
+// import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
-import org.jetbrains.kotlin.gradle.tasks.KotlinJsDce
+// import org.jetbrains.kotlin.gradle.tasks.KotlinJsDce
 
 /**  Removed when migrating to KVision 3.12.0
 buildscript {
@@ -13,20 +13,27 @@ buildscript {
 /* *********************************************************************
 Temporary fix of webpack bug
 See https://youtrack.jetbrains.com/issue/KT-49124
- */
+
 rootProject.plugins.withType<org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlugin> {
     rootProject.the<org.jetbrains.kotlin.gradle.targets.js.yarn.YarnRootExtension>().apply {
         resolution("@webpack-cli/serve", "1.5.2")
     }
 }
+ */
 // End of bug fix ******************************************************
 
 plugins {
     val kotlinVersion: String by System.getProperties()
+    val kvisionVersion: String by System.getProperties()
     val dokkaVersion: String by System.getProperties()
-    id("kotlinx-serialization") version kotlinVersion
+    // val snabbdomKotlinVersion: String by System.getProperties()
+    kotlin("plugin.serialization") version kotlinVersion
     kotlin("js") version kotlinVersion
+    id("io.kvision") version kvisionVersion
     id("org.jetbrains.dokka") version dokkaVersion
+    // id("kotlinx-serialization") version kotlinVersion
+    // kotlin("js") version kotlinVersion
+    // id("org.jetbrains.dokka") version dokkaVersion
 }
 
 version = "1.0.0-SNAPSHOT"
@@ -35,11 +42,13 @@ group = "com.example"
 
 repositories {
     mavenCentral()
+    /*
     jcenter()
     maven { url = uri("https://dl.bintray.com/kotlin/kotlin-eap") }
     maven { url = uri("https://kotlin.bintray.com/kotlinx") }
     maven { url = uri("https://dl.bintray.com/kotlin/kotlin-js-wrappers") }
     maven { url = uri("https://dl.bintray.com/rjaros/kotlin") }
+     */
     mavenLocal()
 }
 
@@ -126,7 +135,7 @@ tasks.dokkaHtml.configure {
         includes.from("src/main/kotlin/se/skoview/view/stat/STAT.PACKAGE.md")
     }
 }
-
+/*
 fun getNodeJsBinaryExecutable(): String {
     // val nodeDir = NodeJsRootPlugin.apply(project).nodeJsSetupTask.destination
     val nodeDir = NodeJsRootPlugin.apply(project).nodeJsSetupTaskProvider.get().destination
@@ -138,6 +147,7 @@ fun getNodeJsBinaryExecutable(): String {
 }
 
 tasks {
+
     withType<KotlinJsDce> {
         doLast {
             copy {
@@ -154,6 +164,7 @@ tasks {
             }
         }
     }
+
     create("generatePotFile", Exec::class) {
         dependsOn("compileKotlinJs")
         executable = getNodeJsBinaryExecutable()
@@ -189,7 +200,7 @@ afterEvaluate {
             group = "package"
             destinationDirectory.set(file("$buildDir/libs"))
             val distribution =
-                project.tasks.getByName("browserProductionWebpack", KotlinWebpack::class).destinationDirectory!!
+                project.tasks.getByName("browserProductionWebpack", org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack::class).destinationDirectory!!
             from(distribution) {
                 include("*.*")
             }
@@ -200,3 +211,4 @@ afterEvaluate {
         }
     }
 }
+*/
