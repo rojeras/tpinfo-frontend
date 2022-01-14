@@ -196,6 +196,7 @@ class ChartLabelTable(
                                 }
                             }
                         },
+
                         cellClick = { _, cell ->
                             val item = cell.getData().unsafeCast<SInfoRecord>()
                             if (item.calls > -1) HippoManager.itemSelectDeselect(item.itemId, item.itemType)
