@@ -30,6 +30,7 @@ import io.kvision.tabulator.PaginationMode
 import io.kvision.tabulator.TableType
 import io.kvision.tabulator.TabulatorOptions
 import io.kvision.tabulator.tabulator
+import io.kvision.utils.perc
 import io.kvision.utils.px
 import io.kvision.utils.vw
 import se.skoview.controller.HippoManager
