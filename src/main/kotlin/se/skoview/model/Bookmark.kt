@@ -27,7 +27,6 @@ import kotlin.js.Date
  * Class which is used to codify the state.
  * The bookmark object is used when state is translated to and from the filter URL parameter (bookmark string)
  *
-
  *
  * @param dateEffective Start date of a selection
  * @param dateEnd: End date of a selection

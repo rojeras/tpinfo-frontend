@@ -113,7 +113,7 @@ fun hippoReducer(state: HippoState, action: HippoAction): HippoState {
             val newState: HippoState =
                 // todo: Remove hard coded tp id below
                 if (action.tpId != 3) {
-                    state.applyFilteredItemsSelection(PreSelect.getDefault()!!.itemsFilter)
+                    state.applyFilteredItemsSelection(PreSelect.getDefault().itemsFilter)
                         .copy(viewPreSelect = PreSelect.getDefault())
                 } else state
 

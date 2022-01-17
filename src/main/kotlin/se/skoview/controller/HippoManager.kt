@@ -307,6 +307,9 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
     }
 
     /*
+    De bortkommenterade satserna nedan möjliggör att styra vilka pajjer som skall visas under "Visa samtliga".
+     */
+    /*
     fun statShowConsumers(flag: Boolean) {
         hippoStore.dispatch(HippoAction.ShowConsumers(flag))
     }
@@ -340,8 +343,6 @@ object HippoManager { // } : CoroutineScope by CoroutineScope(Dispatchers.Defaul
      * @param flag Show history chart or not
      */
     fun statHistorySelected(flag: Boolean) {
-        // if (flag) loadHistory(hippoStore.getState()) // Preload of history
-        // hippoStore.dispatch(HippoAction.ShowTimeGraph(flag))
         val nextState = hippoStore.getState()
             .setFlag(HippoAction.ShowTimeGraph(flag)) // .setShowAllItemTypes(true)
         navigateWithBookmark(nextState)
