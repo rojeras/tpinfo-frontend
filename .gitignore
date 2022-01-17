@@ -4,3 +4,5 @@ build
 .gitignore.swp
 versionInfo.txt
 
+
+.kotlin-js-store/yarn.lock

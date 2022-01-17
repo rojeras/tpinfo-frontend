@@ -16,7 +16,7 @@
  */
 package se.skoview.controller
 
-import com.github.snabbdom.VNode
+import io.kvision.snabbdom.VNode
 import kotlinx.browser.document
 import kotlinx.browser.window
 import org.w3c.xhr.XMLHttpRequest
@@ -223,12 +223,12 @@ fun getPosition(elementId: String): Int {
  * HippoPanel enum contains keys to be used in PanelPosition and PanelDimension
  */
 
-/*
+
 enum class HippoPanel {
     CHARTLABELTABLE,
     EXAMPLE
 }
-*/
+
 
 /**
  * Add this panel to a point on the screen to be able to get its coordinates
@@ -261,7 +261,7 @@ class PanelPosition(val key: HippoPanel, val dummy: HippoState) : SimplePanel() 
  * OBS, identify the panel in HippoPanel enum
  */
 
-/*
+
 object PanelDimension {
 
     val heightMap: MutableMap<HippoPanel, Int> = mutableMapOf()
@@ -276,4 +276,3 @@ object PanelDimension {
     }
      */
 }
-*/

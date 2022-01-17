@@ -2,6 +2,7 @@
 .tabulator-footer {display: none } /* Hide tabulator footer */
 .tabulator {font-size: 12px}
 .tabulator-header {font-size: 12px}
+.tabulator-cell {font-size: 12px}
 
 /* .tabulator-header-filter input::placeholder { font-size: 14px } */
 /* Wrap column title */
@@ -9,6 +10,15 @@
     white-space: normal;
     text-overflow: clip;
 }
+
+/* Workaround provided by Robert 2022-01-14. See KVision issue #332
+   Fixed in KVision 5.7.2.
+*/
+/*
+.tabulator.table-sm > :not(caption) > * > * {
+    padding: 0;
+}
+ */
 
 .pointer {cursor: pointer;}
 
