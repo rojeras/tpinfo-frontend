@@ -1,5 +1,16 @@
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 
+/*
+    Temporary fix to ensure a node version which is supported for MAC computers
+    Refer to https://youtrack.jetbrains.com/issue/KT-49109#focus=Comments-27-5259190.0-0
+
+    LEO 2022-01-28
+ */
+rootProject.plugins.withType<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootPlugin> {
+    rootProject.the<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension>().nodeVersion = "16.0.0"
+}
+// End of temporary fix
+
 plugins {
     val kotlinVersion: String by System.getProperties()
     val kvisionVersion: String by System.getProperties()
