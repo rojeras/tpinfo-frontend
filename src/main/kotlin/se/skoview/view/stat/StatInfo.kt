@@ -95,8 +95,8 @@ fun exportStatData(state: HippoState) {
     var csvData: String = """
      Informationen är baserad på följande filtrering:
      
-     Från datum: ${state.dateEffective}
-     Till datum: ${state.dateEnd}
+     Från datum: ${state.statDateEffective}
+     Till datum: ${state.statDateEnd}
      Aktuell tjänsteplattform: $selectedTpName
      
     """.trimIndent()
