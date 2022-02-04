@@ -55,6 +55,8 @@ This is a preliminary process how to participate and make changes in this tpinfo
 ### Local testing
 Use the *other/run* gradle task to compile, build and start and instance of the application. If there are no errors it will start and listen to port 2000. Use the following URL to access it: http://localhost:2000/ 
 
+A test scenario, in Swedish, is available [here](./testing/TEST_SCENARIOS.md). 
+
 ### Remote access to devserver
 To access the dev-server from another computer (Windows) on the same lan.
 In webpack.config.d/webpack.js add:
