@@ -287,6 +287,23 @@ private fun Container.hippoItemsView(
                                         +"<b>${item.description}</b>"
                                         borderTop = Border(1.px, BorderStyle.SOLID, Color.name(Col.GRAY))
 
+                                        enablePopover(
+                                            PopoverOptions(
+                                                content = """
+                                                    <div>
+                                                        <a href="https://rivta.se/tkview/#/domain/${item.description}" target="_blank">
+                                                            <img alt="Extern dokumentation" src=/icons/external-link-30.png width=20" height="20">
+                                                            <span>Extern dokumentation</span>
+                                                        </a>
+                                                    </div>
+                                                """.trimIndent(),
+                                                triggers = listOf(Trigger.HOVER),
+                                                delay = 400,
+                                                hideDelay = 2000,
+                                                rich = true
+                                            )
+                                        )
+
                                         if (
                                             state.isItemSelected(
                                                 ItemType.DOMAIN,
