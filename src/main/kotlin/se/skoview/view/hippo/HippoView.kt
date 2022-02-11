@@ -292,7 +292,7 @@ private fun Container.hippoItemsView(
                                                 content = """
                                                     <div>
                                                         <a href="https://rivta.se/tkview/#/domain/${item.description}" target="_blank">
-                                                            <img alt="Extern dokumentation" src=/icons/external-link-30.png width=20" height="20">
+                                                            <img alt="Extern dokumentation" src=external-link-30.png width=20" height="20">
                                                             <span>Extern dokumentation</span>
                                                         </a>
                                                     </div>
