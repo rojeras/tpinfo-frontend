@@ -292,14 +292,14 @@ private fun Container.hippoItemsView(
                                                 content = """
                                                     <div>
                                                         <a href="https://rivta.se/tkview/#/domain/${item.description}" target="_blank">
-                                                            <img alt="Extern dokumentation" src=external-link-30.png width=20" height="20">
-                                                            <span>Extern dokumentation</span>
+                                                            <img alt="Domäninformation rivta.se" src=external-link-30.png width=20" height="20">
+                                                            <span>Domäninformation rivta.se</span>
                                                         </a>
                                                     </div>
                                                 """.trimIndent(),
                                                 triggers = listOf(Trigger.HOVER),
-                                                delay = 400,
-                                                hideDelay = 2000,
+                                                delay = 500,
+                                                hideDelay = 1000,
                                                 rich = true
                                             )
                                         )
@@ -311,6 +311,7 @@ private fun Container.hippoItemsView(
                                             ) // && integrationLists.serviceDomains.size == 1
                                         ) {
                                             insertResetButton(item, ItemType.DOMAIN)
+                                            disablePopover()
                                         } else itemSelect(item, ItemType.DOMAIN, textSearchInfo)
                                     } else {
                                         val itemText =
