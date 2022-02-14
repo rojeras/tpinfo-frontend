@@ -135,7 +135,7 @@ tempFile.printWriter().use { writer ->
 check(file.delete() && tempFile.renameTo(file)) { "failed to replace file" }
 // ------------------------------------------------------------------------------
 
-lExec("docker build --rm -t $localImageTag .", quiet = false)
+lExec("docker build --platform linux/amd64 --rm -t $localImageTag .", quiet = false)
 
 if (Largument.isSet("push")) {
         lExec("docker tag $localImageTag $noguiImageTag")
