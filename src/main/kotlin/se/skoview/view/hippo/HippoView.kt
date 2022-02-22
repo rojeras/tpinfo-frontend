@@ -284,25 +284,7 @@ private fun Container.hippoItemsView(
                                             insertResetButton(item, ItemType.CONTRACT)
                                         } else itemSelect(item, ItemType.CONTRACT, textSearchInfo)
                                     } else if (item::class.simpleName == "ServiceDomain") {
-                                        +"<b>${item.description}</b>"
                                         borderTop = Border(1.px, BorderStyle.SOLID, Color.name(Col.GRAY))
-
-                                        enablePopover(
-                                            PopoverOptions(
-                                                content = """
-                                                    <div>
-                                                        <a href="https://rivta.se/tkview/#/domain/${item.description}" target="_blank">
-                                                            <img alt="Extern dokumentation" src=external-link-30.png width=20" height="20">
-                                                            <span>Extern dokumentation</span>
-                                                        </a>
-                                                    </div>
-                                                """.trimIndent(),
-                                                triggers = listOf(Trigger.HOVER),
-                                                delay = 400,
-                                                hideDelay = 2000,
-                                                rich = true
-                                            )
-                                        )
 
                                         if (
                                             state.isItemSelected(
@@ -310,8 +292,16 @@ private fun Container.hippoItemsView(
                                                 item.id
                                             ) // && integrationLists.serviceDomains.size == 1
                                         ) {
+                                            +"""
+                                                <a href="https://rivta.se/tkview/#/domain/${item.description}" target="_blank"> 
+                                                    <b>${item.description}</b>
+                                                </a>
+                                            """.trimIndent()
                                             insertResetButton(item, ItemType.DOMAIN)
-                                        } else itemSelect(item, ItemType.DOMAIN, textSearchInfo)
+                                        } else {
+                                            +"<b>${item.description}</b>"
+                                            itemSelect(item, ItemType.DOMAIN, textSearchInfo)
+                                        }
                                     } else {
                                         val itemText =
                                             if (type == ItemType.PLATTFORM_CHAIN) item.name
